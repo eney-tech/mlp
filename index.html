@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- МЛП · index.html v5 · 12.10.2026 — тімлід і вище скасовують відокремлення й вибуття з історії (✖ з причиною); «↩ назад» лише один раз; адміністратору — час запису по частинах -->
+<!-- МЛП · index.html v6 · 12.10.2026 — звіт «Історія партії» (?h=, тімлід і вище): звідки прийшли й куди пішли деталі, хронологія з партіями-предками, підсумок за кроками, таблиця на пошту -->
 <html>
 <head>
 <meta charset="utf-8">
@@ -85,7 +85,7 @@
 <div class="toast" id="toast"></div>
 
 <script>
-const PAGE_VERSION = 'index.html v5 · 12.10.2026';
+const PAGE_VERSION = 'index.html v6 · 12.10.2026';
 const API = 'https://script.google.com/macros/s/AKfycbx-JUajnAtVsxaLHDgwRpfzE12g4LUtlf6JnWYAQScAVZ5FCpxzGHSrA5PDESqP80KD/exec';
 window.STATIC_SELF = location.origin + location.pathname;
 const PARAMS = Object.fromEntries(new URLSearchParams(location.search));
@@ -95,7 +95,7 @@ var google = { script: { get run() {
     .then(r => r.json()).then(j => j.ok ? ok(j.data) : fail({ message: j.error }))
     .catch(e => fail({ message: 'Немає зв\'язку з сервером. Перевірте інтернет і спробуйте ще раз.' }));
   const o = { withSuccessHandler(f) { ok = f; return o; }, withFailureHandler(f) { fail = f; return o; },
-    apiPage(q) { call('page', q); }, apiAct(q) { call('act', q); }, apiApprove(q) { call('approve', q); }, apiCabinet(q) { call('cabinet', q); }, apiDash(q) { call('dash', q); } };
+    apiPage(q) { call('page', q); }, apiAct(q) { call('act', q); }, apiApprove(q) { call('approve', q); }, apiCabinet(q) { call('cabinet', q); }, apiDash(q) { call('dash', q); }, apiHistory(q) { call('hist', q); } };
   return o;
 } } };
 let S = {};           // дані сторінки
@@ -116,6 +116,7 @@ function load(extra) {
   if (PARAMS.approve) return loadApprove();
   if (PARAMS.cab && CODE) return loadCabinet();   // без коду телефону — звичайний шлях: екран реєстрації
   if (PARAMS.d && CODE) return loadDash();
+  if (PARAMS.h && CODE) return loadHistory();
   loadPage(extra);
 }
 function loadPage(extra) {
@@ -356,6 +357,7 @@ function renderBatch(extra) {
   if (b.comp && p.addPurchased && b.status === 'в роботі') acts.push(['addPurchased', '+ Додати покупні', '']);
   if (p.separate && (b.stages || []).length && b.status !== 'анульовано') acts.push(['separate', '✂ Відокремити', '']);
   if (p.free && S.tare) acts.push(['free', 'Звільнити тару', '']);
+  if (p.history) acts.push(['history', '🕘 Повна історія', '']);
   if (p.annul && b.status !== 'анульовано' && b.status !== 'закрито') acts.push(['annul', '✖ Анулювати', 'btnr']);
   if (acts.length) h += '<div class="card"><div class="grid">' + acts.map(a => '<button class="btn btn2 ' + a[2] + '" onclick="openAct(\'' + a[0] + '\')">' + a[1] + '</button>').join('') + '</div></div>';
 
@@ -438,6 +440,7 @@ function submitStep() {
 // =============================================================== ACTIONS
 function openAct(a) {
   const no = S.batch.info['Номер'];
+  if (a === 'history') { location.href = link('h=' + encodeURIComponent(no)); return; }
   const head = t => '<div class="card"><div class="mid">' + t + '</div><div class="muted">' + esc(no) + ' · є ' + S.batch.remaining + ' шт</div>';
   const foot = '<div class="err" id="merr"></div><div class="grid" style="margin-top:6px"><button class="btn btn2" onclick="closeModal()">Скасувати</button><button class="btn" id="mgo">Підтвердити</button></div></div>';
   if (a === 'move') {
@@ -802,6 +805,88 @@ function dashMy() {
     nb.map(r => '<tr><td>' + esc(r.date) + '</td><td>' + esc(r.work) + (r.comment ? '<br><span class="muted">' + esc(r.comment) + '</span>' : '') + '</td><td class="r">' +
       (r.hours ? String(r.hours).replace('.', ',') + ' год' : fn(r.qty) + ' шт') + '</td></tr>').join('') + '</table></div>');
   return h;
+}
+
+// =============================================================== ІСТОРІЯ ПАРТІЇ (Р-7, тімлід і вище)
+let HB = null; let HF = 'all';
+function loadHistory() {
+  $('hdrTitle').textContent = 'історія';
+  if (!HB) $('app').innerHTML = '<div class="center muted">Збираю історію…</div>';
+  google.script.run.withSuccessHandler(d => { HB = d; renderHistory(); })
+    .withFailureHandler(e => {
+      if (/не зареєстровано/.test(e.message)) return loadPage();
+      $('app').innerHTML = '<div class="card err">' + esc(e.message) + '</div>' +
+        '<a class="btn btn2" style="display:block;text-align:center;text-decoration:none;margin:12px;width:auto" href="' + esc(link('')) + '">На головну</a>';
+    }).apiHistory({ code: CODE, b: PARAMS.h });
+}
+function histMail(btn) {
+  btn.disabled = true; btn.textContent = 'Надсилаю…';
+  google.script.run.withSuccessHandler(r => { btn.disabled = false; btn.textContent = '✉ Надіслати таблицю на пошту'; toast(r.msg); })
+    .withFailureHandler(e => { btn.disabled = false; btn.textContent = '✉ Надіслати таблицю на пошту'; toast(e.message, true); })
+    .apiHistory({ code: CODE, b: PARAMS.h, email: true });
+}
+function histTree(nodes, dir) {
+  if (!nodes.length) return '<p class="muted">' + (dir === 'in' ? 'Деталі з інших партій не надходили.' : 'Деталі в інші партії не йшли.') + '</p>';
+  const one = n => {
+    const l = n.link; const other = dir === 'in' ? l.from : l.to;
+    const head = (dir === 'in' ? '← ' : '→ ') + '<b>' + l.qty + ' шт</b> ' + (dir === 'in' ? 'з ' : '') +
+      (other ? bl(other) : '<b>' + esc(l.purpose || l.type) + '</b>') + ' · ' + esc(l.type) + (l.product ? ' · ' + esc(l.product) : (l.step ? ' · ' + esc(l.step) : ''));
+    return '<div style="margin-left:' + ((n.level - 1) * 14) + 'px;border-left:2px solid #E3EAEF;padding:6px 0 6px 10px">' +
+      '<div class="' + (l.cancelled ? 'x' : '') + '">' + head + '</div><div class="muted" style="font-size:13px">' + esc(l.time) + ' · ' + esc(l.who) +
+      (n.batch ? ' · ' + esc(n.batch.status) : '') + (l.comment ? ' · ' + esc(l.comment) : '') +
+      (l.cancelled ? '<br>скасовано ' + esc(l.cancelled.time) + ' · ' + esc(l.cancelled.who) + (l.cancelled.comment ? ' · ' + esc(l.cancelled.comment) : '') : '') +
+      (n.repeat ? ' · див. вище' : '') + (n.more ? ' · далі не показано' : '') + '</div></div>' + n.children.map(one).join('');
+  };
+  return nodes.map(one).join('');
+}
+function histWhat(x) {
+  const own = x.batch === HB.info.no;
+  if (x.type === 'крок') {
+    const g = x.corrected ? x.corrected.good : x.good, s = x.corrected ? x.corrected.scrap : x.scrap;
+    return '<b>' + esc(x.step) + '</b> ' + esc(x.stepName) + ' · ' + g + ' / ' + s + (x.reason ? ' · ' + esc(x.reason) : '');
+  }
+  if (x.type === 'нова партія') return 'нова партія · ' + x.qty + ' шт';
+  if (x.type === 'перекладання') return 'перекладання ' + esc(x.tare || '—') + ' → ' + esc(x.tareTo);
+  if (x.type === 'відокремлення') return (x.from === x.batch ? 'відокремлено ' + x.qty + ' → ' + bl(x.to) : 'додано ' + x.qty + ' з ' + bl(x.from)) + (x.x2 ? ' · ' + esc(x.x2) : '');
+  if (x.type === 'вибуття') return 'вибуло ' + x.qty + ' → <b>' + esc(x.x1) + '</b> · ' + esc(x.x2);
+  if (x.type === 'видача') return x.from === x.batch ? 'видано ' + x.qty + ' → ' + bl(x.to) : 'отримано ' + x.qty + ' з ' + bl(x.from);
+  if (x.type === 'залишок') return x.from === x.batch ? 'повернуто ' + x.qty + ' ' + esc(x.x1) + ' → ' + (x.to ? bl(x.to) : 'склад') : 'отримано залишок ' + x.qty + ' ' + esc(x.x1) + ' з ' + bl(x.from);
+  if (x.type === 'покупні') return '+ ' + x.qty + ' покупних ' + (x.x1 === 'ротор' ? 'роторів' : 'статорів');
+  return esc(x.type) + (x.qty ? ' · ' + x.qty : '') + (own ? '' : '');
+}
+function renderHistory() {
+  const d = HB, i = d.info;
+  $('who').innerHTML = whoHtml(d.me, d.perms);
+  $('hdrTitle').textContent = 'історія ' + i.no;
+  let h = '<div class="card"><div class="muted">Історія партії · ' + ({ ST: 'статори', RT: 'ротори', MT: 'двигуни' })[i.stream] + '</div>' +
+    '<div class="big">' + esc(i.no) + '</div><span class="pill">' + esc(i.typ) + '</span>' + (i.kv ? '<span class="pill">KV ' + esc(i.kv) + '</span>' : '') +
+    (i.variant ? '<span class="pill">' + esc(i.variant) + '</span>' : '') + statusPill(i.status) + (i.mixed ? '<span class="pill warn">змішана</span>' : '') +
+    '<div class="muted" style="margin-top:10px">Створено ' + esc(i.created) + ' · на старті ' + i.start + ' · є зараз <b>' + i.now + '</b> · брак ' + i.scrap +
+    (i.tare ? ' · тара ' + esc(i.tare) : '') + '</div>' +
+    '<a class="btn btn2" style="display:block;text-align:center;text-decoration:none" href="' + esc(link('b=' + encodeURIComponent(i.no))) + '">Сторінка партії</a>' +
+    '<button class="btn btn2" onclick="histMail(this)">✉ Надіслати таблицю на пошту</button>' +
+    '<p class="muted" style="margin:8px 0 0">Прийде на ' + esc(d.me.email) + ' — файл .xlsx для комп\'ютера.</p></div>';
+  h += dcard('Звідки прийшли деталі', 'до ' + d.depth + ' рівнів', histTree(d.from, 'in'));
+  h += dcard('Куди пішли деталі', 'до ' + d.depth + ' рівнів', histTree(d.to, 'out'));
+  const rows = d.rows.filter(x => HF === 'all' || (HF === 'own' ? x.own : x.type === 'крок'));
+  h += dcard('Хронологія (' + rows.length + ')', d.ancestors.length ? 'Разом із партіями-предками до моменту передачі: ' + d.ancestors.map(a => esc(a.no) + ' до ' + esc(a.until)).join(', ') +
+      '. Їхні числа — за всю їхню партію, а не лише за передану частину.' : '',
+    '<div class="chips" style="margin-bottom:8px">' + [['all', 'Усе'], ['own', 'Тільки ця партія'], ['steps', 'Тільки кроки']].map(x =>
+      '<button type="button" class="' + (HF === x[0] ? 'on' : '') + '" onclick="HF=\'' + x[0] + '\';renderHistory()">' + x[1] + '</button>').join('') + '</div>' +
+    '<div class="list" style="padding:0">' + rows.map(x =>
+      '<div class="li"><div class="' + (x.cancelled ? 'x' : '') + '">' + (x.own ? '' : '<span class="pill warn" style="margin:0 6px 0 0">' + esc(x.batch) + '</span>') + histWhat(x) +
+        (x.corrected ? ' <span class="pill warn" style="margin:0">було ' + x.good + ' / ' + x.scrap + '</span>' : '') +
+        '<br><span class="muted">' + esc(x.who) + (x.comment ? ' · ' + esc(x.comment) : '') +
+        (x.corrected ? '<br>виправив ' + esc(x.corrected.who) + ' ' + esc(x.corrected.time) + ' · ' + esc(x.corrected.comment) : '') +
+        (x.cancelled ? '<br>скасував ' + esc(x.cancelled.who) + ' ' + esc(x.cancelled.time) + (x.cancelled.comment ? ' · ' + esc(x.cancelled.comment) : '') : '') +
+        '</span></div><div class="r muted">' + esc(x.time.slice(0, 10)) + '<br>' + esc(x.time.slice(11)) + '</div></div>').join('') + '</div>');
+  h += dcard('Підсумок за кроками', 'Хто скільки зробив на кожному кроці (з урахуванням виправлень і скасувань)',
+    d.steps.length ? '<div class="tw"><table class="t"><tr><th>Партія</th><th>Крок</th><th>Хто</th><th class="r">Успішних</th><th class="r">Брак</th></tr>' +
+      d.steps.map(s => '<tr><td>' + (s.own ? esc(s.batch) : '<span class="pill warn" style="margin:0">' + esc(s.batch) + '</span>') + '</td><td><b>' + esc(s.step) + '</b> <span class="muted">' +
+        esc(s.stepName) + '</span></td><td>' + esc(s.who) + '</td><td class="r">' + fn(s.good) + '</td><td class="r">' + (s.scrap || '—') + '</td></tr>').join('') + '</table></div>'
+      : '<p class="muted">Кроків ще немає.</p>');
+  h += '<p class="muted" style="text-align:center">Дані на ' + esc(d.now) + (d.me.role === 'адміністратор' ? ' · ' + sec(d.ms) : '') + ' · <a class="lnk" href="javascript:loadHistory()">оновити</a></p><div style="height:30px"></div>';
+  $('app').innerHTML = h;
 }
 
 $('modal').addEventListener('click', e => { if (e.target.id === 'modal') closeModal(); });
