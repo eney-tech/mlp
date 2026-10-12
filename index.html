@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- МЛП · index.html v3 · 12.10.2026 — стан напівфабрикату в партії; наступний крок закрито, поки є незакриті штуки (ПВ-22); нова форма «Відокремити» (у тару або вибуття); «↩ назад» для перекладання; головна з кнопками; дашборди «Стан зараз» (Р-2а), «Тара» (Р-5), «Мій виробіток» (Р-3а); запис — одне звернення до сервера -->
+<!-- МЛП · index.html v4 · 12.10.2026 — «МЛП» у шапці веде на головну (кнопки «Мій виробіток», «Стан зараз», «Тара», «Кабінет», відкриття тари за кодом) -->
 <html>
 <head>
 <meta charset="utf-8">
@@ -79,13 +79,13 @@
 </style>
 </head>
 <body>
-<div class="hdr"><div><b>МЛП</b> <span id="hdrTitle" class="muted" style="color:#cfe0ea"></span></div><div class="who" id="who"></div></div>
+<div class="hdr"><div><a href="./" style="color:#fff;text-decoration:none"><b>МЛП</b></a> <span id="hdrTitle" class="muted" style="color:#cfe0ea"></span></div><div class="who" id="who"></div></div>
 <div id="app"><div class="center muted">Завантаження…</div></div>
 <div class="modal" id="modal"><div class="sheet" id="sheet"></div></div>
 <div class="toast" id="toast"></div>
 
 <script>
-const PAGE_VERSION = 'index.html v3 · 12.10.2026';
+const PAGE_VERSION = 'index.html v4 · 12.10.2026';
 const API = 'https://script.google.com/macros/s/AKfycbx-JUajnAtVsxaLHDgwRpfzE12g4LUtlf6JnWYAQScAVZ5FCpxzGHSrA5PDESqP80KD/exec';
 window.STATIC_SELF = location.origin + location.pathname;
 const PARAMS = Object.fromEntries(new URLSearchParams(location.search));
