@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- МЛП · index.html v4 · 12.10.2026 — «МЛП» у шапці веде на головну (кнопки «Мій виробіток», «Стан зараз», «Тара», «Кабінет», відкриття тари за кодом) -->
+<!-- МЛП · index.html v5 · 12.10.2026 — тімлід і вище скасовують відокремлення й вибуття з історії (✖ з причиною); «↩ назад» лише один раз; адміністратору — час запису по частинах -->
 <html>
 <head>
 <meta charset="utf-8">
@@ -85,7 +85,7 @@
 <div class="toast" id="toast"></div>
 
 <script>
-const PAGE_VERSION = 'index.html v4 · 12.10.2026';
+const PAGE_VERSION = 'index.html v5 · 12.10.2026';
 const API = 'https://script.google.com/macros/s/AKfycbx-JUajnAtVsxaLHDgwRpfzE12g4LUtlf6JnWYAQScAVZ5FCpxzGHSrA5PDESqP80KD/exec';
 window.STATIC_SELF = location.origin + location.pathname;
 const PARAMS = Object.fromEntries(new URLSearchParams(location.search));
@@ -126,6 +126,12 @@ function loadPage(extra) {
 
 /** Яку сторінку показати після дії: сервер повертає її в тій самій відповіді (v3 — без другого звернення) */
 function viewParams() { const v = {}; ['t', 'b'].forEach(k => { if (PARAMS[k]) v[k] = PARAMS[k]; }); return v; }
+/** Для адміністратора: сервер усього (старт · черга · читання · запис · сторінка) / разом із мережею */
+function timing(r, total) {
+  const p = r.parts || {}; const d = (a, b) => sec(Math.max(0, (p[a] || 0) - (b ? p[b] || 0 : 0)));
+  return 'сервер ' + sec(r.ms) + (p.page !== undefined ? ' (старт ' + d('who') + ' · черга ' + d('lock', 'who') + ' · читання ' + d('read', 'lock') +
+    ' · запис ' + d('write', 'read') + ' · сторінка ' + d('page', 'write') + ')' : '') + ' / разом ' + sec(total);
+}
 function sec(ms) { return (ms / 1000).toFixed(1).replace('.', ',') + ' с'; }
 function showPage(r, extra) { if (r && r.page) { S = r.page; render(extra || {}); } else load(extra); }
 function setUrl() { try { const q = new URLSearchParams(PARAMS).toString(); history.replaceState(null, '', location.pathname + (q ? '?' + q : '')); } catch (e) { } }
@@ -141,7 +147,7 @@ function act(payload, btn, after) {
     closeModal();
     let msg = r.msg || 'Готово';
     // адміністратору — час запису: сервер / разом із мережею (перевірка швидкості під час тестів)
-    if (S.me && S.me.role === 'адміністратор' && r.ms !== undefined) msg += ' · ' + sec(r.ms) + ' / ' + sec(Date.now() - t0);
+    if (S.me && S.me.role === 'адміністратор' && r.ms !== undefined) msg += ' · ' + timing(r, Date.now() - t0);
     toast(msg);
     if (after) after(r); else showPage(r, {});
   }).withFailureHandler(e => {
@@ -363,7 +369,7 @@ function renderBatch(extra) {
     let what = esc(x.type);
     if (x.type === 'крок') what = '<b>' + esc(x.step) + '</b> · ' + x.good + ' / ' + x.scrap + (x.reason ? ' · ' + esc(x.reason) : '');
     if (x.type === 'нова партія') what = 'нова партія · ' + x.qty + ' шт';
-    if (x.type === 'перекладання') what = 'перекладання ' + esc(x.from || '—') + ' → ' + esc(x.to);
+    if (x.type === 'перекладання') what = 'перекладання ' + esc(x.from || '—') + ' → ' + esc(x.to) + (x.back ? ' (назад)' : '');
     if (x.type === 'видача') what = x.batch === i['Номер'] ? 'видано ' + x.qty + ' → ' + bl(x.target) : 'отримано ' + x.qty + ' з ' + bl(x.batch);
     if (x.type === 'покупні') what = '+ ' + x.qty + ' покупних ' + (x.comp === 'ротор' ? 'роторів' : 'статорів');
     if (x.type === 'залишок') what = x.batch === i['Номер'] ? 'повернуто ' + x.qty + ' ' + esc(x.comp) + ' → ' + (x.target ? bl(x.target) : 'склад') : 'отримано ' + x.qty + ' ' + esc(x.comp) + ' з ' + bl(x.batch);
@@ -372,6 +378,7 @@ function renderBatch(extra) {
     if (x.type === 'вибуття') what = 'вибуло ' + x.qty + ' шт → <b>' + esc(x.purpose) + '</b> · ' + esc(x.product);
     const btns = (x.canCancel ? '<button class="ic" onclick="cancelRec(\'' + x.id + '\')">✖</button>' : '') +
       (x.canBack && p.move ? '<button class="ic" onclick="moveBack(\'' + x.id + '\')">↩ назад</button>' : '') +
+      (x.canUndo ? '<button class="ic" onclick="undoSep(\'' + x.id + '\')">✖</button>' : '') +
       (x.canCorrect ? '<button class="ic" onclick="openCorrect(\'' + x.id + '\')">✎</button>' : '');
     return '<div class="li"><div class="' + (x.cancelled ? 'x' : '') + '">' + what + (x.corrected ? ' <span class="pill warn">виправлено</span>' : '') +
       '<br><span class="muted">' + esc(x.who) + (x.comment ? ' · ' + esc(x.comment) : '') + '</span></div><div class="r muted">' + esc(x.time) + btns + '</div></div>';
@@ -510,15 +517,25 @@ function openAct(a) {
 }
 function cancelRec(id) { confirmBox('Скасувати свій запис ' + id + '?', () => act({ action: 'cancelOwn', ref: id }, null, r => showPage(r, { openHist: 1 }))); }
 /** Перекладання (і «↩ назад» з історії): сторінка переходить на нову тару */
-function moveTo(no, tg, comment, btn) {
-  act({ action: 'move', batch: no, target: tg, comment: comment || '', view: { t: tg } }, btn, r => {
+function moveTo(no, tg, comment, btn, back) {
+  act({ action: 'move', batch: no, target: tg, comment: comment || '', back: back || '', view: { t: tg } }, btn, r => {
     PARAMS.t = tg; delete PARAMS.b; setUrl(); showPage(r, { suggestStep: r.suggestStep });
     if (r.suggestStep) toast(r.msg + '. Не забудьте записати ' + r.suggestStep);
   });
 }
 function moveBack(id) {
   const x = S.batch.history.find(h => h.id === id);
-  confirmBox('Перекласти ' + S.batch.info['Номер'] + ' назад: ' + x.to + ' → ' + x.from + '?', () => moveTo(S.batch.info['Номер'], x.from, 'назад: помилкове перекладання ' + id));
+  confirmBox('Перекласти ' + S.batch.info['Номер'] + ' назад: ' + x.to + ' → ' + x.from + '?', () => moveTo(S.batch.info['Номер'], x.from, 'назад: помилкове перекладання ' + id, null, id));
+}
+/** Скасувати відокремлення або вибуття (тімлід і вище): деталі повертаються в партію-джерело */
+function undoSep(id) {
+  const x = S.batch.history.find(h => h.id === id);
+  const what = x.type === 'вибуття' ? 'вибуття ' + x.qty + ' шт → ' + x.purpose : 'відокремлення ' + x.qty + ' шт ' + x.batch + ' → ' + x.target;
+  openModal('<div class="card"><div class="mid">Скасувати ' + esc(what) + '?</div>' +
+    '<p class="muted">Деталі повернуться в ' + esc(x.batch) + '. Якщо в іншій партії їх уже використали далі, скасувати не вийде — спершу виправте ті кроки.</p>' +
+    '<label>Причина (обов\'язково)</label><input type="text" id="mcm" placeholder="напр. помилково в телефоні, фізично не перекладали">' +
+    '<div class="err" id="merr"></div><div class="grid" style="margin-top:6px"><button class="btn btn2" onclick="closeModal()">Ні</button><button class="btn btnr" id="mgo">Скасувати запис</button></div></div>');
+  $('mgo').onclick = () => act({ action: 'cancelSep', ref: id, comment: $('mcm').value }, $('mgo'), r => showPage(r, { openHist: 1 }));
 }
 function openCorrect(id) {
   const x = S.batch.history.find(h => h.id === id);
