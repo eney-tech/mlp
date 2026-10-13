@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- МЛП · index.html v9 · 13.10.2026 — екран «Видача зі складу» (?s=КОД локації): фото етикетки з розпізнаванням, калькулятор кількості, «Мої видачі». v8: змішане походження -->
+<!-- МЛП · index.html v10 · 13.10.2026 — кнопка «Видача зі складу» лише тімлідам і вище (perms.sklad). v9: екран «Видача зі складу» (?s=КОД локації): фото етикетки з розпізнаванням, калькулятор кількості, «Мої видачі». v8: змішане походження -->
 <html>
 <head>
 <meta charset="utf-8">
@@ -85,7 +85,7 @@
 <div class="toast" id="toast"></div>
 
 <script>
-const PAGE_VERSION = 'index.html v9 · 13.10.2026';
+const PAGE_VERSION = 'index.html v10 · 13.10.2026';
 const API = 'https://script.google.com/macros/s/AKfycbx-JUajnAtVsxaLHDgwRpfzE12g4LUtlf6JnWYAQScAVZ5FCpxzGHSrA5PDESqP80KD/exec';
 window.STATIC_SELF = location.origin + location.pathname;
 const PARAMS = Object.fromEntries(new URLSearchParams(location.search));
@@ -232,7 +232,7 @@ function renderHome() {
     '<div class="card"><div class="mid">Відкрити тару за кодом</div><div class="muted">якщо QR не читається</div><div style="height:10px"></div>' +
     tarePicker('ht', ['КР', 'ПД', 'ТЧ', 'СК']) + '<button class="btn btn2" id="hgo">Відкрити</button></div>' +
     '<div class="card">' + (p.dashMy ? b('d=my', 'Мій виробіток') : '') + (p.dashStan ? b('d=stan', 'Стан зараз') : '') +
-    (p.dashTare ? b('d=tare', 'Тара') : '') + (p.cabinet ? b('cab=1', 'Кабінет') : '') + b('sklad=1', 'Видача зі складу') + '</div>' +
+    (p.dashTare ? b('d=tare', 'Тара') : '') + (p.cabinet ? b('cab=1', 'Кабінет') : '') + (p.sklad ? b('sklad=1', 'Видача зі складу') : '') + '</div>' +
     '<p class="muted" style="text-align:center">' + esc(PAGE_VERSION) + '</p>';
   $('hgo').onclick = () => { const v = tareVal('ht'); if (v) location.href = link('t=' + encodeURIComponent(v)); };
 }
