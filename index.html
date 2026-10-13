@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- МЛП · index.html v8 · 13.10.2026 — позначка «змішане походження» біля версії двигуна (в11…в22) на картці партії та в «Історії партії» -->
+<!-- МЛП · index.html v9 · 13.10.2026 — екран «Видача зі складу» (?s=КОД локації): фото етикетки з розпізнаванням, калькулятор кількості, «Мої видачі». v8: змішане походження -->
 <html>
 <head>
 <meta charset="utf-8">
@@ -85,7 +85,7 @@
 <div class="toast" id="toast"></div>
 
 <script>
-const PAGE_VERSION = 'index.html v8 · 13.10.2026';
+const PAGE_VERSION = 'index.html v9 · 13.10.2026';
 const API = 'https://script.google.com/macros/s/AKfycbx-JUajnAtVsxaLHDgwRpfzE12g4LUtlf6JnWYAQScAVZ5FCpxzGHSrA5PDESqP80KD/exec';
 window.STATIC_SELF = location.origin + location.pathname;
 const PARAMS = Object.fromEntries(new URLSearchParams(location.search));
@@ -95,9 +95,16 @@ var google = { script: { get run() {
     .then(r => r.json()).then(j => j.ok ? ok(j.data) : fail({ message: j.error }))
     .catch(e => fail({ message: 'Немає зв\'язку з сервером. Перевірте інтернет і спробуйте ще раз.' }));
   const o = { withSuccessHandler(f) { ok = f; return o; }, withFailureHandler(f) { fail = f; return o; },
-    apiPage(q) { call('page', q); }, apiAct(q) { call('act', q); }, apiApprove(q) { call('approve', q); }, apiCabinet(q) { call('cabinet', q); }, apiDash(q) { call('dash', q); }, apiHistory(q) { call('hist', q); } };
+    apiPage(q) { call('page', q); }, apiAct(q) { call('act', q); }, apiApprove(q) { call('approve', q); }, apiCabinet(q) { call('cabinet', q); }, apiDash(q) { call('dash', q); }, apiHistory(q) { call('hist', q); },
+    apiSkladPage(q) { call('skladPage', q); }, apiSkladCancel(q) { call('skladCancel', q); } };
   return o;
 } } };
+/** v9: POST — для великих запитів (фото). text/plain, щоб не було попереднього запиту CORS. */
+function post(api, q) {
+  return fetch(API, { method: 'POST', headers: { 'Content-Type': 'text/plain;charset=utf-8' }, body: JSON.stringify({ api: api, q: q }), credentials: 'omit', redirect: 'follow' })
+    .then(r => r.json(), () => { throw new Error('Немає зв\'язку з сервером. Перевірте інтернет і спробуйте ще раз.'); })
+    .then(j => { if (!j.ok) throw new Error(j.error); return j.data; });
+}
 let S = {};           // дані сторінки
 let CODE = store('mlp_code');
 
@@ -117,6 +124,7 @@ function load(extra) {
   if (PARAMS.cab && CODE) return loadCabinet();   // без коду телефону — звичайний шлях: екран реєстрації
   if (PARAMS.d && CODE) return loadDash();
   if (PARAMS.h && CODE) return loadHistory();
+  if ((PARAMS.s || PARAMS.sklad) && CODE) return loadSklad();
   loadPage(extra);
 }
 function loadPage(extra) {
@@ -224,7 +232,7 @@ function renderHome() {
     '<div class="card"><div class="mid">Відкрити тару за кодом</div><div class="muted">якщо QR не читається</div><div style="height:10px"></div>' +
     tarePicker('ht', ['КР', 'ПД', 'ТЧ', 'СК']) + '<button class="btn btn2" id="hgo">Відкрити</button></div>' +
     '<div class="card">' + (p.dashMy ? b('d=my', 'Мій виробіток') : '') + (p.dashStan ? b('d=stan', 'Стан зараз') : '') +
-    (p.dashTare ? b('d=tare', 'Тара') : '') + (p.cabinet ? b('cab=1', 'Кабінет') : '') + '</div>' +
+    (p.dashTare ? b('d=tare', 'Тара') : '') + (p.cabinet ? b('cab=1', 'Кабінет') : '') + b('sklad=1', 'Видача зі складу') + '</div>' +
     '<p class="muted" style="text-align:center">' + esc(PAGE_VERSION) + '</p>';
   $('hgo').onclick = () => { const v = tareVal('ht'); if (v) location.href = link('t=' + encodeURIComponent(v)); };
 }
@@ -896,6 +904,171 @@ function renderHistory() {
       : '<p class="muted">Кроків ще немає.</p>');
   h += '<p class="muted" style="text-align:center">Дані на ' + esc(d.now) + (d.me.role === 'адміністратор' ? ' · ' + sec(d.ms) : '') + ' · <a class="lnk" href="javascript:loadHistory()">оновити</a></p><div style="height:30px"></div>';
   $('app').innerHTML = h;
+}
+
+// =============================================================== СКЛАД (v9)
+// QR на дверях складу: …?s=П1. Видача / повернення, фото етикетки (розпізнає сервер), «Мої видачі».
+let SKD = null;                 // дані від сервера
+let SKF = { photo: '', raw: '', busy: null };   // фото поточного запису; busy — запит фото, що ще йде
+function loadSklad() {
+  $('hdrTitle').textContent = 'склад';
+  $('app').innerHTML = '<div class="center muted">Завантаження…</div>';
+  google.script.run.withSuccessHandler(d => { SKD = d; renderSklad(); })
+    .withFailureHandler(e => {
+      if (/не зареєстровано/.test(e.message)) return loadPage();
+      $('app').innerHTML = '<div class="card err">' + esc(e.message) + '</div>';
+    }).apiSkladPage({ code: CODE, s: PARAMS.s || '' });
+}
+/** «1+2+5» → 8; «2,5» → 2.5; інакше NaN (сервер перевіряє так само) */
+function skCalc(v) {
+  const s = String(v || '').replace(/\s+/g, '').replace(/,/g, '.');
+  if (!/^\d+(\.\d+)?([+\-]\d+(\.\d+)?)*$/.test(s)) return NaN;
+  let sum = 0; s.match(/[+\-]?\d+(\.\d+)?/g).forEach(t => sum += Number(t));
+  return Math.round(sum * 1000) / 1000;
+}
+function skNum(n) { return String(n).replace('.', ','); }
+function renderSklad() {
+  const d = SKD; const me = d.me;
+  $('who').innerHTML = esc(me.name) + '<br>' + esc(me.role);
+  $('hdrTitle').textContent = d.loc ? 'склад · ' + d.loc.code : 'склад';
+  const locHtml = d.loc
+    ? '<div class="muted">Локація: <b>' + esc(d.loc.code) + (d.loc.name && d.loc.name !== d.loc.code ? ' · ' + esc(d.loc.name) : '') + '</b></div>'
+    : '<label>Локація складу</label><select id="skLoc">' + opts(d.locs.map(l => l.code + (l.name !== l.code ? ' · ' + l.name : '')), '', '— оберіть —') + '</select>';
+  const posList = d.positions.map(p => p.name).concat([d.other]);
+  let h = '<div class="card"><div class="mid">Видача зі складу</div>' + locHtml +
+    '<label>Дія</label><div class="seg"><label><input type="radio" name="skAct" value="взяв" checked><span>Взяв</span></label>' +
+    '<label><input type="radio" name="skAct" value="повернув"><span>Повернув</span></label></div>' +
+    (d.photo ? '<label>Фото етикетки <span class="muted">(необов\'язково — заповнить поля саме)</span></label>' +
+      '<input type="file" accept="image/*" capture="environment" id="skFile" style="display:none">' +
+      '<button type="button" class="btn btn2" id="skCam" style="margin-top:0">📷 Сфотографувати етикетку</button>' +
+      '<div id="skPh" class="muted" style="margin-top:8px"></div>' : '') +
+    '<label>Що взяли</label><select id="skPos">' + opts(posList, '', '— оберіть —') + '</select>' +
+    '<div id="skOtherBox" style="display:none"><label>Що саме</label><input type="text" id="skOther" placeholder="назва"></div>' +
+    '<label>Типорозмір <span class="muted">(якщо є)</span></label><select id="skTyp">' + opts(d.typ, '', '—') + '</select>' +
+    '<label>Деталі <span class="muted">(марка, розмір, артикул)</span></label><input type="text" id="skDet" placeholder="напр. 0,425 мм">' +
+    '<label>Кількість</label><div class="row" style="align-items:center"><input type="text" inputmode="decimal" id="skQty" placeholder="напр. 1000 або 1+2+5" style="font-size:22px;font-weight:600">' +
+    '<button type="button" class="ic" id="skPlus" style="flex:0 0 58px;font-size:26px;padding:10px 0;margin:0">+</button></div>' +
+    '<div id="skSum" class="muted" style="margin-top:6px;min-height:20px"></div>' +
+    '<label>Одиниця</label><select id="skUnit">' + opts(d.units, 'шт') + '</select>' +
+    '<label>Партія постачальника <span class="muted">(з коробки, якщо є)</span></label><input type="text" id="skLot">' +
+    '<label>Партія МЛП <span class="muted">(необов\'язково)</span></label><input type="text" id="skMlp" placeholder="напр. ST-00012" autocapitalize="characters">' +
+    '<label>Коментар</label><textarea id="skCm"></textarea>' +
+    '<button class="btn" id="skGo">Записати</button><div class="err" id="err"></div></div>';
+  h += '<div id="skMy"></div><p class="muted" style="text-align:center">' + esc(PAGE_VERSION) + ' · ' + esc(d.version) + '</p><div style="height:20px"></div>';
+  $('app').innerHTML = h;
+  renderSkMy();
+  $('skPos').onchange = () => {
+    const v = $('skPos').value;
+    $('skOtherBox').style.display = v === d.other ? 'block' : 'none';
+    const p = d.positions.find(x => x.name === v); if (p && !SKF.unitTouched) $('skUnit').value = p.unit;
+  };
+  $('skUnit').onchange = () => SKF.unitTouched = true;
+  $('skQty').oninput = skShowSum;
+  $('skPlus').onclick = () => { const q = $('skQty'); if (q.value && !/[+\-]$/.test(q.value)) q.value += '+'; q.focus(); skShowSum(); };
+  if (d.photo) {
+    $('skCam').onclick = () => $('skFile').click();
+    $('skFile').onchange = e => { const f = e.target.files && e.target.files[0]; if (f) skPhoto(f); e.target.value = ''; };
+  }
+  $('skGo').onclick = skSave;
+}
+function skShowSum() {
+  const v = $('skQty').value; const n = skCalc(v); const box = $('skSum');
+  const hint = SKF.hint ? '<span>на етикетці: ' + esc(SKF.hint) + '</span>' : '';
+  if (!v) { box.innerHTML = hint; return; }
+  if (isNaN(n)) { box.innerHTML = '<span style="color:#9B231A">лише числа і «+»</span>'; return; }
+  box.innerHTML = /[+\-]/.test(v.replace(/^[+\-]/, '')) ? '<b style="color:#1D2B33;font-size:18px">= ' + skNum(n) + '</b>' + (hint ? ' · ' + hint : '') : hint;
+}
+/** Стиснути фото до 1600 px (JPEG) — швидше відправка, сервер і модель читають етикетку так само */
+function skShrink(file) {
+  return new Promise((ok, fail) => {
+    const img = new Image(); const url = URL.createObjectURL(file);
+    img.onload = () => {
+      const k = Math.min(1, 1600 / Math.max(img.width, img.height));
+      const c = document.createElement('canvas'); c.width = Math.round(img.width * k); c.height = Math.round(img.height * k);
+      c.getContext('2d').drawImage(img, 0, 0, c.width, c.height); URL.revokeObjectURL(url);
+      ok(c.toDataURL('image/jpeg', 0.82));
+    };
+    img.onerror = () => { URL.revokeObjectURL(url); fail(new Error('Не вдалося відкрити фото')); };
+    img.src = url;
+  });
+}
+function skPhoto(file) {
+  const ph = $('skPh');
+  SKF.photo = ''; SKF.raw = ''; SKF.hint = '';
+  ph.innerHTML = 'Надсилаю фото…';
+  $('skCam').textContent = '📷 Перезняти етикетку';
+  SKF.busy = skShrink(file).then(data => {
+    ph.innerHTML = '<img src="' + data + '" style="height:64px;border-radius:8px;vertical-align:middle;margin-right:8px">Розпізнаю етикетку…';
+    const loc = SKD.loc ? SKD.loc.code : ($('skLoc') ? $('skLoc').value.split(' ')[0] : '');
+    return post('skladPhoto', { code: CODE, loc: loc, img: data.split(',')[1] }).then(r => {
+      SKF.photo = r.photo; SKF.raw = r.raw || '';
+      const img = '<img src="' + data + '" style="height:64px;border-radius:8px;vertical-align:middle;margin-right:8px">';
+      if (r.fields) { skFill(r.fields); ph.innerHTML = img + '✓ Розпізнано — перевірте поля й впишіть, скільки взяли'; }
+      else ph.innerHTML = img + 'Фото збережено, але розпізнати не вдалось — заповніть поля вручну' +
+        (SKD.me.role === 'адміністратор' ? '<br><span style="color:#9B231A">' + esc(r.recError || '') + '</span>' : '');
+    });
+  }).catch(e => { ph.innerHTML = '<span style="color:#9B231A">' + esc(e.message) + '</span> — можна записати без фото'; })
+    .then(() => { SKF.busy = null; });
+}
+/** Заповнити з етикетки лише порожні поля — що людина вже вписала, не чіпаємо */
+function skFill(f) {
+  const set = (id, v) => { const el = $(id); if (el && v && !el.value) el.value = v; };
+  if (f.position && !$('skPos').value) { $('skPos').value = f.position; $('skPos').onchange(); }
+  set('skTyp', f.typ);
+  set('skDet', [f.details, f.article ? 'арт. ' + f.article : '', f.supplier].filter(x => x).join(' · ').slice(0, 120));
+  set('skLot', f.lot);
+  const u = { 'pcs': 'шт', 'pc': 'шт', 'шт': 'шт', 'шт.': 'шт', 'm': 'м', 'м': 'м', 'kg': 'кг', 'кг': 'кг', 'g': 'г', 'г': 'г' }[String(f.unit || '').toLowerCase()];
+  if (u && !SKF.unitTouched && SKD.units.indexOf(u) >= 0) $('skUnit').value = u;
+  if (f.qty_in_box) { SKF.hint = f.qty_in_box + (f.unit ? ' ' + f.unit : ''); skShowSum(); }
+}
+function skSave() {
+  const btn = $('skGo'); if (btn.disabled) return;
+  $('err').textContent = '';
+  const n = skCalc($('skQty').value);
+  if (!$('skQty').value || isNaN(n) || !(n > 0)) { $('err').textContent = 'Вкажіть кількість (число або 1+2+5)'; return; }
+  btn.disabled = true; btn._t = btn.textContent; btn.textContent = SKF.busy ? 'Чекаю фото…' : 'Зберігаю…';
+  const go = () => {
+    btn.textContent = 'Зберігаю…';
+    const act = (document.querySelector('input[name=skAct]:checked') || {}).value;
+    const loc = SKD.loc ? SKD.loc.code : ($('skLoc').value || '').split(' ')[0];
+    return post('skladSave', { code: CODE, loc: loc, act: act, pos: $('skPos').value, posOther: $('skOther').value, typ: $('skTyp').value,
+      det: $('skDet').value, qty: $('skQty').value, unit: $('skUnit').value, lot: $('skLot').value, mlp: $('skMlp').value,
+      comment: $('skCm').value, photo: SKF.photo, raw: SKF.raw }).then(r => {
+      btn.disabled = false; btn.textContent = btn._t;
+      toast(r.msg || 'Записано');
+      SKD.my = r.my || SKD.my;
+      SKF = { photo: '', raw: '', busy: null };
+      ['skPos', 'skOther', 'skTyp', 'skDet', 'skQty', 'skLot', 'skMlp', 'skCm'].forEach(id => { if ($(id)) $(id).value = ''; });
+      $('skOtherBox').style.display = 'none'; $('skSum').innerHTML = '';
+      if ($('skPh')) { $('skPh').innerHTML = ''; $('skCam').textContent = '📷 Сфотографувати етикетку'; }
+      $('skUnit').value = 'шт';
+      renderSkMy(); window.scrollTo(0, 0);
+    });
+  };
+  (SKF.busy || Promise.resolve()).then(go).catch(e => {
+    btn.disabled = false; btn.textContent = btn._t;
+    const m = String(e.message || e).replace(/^Error:\s*/, ''); $('err').textContent = m; toast(m, true);
+  });
+}
+function renderSkMy() {
+  const my = SKD.my || [];
+  const box = $('skMy'); if (!box) return;
+  box.innerHTML = '<details' + (my.length ? ' open' : '') + '><summary>Мої видачі за 30 днів (' + my.filter(x => !x.cancelled).length + ')</summary><div class="list">' +
+    (my.length ? my.map(x => '<div class="li"><div class="' + (x.cancelled ? 'x' : '') + '">' +
+      (x.act === 'повернув' ? '<span class="pill warn" style="margin:0 6px 0 0">повернув</span>' : '') +
+      '<b>' + esc(x.pos) + (x.typ ? ' ' + esc(x.typ) : '') + '</b> — ' + esc(skNum(x.qty)) + ' ' + esc(x.unit) +
+      '<br><span class="muted">' + esc(x.loc) + (x.det ? ' · ' + esc(x.det) : '') + (x.lot ? ' · партія ' + esc(x.lot) : '') + (x.mlp ? ' · ' + esc(x.mlp) : '') +
+      (x.photo ? ' · 📷' : '') + (x.cancelled ? ' · скасовано' : '') + '</span></div>' +
+      '<div class="r muted">' + esc(x.time.slice(0, 5)) + '<br>' + esc(x.time.slice(6)) +
+      (x.canCancel ? '<br><button class="ic" onclick="skCancel(\'' + esc(x.id) + '\')">✖</button>' : '') + '</div></div>').join('')
+      : '<p class="muted">Записів ще немає.</p>') + '</div></details>';
+}
+function skCancel(id) {
+  confirmBox('Скасувати запис ' + id + '?', () => {
+    busy(true);
+    google.script.run.withSuccessHandler(r => { busy(false); toast(r.msg); SKD.my = r.my; renderSkMy(); })
+      .withFailureHandler(e => { busy(false); toast(e.message, true); }).apiSkladCancel({ code: CODE, id: id });
+  });
 }
 
 $('modal').addEventListener('click', e => { if (e.target.id === 'modal') closeModal(); });
