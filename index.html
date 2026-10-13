@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- МЛП · index.html v10 · 13.10.2026 — кнопка «Видача зі складу» лише тімлідам і вище (perms.sklad). v9: екран «Видача зі складу» (?s=КОД локації): фото етикетки з розпізнаванням, калькулятор кількості, «Мої видачі». v8: змішане походження -->
+<!-- МЛП · index.html v11 · 13.10.2026 — склад: перемикач «Склад» у кабінеті, головна для зав. складу (без виробництва), «Усі видачі» для зав. складу й керівників. v10: кнопка «Видача зі складу» лише тімлідам і вище (perms.sklad). v9: екран «Видача зі складу» (?s=КОД локації): фото етикетки з розпізнаванням, калькулятор кількості, «Мої видачі». v8: змішане походження -->
 <html>
 <head>
 <meta charset="utf-8">
@@ -85,7 +85,7 @@
 <div class="toast" id="toast"></div>
 
 <script>
-const PAGE_VERSION = 'index.html v10 · 13.10.2026';
+const PAGE_VERSION = 'index.html v11 · 13.10.2026';
 const API = 'https://script.google.com/macros/s/AKfycbx-JUajnAtVsxaLHDgwRpfzE12g4LUtlf6JnWYAQScAVZ5FCpxzGHSrA5PDESqP80KD/exec';
 window.STATIC_SELF = location.origin + location.pathname;
 const PARAMS = Object.fromEntries(new URLSearchParams(location.search));
@@ -228,13 +228,15 @@ function renderHome() {
   $('hdrTitle').textContent = '';
   const p = S.perms || {};
   const b = (q, t) => '<a class="btn btn2" style="display:block;text-align:center;text-decoration:none" href="' + esc(link(q)) + '">' + t + '</a>';
-  $('app').innerHTML = '<div class="card center" style="padding:24px 16px">Відскануйте QR на тарі або на плакаті дільниці.</div>' +
+  const prod = !!p.step;   // v11: зав. складу — без виробництва
+  $('app').innerHTML = (prod ? '<div class="card center" style="padding:24px 16px">Відскануйте QR на тарі або на плакаті дільниці.</div>' +
     '<div class="card"><div class="mid">Відкрити тару за кодом</div><div class="muted">якщо QR не читається</div><div style="height:10px"></div>' +
-    tarePicker('ht', ['КР', 'ПД', 'ТЧ', 'СК']) + '<button class="btn btn2" id="hgo">Відкрити</button></div>' +
+    tarePicker('ht', ['КР', 'ПД', 'ТЧ', 'СК']) + '<button class="btn btn2" id="hgo">Відкрити</button></div>'
+      : '<div class="card center" style="padding:24px 16px">Відскануйте QR на дверях складу.</div>') +
     '<div class="card">' + (p.dashMy ? b('d=my', 'Мій виробіток') : '') + (p.dashStan ? b('d=stan', 'Стан зараз') : '') +
     (p.dashTare ? b('d=tare', 'Тара') : '') + (p.cabinet ? b('cab=1', 'Кабінет') : '') + (p.sklad ? b('sklad=1', 'Видача зі складу') : '') + '</div>' +
     '<p class="muted" style="text-align:center">' + esc(PAGE_VERSION) + '</p>';
-  $('hgo').onclick = () => { const v = tareVal('ht'); if (v) location.href = link('t=' + encodeURIComponent(v)); };
+  if (prod) $('hgo').onclick = () => { const v = tareVal('ht'); if (v) location.href = link('t=' + encodeURIComponent(v)); };
 }
 
 function renderReg() {
@@ -621,10 +623,11 @@ function renderCabinet() {
   h += '<details><summary>' + (d.big ? 'Усі працівники' : 'Мої люди') + ' (' + act.length + ')</summary><div class="list">' + act.map(p => {
     const on = p.active === 'так';
     let ctl = '<button class="ic" onclick="wset(\'' + esc(p.email) + '\',\'' + (on ? 'off' : 'on') + '\')">' + (on ? 'Вимкнути' : 'Увімкнути') + '</button>';
+    if (!p.skladByRole) ctl += '<br><button class="ic" style="margin-top:6px;' + (p.sklad ? 'background:#DFF3E7' : '') + '" onclick="wset(\'' + esc(p.email) + '\',\'sklad\',\'' + (p.sklad ? 'ні' : 'так') + '\')">Склад: ' + (p.sklad ? 'так' : 'ні') + '</button>';
     if (d.big) ctl += '<br><select style="font-size:14px;padding:6px;margin-top:6px;width:auto" onchange="wset(\'' + esc(p.email) + '\',\'role\',this.value)">' + opts(d.roles, p.role) + '</select>' +
       '<select style="font-size:14px;padding:6px;margin-top:6px;width:auto" onchange="wset(\'' + esc(p.email) + '\',\'site\',this.value)"><option value="">— місце —</option>' +
         d.sites.map(x => '<option value="' + esc(x.code) + '"' + (x.code === p.site ? ' selected' : '') + '>' + esc(x.name) + '</option>').join('') + '</select>';
-    return '<div class="li"><div class="' + (on ? '' : 'x') + '"><b>' + esc(p.name || p.email) + '</b><br><span class="muted">' + esc(p.role) + ' · ' + esc(p.siteName || '—') +
+    return '<div class="li"><div class="' + (on ? '' : 'x') + '"><b>' + esc(p.name || p.email) + '</b>' + (p.sklad || p.skladByRole ? ' <span class="pill" style="margin:0">склад</span>' : '') + '<br><span class="muted">' + esc(p.role) + ' · ' + esc(p.siteName || '—') +
       (p.last ? ' · останній запис ' + esc(p.last) : '') + '</span></div><div class="r">' + ctl + '</div></div>';
   }).join('') + '</div></details>';
   if (d.flagged.length) h += '<details><summary>Записи з невідомих акаунтів (' + d.flagged.length + ')</summary><div class="list">' + d.flagged.map(f =>
@@ -1053,11 +1056,11 @@ function skSave() {
 function renderSkMy() {
   const my = SKD.my || [];
   const box = $('skMy'); if (!box) return;
-  box.innerHTML = '<details' + (my.length ? ' open' : '') + '><summary>Мої видачі за 30 днів (' + my.filter(x => !x.cancelled).length + ')</summary><div class="list">' +
+  box.innerHTML = '<details' + (my.length ? ' open' : '') + '><summary>' + (SKD.allView ? 'Усі видачі' : 'Мої видачі') + ' за 30 днів (' + my.filter(x => !x.cancelled).length + ')</summary><div class="list">' +
     (my.length ? my.map(x => '<div class="li"><div class="' + (x.cancelled ? 'x' : '') + '">' +
       (x.act === 'повернув' ? '<span class="pill warn" style="margin:0 6px 0 0">повернув</span>' : '') +
       '<b>' + esc(x.pos) + (x.typ ? ' ' + esc(x.typ) : '') + '</b> — ' + esc(skNum(x.qty)) + ' ' + esc(x.unit) +
-      '<br><span class="muted">' + esc(x.loc) + (x.det ? ' · ' + esc(x.det) : '') + (x.lot ? ' · партія ' + esc(x.lot) : '') + (x.mlp ? ' · ' + esc(x.mlp) : '') +
+      '<br><span class="muted">' + (x.who ? esc(x.who) + ' · ' : '') + esc(x.loc) + (x.det ? ' · ' + esc(x.det) : '') + (x.lot ? ' · партія ' + esc(x.lot) : '') + (x.mlp ? ' · ' + esc(x.mlp) : '') +
       (x.photo ? ' · 📷' : '') + (x.cancelled ? ' · скасовано' : '') + '</span></div>' +
       '<div class="r muted">' + esc(x.time.slice(0, 5)) + '<br>' + esc(x.time.slice(6)) +
       (x.canCancel ? '<br><button class="ic" onclick="skCancel(\'' + esc(x.id) + '\')">✖</button>' : '') + '</div></div>').join('')
