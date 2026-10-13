@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- МЛП · index.html v6 · 12.10.2026 — звіт «Історія партії» (?h=, тімлід і вище): звідки прийшли й куди пішли деталі, хронологія з партіями-предками, підсумок за кроками, таблиця на пошту -->
+<!-- МЛП · index.html v7 · 13.10.2026 — плашка «Зберігаю…» для дій після підтвердження (↩ назад, ✖ свій запис); повторне натискання під час збереження ігнорується -->
 <html>
 <head>
 <meta charset="utf-8">
@@ -85,7 +85,7 @@
 <div class="toast" id="toast"></div>
 
 <script>
-const PAGE_VERSION = 'index.html v6 · 12.10.2026';
+const PAGE_VERSION = 'index.html v7 · 13.10.2026';
 const API = 'https://script.google.com/macros/s/AKfycbx-JUajnAtVsxaLHDgwRpfzE12g4LUtlf6JnWYAQScAVZ5FCpxzGHSrA5PDESqP80KD/exec';
 window.STATIC_SELF = location.origin + location.pathname;
 const PARAMS = Object.fromEntries(new URLSearchParams(location.search));
@@ -137,13 +137,22 @@ function sec(ms) { return (ms / 1000).toFixed(1).replace('.', ',') + ' с'; }
 function showPage(r, extra) { if (r && r.page) { S = r.page; render(extra || {}); } else load(extra); }
 function setUrl() { try { const q = new URLSearchParams(PARAMS).toString(); history.replaceState(null, '', location.pathname + (q ? '?' + q : '')); } catch (e) { } }
 
+/** v7: дія без своєї кнопки (після «Так» у підтвердженні: ↩ назад, ✖ свій запис) — плашка «Зберігаю…» внизу,
+ *  поки сервер не відповів; повторне натискання в цей час нічого не робить */
+let BUSY = false;
+function busy(on) {
+  BUSY = on; const t = $('toast');
+  if (on) { clearTimeout(t._h); t.textContent = 'Зберігаю…'; t.style.background = '#2F4858'; t.style.display = 'block'; }
+  else if (t.textContent === 'Зберігаю…') t.style.display = 'none';
+}
 function act(payload, btn, after) {
   const t0 = Date.now();
-  if (btn) { btn.disabled = true; btn._t = btn.textContent; btn.textContent = 'Зберігаю…'; }
+  if (!btn && BUSY) return;
+  if (btn) { btn.disabled = true; btn._t = btn.textContent; btn.textContent = 'Зберігаю…'; } else busy(true);
   payload.code = CODE;
   if (payload.view === undefined) payload.view = viewParams();
   google.script.run.withSuccessHandler(r => {
-    if (btn) { btn.disabled = false; btn.textContent = btn._t; }
+    if (btn) { btn.disabled = false; btn.textContent = btn._t; } else busy(false);
     if (r && r.warn) { confirmBox(r.warn, () => { payload.force = true; act(payload, btn, after); }); return; }
     closeModal();
     let msg = r.msg || 'Готово';
@@ -152,7 +161,7 @@ function act(payload, btn, after) {
     toast(msg);
     if (after) after(r); else showPage(r, {});
   }).withFailureHandler(e => {
-    if (btn) { btn.disabled = false; btn.textContent = btn._t; }
+    if (btn) { btn.disabled = false; btn.textContent = btn._t; } else busy(false);
     const m = String(e.message || e).replace(/^Error:\s*/, '');
     const box = $('err'); if (box && $('modal').style.display !== 'flex') box.textContent = m;
     const mb = $('merr'); if (mb && $('modal').style.display === 'flex') mb.textContent = m;
