@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- МЛП · index.html v13 · 14.10.2026 — партія MT: «звідки статори / ротори» — наша партія ST / RT (тара або номер, перевірка до запису), постачальник, в1 / в2 без номера, пізніше; кількість пар рахується сама; «+ Статори / ротори» замість «Додати покупні»; «Повернути залишок» прибрано — «✂ Залишок» (працівник: в іншу партію MT або «годний залишок»); K2: ящиків рахується саме, план етикеток і ✉ «Етикетки ще раз» з позиції на аркуші; головна: «Знайти партію»; «Стан зараз»: записи без номера партії. v12: реєстрація телефону: сторінка сама перевіряє реєстрацію, коли людина повертається з форми (і 3 хв кожні 4 с); відкриття сторінки з уже надісланою формою завершує реєстрацію без кнопки 2; після реєстрації — одразу потрібний екран (склад, кабінет, звіти); підказка «не скануйте QR знову»; діагностика (rg) у «Реєстрація_лог». v11: склад: перемикач «Склад» у кабінеті, головна для зав. складу (без виробництва), «Усі видачі» для зав. складу й керівників. v10: кнопка «Видача зі складу» лише тімлідам і вище (perms.sklad). v9: екран «Видача зі складу» (?s=КОД локації): фото етикетки з розпізнаванням, калькулятор кількості, «Мої видачі». v8: змішане походження -->
+<!-- МЛП · index.html v14 · 14.10.2026 — T-46: видача ST / RT → MT, в1 і в2 без номера: ✖ автора (15 хв) з поясненням, що станеться, — на картках обох партій; ✎ тімліда «Виправити кількість» (більше / менше / «Скасувати запис», з причиною); в історії «виправлено · було N» і хто й чому виправив; Р-7: «було N» для кількості деталей. v13 · 14.10.2026 — партія MT: «звідки статори / ротори» — наша партія ST / RT (тара або номер, перевірка до запису), постачальник, в1 / в2 без номера, пізніше; кількість пар рахується сама; «+ Статори / ротори» замість «Додати покупні»; «Повернути залишок» прибрано — «✂ Залишок» (працівник: в іншу партію MT або «годний залишок»); K2: ящиків рахується саме, план етикеток і ✉ «Етикетки ще раз» з позиції на аркуші; головна: «Знайти партію»; «Стан зараз»: записи без номера партії. v12: реєстрація телефону: сторінка сама перевіряє реєстрацію, коли людина повертається з форми (і 3 хв кожні 4 с); відкриття сторінки з уже надісланою формою завершує реєстрацію без кнопки 2; після реєстрації — одразу потрібний екран (склад, кабінет, звіти); підказка «не скануйте QR знову»; діагностика (rg) у «Реєстрація_лог». v11: склад: перемикач «Склад» у кабінеті, головна для зав. складу (без виробництва), «Усі видачі» для зав. складу й керівників. v10: кнопка «Видача зі складу» лише тімлідам і вище (perms.sklad). v9: екран «Видача зі складу» (?s=КОД локації): фото етикетки з розпізнаванням, калькулятор кількості, «Мої видачі». v8: змішане походження -->
 <html>
 <head>
 <meta charset="utf-8">
@@ -85,7 +85,7 @@
 <div class="toast" id="toast"></div>
 
 <script>
-const PAGE_VERSION = 'index.html v13 · 14.10.2026';
+const PAGE_VERSION = 'index.html v14 · 14.10.2026';
 const API = 'https://script.google.com/macros/s/AKfycbx-JUajnAtVsxaLHDgwRpfzE12g4LUtlf6JnWYAQScAVZ5FCpxzGHSrA5PDESqP80KD/exec';
 window.STATIC_SELF = location.origin + location.pathname;
 const PARAMS = Object.fromEntries(new URLSearchParams(location.search));
@@ -505,11 +505,14 @@ function renderBatch(extra) {
     const btns = (x.canCancel ? '<button class="ic" onclick="cancelRec(\'' + x.id + '\')">✖</button>' : '') +
       (x.canBack && p.move ? '<button class="ic" onclick="moveBack(\'' + x.id + '\')">↩ назад</button>' : '') +
       (x.canUndo ? '<button class="ic" onclick="undoSep(\'' + x.id + '\')">✖</button>' : '') +
-      (x.canCorrect ? '<button class="ic" onclick="openCorrect(\'' + x.id + '\')">✎</button>' : '') +
+      (x.canCorrect ? '<button class="ic" onclick="' + (PARTS.indexOf(x.type) >= 0 ? 'openCorrectParts' : 'openCorrect') + '(\'' + x.id + '\')">✎</button>' : '') +
       (x.canLabels ? '<button class="ic" onclick="openLabels(\'' + x.id + '\')">✉</button>' : '');
     const cm = x.type === 'покупні' ? '' : x.comment;   // у «покупні» коментар — номер партії постачальника, він уже в рядку
-    return '<div class="li"><div class="' + (x.cancelled ? 'x' : '') + '">' + what + (x.corrected ? ' <span class="pill warn">виправлено</span>' : '') +
-      '<br><span class="muted">' + esc(x.who) + (cm ? ' · ' + esc(cm) : '') + '</span></div><div class="r muted">' + esc(x.time) + btns + '</div></div>';
+    // v14: виправлена кількість деталей — «виправлено · було N»; хто й чому виправив
+    const was = x.corrected && x.was !== '' && x.was !== undefined && x.was !== null ? ' · було ' + x.was : '';
+    return '<div class="li"><div class="' + (x.cancelled ? 'x' : '') + '">' + what + (x.corrected ? ' <span class="pill warn">виправлено' + was + '</span>' : '') +
+      '<br><span class="muted">' + esc(x.who) + (cm ? ' · ' + esc(cm) : '') + (x.corrected && x.why ? '<br>✎ ' + esc(x.corrWho || '') + ': ' + esc(x.why) : '') +
+      '</span></div><div class="r muted">' + esc(x.time) + btns + '</div></div>';
   }).join('') + '</div></details>';
 
   // зв'язки
@@ -689,7 +692,37 @@ function openLabels(id) {
     '<div class="err" id="merr"></div><div class="grid" style="margin-top:6px"><button class="btn btn2" onclick="closeModal()">Скасувати</button><button class="btn" id="mgo">Надіслати</button></div></div>');
   $('mgo').onclick = () => act({ action: 'labels', ref: id, start: $('lpos').value }, $('mgo'), r => showPage(r, { openHist: 1 }));
 }
-function cancelRec(id) { confirmBox('Скасувати свій запис ' + id + '?', () => act({ action: 'cancelOwn', ref: id }, null, r => showPage(r, { openHist: 1 }))); }
+function cancelRec(id) {
+  const x = S.batch.history.find(h => h.id === id);
+  // v14: видача й деталі в MT — кажемо, що саме скасовується і куди повернуться деталі
+  const text = x && x.type === 'видача' ? 'Скасувати видачу ' + partsWhat(x) + ' ' + x.batch + ' → ' + x.target + '? Деталі повернуться в ' + x.batch + '.'
+    : x && PARTS.indexOf(x.type) >= 0 ? 'Скасувати запис: + ' + partsWhat(x) + ' ' + partsVer(x) + ' у ' + x.batch + '?'
+    : 'Скасувати свій запис ' + id + '?';
+  confirmBox(text, () => act({ action: 'cancelOwn', ref: id }, null, r => showPage(r, { openHist: 1 })));
+}
+/** v14 (T-46): записи, якими статори / ротори приходять у партію MT */
+const PARTS = ['видача', 'покупні', 'власні'];
+function partsKey(x) { return x.type === 'видача' ? (String(x.batch).indexOf('ST') === 0 ? 'S' : 'R') : (x.comp === 'ротор' ? 'R' : 'S'); }
+function plural(n, one, few, many) { const a = Math.abs(n) % 100, b = a % 10; return a > 10 && a < 20 ? many : b === 1 ? one : b >= 2 && b <= 4 ? few : many; }
+function partsWhat(x, n) { n = n === undefined ? x.qty : n; return n + (partsKey(x) === 'S' ? ' статор' : ' ротор') + plural(n, '', 'и', 'ів'); }
+function partsVer(x) { return x.type === 'власні' ? 'в2 без номера' : x.comment ? 'в1 · партія постачальника ' + x.comment : 'в1 без номера'; }
+/** v14 (T-46): ✎ тімліда — нова кількість (більше або менше) або «Скасувати запис», з причиною */
+function openCorrectParts(id) {
+  const x = S.batch.history.find(h => h.id === id);
+  const issue = x.type === 'видача'; const mt = issue ? x.target : x.batch;
+  const nm = partsKey(x) === 'S' ? 'статорів' : 'роторів';
+  const head = issue ? 'Видача ' + nm + ' ' + x.batch + ' → ' + x.target : (partsKey(x) === 'S' ? 'Статори ' : 'Ротори ') + partsVer(x) + ' у ' + x.batch;
+  openModal('<div class="card"><div class="mid">Виправити кількість</div><div class="muted">' + esc(head) + '<br>' + esc(x.who) + ' · ' + esc(x.time) +
+    ' · зараз ' + x.qty + ' шт' + (x.corrected && x.was !== '' ? ' (спершу записали ' + x.was + ')' : '') + '</div>' +
+    '<label>Скільки насправді, шт</label>' + numInput('pq', x.qty) +
+    '<p class="muted">' + (issue ? 'Більше — різницю буде взято з ' + esc(x.batch) + ', якщо там є. Менше — різниця повернеться в ' + esc(x.batch) + '. '
+      : 'Більше або менше — як було насправді. ') + 'Зменшити можна лише на стільки ' + nm + ', скільки в ' + esc(mt) + ' ще не зібрано.</p>' +
+    '<label>Причина (обов\'язково)</label><input type="text" id="mcm" placeholder="напр. фізично взяли 20, а записали 30">' +
+    '<div class="err" id="merr"></div><div class="grid" style="margin-top:6px"><button class="btn btn2 btnr" id="cdel">Скасувати запис</button><button class="btn" id="mgo">Зберегти</button></div>' +
+    '<button class="btn btn2" onclick="closeModal()">Закрити</button></div>');
+  $('mgo').onclick = () => act({ action: 'correct', ref: id, qty: $('pq').value, comment: $('mcm').value }, $('mgo'), r => showPage(r, { openHist: 1 }));
+  $('cdel').onclick = () => act({ action: 'correct', ref: id, cancel: true, comment: $('mcm').value }, $('cdel'), r => showPage(r, { openHist: 1 }));
+}
 /** Перекладання (і «↩ назад» з історії): сторінка переходить на нову тару */
 function moveTo(no, tg, comment, btn, back) {
   act({ action: 'move', batch: no, target: tg, comment: comment || '', back: back || '', view: { t: tg } }, btn, r => {
@@ -1049,7 +1082,7 @@ function renderHistory() {
       '<button type="button" class="' + (HF === x[0] ? 'on' : '') + '" onclick="HF=\'' + x[0] + '\';renderHistory()">' + x[1] + '</button>').join('') + '</div>' +
     '<div class="list" style="padding:0">' + rows.map(x =>
       '<div class="li"><div class="' + (x.cancelled ? 'x' : '') + '">' + (x.own ? '' : '<span class="pill warn" style="margin:0 6px 0 0">' + esc(x.batch) + '</span>') + histWhat(x) +
-        (x.corrected ? ' <span class="pill warn" style="margin:0">було ' + x.good + ' / ' + x.scrap + '</span>' : '') +
+        (x.corrected ? ' <span class="pill warn" style="margin:0">було ' + (x.corrected.qty !== null && x.corrected.qty !== undefined ? x.corrected.was : x.good + ' / ' + x.scrap) + '</span>' : '') +
         '<br><span class="muted">' + esc(x.who) + (x.comment ? ' · ' + esc(x.comment) : '') +
         (x.corrected ? '<br>виправив ' + esc(x.corrected.who) + ' ' + esc(x.corrected.time) + ' · ' + esc(x.corrected.comment) : '') +
         (x.cancelled ? '<br>скасував ' + esc(x.cancelled.who) + ' ' + esc(x.cancelled.time) + (x.cancelled.comment ? ' · ' + esc(x.cancelled.comment) : '') : '') +
