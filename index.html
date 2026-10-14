@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- МЛП · index.html v15 · 14.10.2026 — історія: «+ 1 ротор», «+ 3 статори» (відмінки) замість «+ 1 роторів». v14 · 14.10.2026 — T-46: видача ST / RT → MT, в1 і в2 без номера: ✖ автора (15 хв) з поясненням, що станеться, — на картках обох партій; ✎ тімліда «Виправити кількість» (більше / менше / «Скасувати запис», з причиною); в історії «виправлено · було N» і хто й чому виправив; Р-7: «було N» для кількості деталей. v13 · 14.10.2026 — партія MT: «звідки статори / ротори» — наша партія ST / RT (тара або номер, перевірка до запису), постачальник, в1 / в2 без номера, пізніше; кількість пар рахується сама; «+ Статори / ротори» замість «Додати покупні»; «Повернути залишок» прибрано — «✂ Залишок» (працівник: в іншу партію MT або «годний залишок»); K2: ящиків рахується саме, план етикеток і ✉ «Етикетки ще раз» з позиції на аркуші; головна: «Знайти партію»; «Стан зараз»: записи без номера партії. v12: реєстрація телефону: сторінка сама перевіряє реєстрацію, коли людина повертається з форми (і 3 хв кожні 4 с); відкриття сторінки з уже надісланою формою завершує реєстрацію без кнопки 2; після реєстрації — одразу потрібний екран (склад, кабінет, звіти); підказка «не скануйте QR знову»; діагностика (rg) у «Реєстрація_лог». v11: склад: перемикач «Склад» у кабінеті, головна для зав. складу (без виробництва), «Усі видачі» для зав. складу й керівників. v10: кнопка «Видача зі складу» лише тімлідам і вище (perms.sklad). v9: екран «Видача зі складу» (?s=КОД локації): фото етикетки з розпізнаванням, калькулятор кількості, «Мої видачі». v8: змішане походження -->
+<!-- МЛП · index.html v16 · 15.10.2026 — «Робота без партії» з одного QR (?nb=1): дільниця у формі, необов'язково (за замовчуванням — дільниця працівника, «Різні / не вказувати», телефон пам'ятає вибір), кнопка на головній; K2: ящиків перераховується при кожній зміні кількості; помилка — один раз (у формі, без червоної смужки внизу); «Партія: закрито». v15 · 14.10.2026 —історія: «+ 1 ротор», «+ 3 статори» (відмінки) замість «+ 1 роторів». v14 · 14.10.2026 — T-46: видача ST / RT → MT, в1 і в2 без номера: ✖ автора (15 хв) з поясненням, що станеться, — на картках обох партій; ✎ тімліда «Виправити кількість» (більше / менше / «Скасувати запис», з причиною); в історії «виправлено · було N» і хто й чому виправив; Р-7: «було N» для кількості деталей. v13 · 14.10.2026 — партія MT: «звідки статори / ротори» — наша партія ST / RT (тара або номер, перевірка до запису), постачальник, в1 / в2 без номера, пізніше; кількість пар рахується сама; «+ Статори / ротори» замість «Додати покупні»; «Повернути залишок» прибрано — «✂ Залишок» (працівник: в іншу партію MT або «годний залишок»); K2: ящиків рахується саме, план етикеток і ✉ «Етикетки ще раз» з позиції на аркуші; головна: «Знайти партію»; «Стан зараз»: записи без номера партії. v12: реєстрація телефону: сторінка сама перевіряє реєстрацію, коли людина повертається з форми (і 3 хв кожні 4 с); відкриття сторінки з уже надісланою формою завершує реєстрацію без кнопки 2; після реєстрації — одразу потрібний екран (склад, кабінет, звіти); підказка «не скануйте QR знову»; діагностика (rg) у «Реєстрація_лог». v11: склад: перемикач «Склад» у кабінеті, головна для зав. складу (без виробництва), «Усі видачі» для зав. складу й керівників. v10: кнопка «Видача зі складу» лише тімлідам і вище (perms.sklad). v9: екран «Видача зі складу» (?s=КОД локації): фото етикетки з розпізнаванням, калькулятор кількості, «Мої видачі». v8: змішане походження -->
 <html>
 <head>
 <meta charset="utf-8">
@@ -85,7 +85,7 @@
 <div class="toast" id="toast"></div>
 
 <script>
-const PAGE_VERSION = 'index.html v15 · 14.10.2026';
+const PAGE_VERSION = 'index.html v16 · 15.10.2026';
 const API = 'https://script.google.com/macros/s/AKfycbx-JUajnAtVsxaLHDgwRpfzE12g4LUtlf6JnWYAQScAVZ5FCpxzGHSrA5PDESqP80KD/exec';
 window.STATIC_SELF = location.origin + location.pathname;
 const PARAMS = Object.fromEntries(new URLSearchParams(location.search));
@@ -176,9 +176,11 @@ function act(payload, btn, after) {
   }).withFailureHandler(e => {
     if (btn) { btn.disabled = false; btn.textContent = btn._t; } else busy(false);
     const m = String(e.message || e).replace(/^Error:\s*/, '');
-    const box = $('err'); if (box && $('modal').style.display !== 'flex') box.textContent = m;
-    const mb = $('merr'); if (mb && $('modal').style.display === 'flex') mb.textContent = m;
-    toast(m, true);
+    const box = $('err'); const inModal = $('modal').style.display === 'flex';
+    if (box && !inModal) box.textContent = m;
+    const mb = $('merr'); if (mb && inModal) mb.textContent = m;
+    // v16: повідомлення один раз — у формі; червона смужка внизу лише коли поля для помилки немає
+    if (!((box && !inModal) || (mb && inModal))) toast(m, true);
   }).apiAct(payload);
 }
 
@@ -241,7 +243,7 @@ function renderHome() {
     '<div class="row"><select id="hbt" style="flex:0 0 38%">' + opts(['MT', 'ST', 'RT']) + '</select><input type="number" inputmode="numeric" id="hbn" placeholder="номер"></div>' +
     '<button class="btn btn2" id="hbgo">Відкрити партію</button></div>'
       : '<div class="card center" style="padding:24px 16px">Відскануйте QR на дверях складу.</div>') +
-    '<div class="card">' + (p.dashMy ? b('d=my', 'Мій виробіток') : '') + (p.dashStan ? b('d=stan', 'Стан зараз') : '') +
+    '<div class="card">' + (prod ? b('nb=1', 'Робота без партії') : '') + (p.dashMy ? b('d=my', 'Мій виробіток') : '') + (p.dashStan ? b('d=stan', 'Стан зараз') : '') +
     (p.dashTare ? b('d=tare', 'Тара') : '') + (p.cabinet ? b('cab=1', 'Кабінет') : '') + (p.sklad ? b('sklad=1', 'Видача зі складу') : '') + '</div>' +
     '<p class="muted" style="text-align:center">' + esc(PAGE_VERSION) + '</p>';
   if (prod) $('hgo').onclick = () => { const v = tareVal('ht'); if (v) location.href = link('t=' + encodeURIComponent(v)); };
@@ -313,13 +315,24 @@ function renderReg() {
   $('chk').onclick = () => regCheck(true);
 }
 
+/** v16: «Робота без партії». Один QR на всі поверхи (?nb=1) — дільниця у формі, необов'язково: за замовчуванням — дільниця працівника,
+ *  «Різні / не вказувати» — робота на кількох дільницях. Старі плакати ?p=П2 підставляють свою дільницю. Останній вибір пам'ятає телефон. */
 function renderPoster() {
-  const site = (S.dict.sites.find(s => s.code === S.poster) || { name: S.poster }).name;
-  $('hdrTitle').textContent = S.poster;
-  $('app').innerHTML = '<div class="card"><div class="mid">Робота без партії</div><div class="muted">' + esc(site) + '</div>' +
+  const sites = S.dict.sites || [];
+  const mine = S.me && S.me.site ? (sites.find(x => x.code === S.me.site) || { name: S.me.site }).name : '';
+  const fromQr = S.poster && S.poster !== '*' ? S.poster : '';
+  const pre = fromQr || store('mlp_site') || '';
+  $('hdrTitle').textContent = 'без партії';
+  $('app').innerHTML = '<div class="card"><div class="mid">Робота без партії</div>' +
     '<label>Вид роботи</label><select id="wk">' + opts(S.dict.works.map(w => w.name), '', '— оберіть —') + '</select>' +
-    '<div id="wkx"></div><label>Коментар</label><textarea id="cm"></textarea>' +
+    '<div id="wkx"></div>' +
+    '<label>Дільниця (необов\'язково)</label><select id="site">' +
+      '<option value="">' + esc(mine ? 'Моя: ' + mine : '— не вказано —') + '</option>' +
+      sites.map(x => '<option value="' + esc(x.code) + '"' + (x.code === pre ? ' selected' : '') + '>' + esc(x.code + ' · ' + x.name) + '</option>').join('') +
+      '<option value="-"' + (pre === '-' ? ' selected' : '') + '>Різні / не вказувати</option></select>' +
+    '<label>Коментар</label><textarea id="cm"></textarea>' +
     '<button class="btn" id="go">Записати</button><div class="err" id="err"></div></div>';
+  $('site').onchange = () => store('mlp_site', $('site').value || null);
   $('wk').onchange = () => {
     const w = S.dict.works.find(x => x.name === $('wk').value);
     $('wkx').innerHTML = !w ? '' : '<label>' + (w.unit === 'год' ? 'Години' : 'Кількість, шт') + '</label>' +
@@ -327,7 +340,7 @@ function renderPoster() {
       (w.typ ? '<label>Типорозмір</label><select id="typ">' + opts(S.dict.typ, '', '—') + '</select>' : '');
   };
   $('go').onclick = () => act({ action: 'noBatch', work: $('wk').value, value: $('val') ? $('val').value : '', typ: $('typ') ? $('typ').value : '',
-    comment: $('cm').value, site: S.poster, view: null }, $('go'), () => { $('wk').value = ''; $('wkx').innerHTML = ''; $('cm').value = ''; });
+    comment: $('cm').value, site: $('site').value, view: null }, $('go'), () => { $('wk').value = ''; $('wkx').innerHTML = ''; $('cm').value = ''; });
 }
 
 function renderNew() {
@@ -451,7 +464,7 @@ function renderBatch(extra) {
   }
 
   if (b.status === 'анульовано' || b.status === 'закрито') {
-    h += '<div class="card muted">Партія ' + esc(b.status) + '. Записи неможливі.</div>';
+    h += '<div class="card muted">Партія: ' + esc(b.status) + '. Записи неможливі.</div>';
   } else if (i['Призначення']) {
     h += '<div class="card muted">Партія поза маршрутом (' + esc(i['Призначення']) + '): кроки не записуються.</div>';
   } else if (p.step && avail.length) {
@@ -570,7 +583,8 @@ function stepChanged() {
       $('k2plan').innerHTML = plan.length ? 'Етикетки: <b>' + esc(labelsSummary(plan)) + '</b> — PDF прийде на ' + esc(S.me.email) + (S.k2 && S.k2.copy ? ' і на адресу для друку' : '') +
         '.<br>Друк: аркуш наліпок A4 3 × 7, масштаб 100 %.' : '';
     };
-    $('good').oninput = recalc;
+    // v16 (T-48): зміна кількості завжди перераховує ящики; ручне число ящиків діє до наступної зміни кількості
+    $('good').oninput = () => { delete $('x1').dataset.touched; recalc(); };
     $('x1').oninput = () => { $('x1').dataset.touched = '1'; recalc(); };
     recalc();
   }
