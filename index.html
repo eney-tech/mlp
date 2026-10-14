@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- МЛП · index.html v11 · 13.10.2026 — склад: перемикач «Склад» у кабінеті, головна для зав. складу (без виробництва), «Усі видачі» для зав. складу й керівників. v10: кнопка «Видача зі складу» лише тімлідам і вище (perms.sklad). v9: екран «Видача зі складу» (?s=КОД локації): фото етикетки з розпізнаванням, калькулятор кількості, «Мої видачі». v8: змішане походження -->
+<!-- МЛП · index.html v12 · 14.10.2026 — реєстрація телефону: сторінка сама перевіряє реєстрацію, коли людина повертається з форми (і 3 хв кожні 4 с); відкриття сторінки з уже надісланою формою завершує реєстрацію без кнопки 2; після реєстрації — одразу потрібний екран (склад, кабінет, звіти); підказка «не скануйте QR знову»; діагностика (rg) у «Реєстрація_лог». v11: склад: перемикач «Склад» у кабінеті, головна для зав. складу (без виробництва), «Усі видачі» для зав. складу й керівників. v10: кнопка «Видача зі складу» лише тімлідам і вище (perms.sklad). v9: екран «Видача зі складу» (?s=КОД локації): фото етикетки з розпізнаванням, калькулятор кількості, «Мої видачі». v8: змішане походження -->
 <html>
 <head>
 <meta charset="utf-8">
@@ -85,7 +85,7 @@
 <div class="toast" id="toast"></div>
 
 <script>
-const PAGE_VERSION = 'index.html v11 · 13.10.2026';
+const PAGE_VERSION = 'index.html v12 · 14.10.2026';
 const API = 'https://script.google.com/macros/s/AKfycbx-JUajnAtVsxaLHDgwRpfzE12g4LUtlf6JnWYAQScAVZ5FCpxzGHSrA5PDESqP80KD/exec';
 window.STATIC_SELF = location.origin + location.pathname;
 const PARAMS = Object.fromEntries(new URLSearchParams(location.search));
@@ -128,9 +128,13 @@ function load(extra) {
   loadPage(extra);
 }
 function loadPage(extra) {
-  google.script.run.withSuccessHandler(d => { S = d; render(extra || {}); })
+  // v12: телефон ще без коду, але форму вже надсилали з цього браузера — перевіряємо код, що чекає (mlp_pending)
+  const pend = CODE ? '' : store('mlp_pending');
+  const q = Object.assign({}, PARAMS, { code: CODE || pend });
+  if (!CODE) q.rg = regDiag('відкриття', pend);
+  google.script.run.withSuccessHandler(d => { if (!CODE && pend && d.me) return regDone(pend, d); S = d; render(extra || {}); })
     .withFailureHandler(e => { $('app').innerHTML = '<div class="card err">' + esc(e.message) + '</div>'; })
-    .apiPage(Object.assign({}, PARAMS, { code: CODE }));
+    .apiPage(q);
 }
 
 /** Яку сторінку показати після дії: сервер повертає її в тій самій відповіді (v3 — без другого звернення) */
@@ -239,25 +243,69 @@ function renderHome() {
   if (prod) $('hgo').onclick = () => { const v = tareVal('ht'); if (v) location.href = link('t=' + encodeURIComponent(v)); };
 }
 
+/** v12: реєстрація телефону. Код телефону (mlp_pending) створюється один раз і живе в цьому браузері.
+ *  Після кнопки 1 сторінка сама перевіряє реєстрацію: щойно людина повертається на вкладку, і ще 3 хв кожні 4 с.
+ *  Новий код з'являється лише там, де браузер нічого не пам'ятає (інший браузер / приватна вкладка) — тому підказка «не скануйте QR знову». */
+let REG = { pend: '', timer: null, until: 0, busy: false, hooked: false };
+function regDiag(ev, pend, isNew) {
+  return { ev: ev, pend: pend || '', isNew: !!isNew, ua: String(navigator.userAgent || '').slice(0, 200),
+    ref: String(document.referrer || '').slice(0, 100), standalone: !!window.navigator.standalone, hist: history.length };
+}
+function regStop() { if (REG.timer) clearInterval(REG.timer); REG.timer = null; REG.pend = ''; }
+/** Реєстрацію знайдено: запам'ятати код і відкрити те, заради чого сканували QR */
+function regDone(pend, d) {
+  regStop();
+  store('mlp_code', pend); store('mlp_pending', null); CODE = pend; S = d;
+  toast('Телефон зареєстровано: ' + d.me.name);
+  const go = !d.pending && ((PARAMS.cab && d.perms && d.perms.cabinet) || PARAMS.d || PARAMS.h || PARAMS.s || PARAMS.sklad);
+  if (go) load(); else render({});
+}
+/** Тиха перевірка (без повідомлень); manual — натиснуто «2. Я зареєструвався» */
+function regCheck(manual) {
+  const pend = REG.pend; if (!pend || REG.busy) return;
+  REG.busy = true;
+  const q = Object.assign({}, PARAMS, { code: pend });
+  if (manual) q.rg = regDiag('перевірка', pend);
+  const btn = $('chk'); if (manual && btn) btn.disabled = true;
+  google.script.run.withSuccessHandler(d => {
+    REG.busy = false; if (btn) btn.disabled = false;
+    if (REG.pend !== pend) return;
+    if (d.me) return regDone(pend, d);
+    if (manual && $('err')) $('err').innerHTML = 'Реєстрацію з кодом <b>' + esc(pend) + '</b> ще не знайдено.<br>Надіслали форму? Зачекайте кілька секунд — сторінка перевірить сама.' +
+      '<br>Якщо форму надсилали з іншого браузера чи після повторного сканування QR — відкрийте її кнопкою 1 саме тут і надішліть ще раз.';
+  }).withFailureHandler(e => { REG.busy = false; if (btn) btn.disabled = false; if (manual && $('err')) $('err').textContent = e.message; })
+    .apiPage(q);
+}
+function regWatch() {
+  REG.until = Date.now() + 3 * 60000;
+  if (REG.timer) return;
+  REG.timer = setInterval(() => {
+    if (!REG.pend || Date.now() > REG.until) { clearInterval(REG.timer); REG.timer = null; return; }
+    if (document.visibilityState === 'visible') regCheck(false);
+  }, 4000);
+}
 function renderReg() {
-  let pend = store('mlp_pending');
-  if (!pend) { pend = Math.random().toString(36).slice(2, 7).toUpperCase() + Date.now().toString(36).slice(-4).toUpperCase(); store('mlp_pending', pend); }
+  let pend = store('mlp_pending'), isNew = false;
+  if (!pend) { pend = Math.random().toString(36).slice(2, 7).toUpperCase() + Date.now().toString(36).slice(-4).toUpperCase(); store('mlp_pending', pend); isNew = true; }
+  const kept = store('mlp_pending') === pend;   // браузер не зберігає дані сторінки (приватний режим тощо)
+  REG.pend = pend;
+  if (!REG.hooked) {   // повернення з форми на цю вкладку — перевірити одразу
+    REG.hooked = true;
+    const back = () => { if (REG.pend && document.visibilityState === 'visible') { regCheck(false); regWatch(); } };
+    document.addEventListener('visibilitychange', back);
+    window.addEventListener('pageshow', e => { if (e.persisted) back(); });
+  }
   const url = (S.reg || '').replace('CODE_PLACEHOLDER', encodeURIComponent(pend));
   $('app').innerHTML = '<div class="card"><div class="mid">Цей телефон ще не зареєстровано</div>' +
-    '<p class="muted">Один раз: відкрийте форму, увійдіть у свій Google-акаунт (той, з якого заповнюєте вечірній звіт), впишіть прізвище й ім\'я і надішліть. Потім поверніться сюди.</p>' +
+    '<p class="muted">Один раз: натисніть кнопку 1, увійдіть у свій Google-акаунт (той, з якого заповнюєте вечірній звіт), впишіть прізвище й ім\'я і надішліть. ' +
+    'Потім поверніться на цю вкладку — сторінка сама побачить реєстрацію.</p>' +
+    '<p class="warn" style="padding:8px 10px;border-radius:10px;font-size:14px;margin:0 0 12px">Не скануйте QR повторно, доки не з\'явиться «Телефон зареєстровано»: в іншій вкладці чи браузері буде інший код.</p>' +
+    (kept ? '' : '<p class="bad" style="padding:8px 10px;border-radius:10px;font-size:14px;margin:0 0 12px">Браузер не зберігає дані сторінки (можливо, приватний режим). Відкрийте сторінку у звичайній вкладці.</p>') +
     '<p class="muted">Код телефону: <b>' + esc(pend) + '</b></p>' +
-    '<a class="btn" style="text-align:center;text-decoration:none" target="_blank" href="' + esc(url) + '">1. Відкрити форму реєстрації</a>' +
+    '<a class="btn" id="regf" style="text-align:center;text-decoration:none" target="_blank" href="' + esc(url) + '">1. Відкрити форму реєстрації</a>' +
     '<button class="btn btn2" id="chk">2. Я зареєструвався</button><div class="err" id="err"></div></div>';
-  $('chk').onclick = () => {
-    $('chk').disabled = true;
-    google.script.run.withSuccessHandler(d => {
-      $('chk').disabled = false;
-      if (d.me) { store('mlp_code', pend); store('mlp_pending', null); CODE = pend; S = d; toast('Телефон зареєстровано: ' + d.me.name);
-        if (PARAMS.cab && !d.pending && d.perms && d.perms.cabinet) loadCabinet(); else render({}); }
-      else $('err').textContent = 'Реєстрацію ще не знайдено. Надішліть форму і спробуйте ще раз за кілька секунд.';
-    }).withFailureHandler(e => { $('chk').disabled = false; $('err').textContent = e.message; })
-      .apiPage(Object.assign({}, PARAMS, { code: pend }));
-  };
+  $('regf').onclick = () => regWatch();
+  $('chk').onclick = () => regCheck(true);
 }
 
 function renderPoster() {
