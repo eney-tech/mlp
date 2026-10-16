@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- МЛП · index.html v17 · 15.10.2026 — відгуки тімлідів: «+ Додати» (тімлід і вище, звідки + коментар); «✂ Взяли на відбраковку» для зав. відділу браку; партія постачальника (текст + 📷 з розпізнаванням) на кроках LOT_STEPS, у новій партії ST / RT і для в1; нова партія MT і «+ Статори / ротори»: лише в1 / в2 / пізніше, в2 — список готових партій і їх тари; перекладання в два піддони (пара), один піддон пари → інший, пара → одна тара; звіти: фільтр і групування за поверхами (аркуш «Поверхи»); склад: «Робота зі складом», «поклав» + звідки; перемикач «Склад» у кабінеті сховано; реєстрація: «Форму вже надіслали?» — свій код, застарілий код телефону забувається. v16 · 15.10.2026 — «Робота без партії» з одного QR (?nb=1): дільниця у формі, необов'язково (за замовчуванням — дільниця працівника, «Різні / не вказувати», телефон пам'ятає вибір), кнопка на головній; K2: ящиків перераховується при кожній зміні кількості; помилка — один раз (у формі, без червоної смужки внизу); «Партія: закрито». v15 · 14.10.2026 —історія: «+ 1 ротор», «+ 3 статори» (відмінки) замість «+ 1 роторів». v14 · 14.10.2026 — T-46: видача ST / RT → MT, в1 і в2 без номера: ✖ автора (15 хв) з поясненням, що станеться, — на картках обох партій; ✎ тімліда «Виправити кількість» (більше / менше / «Скасувати запис», з причиною); в історії «виправлено · було N» і хто й чому виправив; Р-7: «було N» для кількості деталей. v13 · 14.10.2026 — партія MT: «звідки статори / ротори» — наша партія ST / RT (тара або номер, перевірка до запису), постачальник, в1 / в2 без номера, пізніше; кількість пар рахується сама; «+ Статори / ротори» замість «Додати покупні»; «Повернути залишок» прибрано — «✂ Залишок» (працівник: в іншу партію MT або «годний залишок»); K2: ящиків рахується саме, план етикеток і ✉ «Етикетки ще раз» з позиції на аркуші; головна: «Знайти партію»; «Стан зараз»: записи без номера партії. v12: реєстрація телефону: сторінка сама перевіряє реєстрацію, коли людина повертається з форми (і 3 хв кожні 4 с); відкриття сторінки з уже надісланою формою завершує реєстрацію без кнопки 2; після реєстрації — одразу потрібний екран (склад, кабінет, звіти); підказка «не скануйте QR знову»; діагностика (rg) у «Реєстрація_лог». v11: склад: перемикач «Склад» у кабінеті, головна для зав. складу (без виробництва), «Усі видачі» для зав. складу й керівників. v10: кнопка «Видача зі складу» лише тімлідам і вище (perms.sklad). v9: екран «Видача зі складу» (?s=КОД локації): фото етикетки з розпізнаванням, калькулятор кількості, «Мої видачі». v8: змішане походження -->
+<!-- МЛП · index.html v18 · 16.10.2026 — тімлід і вище: у формі кроку і «Роботи без партії» — «Хто виконав» (будь-який активний працівник) і «Дата» (до RETRO_DAYS днів назад, Code.gs v21); вибір тримається, поки відкрита сторінка; в історії — «вніс …», «внесено …». v17 · 15.10.2026 — відгуки тімлідів: «+ Додати» (тімлід і вище, звідки + коментар); «✂ Взяли на відбраковку» для зав. відділу браку; партія постачальника (текст + 📷 з розпізнаванням) на кроках LOT_STEPS, у новій партії ST / RT і для в1; нова партія MT і «+ Статори / ротори»: лише в1 / в2 / пізніше, в2 — список готових партій і їх тари; перекладання в два піддони (пара), один піддон пари → інший, пара → одна тара; звіти: фільтр і групування за поверхами (аркуш «Поверхи»); склад: «Робота зі складом», «поклав» + звідки; перемикач «Склад» у кабінеті сховано; реєстрація: «Форму вже надіслали?» — свій код, застарілий код телефону забувається. v16 · 15.10.2026 — «Робота без партії» з одного QR (?nb=1): дільниця у формі, необов'язково (за замовчуванням — дільниця працівника, «Різні / не вказувати», телефон пам'ятає вибір), кнопка на головній; K2: ящиків перераховується при кожній зміні кількості; помилка — один раз (у формі, без червоної смужки внизу); «Партія: закрито». v15 · 14.10.2026 —історія: «+ 1 ротор», «+ 3 статори» (відмінки) замість «+ 1 роторів». v14 · 14.10.2026 — T-46: видача ST / RT → MT, в1 і в2 без номера: ✖ автора (15 хв) з поясненням, що станеться, — на картках обох партій; ✎ тімліда «Виправити кількість» (більше / менше / «Скасувати запис», з причиною); в історії «виправлено · було N» і хто й чому виправив; Р-7: «було N» для кількості деталей. v13 · 14.10.2026 — партія MT: «звідки статори / ротори» — наша партія ST / RT (тара або номер, перевірка до запису), постачальник, в1 / в2 без номера, пізніше; кількість пар рахується сама; «+ Статори / ротори» замість «Додати покупні»; «Повернути залишок» прибрано — «✂ Залишок» (працівник: в іншу партію MT або «годний залишок»); K2: ящиків рахується саме, план етикеток і ✉ «Етикетки ще раз» з позиції на аркуші; головна: «Знайти партію»; «Стан зараз»: записи без номера партії. v12: реєстрація телефону: сторінка сама перевіряє реєстрацію, коли людина повертається з форми (і 3 хв кожні 4 с); відкриття сторінки з уже надісланою формою завершує реєстрацію без кнопки 2; після реєстрації — одразу потрібний екран (склад, кабінет, звіти); підказка «не скануйте QR знову»; діагностика (rg) у «Реєстрація_лог». v11: склад: перемикач «Склад» у кабінеті, головна для зав. складу (без виробництва), «Усі видачі» для зав. складу й керівників. v10: кнопка «Видача зі складу» лише тімлідам і вище (perms.sklad). v9: екран «Видача зі складу» (?s=КОД локації): фото етикетки з розпізнаванням, калькулятор кількості, «Мої видачі». v8: змішане походження -->
 <html>
 <head>
 <meta charset="utf-8">
@@ -27,6 +27,8 @@
   .btnr{background:#B3261E}
   .grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}.grid .btn{margin-top:0}
   .row{display:flex;gap:8px}.row>*{flex:1}
+  input[type=date],input[type=time]{width:100%;font-size:18px;padding:11px;border:1px solid #C5D0D7;border-radius:10px;background:#fff;color:#1D2B33;font-family:inherit;min-height:50px}
+  .onb{border:1px dashed #C5D0D7;border-radius:12px;padding:2px 12px 12px;margin-top:12px}.onb.on{border:2px solid #E0A100;background:#FFFAEE}
   .seg{display:flex;gap:6px}.seg label{flex:1;margin:0}.seg input{display:none}
   .seg span{display:block;text-align:center;padding:13px 4px;border:1px solid #C5D0D7;border-radius:10px;font-size:17px;font-weight:600;background:#fff}
   .seg input:checked+span{background:#2F4858;color:#fff;border-color:#2F4858}
@@ -86,7 +88,7 @@
 <div class="toast" id="toast"></div>
 
 <script>
-const PAGE_VERSION = 'index.html v17 · 15.10.2026';
+const PAGE_VERSION = 'index.html v18 · 16.10.2026';
 const API = 'https://script.google.com/macros/s/AKfycbx-JUajnAtVsxaLHDgwRpfzE12g4LUtlf6JnWYAQScAVZ5FCpxzGHSrA5PDESqP80KD/exec';
 window.STATIC_SELF = location.origin + location.pathname;
 const PARAMS = Object.fromEntries(new URLSearchParams(location.search));
@@ -198,6 +200,38 @@ function numInput(id, val) {
 }
 function bump(id, d) { const i = $(id); i.value = Math.max(0, (Number(i.value) || 0) + d); i.dispatchEvent(new Event('input')); }
 function opts(list, sel, ph) { return (ph ? '<option value="">' + esc(ph) + '</option>' : '') + list.map(x => '<option' + (String(x) === String(sel) ? ' selected' : '') + '>' + esc(x) + '</option>').join(''); }
+/** v18: тімлід — «Хто виконав» і «Дата» (Code.gs v21: a.who, a.at). Вибір тримається в ONB, поки сторінка відкрита (дооформлення кількох кроків поспіль) */
+let ONB = { who: '', date: '', time: '' };
+function ymd(d) { return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0'); }
+function onbHtml() {
+  if (!S.perms || !S.perms.onBehalf || !S.people) return '';
+  const n = S.retroDays || 30; const now = new Date();
+  if (ONB.who && !S.people.some(x => x.id === ONB.who)) ONB.who = '';
+  const me = S.me ? S.me.name : 'я';
+  return '<div class="onb' + (ONB.who || ONB.date ? ' on' : '') + '" id="onb">' +
+    '<label>Хто виконав</label><select id="onbWho"><option value="">Я — ' + esc(me) + '</option>' +
+    S.people.filter(x => !S.me || x.id !== S.me.id).map(x => '<option value="' + esc(x.id) + '"' + (x.id === ONB.who ? ' selected' : '') + '>' + esc(x.name) + (x.site ? ' · ' + esc(x.site) : '') + '</option>').join('') + '</select>' +
+    '<label>Дата, якщо не сьогодні (до ' + n + ' дн. назад)</label><div class="row"><div><input type="date" id="onbDate" value="' + esc(ONB.date) + '" min="' + ymd(new Date(now.getTime() - n * 86400000)) + '" max="' + ymd(now) + '"></div>' +
+    '<div style="flex:.7"><input type="time" id="onbTime" value="' + esc(ONB.time) + '"></div></div>' +
+    '<div class="muted" id="onbNote" style="margin-top:6px"></div></div>';
+}
+function onbWire() {
+  if (!$('onb')) return;
+  const upd = () => {
+    ONB = { who: $('onbWho').value, date: $('onbDate').value, time: $('onbDate').value ? $('onbTime').value : '' };
+    const p = ONB.who ? S.people.find(x => x.id === ONB.who) : null;
+    const today = ONB.date === ymd(new Date()) && !ONB.time;   // сьогодні без часу — те саме, що «зараз»
+    $('onb').className = 'onb' + (ONB.who || (ONB.date && !today) ? ' on' : '');
+    $('onbNote').innerHTML = (p ? 'Записуєте <b>за ' + esc(p.name) + '</b>' : 'Записуєте за себе') +
+      (ONB.date && !today ? ' · дата <b>' + esc(ONB.date.split('-').reverse().join('.')) + (ONB.time ? ' ' + esc(ONB.time) : '') + '</b>' : ' · сьогодні') +
+      (ONB.who || ONB.date ? ' · <a class="lnk" href="#" id="onbReset">скинути</a>' : '');
+    if ($('onbReset')) $('onbReset').onclick = e => { e.preventDefault(); $('onbWho').value = ''; $('onbDate').value = ''; $('onbTime').value = ''; upd(); };
+  };
+  ['onbWho', 'onbDate', 'onbTime'].forEach(id => $(id).onchange = upd);
+  upd();
+}
+function onbVal() { return $('onb') ? { who: ONB.who, at: ONB.date ? ONB.date + (ONB.time ? 'T' + ONB.time : '') : '' } : {}; }
+
 function tarePicker(id, types) {
   return '<div class="row"><select id="' + id + 't" style="flex:0 0 38%">' + opts(types) + '</select>' +
     '<input type="number" inputmode="numeric" id="' + id + 'n" placeholder="номер"></div>';
@@ -340,7 +374,7 @@ function renderPoster() {
   const fromQr = S.poster && S.poster !== '*' ? S.poster : '';
   const pre = fromQr || store('mlp_site') || '';
   $('hdrTitle').textContent = 'без партії';
-  $('app').innerHTML = '<div class="card"><div class="mid">Робота без партії</div>' +
+  $('app').innerHTML = '<div class="card"><div class="mid">Робота без партії</div>' + onbHtml() +
     '<label>Вид роботи</label><select id="wk">' + opts(S.dict.works.map(w => w.name), '', '— оберіть —') + '</select>' +
     '<div id="wkx"></div>' +
     '<label>Дільниця (необов\'язково)</label><select id="site">' +
@@ -350,14 +384,15 @@ function renderPoster() {
     '<label>Коментар</label><textarea id="cm"></textarea>' +
     '<button class="btn" id="go">Записати</button><div class="err" id="err"></div></div>';
   $('site').onchange = () => store('mlp_site', $('site').value || null);
+  onbWire();
   $('wk').onchange = () => {
     const w = S.dict.works.find(x => x.name === $('wk').value);
     $('wkx').innerHTML = !w ? '' : '<label>' + (w.unit === 'год' ? 'Години' : 'Кількість, шт') + '</label>' +
       (w.unit === 'год' ? '<input type="text" inputmode="decimal" id="val" placeholder="напр. 1,5">' : numInput('val', '')) +
       (w.typ ? '<label>Типорозмір</label><select id="typ">' + opts(S.dict.typ, '', '—') + '</select>' : '');
   };
-  $('go').onclick = () => act({ action: 'noBatch', work: $('wk').value, value: $('val') ? $('val').value : '', typ: $('typ') ? $('typ').value : '',
-    comment: $('cm').value, site: $('site').value, view: null }, $('go'), () => { $('wk').value = ''; $('wkx').innerHTML = ''; $('cm').value = ''; });
+  $('go').onclick = () => act(Object.assign({ action: 'noBatch', work: $('wk').value, value: $('val') ? $('val').value : '', typ: $('typ') ? $('typ').value : '',
+    comment: $('cm').value, site: $('site').value, view: null }, onbVal()), $('go'), () => { $('wk').value = ''; $('wkx').innerHTML = ''; $('cm').value = ''; });
 }
 
 function renderNew() {
@@ -531,7 +566,7 @@ function renderBatch(extra) {
   } else if (i['Призначення']) {
     h += '<div class="card muted">Партія поза маршрутом (' + esc(i['Призначення']) + '): кроки не записуються.</div>';
   } else if (p.step && avail.length) {
-    h += '<div class="card"><div class="mid">Додати крок</div>' +
+    h += '<div class="card"><div class="mid">Додати крок</div>' + onbHtml() +
       '<label>Крок</label><select id="stp">' + b.route.map(s => '<option value="' + esc(s.code) + '"' + (s.avail && !s.blockedBy ? '' : ' disabled') + (s.code === pre ? ' selected' : '') + '>' +
         esc(s.code + ' · ' + s.name) + (s.avail ? (s.blockedBy ? ' — ' + s.avail + ' шт, спершу закрити ' + s.blockedBy : ' — доступно ' + s.avail) : '') + '</option>').join('') + '</select>' +
       '<label id="goodLbl">Успішних</label>' + numInput('good', '') +
@@ -592,7 +627,7 @@ function renderBatch(extra) {
     // v14: виправлена кількість деталей — «виправлено · було N»; хто й чому виправив
     const was = x.corrected && x.was !== '' && x.was !== undefined && x.was !== null ? ' · було ' + x.was : '';
     return '<div class="li"><div class="' + (x.cancelled ? 'x' : '') + '">' + what + (x.corrected ? ' <span class="pill warn">виправлено' + was + '</span>' : '') +
-      '<br><span class="muted">' + esc(x.who) + (cm ? ' · ' + esc(cm) : '') + (x.corrected && x.why ? '<br>✎ ' + esc(x.corrWho || '') + ': ' + esc(x.why) : '') +
+      '<br><span class="muted">' + esc(x.who) + (x.by ? ' · вніс ' + esc(x.by) : '') + (x.entered ? ' · внесено ' + esc(x.entered) : '') + (cm ? ' · ' + esc(cm) : '') + (x.corrected && x.why ? '<br>✎ ' + esc(x.corrWho || '') + ': ' + esc(x.why) : '') +
       '</span></div><div class="r muted">' + esc(x.time) + btns + '</div></div>';
   }).join('') + '</div></details>';
 
@@ -612,6 +647,7 @@ function renderBatch(extra) {
 
   $('app').innerHTML = h + '<div style="height:40px"></div>';
   if ($('stp')) { $('stp').onchange = stepChanged; stepChanged(); $('scrap').oninput = () => $('rsn').style.display = Number($('scrap').value) > 0 ? 'block' : 'none'; $('go').onclick = submitStep; }
+  onbWire();
 }
 /** Що зараз лежить у тарі: напівфабрикат і скільки (після якого кроку, який крок чекає) */
 function nowHtml(b) {
@@ -686,8 +722,8 @@ function submitStep() {
   lotWait().then(() => {   // v17: фото етикетки ще надсилається — дочекатися посилання
     btn.disabled = false;
     const l = lotVal('slot');
-    act({ action: 'step', batch: S.batch.info['Номер'], step: $('stp').value, good: v('good'), scrap: v('scrap'), reason: v('reason'),
-      x1: v('x1'), x2: v('x2'), kv: v('kvs'), check: $('chk') ? $('chk').checked : false, comment: v('cm'), lot: l.lot, photo: l.photo }, btn);
+    act(Object.assign({ action: 'step', batch: S.batch.info['Номер'], step: $('stp').value, good: v('good'), scrap: v('scrap'), reason: v('reason'),
+      x1: v('x1'), x2: v('x2'), kv: v('kvs'), check: $('chk') ? $('chk').checked : false, comment: v('cm'), lot: l.lot, photo: l.photo }, onbVal()), btn);
   });
 }
 
