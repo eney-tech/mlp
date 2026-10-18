@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- МЛП · index.html v35 · 18.10.2026 — Р-8с «Мій виробіток» за прототипом звітів v19 (етап 3): день / тиждень / місяць, ‹ ›, календар, «Сьогодні»; картки «Успішних операцій» і «За моїми цінами»; графік за годинами / днями з розрізом, шт / ₴ і лінією % браку; «Роботи й записи» з групуванням кроки / партії / дні; калькулятор ₴ (ціни тільки на пристрої); робота без партії; порожній період — «останній день із записами». 👁 «як працівник»: тімлід, зав. виробництва, адміністратор — будь-який працівник, тільки перегляд (С-29); 👁 у кабінеті біля людей сьогодні. Специфікація: MLP_specyfikacija, аркуш «21. Прототип» -->
+<!-- МЛП · index.html v36 · 18.10.2026 — «Звіти»: пункт «Р-8с · Мій виробіток 👁» для тімліда, зав. виробництва, адміністратора (перегляд як працівник, Р-0_08). v35 · 18.10.2026 — Р-8с «Мій виробіток» за прототипом звітів v19 (етап 3): день / тиждень / місяць, ‹ ›, календар, «Сьогодні»; картки «Успішних операцій» і «За моїми цінами»; графік за годинами / днями з розрізом, шт / ₴ і лінією % браку; «Роботи й записи» з групуванням кроки / партії / дні; калькулятор ₴ (ціни тільки на пристрої); робота без партії; порожній період — «останній день із записами». 👁 «як працівник»: тімлід, зав. виробництва, адміністратор — будь-який працівник, тільки перегляд (С-29); 👁 у кабінеті біля людей сьогодні. Специфікація: MLP_specyfikacija, аркуш «21. Прототип» -->
 <html>
 <head>
 <meta charset="utf-8">
@@ -207,7 +207,7 @@
 <div class="toast" id="toast"></div>
 
 <script>
-const PAGE_VERSION = 'index.html v35 · 18.10.2026';
+const PAGE_VERSION = 'index.html v36 · 18.10.2026';
 const API = 'https://script.google.com/macros/s/AKfycbx-JUajnAtVsxaLHDgwRpfzE12g4LUtlf6JnWYAQScAVZ5FCpxzGHSrA5PDESqP80KD/exec';
 window.STATIC_SELF = location.origin + location.pathname;
 const PARAMS = Object.fromEntries(new URLSearchParams(location.search));
@@ -399,6 +399,7 @@ function navReports() {
   if (p.dashStan) r.push(['d=stan', 'stan']);
   if (p.dashTare) r.push(['d=tare', 'tare']);
   if (p.dashMy && NAV.role === 'зав. відділу браку') r.push(['d=my', 'my']);
+  if (p.dashMy && ['тімлід', 'зав. виробництва', 'адміністратор'].indexOf(NAV.role) >= 0) r.push(['d=my', 'my', ' 👁']);   // v36: перегляд як працівник (Р-0_08)
   return r;
 }
 let VIEW = '';
@@ -427,7 +428,7 @@ function navRender() {
   const a = (href, inner, on) => '<a href="' + esc(link(href)) + '" class="' + (on ? 'on' : '') + '">' + inner + '</a>';
   let h = a('', '<span>⌂</span>Головна', VIEW === 'home') + a('cab=1', '<span>☰</span>Кабінет', VIEW === 'cab');
   if (worker && p.dashMy) h += '<div class="sec">Звіти</div>' + a('d=my', '<span class="code">Р-8с</span>Мій виробіток', curD === 'my');
-  else if (reps.length) h += '<div class="sec">Звіти</div>' + reps.map(x => a(x[0], '<span class="code">' + DASHT[x[1]][0] + '</span>' + DASHT[x[1]][1], curD === x[1])).join('');
+  else if (reps.length) h += '<div class="sec">Звіти</div>' + reps.map(x => a(x[0], '<span class="code">' + DASHT[x[1]][0] + '</span>' + DASHT[x[1]][1] + (x[2] || ''), curD === x[1])).join('');
   side.innerHTML = h;
   const tabs = [['', NIC.home, 'Головна', VIEW === 'home']];
   if (worker && p.dashMy) tabs.push(['d=my', NIC.work, 'Мій виробіток', VIEW === 'my']);
@@ -442,7 +443,7 @@ function renderReports() {
   document.body.classList.remove('nonav');
   setView('', 'Звіти', 'rep');
   const reps = navReports();
-  $('app').innerHTML = (reps.length ? '<div class="tiles">' + reps.map(x => '<a class="tile" href="' + esc(link(x[0])) + '"><div class="tn">' + esc(DASHT[x[1]][0] + ' · ' + DASHT[x[1]][1]) + '</div></a>').join('') + '</div>'
+  $('app').innerHTML = (reps.length ? '<div class="tiles">' + reps.map(x => '<a class="tile" href="' + esc(link(x[0])) + '"><div class="tn">' + esc(DASHT[x[1]][0] + ' · ' + DASHT[x[1]][1] + (x[2] || '')) + '</div></a>').join('') + '</div>'
     : '<div class="card muted">Звітів для вашої ролі ще немає.</div>') + '<p class="muted" style="text-align:center">' + esc(PAGE_VERSION) + '</p>';
 }
 
