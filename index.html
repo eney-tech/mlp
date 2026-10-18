@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- МЛП · index.html v36 · 18.10.2026 — «Звіти»: пункт «Р-8с · Мій виробіток 👁» для тімліда, зав. виробництва, адміністратора (перегляд як працівник, Р-0_08). v35 · 18.10.2026 — Р-8с «Мій виробіток» за прототипом звітів v19 (етап 3): день / тиждень / місяць, ‹ ›, календар, «Сьогодні»; картки «Успішних операцій» і «За моїми цінами»; графік за годинами / днями з розрізом, шт / ₴ і лінією % браку; «Роботи й записи» з групуванням кроки / партії / дні; калькулятор ₴ (ціни тільки на пристрої); робота без партії; порожній період — «останній день із записами». 👁 «як працівник»: тімлід, зав. виробництва, адміністратор — будь-який працівник, тільки перегляд (С-29); 👁 у кабінеті біля людей сьогодні. Специфікація: MLP_specyfikacija, аркуш «21. Прототип» -->
+<!-- МЛП · index.html v37 · 18.10.2026 — «оновити» у звітах рахує заново (Р-2 інакше — кеш сервера 60 с, Reports.gs v17); Кабінет зав. виробництва й адміністратора: «Підсумки для звітів» — коли пораховано, «Перерахувати зараз» (етап 4). v36 · 18.10.2026 — «Звіти»: пункт «Р-8с · Мій виробіток 👁» для тімліда, зав. виробництва, адміністратора (перегляд як працівник, Р-0_08). v35 · 18.10.2026 — Р-8с «Мій виробіток» за прототипом звітів v19 (етап 3): день / тиждень / місяць, ‹ ›, календар, «Сьогодні»; картки «Успішних операцій» і «За моїми цінами»; графік за годинами / днями з розрізом, шт / ₴ і лінією % браку; «Роботи й записи» з групуванням кроки / партії / дні; калькулятор ₴ (ціни тільки на пристрої); робота без партії; порожній період — «останній день із записами». 👁 «як працівник»: тімлід, зав. виробництва, адміністратор — будь-який працівник, тільки перегляд (С-29); 👁 у кабінеті біля людей сьогодні. Специфікація: MLP_specyfikacija, аркуш «21. Прототип» -->
 <html>
 <head>
 <meta charset="utf-8">
@@ -207,7 +207,7 @@
 <div class="toast" id="toast"></div>
 
 <script>
-const PAGE_VERSION = 'index.html v36 · 18.10.2026';
+const PAGE_VERSION = 'index.html v37 · 18.10.2026';
 const API = 'https://script.google.com/macros/s/AKfycbx-JUajnAtVsxaLHDgwRpfzE12g4LUtlf6JnWYAQScAVZ5FCpxzGHSrA5PDESqP80KD/exec';
 window.STATIC_SELF = location.origin + location.pathname;
 const PARAMS = Object.fromEntries(new URLSearchParams(location.search));
@@ -1377,15 +1377,16 @@ function loadApprove() {
 
 // =============================================================== КАБІНЕТ
 let CAB = null;
-function loadCabinet() {
+function loadCabinet(rebuild) {
   setView('', 'Кабінет', 'cab');
-  google.script.run.withSuccessHandler(d => { CAB = d; S.webapp = S.webapp || ''; if (d.me) navSave(d.me, d.perms); renderCabinet(); })
+  if (rebuild) toast('Перераховую підсумки…');
+  google.script.run.withSuccessHandler(d => { CAB = d; S.webapp = S.webapp || ''; if (d.me) navSave(d.me, d.perms); renderCabinet(); if (d.sums && d.sums.msg) toast(d.sums.msg); })
     .withFailureHandler(e => {
       if (/не зареєстровано/.test(e.message)) { forgetCode(); return loadPage(); }   // сервер не знає цього телефону — екран реєстрації
       $('app').innerHTML = '<div class="card err">' + esc(e.message) + '</div>' +
         '<a class="btn btn2" style="text-align:center;text-decoration:none" href="' + esc(link('')) + '">На головну</a>';
     })
-    .apiCabinet({ code: CODE });
+    .apiCabinet({ code: CODE, rebuild: rebuild ? 1 : 0 });
 }
 function wset(email, op, value) {
   const payload = { action: 'workerSet', email: email, op: op, value: value || '', code: CODE };
@@ -1442,6 +1443,9 @@ function renderCabinet() {
     return '<div class="li"><div class="' + (on ? '' : 'x') + '"><b>' + esc(p.name || p.email) + '</b>' + (p.skladByRole || (d.skladAttr && p.sklad) ? ' <span class="pill" style="margin:0">склад</span>' : '') + '<br><span class="muted">' + esc(p.role) + ' · ' + esc(p.siteName || '—') +
       (p.last ? ' · останній запис ' + esc(p.last) : '') + '</span></div><div class="r">' + ctl + '</div></div>';
   }).join('') + '</div></details>';
+  if (d.sums) h += '<div class="card"><div class="mid">Підсумки для звітів</div><div class="muted">Рахуються щоночі о 02:30; сьогоднішні записи — одразу. Зміни за минулі дні, внесені сьогодні, — після перерахунку.</div>' +   // v37: етап 4
+    '<p style="margin:10px 0 0">Останній перерахунок:<br><b>' + esc(d.sums.last || 'ще не було') + '</b></p>' +
+    '<button type="button" class="btn btn2" onclick="loadCabinet(1)">Перерахувати зараз</button></div>';
   if (d.reports) h += '<div class="card"><div class="muted">Р-1 випуск за день, Р-2а стан виробництва, Р-3 виробіток — також у таблиці MLP_Звіти (зручніше з комп\'ютера).</div>' +
     '<a class="btn btn2" style="text-align:center;text-decoration:none" target="_blank" href="' + esc(d.reports) + '">Відкрити MLP_Звіти</a></div>';
   $('app').innerHTML = h + profile;
@@ -1462,7 +1466,7 @@ const FLOWN = { ST: ['Статори', 'статорів'], RT: ['Ротори',
 const LOCN = { 'П': 'Печерськ', 'Ж': 'Жуляни' };
 function fn(n) { return Math.round(Number(n) || 0).toLocaleString('uk-UA'); }
 function pct(a, b) { return b ? (a / b * 100).toFixed(1).replace('.', ',') + ' %' : ''; }
-function loadDash() {
+function loadDash(fresh) {
   { const t = DASHT[PARAMS.d] || DASHT.stan; setView(t[0], t[1], PARAMS.d === 'my' && NAV.role === 'працівник' ? 'my' : 'rep'); }
   if (!DB) $('app').innerHTML = '<div class="center muted">Завантаження…</div>';
   const t0 = Date.now();
@@ -1473,7 +1477,7 @@ function loadDash() {
       if (/не зареєстровано/.test(e.message)) { forgetCode(); return loadPage(); }
       $('app').innerHTML = '<div class="card err">' + esc(e.message) + '</div>' +
         '<a class="btn btn2" style="display:block;text-align:center;text-decoration:none;margin:12px;width:auto" href="' + esc(link('')) + '">На головну</a>';
-    }).apiDash(Object.assign({ code: CODE, d: PARAMS.d, per: PARAMS.per || 'w' }, PARAMS.d === 'my' ? z8q() : {}));   // v35: Р-8с — режим, дата, 👁
+    }).apiDash(Object.assign({ code: CODE, d: PARAMS.d, per: PARAMS.per || 'w', fresh: fresh ? 1 : 0 }, PARAMS.d === 'my' ? z8q() : {}));   // v35: Р-8с — режим, дата, 👁
 }
 function dset(k, v) {
   DF[k] = (k === 'step' && DF.step === v) ? '' : v;
@@ -1511,8 +1515,8 @@ function renderDash() {
   ZA = []; ZDRAW = [];
   // v35: усі звіти без вкладок (переходи — у меню); «Мій виробіток» — Р-8с (старий dashMy лишається для відповіді без mode — прибрати на етапі 8)
   let h = d.d === 'stan' ? r2() : d.d === 'tare' ? r5() : d.recs ? r8c() : dashMy();
-  h += '<p class="muted" style="text-align:center">Дані на ' + esc(d.now) + (d.me.role === 'адміністратор' ? ' · ' + sec(d.ms) + ' / ' + sec(d.total) : '') +
-    ' · <a class="lnk" href="javascript:loadDash()">оновити</a></p><div style="height:30px"></div>';
+  h += '<p class="muted" style="text-align:center">Дані на ' + esc(d.now) + (d.me.role === 'адміністратор' ? ' · ' + sec(d.ms) + ' / ' + sec(d.total) + (d.cached ? ' · кеш' : '') + (d.logSrc ? ' · ' + esc(d.logSrc) : '') : '') +
+    ' · <a class="lnk" href="javascript:loadDash(1)">оновити</a></p><div style="height:30px"></div>';
   $('app').innerHTML = h;
   ZDRAW.forEach(f => f());
   zAfter();
