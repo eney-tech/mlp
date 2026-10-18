@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- МЛП · index.html v38 · 18.10.2026 — Р-8 «Виробіток» і Р-10 «Аналіз браку» за прототипом звітів v19 (етап 5): період і деталізація, фільтри з мультивибором і пошуком, чипи обраного, перехресний вибір (графік, легенда, рейтинги, матриця), картки, графік у часі (розріз, наростаючим, лінія % браку), рейтинги, брак за причинами, операції за поверхами, матриця з рівнями і CSV; 🔖 «Випуск для бухгалтерії»; тімлід — свій поверх за замовчуванням; бухгалтер — тільки випуск двигунів; примітка про історію до LIVE_FROM. v37 · 18.10.2026 — «оновити» у звітах рахує заново (Р-2 інакше — кеш сервера 60 с, Reports.gs v17); Кабінет зав. виробництва й адміністратора: «Підсумки для звітів» — коли пораховано, «Перерахувати зараз» (етап 4). v36 · 18.10.2026 — «Звіти»: пункт «Р-8с · Мій виробіток 👁» для тімліда, зав. виробництва, адміністратора (перегляд як працівник, Р-0_08). v35 · 18.10.2026 — Р-8с «Мій виробіток» за прототипом звітів v19 (етап 3): день / тиждень / місяць, ‹ ›, календар, «Сьогодні»; картки «Успішних операцій» і «За моїми цінами»; графік за годинами / днями з розрізом, шт / ₴ і лінією % браку; «Роботи й записи» з групуванням кроки / партії / дні; калькулятор ₴ (ціни тільки на пристрої); робота без партії; порожній період — «останній день із записами». 👁 «як працівник»: тімлід, зав. виробництва, адміністратор — будь-який працівник, тільки перегляд (С-29); 👁 у кабінеті біля людей сьогодні. Специфікація: MLP_specyfikacija, аркуш «21. Прототип» -->
+<!-- МЛП · index.html v39 · 18.10.2026 — Р-7 «Аналіз партій» за прототипом звітів v19 (етап 6): фільтри (вид, типорозмір, KV, версія, локація, колір, статус), картки (партій, у роботі, без руху → список, пройшли маршрут, час проходження, вихід придатних), «Пройшли маршрут» за періодами, середній час проходження, «Де партії чекають», таблиця партій із сортуванням; картка партії (шлях за кроками, «!» простій, записи, 🕘 Повна історія). У звітах номер партії веде на картку Р-7 (кому Р-7 доступний), інакше — на сторінку партії. v38 · 18.10.2026 — Р-8 «Виробіток» і Р-10 «Аналіз браку» за прототипом звітів v19 (етап 5): період і деталізація, фільтри з мультивибором і пошуком, чипи обраного, перехресний вибір (графік, легенда, рейтинги, матриця), картки, графік у часі (розріз, наростаючим, лінія % браку), рейтинги, брак за причинами, операції за поверхами, матриця з рівнями і CSV; 🔖 «Випуск для бухгалтерії»; тімлід — свій поверх за замовчуванням; бухгалтер — тільки випуск двигунів; примітка про історію до LIVE_FROM. v37 · 18.10.2026 — «оновити» у звітах рахує заново (Р-2 інакше — кеш сервера 60 с, Reports.gs v17); Кабінет зав. виробництва й адміністратора: «Підсумки для звітів» — коли пораховано, «Перерахувати зараз» (етап 4). v36 · 18.10.2026 — «Звіти»: пункт «Р-8с · Мій виробіток 👁» для тімліда, зав. виробництва, адміністратора (перегляд як працівник, Р-0_08). v35 · 18.10.2026 — Р-8с «Мій виробіток» за прототипом звітів v19 (етап 3): день / тиждень / місяць, ‹ ›, календар, «Сьогодні»; картки «Успішних операцій» і «За моїми цінами»; графік за годинами / днями з розрізом, шт / ₴ і лінією % браку; «Роботи й записи» з групуванням кроки / партії / дні; калькулятор ₴ (ціни тільки на пристрої); робота без партії; порожній період — «останній день із записами». 👁 «як працівник»: тімлід, зав. виробництва, адміністратор — будь-який працівник, тільки перегляд (С-29); 👁 у кабінеті біля людей сьогодні. Специфікація: MLP_specyfikacija, аркуш «21. Прототип» -->
 <html>
 <head>
 <meta charset="utf-8">
@@ -227,7 +227,7 @@
 <div class="toast" id="toast"></div>
 
 <script>
-const PAGE_VERSION = 'index.html v38 · 18.10.2026';
+const PAGE_VERSION = 'index.html v39 · 18.10.2026';
 const API = 'https://script.google.com/macros/s/AKfycbx-JUajnAtVsxaLHDgwRpfzE12g4LUtlf6JnWYAQScAVZ5FCpxzGHSrA5PDESqP80KD/exec';
 window.STATIC_SELF = location.origin + location.pathname;
 const PARAMS = Object.fromEntries(new URLSearchParams(location.search));
@@ -405,19 +405,20 @@ function whoHtml(me, perms, unknown) {
 // =============================================================== v33: ОБОЛОНКА — меню, шапка, Головна, сканер QR, довідка
 /** Роль і права для меню. Сторінки кабінету, звітів і складу не викликають apiPage, тож меню бере роль з пристрою (останнє відоме) */
 let NAV = (() => { try { return JSON.parse(store('mlp_nav') || '{}') || {}; } catch (e) { return {}; } })();
-const NAV_KEYS = ['step', 'separate', 'noBatch', 'sklad', 'dashStan', 'dashTare', 'dashMy', 'history', 'cabinet', 'dashOut', 'dashScrap'];
+const NAV_KEYS = ['step', 'separate', 'noBatch', 'sklad', 'dashStan', 'dashTare', 'dashMy', 'history', 'cabinet', 'dashOut', 'dashScrap', 'dashBatches'];
 function navSave(me, perms) {
   const n = { role: me.role, name: me.name, perms: NAV.perms || {} };
   if (perms) { n.perms = {}; NAV_KEYS.forEach(k => n.perms[k] = !!perms[k]); }
   else if (NAV.role !== me.role) n.perms = {};   // роль змінилась, а прав ще не знаємо — меню до наступного відкриття головної мінімальне
   NAV = n; store('mlp_nav', JSON.stringify(n)); navRender();
 }
-const DASHT = { stan: ['Р-2', 'Стан зараз'], tare: ['Р-5', 'Аналіз тари'], out: ['Р-8', 'Виробіток'], scrap: ['Р-10', 'Аналіз браку'], my: ['Р-8с', 'Мій виробіток'] };
+const DASHT = { stan: ['Р-2', 'Стан зараз'], tare: ['Р-5', 'Аналіз тари'], batches: ['Р-7', 'Аналіз партій'], out: ['Р-8', 'Виробіток'], scrap: ['Р-10', 'Аналіз браку'], my: ['Р-8с', 'Мій виробіток'] };
 /** Звіти ролі для меню (Р-0_07). «Мій виробіток» у меню — працівнику (окрема вкладка) і зав. відділу браку (рішення 18.10) */
 function navReports() {
   const p = NAV.perms || {}, r = [];
   if (p.dashStan) r.push(['d=stan', 'stan']);
   if (p.dashTare) r.push(['d=tare', 'tare']);
+  if (p.dashBatches) r.push(['d=batches', 'batches']);   // v39
   if (p.dashOut) r.push(['d=out', 'out']);   // v38
   if (p.dashScrap) r.push(['d=scrap', 'scrap']);
   if (p.dashMy && NAV.role === 'зав. відділу браку') r.push(['d=my', 'my']);
@@ -1055,7 +1056,10 @@ function nowHtml(b) {
   return '<div class="now"><div class="muted">Що в тарі зараз</div><div class="list" style="padding:0">' + st.map(x =>
     '<div class="li"><div><b>' + x.qty + ' шт</b> · ' + esc(x.name) + '</div><div class="r muted">' + (x.done ? 'усі кроки пройдено' : 'чекає ' + esc(x.wait)) + '</div></div>').join('') + '</div></div>';
 }
-function bl(no) { return '<a class="lnk" href="' + esc(link('b=' + encodeURIComponent(no))) + '">' + esc(no) + '</a>'; }
+function bl(no) {   // v39 (Р-0_02): у звітах — картка партії Р-7, якщо роль її бачить; інакше — сторінка партії
+  const r7 = VIEW === 'rep' && (NAV.perms || {}).dashBatches;
+  return '<a class="lnk" href="' + esc(link(r7 ? 'd=batches&card=' + encodeURIComponent(no) : 'b=' + encodeURIComponent(no))) + '">' + esc(no) + '</a>';
+}
 
 function stepChanged() {
   const s = S.batch.route.find(x => x.code === $('stp').value);
@@ -1499,7 +1503,7 @@ function loadDash(fresh) {
       if (/не зареєстровано/.test(e.message)) { forgetCode(); return loadPage(); }
       $('app').innerHTML = '<div class="card err">' + esc(e.message) + '</div>' +
         '<a class="btn btn2" style="display:block;text-align:center;text-decoration:none;margin:12px;width:auto" href="' + esc(link('')) + '">На головну</a>';
-    }).apiDash(Object.assign({ code: CODE, d: PARAMS.d, per: PARAMS.per || 'w', fresh: fresh ? 1 : 0 }, PARAMS.d === 'my' ? z8q() : (PARAMS.d === 'out' || PARAMS.d === 'scrap') ? zOutQ() : {}));   // v35: Р-8с — режим, дата, 👁
+    }).apiDash(Object.assign({ code: CODE, d: PARAMS.d, per: PARAMS.per || 'w', fresh: fresh ? 1 : 0 }, PARAMS.d === 'my' ? z8q() : (PARAMS.d === 'batches' && PARAMS.card) ? { card: PARAMS.card } : (PARAMS.d === 'out' || PARAMS.d === 'scrap' || PARAMS.d === 'batches') ? zOutQ() : {}));   // v35: Р-8с — режим, дата, 👁
 }
 function dset(k, v) {
   DF[k] = (k === 'step' && DF.step === v) ? '' : v;
@@ -1536,7 +1540,7 @@ function renderDash() {
   $('who').innerHTML = whoHtml(d.me, d.perms);
   ZA = []; ZDRAW = [];
   // v35: усі звіти без вкладок (переходи — у меню); «Мій виробіток» — Р-8с (старий dashMy лишається для відповіді без mode — прибрати на етапі 8)
-  let h = d.d === 'stan' ? r2() : d.d === 'tare' ? r5() : d.d === 'out' ? r8() : d.d === 'scrap' ? r10() : d.recs ? r8c() : dashMy();
+  let h = d.d === 'stan' ? r2() : d.d === 'tare' ? r5() : d.d === 'out' ? r8() : d.d === 'scrap' ? r10() : d.d === 'batches' ? (d.card ? r7card() : r7()) : d.recs ? r8c() : dashMy();
   h += '<p class="muted" style="text-align:center">Дані на ' + esc(d.now) + (d.me.role === 'адміністратор' ? ' · ' + sec(d.ms) + ' / ' + sec(d.total) + (d.cached ? ' · кеш' : '') + (d.logSrc ? ' · ' + esc(d.logSrc) : '') : '') +
     ' · <a class="lnk" href="javascript:loadDash(1)">оновити</a></p><div style="height:30px"></div>';
   $('app').innerHTML = h;
@@ -1868,7 +1872,7 @@ function zSelTog(S, src, dim, val, gran) {
   renderDash();
 }
 const zSelOf = (S, src) => S.sel.find(x => x.src === src);
-const zSelLabel = x => x.dim === 'bucket' ? zBkLabel(x.val, x.gran, true) : ZDIMS[x.dim].l + ': ' + ZDIMS[x.dim].lab(x.val);
+const zSelLabel = (x, D) => x.dim === 'bucket' ? zBkLabel(x.val, x.gran, true) : (D || ZDIMS)[x.dim].l + ': ' + (D || ZDIMS)[x.dim].lab(x.val);
 const ZFIXC = { kind: { ST: 0, RT: 1, MT: 2 }, loc: { 'П': 0, 'Ж': 1 } };
 const zColor = (dim, k, i) => { const f = ZFIXC[dim]; const n = f && f[k] !== undefined ? f[k] : i; return n > 7 ? '#9AA8B0' : ZPAL[n]; };
 function zTop(rs, dim, valF, n) {
@@ -1890,23 +1894,23 @@ function zPerSave(rid) { const F = ZST[rid].F; store('mlp_per_' + rid, JSON.stri
 function zSetCustom(rid, k, v) { if (!v) return; ZST[rid].F[k] = v; zPerSave(rid); loadDash(); }
 function zSetGran(rid, g) { ZST[rid].F.gran = g; ZST[rid].sel = ZST[rid].sel.filter(x => x.dim !== 'bucket'); zPerSave(rid); renderDash(); }
 function zFbar8(rid, fields, extra) {
-  const S = ZST[rid], F = S.F, lock = S.lock || {};
+  const S = ZST[rid], F = S.F, lock = S.lock || {}, D = S.D || ZDIMS;
   const nAct = Object.keys(F.m).filter(k => F.m[k] && F.m[k].length).length + S.sel.length;
   let h = '<select onchange="zSetPer(\'' + rid + '\',this.value)">' + ZPERS.map(p => '<option value="' + p[0] + '"' + (F.per === p[0] ? ' selected' : '') + '>' + p[1] + '</option>').join('') + '</select>';
   if (F.per === 'custom') { const rg = zRange(F); h += '<input type="date" class="zdate" value="' + rg[0] + '" max="' + zToday() + '" onchange="zSetCustom(\'' + rid + '\',\'from\',this.value)"><span class="muted">–</span><input type="date" class="zdate" value="' + rg[1] + '" max="' + zToday() + '" onchange="zSetCustom(\'' + rid + '\',\'to\',this.value)">'; }
   h += zChips(F.gran, [['d', 'Дні'], ['w', 'Тижні'], ['m', 'Місяці']], v => zSetGran(rid, v));
   fields.forEach(k => {
     const v = F.m[k] || [], lk = lock[k];
-    h += '<button type="button" class="zfbtn' + (v.length ? ' on' : '') + '"' + (lk ? ' disabled' : ' onclick="zMsOpen(\'' + rid + '\',\'' + k + '\',this)"') + '>' + esc(ZDIMS[k].l) + ': ' +
-      (v.length ? (v.length === 1 ? esc(ZDIMS[k].lab(v[0])) : v.length + ' обрано') : 'усі') + (lk ? ' 🔒' : ' ▾') + '</button>';
+    h += '<button type="button" class="zfbtn' + (v.length ? ' on' : '') + '"' + (lk ? ' disabled' : ' onclick="zMsOpen(\'' + rid + '\',\'' + k + '\',this)"') + '>' + esc(D[k].l) + ': ' +
+      (v.length ? (v.length === 1 ? esc(D[k].lab(v[0])) : v.length + ' обрано') : 'усі') + (lk ? ' 🔒' : ' ▾') + '</button>';
   });
   let out = zFbar(rid, zPerLabel(F), nAct, h + (extra || ''));
   let ch = '';
   if (S.chip) ch += '<span class="zchip sel">' + esc(S.chip.t) + (S.chip.x !== undefined ? '<button type="button" onclick="zA(' + S.chip.x + ')">✕</button>' : '') + '</span>';
   Object.keys(F.m).forEach(k => (F.m[k] || []).forEach(v => {
-    ch += '<span class="zchip">' + esc(ZDIMS[k].l + ': ' + ZDIMS[k].lab(v)) + (lock[k] ? ' 🔒' : '<button type="button" onclick="zA(' + zAct(() => { F.m[k] = F.m[k].filter(x => x !== v); renderDash(); }) + ')">✕</button>') + '</span>';
+    ch += '<span class="zchip">' + esc(D[k].l + ': ' + D[k].lab(v)) + (lock[k] ? ' 🔒' : '<button type="button" onclick="zA(' + zAct(() => { F.m[k] = F.m[k].filter(x => x !== v); renderDash(); }) + ')">✕</button>') + '</span>';
   }));
-  S.sel.forEach(x => { ch += '<span class="zchip sel" title="Натиснули на графік / таблицю">◎ ' + esc(zSelLabel(x)) + '<button type="button" onclick="zA(' + zAct(() => { S.sel = S.sel.filter(y => y !== x); renderDash(); }) + ')">✕</button></span>'; });
+  S.sel.forEach(x => { ch += '<span class="zchip sel" title="Натиснули на графік / таблицю">◎ ' + esc(zSelLabel(x, D)) + '<button type="button" onclick="zA(' + zAct(() => { S.sel = S.sel.filter(y => y !== x); renderDash(); }) + ')">✕</button></span>'; });
   if (nAct) ch += '<button type="button" class="ic" onclick="zA(' + zAct(() => { Object.keys(F.m).forEach(k => { if (!lock[k]) delete F.m[k]; }); S.sel = []; renderDash(); }) + ')">Скинути все</button>';
   const rg = zRange(F);
   if (DB.liveFrom && rg[0] < DB.liveFrom) ch += '<span class="muted" style="flex-basis:100%">До ' + zDmy(DB.liveFrom) + ' — тільки історія партій, які на ' + zDm(DB.liveFrom) + ' були в роботі (внесена задним числом); партії, завершені раніше, у звіт не потрапили.</span>';
@@ -1922,15 +1926,15 @@ function zMsOpen(rid, k, btn) {
   p.style.top = Math.max(8, Math.min(r.bottom + 4, window.innerHeight - 430)) + 'px';
   zPopDraw(true);
 }
-function zPopOpts() { const S = ZST[ZPOP.rid]; return zSortVals(ZPOP.k, [...new Set(S.base.map(ZDIMS[ZPOP.k].f))]); }
+function zPopOpts() { const S = ZST[ZPOP.rid], D = S.D || ZDIMS; return (S.sortV || zSortVals)(ZPOP.k, [...new Set(S.base.map(D[ZPOP.k].f))]); }
 function zPopDraw(full) {
   if (!ZPOP) return;
-  const S = ZST[ZPOP.rid], k = ZPOP.k, cur = S.F.m[k] || [], all = zPopOpts(), q = ZPOP.q.toLowerCase();
-  const list = all.filter(v => !q || String(ZDIMS[k].lab(v)).toLowerCase().indexOf(q) >= 0);
+  const S = ZST[ZPOP.rid], D = S.D || ZDIMS, k = ZPOP.k, cur = S.F.m[k] || [], all = zPopOpts(), q = ZPOP.q.toLowerCase();
+  const list = all.filter(v => !q || String(D[k].lab(v)).toLowerCase().indexOf(q) >= 0);
   const lh = '<label class="all"><input type="checkbox" ' + (cur.length ? '' : 'checked') + ' onchange="zPopAll()"> Усі (' + all.length + ')</label>' +
-    list.slice(0, 300).map(v => '<label><input type="checkbox" ' + (cur.indexOf(v) >= 0 ? 'checked' : '') + ' data-v="' + esc(v) + '" onchange="zPopTog(this.dataset.v)"> ' + esc(ZDIMS[k].lab(v)) + '</label>').join('') +
+    list.slice(0, 300).map(v => '<label><input type="checkbox" ' + (cur.indexOf(v) >= 0 ? 'checked' : '') + ' data-v="' + esc(v) + '" onchange="zPopTog(this.dataset.v)"> ' + esc(D[k].lab(v)) + '</label>').join('') +
     (list.length > 300 ? '<div class="muted" style="padding:6px">… ще ' + (list.length - 300) + ' — уточніть пошук</div>' : '') + (list.length ? '' : '<div class="muted" style="padding:6px">Нічого не знайдено</div>');
-  if (full) $('zpop').innerHTML = '<div class="ph"><b>' + esc(ZDIMS[k].l) + '</b><button type="button" class="ic" onclick="zPopClose()">✕</button></div>' +
+  if (full) $('zpop').innerHTML = '<div class="ph"><b>' + esc(D[k].l) + '</b><button type="button" class="ic" onclick="zPopClose()">✕</button></div>' +
     (all.length > 8 ? '<input type="search" placeholder="Пошук…" oninput="ZPOP.q=this.value;zPopDraw(false)">' : '') + '<div class="pl" id="zpopl">' + lh + '</div>' +
     '<div class="pf"><button type="button" class="ic" onclick="zPopAll()">Скинути</button><button type="button" class="ic pri" onclick="zPopClose()">Готово</button></div>';
   else $('zpopl').innerHTML = lh;
@@ -2156,6 +2160,103 @@ function r10() {
   const rr = zSelApply(rs, S, 'reas').filter(r => r.s), gr = zGroup(rr, r => r.rs || '—'), rk = [...gr.keys()].sort((a, b) => zAgg(gr.get(b)).s - zAgg(gr.get(a)).s), sr = zSelOf(S, 'reas');
   h += zFold('r10r', 'Причини браку', rk.length, rk.length ? zBars(rk.map(k => { const a = zAgg(gr.get(k)); return { l: esc(ZDIMS.reason.lab(k)), v: a.s, t: fn(a.s) + ' шт', c: '#B3261E', on: zAct(() => zSelTog(S, 'reas', 'reason', k)), dim: sr && sr.val !== k }; })) : '<p class="muted">Браку немає.</p>');
   h += zFold('r10m', 'Матриця браку', '', zMatrix('scrap', zSelApply(rs, S, 'mx'), S.mx, { gran: F.gran, vals: ZVALS10, dims: ['step', 'worker', 'batch', 'reason', 'kind', 'typ', 'kv', 'floor', 'loc'], colDims: ['kind', 'floor', 'reason'] }));
+  return h;
+}
+
+// =============================================================== v39: Р-7 «АНАЛІЗ ПАРТІЙ» І КАРТКА ПАРТІЇ (етап 6, прототип звітів v19)
+const ZBDIMS = {
+  kind: { l: 'Вид продукції', f: b => b.kind, lab: v => ZKINDN[v] || v },
+  typ: { l: 'Типорозмір', f: b => b.typ, lab: v => v },
+  kv: { l: 'KV', f: b => b.kv || '—', lab: v => v === '—' ? 'не вказано (ротори до F4)' : v },
+  ver: { l: 'Версія', f: b => b.ver || '—', lab: v => v === '—' ? '— (не двигуни)' : v },
+  loc: { l: 'Локація', f: b => b.loc || '—', lab: v => LOCN[v] || v },
+  color: { l: 'Колір', f: b => b.color || '—', lab: v => v === '—' ? '— (не вказано)' : v },
+  status: { l: 'Статус', f: b => b.status, lab: v => v },
+  wait: { l: 'Чекають крок', f: b => b.next, lab: v => v + ' · ' + ((DB.steps || {})[v] || [''])[0] }
+};
+const zBSort = (dim, vals) => dim === 'kind' ? vals.sort((a, b) => ['ST', 'RT', 'MT'].indexOf(a) - ['ST', 'RT', 'MT'].indexOf(b)) : vals.sort();
+ZST.batches = { F: zMkF('month', 'w'), sel: [], sort: { k: 'idle', dir: -1 }, more: false, D: ZBDIMS, sortV: zBSort };
+try { const v = JSON.parse(store('mlp_per_batches') || 'null'); if (v && v.per) Object.assign(ZST.batches.F, { per: v.per, from: v.from || '', to: v.to || '', gran: v.gran || 'w' }); } catch (e) { }
+const ZKS = { ST: 'СТ', RT: 'РТ', MT: 'ДВ' };
+const zStatusPill = st => '<span class="pill ' + (st === 'в роботі' ? '' : st === 'видано частково' || st === 'поза маршрутом' ? 'warn' : 'ok') + '" style="margin:0">' + esc(st) + '</span>';
+const zSN = c => ((DB.steps || {})[c] || [''])[0];
+const ZIDLE_TIP = () => 'Без руху — ' + (DB.idleDays || 5) + ' і більше робочих днів від останньої операції з партією. Вихідні не рахуються.';
+function r7() {
+  const S = ZST.batches, F = S.F, rg = zRange(F);
+  S.base = DB.batches || [];
+  const okF = b => { for (const k in F.m) { const v = F.m[k]; if (v && v.length && v.indexOf(ZBDIMS[k].f(b)) < 0) return false; } return true; };
+  const bs = S.base.filter(okF);
+  let h = zFbar8('batches', ['kind', 'typ', 'kv', 'ver', 'loc', 'color', 'status']);
+  const sb = src => { const sel = S.sel.filter(x => x.src !== src); return bs.filter(b => sel.every(x => x.dim === 'bucket' ? b.done && zBk(b.doneDate, x.gran) === x.val : x.dim === 'wait' ? b.next === x.val && !b.done : String(ZBDIMS[x.dim].f(b)) === String(x.val))); };
+  const inDone = b => b.done && b.doneDate >= rg[0] && b.doneDate <= rg[1];
+  const kb = sb('kpi'), doneP = kb.filter(inDone), work = kb.filter(b => !b.done), stuck = kb.filter(b => b.stuck);
+  const avgLead = doneP.length ? doneP.reduce((a, b) => a + b.lead, 0) / doneP.length : 0;
+  const yS = doneP.reduce((a, b) => a + b.start, 0), yC = doneP.reduce((a, b) => a + b.cur, 0);
+  h += '<div class="zkpis">' + zKpi('Партій', fn(kb.length), '', 'за фільтрами') + zKpi('У роботі', fn(work.length), 'партій', fn(work.reduce((a, b) => a + b.cur, 0)) + ' шт') +
+    (stuck.length ? zKpi('Без руху', fn(stuck.length), 'партій', 'показати ▾', ZIDLE_TIP(), 'kbad', zAct(() => { zOpen('r7idle'); renderDash(); })) : zKpi('Без руху', '0', 'партій', 'усе рухається', ZIDLE_TIP())) +
+    zKpi('Пройшли маршрут', fn(doneP.length), 'партій', 'за період') +
+    zKpi('Час проходження', doneP.length ? zF1p(avgLead) : '—', 'роб. дн.', 'середній, від початку до останнього кроку', 'Тільки партії, що пройшли маршрут у періоді. Початок — створення в МЛП або найраніший запис кроку (історію вносили задним числом).') +
+    zKpi('Вихід придатних', yS ? zF1p(yC / yS * 100) : '—', yS ? '%' : '', 'готово ÷ на старті', 'Для партій, що пройшли маршрут у періоді: скільки штук дійшло до кінця від запущених', 'kgood') + '</div>';
+  if (stuck.length) h += zFold('r7idle', 'Партії без руху', stuck.length, '<div class="tw"><table class="t"><tr><th>Партія</th><th>Тип · KV</th><th>Крок</th><th>Тара</th><th class="r">шт</th><th>Остання операція</th><th class="r">Роб. дн.</th></tr>' +
+    stuck.slice().sort((a, b) => b.idle - a.idle).map(b => '<tr><td>' + bl(b.no) + '</td><td>' + esc(b.typ) + (b.kv ? ' · ' + esc(b.kv) : '') + '</td><td>' + esc((b.lastStep || 'старт') + (b.next ? ' → ' + b.next : '')) + '</td><td>' + (b.tare ? esc(b.tare) : '—') + '</td><td class="r">' + fn(b.cur) + '</td><td>' + zDm(b.lastOp) + '</td><td class="r"><span class="pill bad" style="margin:0">' + b.idle + '</span></td></tr>').join('') + '</table></div>');
+  // Р-7_03 пройшли маршрут за періодами
+  const cb = sb('chart').filter(inDone), cats = zBucketsIn(F, cb.map(b => b.doneDate));
+  const series = ['ST', 'RT', 'MT'].map(k => ({ k: k, l: ZKINDN[k], c: zColor('kind', k, 0), v: {} }));
+  cb.forEach(b => { const x = series.find(y => y.k === b.kind); if (!x) return; const c = zBk(b.doneDate, F.gran); x.v[c] = (x.v[c] || 0) + 1; });
+  const sc = zSelOf(S, 'chart'), sl = zSelOf(S, 'legend');
+  h += '<div class="card"><div class="mid">Пройшли маршрут</div><div class="muted">Партій за ' + ({ d: 'днями', w: 'тижнями', m: 'місяцями' })[F.gran] + '. Стовпчик або легенда — фільтр.</div>' +
+    zChart('zc7', { cats: cats, series: series.filter(x => Object.keys(x.v).length), catLabel: (c, l) => zBkLabel(c, F.gran, l), selCat: sc && sc.val, selSer: sl && sl.val,
+      fmt: (v, ax) => ax ? String(Math.round(v * 10) / 10) : fn(v) + ' ' + plural(Math.round(v), 'партія', 'партії', 'партій'),
+      onCat: c => zSelTog(S, 'chart', 'bucket', c, F.gran), onSer: k => zSelTog(S, 'legend', 'kind', k) }) + '</div>';
+  // Р-7_04 середній час проходження
+  const lb = sb('lead').filter(inDone), gl = zGroup(lb, b => b.kind + ' · ' + b.typ), lk = [...gl.keys()].sort();
+  h += zFold('r7lead', 'Середній час проходження', lk.length ? lb.length + ' парт.' : '', '<p class="muted" style="margin-top:0">Робочих днів від початку партії до останнього кроку маршруту</p>' +
+    (lk.length ? zBars(lk.map(k => { const a = gl.get(k), av = a.reduce((x, b) => x + b.lead, 0) / a.length, mxl = Math.max(...a.map(b => b.lead)), kd = k.split(' · ');
+      return { l: '<b>' + esc(ZKS[kd[0]] || kd[0]) + '</b> ' + esc(kd[1]), v: av, t: zF1p(av) + ' дн. <span class="muted">· макс. ' + mxl + ' · ' + a.length + ' парт.</span>', c: zColor('kind', kd[0], 0) }; })) : '<p class="muted">За період партії маршрут не пройшли.</p>'));
+  // Р-7_05 де партії чекають
+  const wb = sb('wait'), wsum = {}, wn = {}, now = {};
+  wb.forEach(b => { Object.keys(b.waits || {}).forEach(c => { wsum[c] = (wsum[c] || 0) + b.waits[c]; wn[c] = (wn[c] || 0) + 1; }); if (!b.done && b.next && b.status === 'в роботі') now[b.next] = (now[b.next] || 0) + 1; });
+  const wk = zSortVals('step', [...new Set(Object.keys(wn).concat(Object.keys(now)))]), sw = zSelOf(S, 'wait');
+  let lkk = ''; const wr = [];
+  wk.forEach(c => { const kk = ((DB.steps || {})[c] || [])[2] || ''; if (kk !== lkk) { lkk = kk; wr.push({ hd: ZKINDN[kk] || kk }); }
+    const av = wn[c] ? wsum[c] / wn[c] : 0;
+    wr.push({ l: '<b>' + esc(c) + '</b> <span class="muted">' + esc(zSN(c)) + '</span>', v: av, t: zF1p(av) + ' дн.' + (now[c] ? ' <span class="pill' + (now[c] > 3 ? ' warn' : '') + '" style="margin:0">зараз ' + now[c] + '</span>' : ''), on: zAct(() => zSelTog(S, 'wait', 'wait', c)), dim: sw && sw.val !== c }); });
+  h += zFold('r7wait', 'Де партії чекають', '', '<p class="muted" style="margin-top:0">Середнє очікування перед кроком, роб. днів (від останнього запису попереднього кроку до першого запису цього). «Зараз» — партій, для яких цей крок наступний. Натисніть — таблиця покаже партії, що чекають цей крок.</p>' + (wr.length ? zBars(wr) : '<p class="muted">Немає даних.</p>'));
+  // Р-7_06 таблиця партій (Р-0_13 сортування)
+  const tb = sb('table');
+  const cols = [['no', 'Партія'], ['kind', 'Вид'], ['tk', 'Тип · KV'], ['vc', 'Версія / колір'], ['created', 'Почато'], ['step', 'Останній → наступний'], ['start', 'Старт', 1], ['cur', 'Є / готово', 1], ['sp', 'Брак', 1], ['days', 'Роб. днів', 1], ['idle', 'Без руху', 1], ['status', 'Статус']];
+  const key = { no: b => b.no, kind: b => b.kind, tk: b => b.typ + (b.kv || ''), vc: b => b.ver || b.color, created: b => b.created, step: b => zSord(b.lastStep), start: b => b.start, cur: b => b.cur, sp: b => b.start ? b.scrap / b.start : 0, days: b => b.lead, idle: b => b.done ? -1 : b.idle, status: b => b.status };
+  const srt = S.sort; tb.sort((a, b) => { const x = key[srt.k](a), y = key[srt.k](b); return (x < y ? -1 : x > y ? 1 : 0) * srt.dir || (a.no < b.no ? 1 : -1); });
+  const shown = S.more ? tb : tb.slice(0, 25), idl = DB.idleDays || 5;
+  h += zFold('r7tbl', 'Партії', fn(tb.length), tb.length ? '<p class="muted" style="margin-top:0">Заголовок колонки — сортування. Номер партії — картка.</p><div class="tw" style="max-height:620px"><table class="t"><tr>' +
+    cols.map(c => '<th class="' + (c[2] ? 'r' : '') + '" style="cursor:pointer" onclick="zA(' + zAct(() => { S.sort = { k: c[0], dir: srt.k === c[0] ? -srt.dir : (c[2] || c[0] === 'idle' ? -1 : 1) }; renderDash(); }) + ')">' + c[1] + (srt.k === c[0] ? (srt.dir > 0 ? ' ▲' : ' ▼') : '') + '</th>').join('') + '</tr>' +
+    shown.map(b => '<tr><td>' + bl(b.no) + '</td><td>' + (ZKS[b.kind] || b.kind) + '</td><td>' + esc(b.typ) + ' · ' + esc(b.kv || '—') + '</td><td>' + esc(b.ver || b.color || '') + '</td><td>' + zDm(b.created) + '</td>' +
+      '<td>' + esc(b.lastStep || 'старт') + ' → ' + (b.done ? '✓' : '<b>' + esc(b.next || '—') + '</b>') + '</td><td class="r">' + fn(b.start) + '</td><td class="r">' + fn(b.cur) + '</td><td class="r">' + (b.scrap ? zPc(b.scrap, b.start) : '—') + '</td>' +
+      '<td class="r">' + b.lead + '</td><td class="r">' + (b.done ? '—' : b.stuck ? '<span class="pill bad" style="margin:0">' + b.idle + '</span>' : b.idle) + '</td><td>' + zStatusPill(b.status) + '</td></tr>').join('') + '</table></div>' +
+    (tb.length > 25 ? '<button type="button" class="ic" style="margin-top:8px" onclick="zA(' + zAct(() => { S.more = !S.more; renderDash(); }) + ')">' + (S.more ? 'Згорнути' : 'Показати всі ' + fn(tb.length)) + '</button>' : '') : '<p class="muted">Немає партій за цими фільтрами.</p>');
+  return h;
+}
+/** Р-7_07 картка партії */
+function r7card() {
+  const b = DB.card, idl = DB.idleDays || 5;
+  setView('Р-7', b.no, 'rep');
+  let h = '<div class="card"><div style="display:flex;flex-wrap:wrap;gap:6px;align-items:center"><span class="pill" style="margin:0">' + esc(ZKINDN[b.kind] || b.kind) + '</span><span class="pill" style="margin:0">' + esc(b.typ) + '</span><span class="pill" style="margin:0">KV ' + esc(b.kv || '—') + '</span>' +
+    (b.ver ? '<span class="pill" style="margin:0">' + esc(b.ver) + '</span>' : '') + (b.color ? '<span class="pill" style="margin:0">' + esc(b.color) + '</span>' : '') + zStatusPill(b.status) + (b.stuck ? '<span class="pill bad" style="margin:0">без руху ' + b.idle + ' роб. дн.</span>' : '') + '</div>' +
+    '<p class="muted" style="margin:8px 0 0">Почато ' + zDmy(b.created) + (b.reg !== b.created ? ' (у МЛП — з ' + zDmy(b.reg) + ')' : '') + ' · ' + esc(LOCN[b.loc] || b.loc || '—') + ' · тара ' + (b.tare ? '<a class="lnk" href="' + esc(link('t=' + encodeURIComponent(b.tare))) + '">' + esc(b.tare) + '</a>' : '—') + ' · остання операція ' + zDmy(b.lastOp) + '</p>' +
+    '<div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:10px"><a class="ic" style="text-decoration:none" href="' + esc(link('h=' + encodeURIComponent(b.no))) + '">🕘 Повна історія</a><a class="ic" style="text-decoration:none" href="' + esc(link('b=' + encodeURIComponent(b.no))) + '">Сторінка партії</a><a class="ic" style="text-decoration:none" href="' + esc(link('d=batches')) + '">← Аналіз партій</a></div></div>';
+  h += '<div class="zkpis">' + zKpi('На старті', fn(b.start), 'шт') + zKpi(b.done ? 'Готово' : 'Є зараз', fn(b.cur), 'шт', zPc(b.cur, b.start) + ' від старту') + zKpi('Брак', fn(b.scrap), 'шт', zPc(b.scrap, b.start), '', b.scrap ? 'kbad' : '') +
+    zKpi(b.done ? 'Пройшла за' : 'У роботі', fn(b.lead), 'роб. дн.') + '</div>';
+  const lastI = b.route.findIndex(x => x[0] === b.lastStep);
+  const idleX = d => d >= idl ? '<span class="info xmark" data-tip="Простій перед кроком: ' + d + ' роб. дн. (' + idl + ' і більше)">!</span>' : '';
+  const rows = b.route.map((x, i) => {
+    const has = x[3] || x[4], nxt = !b.done && x[0] === b.next;
+    if (!has) return { l: '<b>' + esc(x[0]) + '</b> <span class="muted">' + esc(x[1]) + '</span>', v: 0, t: nxt ? '<span class="pill warn" style="margin:0">наступний</span>' : '<span class="muted">—</span>', x: nxt ? idleX(b.idle) : '' };
+    return { l: '<b>' + esc(x[0]) + '</b> <span class="muted">' + esc(x[1]) + '</span>', v: x[3], t: fn(x[3]) + (x[4] ? ' <span class="pill bad" style="margin:0">−' + x[4] + '</span>' : ''), x: idleX((b.waits || {})[x[0]] || 0), c: x[2] === 'К' ? '#eda100' : '#2a78d6' };
+  });
+  h += '<div class="card"><div class="mid">Шлях партії за кроками</div>' + ('<p class="muted">Успішних на кожному кроці, червоне — брак. «!» — простій перед кроком ' + idl + ' і більше роб. дн. (у «наступний» — якщо стільки чекає зараз). Жовті смуги — контроль.</p>' + zBars(rows)) + '</div>';
+  h += zFold('r7recs', 'Записи', b.recs.length, '<div class="tw"><table class="t"><tr><th>Час</th><th>Крок</th><th>Хто</th><th>Дільниця</th><th class="r">Успішних</th><th class="r">Брак</th><th>Причина</th></tr>' +
+    b.recs.slice().reverse().map(r => '<tr><td>' + zDm(r.d) + ' <span class="muted">' + esc(r.tm) + '</span></td><td><b>' + esc(r.step) + '</b> <span class="muted">' + esc(zSN(r.step) || (b.route.find(x => x[0] === r.step) || ['', ''])[1]) + '</span></td><td>' + esc(r.who) +
+      (['тімлід', 'зав. виробництва', 'адміністратор'].indexOf(DB.me.role) >= 0 && /^W/.test(r.w) ? ' <a class="lnk" href="' + esc(link('d=my&as=' + encodeURIComponent(r.w))) + '">👁</a>' : '') + '</td><td>' + esc(r.loc) + '</td><td class="r">' + fn(r.g) + '</td><td class="r">' + (r.s || '—') + '</td><td>' + esc(r.rs) + '</td></tr>').join('') + '</table></div>');
   return h;
 }
 
