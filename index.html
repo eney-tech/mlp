@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- МЛП · index.html v34 · 18.10.2026 — Р-2 «Стан зараз» і Р-5 «Аналіз тари» за прототипом звітів v19 (етап 2): фільтри згортаються на телефоні, 4 картки стану на зараз (готові до збирання статори / ротори, у роботі, з них без руху) відкривають згорнуті блоки; «Де зараз» — за процесами або за поверхами, «Готово до збирання» на спільній шкалі, «Готово до реалізації» — окремо; партії в роботі й завершені; колір двигунів — за роторами (Reports.gs v15); Р-5 — картка «Без руху» відкриває список. Без вкладок усередині звіту. v33 · 18.10.2026 — оболонка за прототипом звітів v19 (етап 1): шапка «‹ Назад» + назва (ПК — ще ⌂), нижнє меню телефона (Головна · «Мій виробіток» для працівника / «Звіти» для інших · Кабінет), ліве меню на ПК; Головна — 📷 сканер QR, «Відкрити тару або партію» одним полем, «Записати роботу без партії», «Робота зі складом», довідка «Етапи виробництва»; Кабінет — усім ролям (профіль), тімліду — ще «Деталі без номера партії · сьогодні» і «Люди на моєму поверсі сьогодні» (Code.gs v40); роль «керівництво»; список «Звіти» (?r=1). Тільки світла тема. v32 · 18.10.2026 — «Нова партія» ротори: поле «KV (якщо вже відомо)», необов'язкове (рішення 18.10, Code.gs v39); на F4 KV обов'язковий, як і раніше. v31 · 18.10.2026 — номер партії — одна літера (Code.gs v38): S-00012 · R-00012 · M-00012; «Знайти партію» — M / S / R; деталі в партії двигунів (статор / ротор) — за літерою номера, старий формат ST- теж розуміється. v30 · 16.10.2026 — етикетки K2 за новим зразком (Labels.gs v2): аркуш наліпок A4 2 × 3 (105 × 99 мм), позиція на аркуші 1–6. v29 · 16.10.2026 — «Без руху»: робочі дні від останньої операції (кроку) — підписи «роб. дн.», колонка «Остання операція». v28 · 16.10.2026 — «Пропустити крок»: останнього кроку маршруту в списку немає. v27 · 16.10.2026 — «Нова партія» ротори: «Походження» — наші (з R1) або покупні в1 (одразу на F4); тімлід: «Почати з кроку» (ST / RT, коментар обов'язковий); «⏭ Пропустити крок» на картці (тімлід, причина обов'язкова), пропуск — в історії, ✖ скасування. v26 · 16.10.2026 — кнопку «Видати на збирання» з картки ST / RT прибрано: статори й ротори в партію двигунів беруть тільки з боку MT («Нова партія», «+ Статори / ротори»); «Стан зараз»: блок «Готово» — статори й ротори, готові до збирання (партій · шт, за типорозміром і KV), у збиранні (взято в MT, ще не зібрано), двигуни після K2 за день. v25 · 16.10.2026 — «Стан зараз»: кнопка «Усі» в потоках — статори, ротори й двигуни разом: кроки всіх трьох маршрутів (за потоками, у локації — за поверхами), партії, брак, «Готових» з розбивкою за потоками. v24 · 16.10.2026 — R5: «Одразу на …» — крок після балансування за маршрутом (без OV4 і R7 — F4), а не жорстко R7. v23 · 16.10.2026 — «Стан зараз»: «Успішні операції за поверхами» — усі потоки (статори, ротори, двигуни), а не лише обраний, тож видно й 3 поверх; запис без локації — Печерськ (як і раніше для поверху). v22 · 16.10.2026 — крок на вибір, який не знадобився (напр. після «Фен» — «Піч нова»), показано як пропущений: закреслений у смужці кроків, у списку кроків «не потрібен — обрано …», у «Маршрут і кількості» «пропущено». v21 · 16.10.2026 — колір партії (Code.gs v27): ротори — у «Новій партії» RT, статори — на кроці «База статора» (необов'язково); тімлід і вище — «🎨 Колір» на картці; колір — плашка на картці, в історії «колір: було → стало». v20 · 16.10.2026 — маршрути за типорозміром (Code.gs v25, Reports.gs v11): «Стан зараз» — кроки обраного типорозміру, «Готових» — за останнім кроком маршруту кожного типорозміру; крок на вибір — підказка «або …» у списку кроків. v19 · 16.10.2026 — зав. відділу браку: «↩ Повернути з відбраковки» на картці партії (етап — як востаннє брали з цієї партії, коментар необов'язковий; Code.gs v22). v18 · 16.10.2026 — тімлід і вище: у формі кроку і «Роботи без партії» — «Хто виконав» (будь-який активний працівник) і «Дата» (до RETRO_DAYS днів назад, Code.gs v21); вибір тримається, поки відкрита сторінка; в історії — «вніс …», «внесено …». v17 · 15.10.2026 — відгуки тімлідів: «+ Додати» (тімлід і вище, звідки + коментар); «✂ Взяли на відбраковку» для зав. відділу браку; партія постачальника (текст + 📷 з розпізнаванням) на кроках LOT_STEPS, у новій партії ST / RT і для в1; нова партія MT і «+ Статори / ротори»: лише в1 / в2 / пізніше, в2 — список готових партій і їх тари; перекладання в два піддони (пара), один піддон пари → інший, пара → одна тара; звіти: фільтр і групування за поверхами (аркуш «Поверхи»); склад: «Робота зі складом», «поклав» + звідки; перемикач «Склад» у кабінеті сховано; реєстрація: «Форму вже надіслали?» — свій код, застарілий код телефону забувається. v16 · 15.10.2026 — «Робота без партії» з одного QR (?nb=1): дільниця у формі, необов'язково (за замовчуванням — дільниця працівника, «Різні / не вказувати», телефон пам'ятає вибір), кнопка на головній; K2: ящиків перераховується при кожній зміні кількості; помилка — один раз (у формі, без червоної смужки внизу); «Партія: закрито». v15 · 14.10.2026 —історія: «+ 1 ротор», «+ 3 статори» (відмінки) замість «+ 1 роторів». v14 · 14.10.2026 — T-46: видача ST / RT → MT, в1 і в2 без номера: ✖ автора (15 хв) з поясненням, що станеться, — на картках обох партій; ✎ тімліда «Виправити кількість» (більше / менше / «Скасувати запис», з причиною); в історії «виправлено · було N» і хто й чому виправив; Р-7: «було N» для кількості деталей. v13 · 14.10.2026 — партія MT: «звідки статори / ротори» — наша партія ST / RT (тара або номер, перевірка до запису), постачальник, в1 / в2 без номера, пізніше; кількість пар рахується сама; «+ Статори / ротори» замість «Додати покупні»; «Повернути залишок» прибрано — «✂ Залишок» (працівник: в іншу партію MT або «годний залишок»); K2: ящиків рахується саме, план етикеток і ✉ «Етикетки ще раз» з позиції на аркуші; головна: «Знайти партію»; «Стан зараз»: записи без номера партії. v12: реєстрація телефону: сторінка сама перевіряє реєстрацію, коли людина повертається з форми (і 3 хв кожні 4 с); відкриття сторінки з уже надісланою формою завершує реєстрацію без кнопки 2; після реєстрації — одразу потрібний екран (склад, кабінет, звіти); підказка «не скануйте QR знову»; діагностика (rg) у «Реєстрація_лог». v11: склад: перемикач «Склад» у кабінеті, головна для зав. складу (без виробництва), «Усі видачі» для зав. складу й керівників. v10: кнопка «Видача зі складу» лише тімлідам і вище (perms.sklad). v9: екран «Видача зі складу» (?s=КОД локації): фото етикетки з розпізнаванням, калькулятор кількості, «Мої видачі». v8: змішане походження -->
+<!-- МЛП · index.html v35 · 18.10.2026 — Р-8с «Мій виробіток» за прототипом звітів v19 (етап 3): день / тиждень / місяць, ‹ ›, календар, «Сьогодні»; картки «Успішних операцій» і «За моїми цінами»; графік за годинами / днями з розрізом, шт / ₴ і лінією % браку; «Роботи й записи» з групуванням кроки / партії / дні; калькулятор ₴ (ціни тільки на пристрої); робота без партії; порожній період — «останній день із записами». 👁 «як працівник»: тімлід, зав. виробництва, адміністратор — будь-який працівник, тільки перегляд (С-29); 👁 у кабінеті біля людей сьогодні. Специфікація: MLP_specyfikacija, аркуш «21. Прототип» -->
 <html>
 <head>
 <meta charset="utf-8">
@@ -99,6 +99,28 @@
     .zkpis{grid-template-columns:1fr 1fr}.zkpi .v{font-size:22px}
     .zhb .lb{max-width:150px}
   }
+  /* v35: Р-8с «Мій виробіток» — період, графік, групування, калькулятор, 👁 */
+  .zban{margin:12px;background:#FFF1D6;color:#5C3D00;border-radius:12px;padding:10px 12px;display:flex;flex-wrap:wrap;gap:8px;align-items:center;font-size:14px}
+  .zban select{width:auto;font-size:15px;padding:7px 9px;min-height:0}
+  .znav{display:flex;align-items:center;gap:6px}.znav b{font-size:15px;white-space:nowrap}
+  .zctl select{width:auto;font-size:15px;padding:7px 9px;min-height:0}
+  .zfrow input.zdate,input.zdate{width:auto;flex:0 0 auto;font-size:15px;padding:7px 8px;min-height:0;font-size:15px;padding:7px 8px;border:1px solid #C5D0D7;border-radius:10px;background:#fff;color:#1D2B33;font-family:inherit}
+  .zlegend{display:flex;flex-wrap:wrap;gap:4px 12px;font-size:13px;margin:6px 0;color:#55656E}
+  .zlegend span{display:inline-flex;align-items:center;gap:6px}.zlegend i{width:10px;height:10px;border-radius:2px;display:inline-block}
+  .zchart{width:100%;min-height:200px}.zchart svg{display:block;width:100%;height:auto;cursor:pointer;touch-action:pan-y}
+  .zchart text{fill:#66767F;font-size:11px;font-family:inherit}
+  .tip .ztr{display:flex;justify-content:space-between;gap:12px;align-items:center}.tip .ztr i{display:inline-block;width:10px;height:10px;border-radius:2px;margin-right:6px}
+  table.zgrp td,table.zgrp th{padding:6px 8px}table.zgrp tr.g1 td{font-weight:700;background:#F4F7F9}
+  table.zgrp tr.g2 td:first-child{padding-left:26px}table.zgrp tr.g3 td{font-size:13px;color:#55656E}table.zgrp tr.g3 td:first-child{padding-left:50px}
+  table.zgrp tr.tot td{border-top:2px solid #C5D0D7}
+  .tg{border:0;background:#E7EDF1;border-radius:5px;width:22px;height:22px;cursor:pointer;margin-right:6px;font-size:11px;line-height:22px;padding:0;color:#2F4858}
+  .zcalc .crow{padding:9px 0;border-top:1px solid #EEF2F5}.zcalc .chd+.crow{border-top:0}
+  .zcalc .cm{display:flex;align-items:center;gap:8px;margin-top:4px;font-variant-numeric:tabular-nums;white-space:nowrap}
+  .zcalc .cm input{width:80px;font-size:16px;padding:6px 8px;border:1px solid #C5D0D7;border-radius:8px;text-align:right;font-family:inherit}
+  .zcalc .cq{min-width:56px;text-align:right;font-weight:600}.zcalc .cs{min-width:70px;text-align:right;font-weight:700}
+  .zcalc .chd{text-align:right;font-size:12px;color:#66767F;padding-bottom:4px}
+  .zcalc .ctot{display:flex;justify-content:space-between;border-top:2px solid #C5D0D7;padding-top:8px;margin-top:4px;font-weight:700}
+  @media (min-width:900px){.zcalc .crow{display:flex;justify-content:space-between;align-items:center;gap:12px}.zcalc .cm{margin-top:0}}
   .card{background:#fff;margin:12px;border-radius:14px;padding:16px;box-shadow:0 1px 3px rgba(0,0,0,.08)}
   .big{font-size:34px;font-weight:700;letter-spacing:.5px;line-height:1.1}
   .mid{font-size:18px;font-weight:600}
@@ -185,7 +207,7 @@
 <div class="toast" id="toast"></div>
 
 <script>
-const PAGE_VERSION = 'index.html v34 · 18.10.2026';
+const PAGE_VERSION = 'index.html v35 · 18.10.2026';
 const API = 'https://script.google.com/macros/s/AKfycbx-JUajnAtVsxaLHDgwRpfzE12g4LUtlf6JnWYAQScAVZ5FCpxzGHSrA5PDESqP80KD/exec';
 window.STATIC_SELF = location.origin + location.pathname;
 const PARAMS = Object.fromEntries(new URLSearchParams(location.search));
@@ -1407,7 +1429,8 @@ function renderCabinet() {
   h += '<details' + (CABO.ppl ? ' open' : '') + ' ontoggle="CABO.ppl=this.open"><summary>' + (T.floor ? 'Люди на моєму поверсі сьогодні' : 'Хто працював сьогодні') + ' (' + T.people.length + ')</summary><div class="list">' +
     '<p class="muted" style="margin-top:0">Успішних операцій сьогодні' + (T.floor ? ' на кроках вашого поверху (за аркушем «Поверхи»)' : '') + '.</p>' +
     (T.people.length ? T.people.map(p => '<div class="li"><div>' + esc(p.name) + '<br><span class="muted">' + esc(p.steps.join(', ')) + (T.floor ? '' : (p.floors.length ? ' · ' + esc(p.floors.join(', ')) : '')) + '</span></div>' +
-      '<div class="r"><b>' + fn(p.good) + '</b>' + (p.scrap ? ' <span class="muted">· брак ' + fn(p.scrap) + '</span>' : '') + '</div></div>').join('') : '<p class="muted">Сьогодні записів ще немає.</p>') + '</div></details>';
+      '<div class="r"><b>' + fn(p.good) + '</b>' + (p.scrap ? ' <span class="muted">· брак ' + fn(p.scrap) + '</span>' : '') +
+      (/^W/.test(p.id || '') ? ' <a class="ic" style="text-decoration:none;padding:6px 9px" title="Мій виробіток очима працівника" href="' + esc(link('d=my&as=' + encodeURIComponent(p.id))) + '">👁</a>' : '') + '</div></div>').join('') : '<p class="muted">Сьогодні записів ще немає.</p>') + '</div></details>';
   h += '<details><summary>' + (d.big ? 'Усі працівники' : 'Мої люди') + ' (' + act.length + ')</summary><div class="list">' + act.map(p => {
     const on = p.active === 'так';
     let ctl = '<button class="ic" onclick="wset(\'' + esc(p.email) + '\',\'' + (on ? 'off' : 'on') + '\')">' + (on ? 'Вимкнути' : 'Увімкнути') + '</button>';
@@ -1449,7 +1472,7 @@ function loadDash() {
       if (/не зареєстровано/.test(e.message)) { forgetCode(); return loadPage(); }
       $('app').innerHTML = '<div class="card err">' + esc(e.message) + '</div>' +
         '<a class="btn btn2" style="display:block;text-align:center;text-decoration:none;margin:12px;width:auto" href="' + esc(link('')) + '">На головну</a>';
-    }).apiDash({ code: CODE, d: PARAMS.d, per: PARAMS.per || 'w' });
+    }).apiDash(Object.assign({ code: CODE, d: PARAMS.d, per: PARAMS.per || 'w' }, PARAMS.d === 'my' ? z8q() : {}));   // v35: Р-8с — режим, дата, 👁
 }
 function dset(k, v) {
   DF[k] = (k === 'step' && DF.step === v) ? '' : v;
@@ -1484,15 +1507,232 @@ function dcard(title, sub, body) { return '<div class="card"><div class="mid">' 
 function renderDash() {
   const d = DB;
   $('who').innerHTML = whoHtml(d.me, d.perms);
-  ZA = [];
-  const tabs = [['stan', 'Стан зараз', d.perms.dashStan], ['tare', 'Тара', d.perms.dashTare], ['my', 'Мій виробіток', d.perms.dashMy]].filter(x => x[2]);
-  // v34: Р-2 і Р-5 — нові звіти без вкладок (переходи — у меню); «Мій виробіток» — поки старий, з вкладками (етап 3)
-  let h = d.d === 'my' ? '<div class="tabs">' + tabs.map(x => '<a class="' + (x[0] === d.d ? 'on' : '') + '" href="' + esc(link('d=' + x[0])) + '">' + x[1] + '</a>').join('') + '</div>' : '';
-  h += d.d === 'stan' ? r2() : d.d === 'tare' ? r5() : dashMy();
+  ZA = []; ZDRAW = [];
+  // v35: усі звіти без вкладок (переходи — у меню); «Мій виробіток» — Р-8с (старий dashMy лишається для відповіді без mode — прибрати на етапі 8)
+  let h = d.d === 'stan' ? r2() : d.d === 'tare' ? r5() : d.recs ? r8c() : dashMy();
   h += '<p class="muted" style="text-align:center">Дані на ' + esc(d.now) + (d.me.role === 'адміністратор' ? ' · ' + sec(d.ms) + ' / ' + sec(d.total) : '') +
     ' · <a class="lnk" href="javascript:loadDash()">оновити</a></p><div style="height:30px"></div>';
   $('app').innerHTML = h;
+  ZDRAW.forEach(f => f());
   zAfter();
+}
+let ZRSZ = 0; window.addEventListener('resize', () => { clearTimeout(ZRSZ); ZRSZ = setTimeout(() => ZDRAW.forEach(f => f()), 200); });
+
+// =============================================================== v35: Р-8с «МІЙ ВИРОБІТОК» (етап 3, прототип звітів v19)
+// Р-8с_01 день / тиждень / місяць, ‹ ›, календар · Р-8с_02 картки · Р-8с_09 графік (розріз, шт / ₴, лінія % браку) · Р-8с_03 роботи й записи ·
+// Р-8с_05 калькулятор ₴ (ціни — тільки на цьому телефоні) · Р-8с_07 робота без партії · Р-8с_08 порожній період · Р-0_08 👁 «як працівник»
+const ZPAL = ['#2a78d6', '#eb6834', '#1baf7a', '#eda100', '#e87ba4', '#008300', '#6250d6', '#e34948'];
+const zPd = s => { const p = s.split('-').map(Number); return new Date(p[0], p[1] - 1, p[2]); };
+const zYmd = d => d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
+const zAdd = (s, n) => { const d = zPd(s); d.setDate(d.getDate() + n); return zYmd(d); };
+const zDow = s => (zPd(s).getDay() + 6) % 7;
+const zDm = s => s.slice(8, 10) + '.' + s.slice(5, 7);
+const ZDOWN = ['Пн', 'Вт', 'Ср', 'Чт', 'Пт', 'Сб', 'Нд'];
+const ZMONN = ['січень', 'лютий', 'березень', 'квітень', 'травень', 'червень', 'липень', 'серпень', 'вересень', 'жовтень', 'листопад', 'грудень'];
+const zF1 = n => (Math.round(n * 10) / 10).toLocaleString('uk-UA');
+const Z8 = { csplit: 'none', cunit: 'qty', cline: false, grp: 'step', exp: {}, open: {} };
+/** параметри запиту «Мій виробіток»: режим, дата, 👁 — з адреси сторінки (?m=, ?a=, ?as=) */
+function z8q() { return { mode: PARAMS.m || 'd', anchor: PARAMS.a || '', as: PARAMS.as || '' }; }
+function z8go(k, v) { if (v) PARAMS[k] = v; else delete PARAMS[k]; setUrl(); loadDash(); }
+function z8shift(n) {
+  const d = DB; let a = d.anchor;
+  if (d.mode === 'd') a = zAdd(a, n);
+  else if (d.mode === 'w') a = zAdd(a, 7 * n);
+  else { const x = zPd(a.slice(0, 8) + '01'); x.setMonth(x.getMonth() + n); a = zYmd(x); }
+  if (a > d.today) a = d.today;
+  z8go('a', a);
+}
+function zPriceKey(id) { return 'mlp_prices_' + id; }
+function zPrices(id) { try { return JSON.parse(store(zPriceKey(id)) || '{}') || {}; } catch (e) { return {}; } }
+function zPriceSave(id, p) { store(zPriceKey(id), JSON.stringify(p)); }
+const zNum = v => Number(String(v || '').replace(',', '.')) || 0;
+const zPayQ = r => r.ctl ? r.good + r.scrap : r.good;   // З-05: тести й контроль — усі перевірені
+const zSid = k => 'zs_' + Array.from(k).map(c => c.charCodeAt(0).toString(36)).join('_');
+function zMoney(d, prices) {
+  let m = 0; const g = {};
+  d.recs.forEach(r => { const k = r.step + '|' + r.typ; g[k] = (g[k] || 0) + zPayQ(r); });
+  Object.keys(g).forEach(k => { m += g[k] * zNum(prices[k]); });
+  d.noBatch.forEach(r => { m += (r.hours || r.qty) * zNum(prices['nb|' + r.work]); });
+  return m;
+}
+function zKpiMoney(m) { return zKpi('За моїми цінами', m ? fn(m) : '—', m ? '₴' : '', m ? 'неофіційний розрахунок' : 'введіть ціни в калькуляторі нижче', 'Рахується тільки на цьому телефоні з цін, які ви ввели самі. Це не відомість ЗП.'); }
+function zCalcInput(el, uid) {
+  const p = zPrices(uid); const k = el.dataset.k; const v = el.value.trim();
+  if (v) p[k] = v; else delete p[k]; zPriceSave(uid, p);
+  const c = $(zSid(k)); if (c) c.textContent = zNum(v) ? fn(Number(el.dataset.q) * zNum(v)) : '—';
+  const m = zMoney(DB, p);
+  $('zcTot').textContent = m ? fn(m) + ' ₴' : '—'; const km = $('zkMoney'); if (km) km.innerHTML = zKpiMoney(m);
+  if (Z8.cunit === 'uah') { clearTimeout(zCalcInput._t); zCalcInput._t = setTimeout(() => { const y = window.scrollY; renderDash(); window.scrollTo(0, y); }, 900); }
+}
+function zFold8(key, title, cnt, body) {
+  return '<details class="zfold"' + (Z8.open[key] ? ' open' : '') + ' ontoggle="Z8.open[\'' + key + '\']=this.open"><summary>' + title + (cnt ? ' <span class="cnt">' + cnt + '</span>' : '') + '</summary><div class="zfb">' + body + '</div></details>';
+}
+function r8c() {
+  const d = DB, S8 = Z8;
+  const uid = d.who.id;
+  const viewer = !!d.people;
+  let h = '';
+  if (viewer) {
+    h += '<div class="zban"><span>👁 ' + (d.viewAs ? 'Перегляд як працівник: <b>' + esc(d.viewAs.name) + '</b> · тільки перегляд' : 'Ваш «Мій виробіток». Подивитись очима працівника:') + '</span>' +
+      '<select onchange="z8go(\'as\',this.value)"><option value="">' + (d.viewAs ? '← мій' : '— працівник —') + '</option>' +
+      d.people.map(p => '<option value="' + esc(p.id) + '"' + (d.viewAs && d.viewAs.id === p.id ? ' selected' : '') + '>' + esc(p.name) + '</option>').join('') + '</select></div>';
+  }
+  const lbl = d.mode === 'd' ? (d.anchor === d.today ? 'Сьогодні, ' : '') + ZDOWN[zDow(d.anchor)] + ' ' + zDm(d.anchor) + '.' + d.anchor.slice(0, 4)
+    : d.mode === 'w' ? 'Тиждень ' + zDm(d.from) + ' – ' + zDm(d.to) : ZMONN[Number(d.from.slice(5, 7)) - 1] + ' ' + d.from.slice(0, 4);
+  h += '<div class="zfbar" style="display:block"><div class="zfrow">' + zChips(d.mode, [['d', 'День'], ['w', 'Тиждень'], ['m', 'Місяць']], v => { PARAMS.m = v; z8go('a', d.anchor); }) +
+    '<div class="znav"><button type="button" class="ic" onclick="z8shift(-1)">‹</button><b>' + esc(lbl) + '</b><button type="button" class="ic"' + (d.to >= d.today ? ' disabled style="opacity:.4"' : '') + ' onclick="z8shift(1)">›</button></div>' +
+    '<input type="date" class="zdate" value="' + esc(d.anchor) + '" max="' + esc(d.today) + '" onchange="if(this.value)z8go(\'a\',this.value)">' +
+    (d.anchor !== d.today ? '<button type="button" class="ic" onclick="z8go(\'a\',\'\')">Сьогодні</button>' : '') + '</div></div>';
+  if (!d.recs.length && !d.noBatch.length) {
+    return h + '<div class="card center muted">За ' + (d.mode === 'd' ? 'цей день' : d.mode === 'w' ? 'цей тиждень' : 'цей місяць') + ' записів немає.' +
+      (d.lastDay ? '<br><button type="button" class="btn btn2" style="width:auto;display:inline-block;padding:12px 16px" onclick="PARAMS.m=\'d\';z8go(\'a\',\'' + esc(d.lastDay) + '\')">Показати останній день із записами — ' + ZDOWN[zDow(d.lastDay)] + ' ' + zDm(d.lastDay) + '</button>' : '') + '</div>';
+  }
+  const prices = zPrices(uid);
+  const gw = {};
+  d.recs.forEach(r => { const k = r.step + '|' + r.typ; (gw[k] = gw[k] || []).push(r); });
+  const ord = c => { const i = (d.order || []).indexOf(c); return i < 0 ? 999 : i; };
+  const works = Object.keys(gw).sort((a, b) => ord(a.split('|')[0]) - ord(b.split('|')[0]) || a.localeCompare(b));
+  const good = d.recs.reduce((a, r) => a + r.good, 0), scrap = d.recs.reduce((a, r) => a + r.scrap, 0);
+  const nb = new Set(d.recs.map(r => r.batch)).size;
+  const money = zMoney(d, prices);
+  h += '<div class="zkpis">' + zKpi('Успішних операцій', fn(good), 'шт', 'у ' + nb + ' ' + plural(nb, 'партії', 'партіях', 'партіях'), '', 'kgood') + '<div id="zkMoney" style="display:contents">' + zKpiMoney(money) + '</div></div>';
+  // Р-8с_09 графік
+  const anyPrice = works.some(k => zNum(prices[k]) > 0);
+  h += '<div class="card"><div class="mid">' + (d.mode === 'd' ? 'За годинами' : 'За днями') + '</div><div class="zctl"><span>Розріз:</span><select onchange="Z8.csplit=this.value;renderDash()">' +
+    [['none', 'Без розрізу'], ['batch', 'Партії'], ['tk', 'Типорозмір · KV'], ['step', 'Крок']].map(x => '<option value="' + x[0] + '"' + (S8.csplit === x[0] ? ' selected' : '') + '>' + x[1] + '</option>').join('') + '</select>' +
+    zChips(S8.cunit, [['qty', 'шт'], ['uah', '₴']], v => { S8.cunit = v; renderDash(); }) +
+    '<label style="display:flex;gap:5px;align-items:center;margin:0;font-size:14px"><input type="checkbox"' + (S8.cline ? ' checked' : '') + ' onchange="Z8.cline=this.checked;renderDash()"> лінія % браку</label></div>' +
+    (S8.cunit === 'uah' && !anyPrice ? '<p class="muted">Введіть ціни в калькуляторі нижче — тоді графік покаже суми в ₴.</p>' : zChart('zc8', z8chart(d, prices))) + '</div>';
+  // Р-8с_03 роботи й записи
+  const nm = c => (d.names || {})[c] || '';
+  const GR = { step: { f: r => r.step + '|' + r.typ, l: k => '<b>' + esc(k.split('|')[0]) + '</b> ' + esc(nm(k.split('|')[0])) + ' <span class="muted">· ' + esc(k.split('|')[1]) + '</span>', o: (a, b) => ord(a.split('|')[0]) - ord(b.split('|')[0]) || a.localeCompare(b) },
+    batch: { f: r => r.batch, l: k => bl(k), o: (a, b) => a.localeCompare(b) },
+    day: { f: r => r.d, l: k => ZDOWN[zDow(k)] + ' ' + zDm(k), o: (a, b) => b.localeCompare(a) } };
+  const SUB = { step: 'day', batch: 'step', day: 'step' };
+  const g1 = GR[S8.grp], g2 = GR[SUB[S8.grp]];
+  const tg = (key, open) => '<button type="button" class="tg" onclick="zA(' + zAct(() => { if (S8.exp[key]) delete S8.exp[key]; else S8.exp[key] = 1; renderDash(); }) + ')">' + (open ? '▾' : '▸') + '</button>';
+  const grpOf = (rs, f) => { const m = {}; rs.forEach(r => (m[f(r)] = m[f(r)] || []).push(r)); return m; };
+  const sumG = rs => rs.reduce((a, r) => a + r.good, 0), sumS = rs => rs.reduce((a, r) => a + r.scrap, 0);
+  let gt = '<div class="zctl"><span>Групувати:</span>' + zChips(S8.grp, [['step', 'Кроки'], ['batch', 'Партії'], ['day', 'Дні']], v => { S8.grp = v; S8.exp = {}; renderDash(); }) + '</div>' +
+    '<div class="tw" style="max-height:560px"><table class="t zgrp"><tr><th></th><th class="r">Успішних</th><th class="r">Брак</th></tr>';
+  const m1 = grpOf(d.recs, g1.f);
+  Object.keys(m1).sort(g1.o).forEach(k1 => {
+    const r1 = m1[k1], key1 = S8.grp + '¦' + k1, o1 = S8.exp[key1];
+    gt += '<tr class="g1"><td>' + tg(key1, o1) + g1.l(k1) + '</td><td class="r">' + fn(sumG(r1)) + '</td><td class="r">' + (sumS(r1) ? fn(sumS(r1)) : '—') + '</td></tr>';
+    if (!o1) return;
+    const m2 = grpOf(r1, g2.f);
+    Object.keys(m2).sort(g2.o).forEach(k2 => {
+      const r2 = m2[k2], key2 = key1 + '¦' + k2, o2 = S8.exp[key2];
+      gt += '<tr class="g2"><td>' + tg(key2, o2) + g2.l(k2) + '</td><td class="r">' + fn(sumG(r2)) + '</td><td class="r">' + (sumS(r2) ? fn(sumS(r2)) : '—') + '</td></tr>';
+      if (o2) r2.slice().sort((a, b) => (a.d + a.tm) < (b.d + b.tm) ? -1 : 1).forEach(r => {
+        gt += '<tr class="g3"><td>' + zDm(r.d) + ' ' + esc(r.tm) + ' · ' + (S8.grp === 'batch' ? '<b>' + esc(r.step) + '</b> ' + esc(nm(r.step)) : bl(r.batch) + (S8.grp === 'day' ? '' : ' · ' + esc(r.step))) + '</td><td class="r">' + fn(r.good) + '</td><td class="r">' + (r.scrap || '—') + '</td></tr>';
+      });
+    });
+  });
+  gt += '<tr class="tot"><td><b>Разом</b></td><td class="r"><b>' + fn(good) + '</b></td><td class="r">' + fn(scrap) + '</td></tr></table></div>' +
+    '<p class="muted" style="margin:6px 0 0">▸ — розгорнути: ' + ({ step: 'крок → дні → записи', batch: 'партія → кроки → записи', day: 'день → кроки → записи' })[S8.grp] + '.</p>';
+  h += zFold8('works', 'Роботи й записи', d.recs.length + ' ' + plural(d.recs.length, 'запис', 'записи', 'записів'), gt);
+  // Р-8с_05 калькулятор
+  const TESTTIP = 'Тести й перевірки рахуються за кількістю всіх перевірених — успішні + брак.';
+  let c = '<div class="zcalc"><div class="chd">шт × ціна за 1 = сума, ₴</div>';
+  works.forEach(k => { const [code, typ] = k.split('|'); const q = gw[k].reduce((a, r) => a + zPayQ(r), 0); const p = prices[k] || ''; const ctl = gw[k][0].ctl;
+    c += '<div class="crow"><div><b>' + esc(code) + '</b> ' + esc(nm(code)) + ' <span class="muted">· ' + esc(typ) + '</span>' + (ctl ? ' ' + info(TESTTIP) : '') + '</div>' +
+      '<div class="cm"><span class="cq">' + fn(q) + '</span><span class="muted">×</span><input inputmode="decimal" data-k="' + esc(k) + '" data-q="' + q + '" value="' + esc(p) + '" placeholder="ціна" oninput="zCalcInput(this,\'' + esc(uid) + '\')">' +
+      '<span class="muted">=</span><span class="cs" id="' + zSid(k) + '">' + (zNum(p) ? fn(q * zNum(p)) : '—') + '</span></div></div>'; });
+  const gnb = {}; d.noBatch.forEach(r => { const k = 'nb|' + r.work; gnb[k] = gnb[k] || { q: 0, h: false }; gnb[k].q += r.hours || r.qty; if (r.hours) gnb[k].h = true; });
+  Object.keys(gnb).forEach(k => { const x = gnb[k]; const p = prices[k] || '';
+    c += '<div class="crow"><div>' + esc(k.slice(3)) + ' <span class="muted">· без партії</span></div><div class="cm"><span class="cq">' + zF1(x.q) + (x.h ? ' год' : ' шт') + '</span><span class="muted">×</span>' +
+      '<input inputmode="decimal" data-k="' + esc(k) + '" data-q="' + x.q + '" value="' + esc(p) + '" placeholder="' + (x.h ? 'за год' : 'ціна') + '" oninput="zCalcInput(this,\'' + esc(uid) + '\')"><span class="muted">=</span><span class="cs" id="' + zSid(k) + '">' + (zNum(p) ? fn(x.q * zNum(p)) : '—') + '</span></div></div>'; });
+  c += '<div class="ctot"><span>Разом</span><span id="zcTot">' + (money ? fn(money) + ' ₴' : '—') + '</span></div></div>';
+  h += zFold8('calc', 'Калькулятор ₴', money ? fn(money) + ' ₴' : '', '<p class="muted" style="margin-top:0">Ціни зберігаються <b>тільки на цьому телефоні</b> і не потрапляють у базу. Це особистий підрахунок, а не відомість ЗП.' +
+    (d.viewAs ? ' У режимі 👁 видно ціни, введені на ЦЬОМУ пристрої.' : '') + '</p>' + c +
+    '<button type="button" class="ic" style="margin-top:10px" onclick="zA(' + zAct(() => confirmBox('Очистити всі введені ціни на цьому телефоні?', () => { zPriceSave(uid, {}); renderDash(); })) + ')">Очистити ціни</button>');
+  // Р-8с_07 робота без партії
+  const hrs = d.noBatch.reduce((a, r) => a + r.hours, 0);
+  h += zFold8('nb', 'Робота без партії', d.noBatch.length ? (hrs ? zF1(hrs) + ' год' : d.noBatch.length + '') : '0',
+    d.noBatch.length ? d.noBatch.slice().reverse().map(r => '<div class="li"><div>' + esc(r.work) + (r.comment ? '<br><span class="muted">' + esc(r.comment) + '</span>' : '') + '<br><span class="muted">' + ZDOWN[zDow(r.d)] + ' ' + zDm(r.d) + ' ' + esc(r.tm) + '</span></div><b class="r">' +
+      (r.hours ? zF1(r.hours) + ' год' : fn(r.qty) + ' шт') + '</b></div>').join('') : '<p class="muted">За цей період немає. Записати — на Головній.</p>');
+  return h;
+}
+/** дані графіка Р-8с_09: кошики — години (день) або дні (тиждень / місяць), серії — розріз, лінія % браку */
+function z8chart(d, prices) {
+  const price = r => zNum(prices[r.step + '|' + r.typ]);
+  const val = r => Z8.cunit === 'uah' ? zPayQ(r) * price(r) : r.good;
+  const bucket = r => d.mode === 'd' ? r.tm.slice(0, 2) : r.d;
+  const cats = [];
+  if (d.mode === 'd') { const hs = d.recs.map(r => Number(r.tm.slice(0, 2))); const h0 = Math.min(8, ...hs), h1 = Math.max(17, ...hs); for (let x = h0; x <= h1; x++) cats.push(String(x).padStart(2, '0')); }
+  else for (let x = d.from; x <= d.to && x <= d.today; x = zAdd(x, 1)) if (zDow(x) < 5 || d.recs.some(r => r.d === x)) cats.push(x);
+  const nm = c => (d.names || {})[c] || '';
+  const DM = { batch: { f: r => r.batch, l: k => k }, tk: { f: r => r.typ + ' · ' + (r.kv || '—'), l: k => k }, step: { f: r => r.step, l: k => k + ' · ' + nm(k) } };
+  let keys = ['__all'], kf = () => '__all';
+  if (Z8.csplit !== 'none') {
+    const dm = DM[Z8.csplit], tot = {}; d.recs.forEach(r => { const k = dm.f(r); tot[k] = (tot[k] || 0) + val(r); });
+    keys = Object.keys(tot).sort((a, b) => tot[b] - tot[a]);
+    if (Z8.csplit === 'step') { const ord = c => { const i = (d.order || []).indexOf(c); return i < 0 ? 999 : i; }; keys.sort((a, b) => ord(a) - ord(b)); }
+    if (keys.length > 7) { const top = new Set(keys.slice(0, 7)); keys = keys.slice(0, 7).concat('__oth'); kf = r => top.has(dm.f(r)) ? dm.f(r) : '__oth'; } else kf = dm.f;
+  }
+  const series = keys.map((k, i) => ({ k: k, l: k === '__all' ? (Z8.cunit === 'uah' ? 'Сума, ₴' : 'Успішних, шт') : k === '__oth' ? 'Інші' : DM[Z8.csplit].l(k), c: k === '__all' ? ZPAL[0] : k === '__oth' ? '#9AA8B0' : ZPAL[i % 8], v: {} }));
+  const si = {}; series.forEach(x => si[x.k] = x);
+  d.recs.forEach(r => { const x = si[kf(r)], c = bucket(r); x.v[c] = (x.v[c] || 0) + val(r); });
+  let line = null;
+  if (Z8.cline) { const g = {}, t = {}; d.recs.forEach(r => { const c = bucket(r); g[c] = (g[c] || 0) + r.scrap; t[c] = (t[c] || 0) + r.good + r.scrap; }); const v = {}; Object.keys(t).forEach(c => { if (t[c]) v[c] = g[c] / t[c] * 100; }); line = { v: v, l: '% браку' }; }
+  return { cats: cats, series: series, line: line, catLabel: (c, l) => d.mode === 'd' ? c + ':00' : (l ? ZDOWN[zDow(c)] + ' ' : '') + zDm(c), fmt: Z8.cunit === 'uah' ? ((v, ax) => fn(v) + (ax ? '' : ' ₴')) : fn };
+}
+
+// ---- Р-0_11 стовпчиковий графік (SVG): серії складаються в стовпчик, лінія — на правій осі (cfg.line)
+let ZDRAW = [];
+function zChart(id, cfg) { ZDRAW.push(() => zDrawCol(id, cfg)); return '<div class="zlegend" id="' + id + '_lg"></div><div class="zchart" id="' + id + '"></div>'; }
+function zNice(v) { if (v <= 0) return 1; const p = Math.pow(10, Math.floor(Math.log10(v))); for (const m of [1, 1.2, 1.5, 2, 2.5, 3, 4, 5, 6, 8, 10]) if (m * p >= v) return m * p; return 10 * p; }
+function zDrawCol(id, cfg) {
+  const el = $(id); if (!el) return;
+  const cats = cfg.cats, n = cats.length, ser = cfg.series;
+  const LN = cfg.line && Object.keys(cfg.line.v).length ? cfg.line : null;
+  const lg = $(id + '_lg');
+  if (lg) lg.innerHTML = (LN ? '<span><i style="width:14px;height:2px;background:#B3261E"></i>' + esc(LN.l) + ' (права вісь)</span>' : '') +
+    (ser.length > 1 ? ser.map(s => '<span><i style="background:' + s.c + '"></i>' + esc(s.l) + '</span>').join('') : '');
+  const tot = cats.map(c => ser.reduce((a, s) => a + (s.v[c] || 0), 0));
+  if (!n || !tot.some(x => x)) { el.innerHTML = '<p class="muted">Немає даних.</p>'; return; }
+  const fmt = cfg.fmt || fn;
+  const W = Math.max(280, el.clientWidth), H = W < 520 ? 210 : 250, ml = 46, mr = LN ? 40 : 6, mt = 10, mb = 24, pw = W - ml - mr, ph = H - mt - mb;
+  const mx0 = Math.max.apply(null, tot), mx = zNice(mx0);
+  const band = pw / n, bw = Math.max(2, Math.min(56, band * .72)), y = v => mt + ph - v / mx * ph;
+  let s = '<svg viewBox="0 0 ' + W + ' ' + H + '" role="img" aria-label="графік">';
+  for (let i = 0; i <= 4; i++) { const v = mx * i / 4, yy = y(v); s += '<line x1="' + ml + '" x2="' + (W - mr) + '" y1="' + yy + '" y2="' + yy + '" stroke="#E3EAEF"/><text x="' + (ml - 6) + '" y="' + (yy + 4) + '" text-anchor="end">' + esc(fmt(v, true)) + '</text>'; }
+  s += '<rect id="' + id + '_hv" x="0" y="' + mt + '" width="' + band + '" height="' + ph + '" fill="rgba(47,72,88,.07)" style="display:none"/>';
+  const every = Math.max(1, Math.ceil(n / Math.max(1, Math.floor(pw / 46))));
+  cats.forEach((c, i) => {
+    const x = ml + i * band + (band - bw) / 2; let acc = 0;
+    const vis = ser.map(sr => [sr, sr.v[c] || 0]).filter(z => z[1] > 0);
+    vis.forEach((z, j) => {
+      const y0 = y(acc), y1 = y(acc + z[1]); acc += z[1]; const h0 = Math.max(0, y0 - y1);
+      if (j === vis.length - 1) { const r = Math.min(3, bw / 2, h0); s += '<path d="M' + x + ',' + y0 + 'V' + (y1 + r) + 'Q' + x + ',' + y1 + ' ' + (x + r) + ',' + y1 + 'H' + (x + bw - r) + 'Q' + (x + bw) + ',' + y1 + ' ' + (x + bw) + ',' + (y1 + r) + 'V' + y0 + 'Z" fill="' + z[0].c + '"/>'; }
+      else s += '<rect x="' + x + '" y="' + y1 + '" width="' + bw + '" height="' + h0 + '" fill="' + z[0].c + '" stroke="#fff" stroke-width="1.5"/>';
+    });
+    if (i % every === 0) s += '<text x="' + (ml + i * band + band / 2) + '" y="' + (H - 6) + '" text-anchor="middle">' + esc(cfg.catLabel(c)) + '</text>';
+  });
+  s += '<line x1="' + ml + '" x2="' + (W - mr) + '" y1="' + (mt + ph) + '" y2="' + (mt + ph) + '" stroke="#C5D0D7"/>';
+  if (LN) {
+    const lmx = Math.max(2, zNice(Math.max.apply(null, Object.values(LN.v)))), y2 = v => mt + ph - v / lmx * ph;
+    for (let i = 0; i <= 4; i++) { const v = lmx * i / 4; s += '<text x="' + (W - mr + 6) + '" y="' + (y2(v) + 4) + '" text-anchor="start" style="fill:#B3261E">' + (Math.round(v * 10) / 10) + '%</text>'; }
+    const pts = cats.map((c, i) => LN.v[c] === undefined ? null : [ml + i * band + band / 2, y2(LN.v[c])]);
+    let dp = '', pen = false; pts.forEach(p => { if (!p) { pen = false; return; } dp += (pen ? 'L' : 'M') + p[0].toFixed(1) + ',' + p[1].toFixed(1); pen = true; });
+    s += '<path d="' + dp + '" fill="none" stroke="#B3261E" stroke-width="2"/>' + pts.filter(p => p).map(p => '<circle cx="' + p[0].toFixed(1) + '" cy="' + p[1].toFixed(1) + '" r="3.5" fill="#B3261E" stroke="#fff" stroke-width="1.5"/>').join('');
+  }
+  el.innerHTML = s + '</svg>';
+  const svg = el.querySelector('svg'), hv = $(id + '_hv'), tip = $('tip');
+  const idx = e => { const r = svg.getBoundingClientRect(); const x = (e.clientX - r.left) * (W / r.width); const i = Math.floor((x - ml) / band); return i >= 0 && i < n ? i : -1; };
+  const show = e => {
+    const i = idx(e); if (i < 0) { hv.style.display = 'none'; tip.style.display = 'none'; return; }
+    hv.setAttribute('x', ml + i * band); hv.style.display = '';
+    const c = cats[i];
+    tip.innerHTML = '<b>' + esc(cfg.catLabel(c, true)) + '</b>' + ser.filter(sr => sr.v[c]).map(sr => '<div class="ztr"><span><i style="background:' + sr.c + '"></i>' + esc(sr.l) + '</span><b>' + esc(fmt(sr.v[c])) + '</b></div>').join('') +
+      (ser.length > 1 ? '<div class="ztr" style="border-top:1px solid #E3EAEF;margin-top:4px;padding-top:4px"><span>Разом</span><b>' + esc(fmt(tot[i])) + '</b></div>' : '') +
+      (LN && LN.v[c] !== undefined ? '<div class="ztr"><span><i style="background:#B3261E"></i>' + esc(LN.l) + '</span><b>' + zF1(LN.v[c]) + ' %</b></div>' : '');
+    tip.style.display = 'block'; tip._info = null;
+    tip.style.left = Math.min(e.clientX + 14, window.innerWidth - tip.offsetWidth - 8) + 'px'; tip.style.top = (e.clientY + 14) + 'px';
+  };
+  svg.addEventListener('pointermove', show); svg.addEventListener('pointerdown', show);
+  svg.addEventListener('pointerleave', () => { hv.style.display = 'none'; tip.style.display = 'none'; });
 }
 
 // =============================================================== v34: Р-2 «СТАН ЗАРАЗ» і Р-5 «АНАЛІЗ ТАРИ» (етап 2, прототип звітів v19)
