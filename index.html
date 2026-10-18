@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- МЛП · index.html v33 · 18.10.2026 — оболонка за прототипом звітів v19 (етап 1): шапка «‹ Назад» + назва (ПК — ще ⌂), нижнє меню телефона (Головна · «Мій виробіток» для працівника / «Звіти» для інших · Кабінет), ліве меню на ПК; Головна — 📷 сканер QR, «Відкрити тару або партію» одним полем, «Записати роботу без партії», «Робота зі складом», довідка «Етапи виробництва»; Кабінет — усім ролям (профіль), тімліду — ще «Деталі без номера партії · сьогодні» і «Люди на моєму поверсі сьогодні» (Code.gs v40); роль «керівництво»; список «Звіти» (?r=1). Тільки світла тема. v32 · 18.10.2026 — «Нова партія» ротори: поле «KV (якщо вже відомо)», необов'язкове (рішення 18.10, Code.gs v39); на F4 KV обов'язковий, як і раніше. v31 · 18.10.2026 — номер партії — одна літера (Code.gs v38): S-00012 · R-00012 · M-00012; «Знайти партію» — M / S / R; деталі в партії двигунів (статор / ротор) — за літерою номера, старий формат ST- теж розуміється. v30 · 16.10.2026 — етикетки K2 за новим зразком (Labels.gs v2): аркуш наліпок A4 2 × 3 (105 × 99 мм), позиція на аркуші 1–6. v29 · 16.10.2026 — «Без руху»: робочі дні від останньої операції (кроку) — підписи «роб. дн.», колонка «Остання операція». v28 · 16.10.2026 — «Пропустити крок»: останнього кроку маршруту в списку немає. v27 · 16.10.2026 — «Нова партія» ротори: «Походження» — наші (з R1) або покупні в1 (одразу на F4); тімлід: «Почати з кроку» (ST / RT, коментар обов'язковий); «⏭ Пропустити крок» на картці (тімлід, причина обов'язкова), пропуск — в історії, ✖ скасування. v26 · 16.10.2026 — кнопку «Видати на збирання» з картки ST / RT прибрано: статори й ротори в партію двигунів беруть тільки з боку MT («Нова партія», «+ Статори / ротори»); «Стан зараз»: блок «Готово» — статори й ротори, готові до збирання (партій · шт, за типорозміром і KV), у збиранні (взято в MT, ще не зібрано), двигуни після K2 за день. v25 · 16.10.2026 — «Стан зараз»: кнопка «Усі» в потоках — статори, ротори й двигуни разом: кроки всіх трьох маршрутів (за потоками, у локації — за поверхами), партії, брак, «Готових» з розбивкою за потоками. v24 · 16.10.2026 — R5: «Одразу на …» — крок після балансування за маршрутом (без OV4 і R7 — F4), а не жорстко R7. v23 · 16.10.2026 — «Стан зараз»: «Успішні операції за поверхами» — усі потоки (статори, ротори, двигуни), а не лише обраний, тож видно й 3 поверх; запис без локації — Печерськ (як і раніше для поверху). v22 · 16.10.2026 — крок на вибір, який не знадобився (напр. після «Фен» — «Піч нова»), показано як пропущений: закреслений у смужці кроків, у списку кроків «не потрібен — обрано …», у «Маршрут і кількості» «пропущено». v21 · 16.10.2026 — колір партії (Code.gs v27): ротори — у «Новій партії» RT, статори — на кроці «База статора» (необов'язково); тімлід і вище — «🎨 Колір» на картці; колір — плашка на картці, в історії «колір: було → стало». v20 · 16.10.2026 — маршрути за типорозміром (Code.gs v25, Reports.gs v11): «Стан зараз» — кроки обраного типорозміру, «Готових» — за останнім кроком маршруту кожного типорозміру; крок на вибір — підказка «або …» у списку кроків. v19 · 16.10.2026 — зав. відділу браку: «↩ Повернути з відбраковки» на картці партії (етап — як востаннє брали з цієї партії, коментар необов'язковий; Code.gs v22). v18 · 16.10.2026 — тімлід і вище: у формі кроку і «Роботи без партії» — «Хто виконав» (будь-який активний працівник) і «Дата» (до RETRO_DAYS днів назад, Code.gs v21); вибір тримається, поки відкрита сторінка; в історії — «вніс …», «внесено …». v17 · 15.10.2026 — відгуки тімлідів: «+ Додати» (тімлід і вище, звідки + коментар); «✂ Взяли на відбраковку» для зав. відділу браку; партія постачальника (текст + 📷 з розпізнаванням) на кроках LOT_STEPS, у новій партії ST / RT і для в1; нова партія MT і «+ Статори / ротори»: лише в1 / в2 / пізніше, в2 — список готових партій і їх тари; перекладання в два піддони (пара), один піддон пари → інший, пара → одна тара; звіти: фільтр і групування за поверхами (аркуш «Поверхи»); склад: «Робота зі складом», «поклав» + звідки; перемикач «Склад» у кабінеті сховано; реєстрація: «Форму вже надіслали?» — свій код, застарілий код телефону забувається. v16 · 15.10.2026 — «Робота без партії» з одного QR (?nb=1): дільниця у формі, необов'язково (за замовчуванням — дільниця працівника, «Різні / не вказувати», телефон пам'ятає вибір), кнопка на головній; K2: ящиків перераховується при кожній зміні кількості; помилка — один раз (у формі, без червоної смужки внизу); «Партія: закрито». v15 · 14.10.2026 —історія: «+ 1 ротор», «+ 3 статори» (відмінки) замість «+ 1 роторів». v14 · 14.10.2026 — T-46: видача ST / RT → MT, в1 і в2 без номера: ✖ автора (15 хв) з поясненням, що станеться, — на картках обох партій; ✎ тімліда «Виправити кількість» (більше / менше / «Скасувати запис», з причиною); в історії «виправлено · було N» і хто й чому виправив; Р-7: «було N» для кількості деталей. v13 · 14.10.2026 — партія MT: «звідки статори / ротори» — наша партія ST / RT (тара або номер, перевірка до запису), постачальник, в1 / в2 без номера, пізніше; кількість пар рахується сама; «+ Статори / ротори» замість «Додати покупні»; «Повернути залишок» прибрано — «✂ Залишок» (працівник: в іншу партію MT або «годний залишок»); K2: ящиків рахується саме, план етикеток і ✉ «Етикетки ще раз» з позиції на аркуші; головна: «Знайти партію»; «Стан зараз»: записи без номера партії. v12: реєстрація телефону: сторінка сама перевіряє реєстрацію, коли людина повертається з форми (і 3 хв кожні 4 с); відкриття сторінки з уже надісланою формою завершує реєстрацію без кнопки 2; після реєстрації — одразу потрібний екран (склад, кабінет, звіти); підказка «не скануйте QR знову»; діагностика (rg) у «Реєстрація_лог». v11: склад: перемикач «Склад» у кабінеті, головна для зав. складу (без виробництва), «Усі видачі» для зав. складу й керівників. v10: кнопка «Видача зі складу» лише тімлідам і вище (perms.sklad). v9: екран «Видача зі складу» (?s=КОД локації): фото етикетки з розпізнаванням, калькулятор кількості, «Мої видачі». v8: змішане походження -->
+<!-- МЛП · index.html v34 · 18.10.2026 — Р-2 «Стан зараз» і Р-5 «Аналіз тари» за прототипом звітів v19 (етап 2): фільтри згортаються на телефоні, 4 картки стану на зараз (готові до збирання статори / ротори, у роботі, з них без руху) відкривають згорнуті блоки; «Де зараз» — за процесами або за поверхами, «Готово до збирання» на спільній шкалі, «Готово до реалізації» — окремо; партії в роботі й завершені; колір двигунів — за роторами (Reports.gs v15); Р-5 — картка «Без руху» відкриває список. Без вкладок усередині звіту. v33 · 18.10.2026 — оболонка за прототипом звітів v19 (етап 1): шапка «‹ Назад» + назва (ПК — ще ⌂), нижнє меню телефона (Головна · «Мій виробіток» для працівника / «Звіти» для інших · Кабінет), ліве меню на ПК; Головна — 📷 сканер QR, «Відкрити тару або партію» одним полем, «Записати роботу без партії», «Робота зі складом», довідка «Етапи виробництва»; Кабінет — усім ролям (профіль), тімліду — ще «Деталі без номера партії · сьогодні» і «Люди на моєму поверсі сьогодні» (Code.gs v40); роль «керівництво»; список «Звіти» (?r=1). Тільки світла тема. v32 · 18.10.2026 — «Нова партія» ротори: поле «KV (якщо вже відомо)», необов'язкове (рішення 18.10, Code.gs v39); на F4 KV обов'язковий, як і раніше. v31 · 18.10.2026 — номер партії — одна літера (Code.gs v38): S-00012 · R-00012 · M-00012; «Знайти партію» — M / S / R; деталі в партії двигунів (статор / ротор) — за літерою номера, старий формат ST- теж розуміється. v30 · 16.10.2026 — етикетки K2 за новим зразком (Labels.gs v2): аркуш наліпок A4 2 × 3 (105 × 99 мм), позиція на аркуші 1–6. v29 · 16.10.2026 — «Без руху»: робочі дні від останньої операції (кроку) — підписи «роб. дн.», колонка «Остання операція». v28 · 16.10.2026 — «Пропустити крок»: останнього кроку маршруту в списку немає. v27 · 16.10.2026 — «Нова партія» ротори: «Походження» — наші (з R1) або покупні в1 (одразу на F4); тімлід: «Почати з кроку» (ST / RT, коментар обов'язковий); «⏭ Пропустити крок» на картці (тімлід, причина обов'язкова), пропуск — в історії, ✖ скасування. v26 · 16.10.2026 — кнопку «Видати на збирання» з картки ST / RT прибрано: статори й ротори в партію двигунів беруть тільки з боку MT («Нова партія», «+ Статори / ротори»); «Стан зараз»: блок «Готово» — статори й ротори, готові до збирання (партій · шт, за типорозміром і KV), у збиранні (взято в MT, ще не зібрано), двигуни після K2 за день. v25 · 16.10.2026 — «Стан зараз»: кнопка «Усі» в потоках — статори, ротори й двигуни разом: кроки всіх трьох маршрутів (за потоками, у локації — за поверхами), партії, брак, «Готових» з розбивкою за потоками. v24 · 16.10.2026 — R5: «Одразу на …» — крок після балансування за маршрутом (без OV4 і R7 — F4), а не жорстко R7. v23 · 16.10.2026 — «Стан зараз»: «Успішні операції за поверхами» — усі потоки (статори, ротори, двигуни), а не лише обраний, тож видно й 3 поверх; запис без локації — Печерськ (як і раніше для поверху). v22 · 16.10.2026 — крок на вибір, який не знадобився (напр. після «Фен» — «Піч нова»), показано як пропущений: закреслений у смужці кроків, у списку кроків «не потрібен — обрано …», у «Маршрут і кількості» «пропущено». v21 · 16.10.2026 — колір партії (Code.gs v27): ротори — у «Новій партії» RT, статори — на кроці «База статора» (необов'язково); тімлід і вище — «🎨 Колір» на картці; колір — плашка на картці, в історії «колір: було → стало». v20 · 16.10.2026 — маршрути за типорозміром (Code.gs v25, Reports.gs v11): «Стан зараз» — кроки обраного типорозміру, «Готових» — за останнім кроком маршруту кожного типорозміру; крок на вибір — підказка «або …» у списку кроків. v19 · 16.10.2026 — зав. відділу браку: «↩ Повернути з відбраковки» на картці партії (етап — як востаннє брали з цієї партії, коментар необов'язковий; Code.gs v22). v18 · 16.10.2026 — тімлід і вище: у формі кроку і «Роботи без партії» — «Хто виконав» (будь-який активний працівник) і «Дата» (до RETRO_DAYS днів назад, Code.gs v21); вибір тримається, поки відкрита сторінка; в історії — «вніс …», «внесено …». v17 · 15.10.2026 — відгуки тімлідів: «+ Додати» (тімлід і вище, звідки + коментар); «✂ Взяли на відбраковку» для зав. відділу браку; партія постачальника (текст + 📷 з розпізнаванням) на кроках LOT_STEPS, у новій партії ST / RT і для в1; нова партія MT і «+ Статори / ротори»: лише в1 / в2 / пізніше, в2 — список готових партій і їх тари; перекладання в два піддони (пара), один піддон пари → інший, пара → одна тара; звіти: фільтр і групування за поверхами (аркуш «Поверхи»); склад: «Робота зі складом», «поклав» + звідки; перемикач «Склад» у кабінеті сховано; реєстрація: «Форму вже надіслали?» — свій код, застарілий код телефону забувається. v16 · 15.10.2026 — «Робота без партії» з одного QR (?nb=1): дільниця у формі, необов'язково (за замовчуванням — дільниця працівника, «Різні / не вказувати», телефон пам'ятає вибір), кнопка на головній; K2: ящиків перераховується при кожній зміні кількості; помилка — один раз (у формі, без червоної смужки внизу); «Партія: закрито». v15 · 14.10.2026 —історія: «+ 1 ротор», «+ 3 статори» (відмінки) замість «+ 1 роторів». v14 · 14.10.2026 — T-46: видача ST / RT → MT, в1 і в2 без номера: ✖ автора (15 хв) з поясненням, що станеться, — на картках обох партій; ✎ тімліда «Виправити кількість» (більше / менше / «Скасувати запис», з причиною); в історії «виправлено · було N» і хто й чому виправив; Р-7: «було N» для кількості деталей. v13 · 14.10.2026 — партія MT: «звідки статори / ротори» — наша партія ST / RT (тара або номер, перевірка до запису), постачальник, в1 / в2 без номера, пізніше; кількість пар рахується сама; «+ Статори / ротори» замість «Додати покупні»; «Повернути залишок» прибрано — «✂ Залишок» (працівник: в іншу партію MT або «годний залишок»); K2: ящиків рахується саме, план етикеток і ✉ «Етикетки ще раз» з позиції на аркуші; головна: «Знайти партію»; «Стан зараз»: записи без номера партії. v12: реєстрація телефону: сторінка сама перевіряє реєстрацію, коли людина повертається з форми (і 3 хв кожні 4 с); відкриття сторінки з уже надісланою формою завершує реєстрацію без кнопки 2; після реєстрації — одразу потрібний екран (склад, кабінет, звіти); підказка «не скануйте QR знову»; діагностика (rg) у «Реєстрація_лог». v11: склад: перемикач «Склад» у кабінеті, головна для зав. складу (без виробництва), «Усі видачі» для зав. складу й керівників. v10: кнопка «Видача зі складу» лише тімлідам і вище (perms.sklad). v9: екран «Видача зі складу» (?s=КОД локації): фото етикетки з розпізнаванням, калькулятор кількості, «Мої видачі». v8: змішане походження -->
 <html>
 <head>
 <meta charset="utf-8">
@@ -62,6 +62,43 @@
   .hbody{padding:6px 4px 10px 14px;font-size:14px}
   .hrow{padding:3px 0}.hrow>span{display:block;color:#66767F;font-size:12px}
   @media (min-width:900px){.hrow{display:grid;grid-template-columns:150px 1fr;gap:8px}.hrow>span{font-size:13px}}
+  /* v34: компоненти звітів (Р-0_09, Р-0_10, Р-0_24, Р-0_26) — клас z… , щоб не зачепити старий «Мій виробіток» */
+  .zfbar{margin:12px;background:#fff;border-radius:14px;box-shadow:0 1px 3px rgba(0,0,0,.08);padding:10px 12px}
+  .zfbar>summary{display:none}
+  .zfrow{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+  .zfrow select{width:auto;font-size:15px;padding:8px 10px;min-height:0}
+  .zkpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:10px;margin:12px}
+  .zkpi{background:#fff;border-radius:14px;padding:11px 13px;box-shadow:0 1px 3px rgba(0,0,0,.08);min-width:0}
+  .zkpi.go{cursor:pointer}.zkpi.go:hover{box-shadow:0 0 0 2px #C5D0D7,0 1px 3px rgba(0,0,0,.08)}
+  .zkpi .l{font-size:11.5px;color:#66767F;text-transform:uppercase;letter-spacing:.04em;font-weight:700}
+  .zkpi .v{font-size:25px;font-weight:700;line-height:1.2;font-variant-numeric:tabular-nums;white-space:nowrap}
+  .zkpi .v small{font-size:13px;font-weight:500;color:#66767F;margin-left:3px}
+  .zkpi .d{font-size:12.5px;color:#66767F}
+  .zkpi.kbad .v{color:#B3261E}.zkpi.kgood .v{color:#17643D}
+  details.zfold>summary{display:flex;align-items:center;gap:8px;list-style:none}
+  details.zfold>summary::-webkit-details-marker{display:none}
+  details.zfold>summary::before{content:'▸';font-size:13px;color:#66767F;width:14px}
+  details.zfold[open]>summary::before{content:'▾'}
+  details.zfold>summary .cnt{color:#66767F;font-weight:500;font-size:15px}
+  .zfb{padding:0 16px 14px}
+  .zctl{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin:8px 0;font-size:14px;color:#55656E}
+  .zhb{display:grid;grid-template-columns:minmax(90px,max-content) 1fr auto;gap:5px 10px;align-items:center;font-size:14px}
+  .zhb.x4{grid-template-columns:minmax(90px,max-content) 1fr auto 18px}
+  .zhb .lb{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:260px}
+  .zhb .bx{height:14px;background:#F4F7F9;border-radius:4px;overflow:hidden}
+  .zhb .bar{height:100%;background:#2a78d6;border-radius:0 4px 4px 0}
+  .zhb .r{text-align:right;white-space:nowrap;font-variant-numeric:tabular-nums}
+  .zhb .click{cursor:pointer}.zhb .dim{opacity:.35}
+  .zhb .hd{grid-column:1/-1;font-size:11.5px;font-weight:700;color:#66767F;text-transform:uppercase;letter-spacing:.05em;margin-top:8px}
+  .zhb .xm{text-align:right}
+  .info.xmark{border:0;background:#FDE3E1;color:#B3261E;font-size:11px;font-weight:800}
+  @media (max-width:899px){
+    .zfbar>summary{display:flex;justify-content:space-between;cursor:pointer;font-weight:700;padding:2px 0;list-style:none;font-size:15px;gap:8px}
+    .zfbar>summary::-webkit-details-marker{display:none}
+    .zfbar[open]>summary{margin-bottom:8px}
+    .zkpis{grid-template-columns:1fr 1fr}.zkpi .v{font-size:22px}
+    .zhb .lb{max-width:150px}
+  }
   .card{background:#fff;margin:12px;border-radius:14px;padding:16px;box-shadow:0 1px 3px rgba(0,0,0,.08)}
   .big{font-size:34px;font-weight:700;letter-spacing:.5px;line-height:1.1}
   .mid{font-size:18px;font-weight:600}
@@ -148,7 +185,7 @@
 <div class="toast" id="toast"></div>
 
 <script>
-const PAGE_VERSION = 'index.html v33 · 18.10.2026';
+const PAGE_VERSION = 'index.html v34 · 18.10.2026';
 const API = 'https://script.google.com/macros/s/AKfycbx-JUajnAtVsxaLHDgwRpfzE12g4LUtlf6JnWYAQScAVZ5FCpxzGHSrA5PDESqP80KD/exec';
 window.STATIC_SELF = location.origin + location.pathname;
 const PARAMS = Object.fromEntries(new URLSearchParams(location.search));
@@ -333,7 +370,7 @@ function navSave(me, perms) {
   else if (NAV.role !== me.role) n.perms = {};   // роль змінилась, а прав ще не знаємо — меню до наступного відкриття головної мінімальне
   NAV = n; store('mlp_nav', JSON.stringify(n)); navRender();
 }
-const DASHT = { stan: ['Р-2', 'Стан зараз'], tare: ['Р-5', 'Тара'], my: ['Р-8с', 'Мій виробіток'] };
+const DASHT = { stan: ['Р-2', 'Стан зараз'], tare: ['Р-5', 'Аналіз тари'], my: ['Р-8с', 'Мій виробіток'] };
 /** Звіти ролі для меню (Р-0_07). «Мій виробіток» у меню — працівнику (окрема вкладка) і зав. відділу браку (рішення 18.10) */
 function navReports() {
   const p = NAV.perms || {}, r = [];
@@ -1447,175 +1484,223 @@ function dcard(title, sub, body) { return '<div class="card"><div class="mid">' 
 function renderDash() {
   const d = DB;
   $('who').innerHTML = whoHtml(d.me, d.perms);
+  ZA = [];
   const tabs = [['stan', 'Стан зараз', d.perms.dashStan], ['tare', 'Тара', d.perms.dashTare], ['my', 'Мій виробіток', d.perms.dashMy]].filter(x => x[2]);
-  let h = '<div class="tabs">' + tabs.map(x => '<a class="' + (x[0] === d.d ? 'on' : '') + '" href="' + esc(link('d=' + x[0])) + '">' + x[1] + '</a>').join('') + '</div>';
-  h += d.d === 'stan' ? dashStan() : d.d === 'tare' ? dashTare() : dashMy();
+  // v34: Р-2 і Р-5 — нові звіти без вкладок (переходи — у меню); «Мій виробіток» — поки старий, з вкладками (етап 3)
+  let h = d.d === 'my' ? '<div class="tabs">' + tabs.map(x => '<a class="' + (x[0] === d.d ? 'on' : '') + '" href="' + esc(link('d=' + x[0])) + '">' + x[1] + '</a>').join('') + '</div>' : '';
+  h += d.d === 'stan' ? r2() : d.d === 'tare' ? r5() : dashMy();
   h += '<p class="muted" style="text-align:center">Дані на ' + esc(d.now) + (d.me.role === 'адміністратор' ? ' · ' + sec(d.ms) + ' / ' + sec(d.total) : '') +
     ' · <a class="lnk" href="javascript:loadDash()">оновити</a></p><div style="height:30px"></div>';
   $('app').innerHTML = h;
+  zAfter();
 }
 
-/** Р-2а «Стан зараз» (ДШ-1): що лежить на кожному кроці, які партії стоять, що пішло в брак */
-function dashStan() {
-  const d = DB;
-  // v25: «Усі» — кроки всіх трьох маршрутів підряд (5-й елемент — потік); v20: маршрут типорозміру
-  const FL = DF.flow === 'all' ? ['ST', 'RT', 'MT'] : [DF.flow];
-  const R0 = [].concat(...FL.map(f => ((DF.typ !== 'all' && d.routesT && d.routesT[f + '|' + DF.typ]) || d.routes[f] || []).map(x => x.slice(0, 4).concat([f]))));
-  const flowOk = x => DF.flow === 'all' || x.stream === DF.flow;
-  const nm = c => (R0.find(x => x[0] === c) || [c, ''])[1];
-  const locOk = l => DF.loc === 'all' || String(l || '').charAt(0) === DF.loc;
-  const fit = x => (DF.typ === 'all' || x.typ === DF.typ) && (DF.kv === 'all' || x.kv === DF.kv);
-  // v17: поверх — за кроком (аркуш «Поверхи»), у локації тари партії / запису
-  const flOn = DF.loc !== 'all' && DF.fl !== 'all';
-  const tp = DF.typ === 'all' ? '' : DF.typ;
-  const R = flOn ? R0.filter(x => floorOf(DF.loc, x[0], tp) === DF.fl) : R0;
-  const bWaitFl = b => Object.keys(b.wait).some(c => floorOf(String(b.loc || '').charAt(0), c, b.typ) === DF.fl);
-  const bs0 = d.batches.filter(b => flowOk(b) && locOk(b.loc) && fit(b) && (!flOn || bWaitFl(b)));
-  const bs = DF.step ? bs0.filter(b => b.wait[DF.step]) : bs0;
-  const stuck = bs.filter(b => b.stuck);
-  const recLoc = r => String(r.floor || '').charAt(0) || 'П';
-  const recOk = r => r.isStep && flowOk(r) && r.p === DF.per && (DF.loc === 'all' || recLoc(r) === DF.loc) && fit(r) && (!flOn || floorOf(recLoc(r), r.step, r.typ) === DF.fl);
-  const rs = d.recs.filter(r => recOk(r) && (!DF.step || r.step === DF.step));
-  const lastCode = R.length ? R[R.length - 1][0] : '';
-  const doneStep = DF.step || lastCode;
-  // v20: «Готових» — останній крок маршруту типорозміру запису (ST 3115 — S13, 4320 — S9.3)
-  const finOf = r => (d.finals && (d.finals[r.stream + '|' + r.typ] || d.finals[r.stream + '|*'])) || [lastCode];
-  const done = d.recs.filter(r => recOk(r) && (DF.step ? r.step === DF.step : finOf(r).indexOf(r.step) >= 0)).reduce((a, r) => a + r.good, 0);
-  const finAll = [...new Set(d.recs.filter(r => flowOk(r) && (DF.typ === 'all' || r.typ === DF.typ)).map(finOf).flat())];
-  const doneBy = f => d.recs.filter(r => recOk(r) && r.stream === f && finOf(r).indexOf(r.step) >= 0).reduce((a, r) => a + r.good, 0);   // v25
-  const scr = rs.reduce((a, r) => a + r.scrap, 0);
-  const ctl = {}; R.forEach(x => ctl[x[0]] = x[2] === 'К');
-  const chk = rs.filter(r => ctl[r.step]).reduce((a, r) => a + r.good + r.scrap, 0);
-  const flagged = d.recs.filter(r => r.flagged && r.p === DF.per).length;
-  const perL = DF.per === 'today' ? 'сьогодні' : 'за ' + d.prevLabel;
-  const typs = [...new Set(d.batches.filter(flowOk).map(b => b.typ).concat(d.recs.filter(flowOk).map(r => r.typ)))].filter(x => x).sort();
-  const kvs = [...new Set(d.batches.filter(b => flowOk(b) && (DF.typ === 'all' || b.typ === DF.typ)).map(b => b.kv))].filter(x => x).sort((a, b) => a - b);
-  let h = '<div class="fl">' + chips('loc', [['all', 'Усі'], ['П', 'Печерськ'], ['Ж', 'Жуляни']]) + floorChips() + chips('flow', [['all', 'Усі'], ['ST', 'Статори'], ['RT', 'Ротори'], ['MT', 'Двигуни']]) +
-    chips('per', [['today', 'Сьогодні']].concat(d.prevLabel ? [['prev', d.prevLabel]] : [])) + dsel('typ', 'Типорозмір', typs) + dsel('kv', 'KV', kvs) +
-    (DF.step ? '<div class="chips"><button type="button" class="on" onclick="dset(\'step\',\'' + esc(DF.step) + '\')">Крок ' + esc(DF.step) + ' ✕</button></div>' : '') + '</div>';
-  h += '<div class="kpis" style="margin:12px">' +
-    (DF.flow === 'all' && !DF.step   // v25: усі потоки — готові окремо, бо статори, ротори й двигуни не додаються
-      ? kpi('Готових ' + perL, fn(doneBy('MT')), 'двигунів', 'статорів ' + fn(doneBy('ST')) + ' · роторів ' + fn(doneBy('RT')))
-      : kpi(DF.step ? 'Записано на ' + esc(DF.step) + ' ' + perL : 'Готових ' + FLOWN[DF.flow][1] + ' ' + perL, fn(done), 'шт', esc(DF.step || !finAll.length ? doneStep + ' · ' + nm(doneStep) : finAll.length === 1 ? finAll[0] + ' · ' + nm(finAll[0]) : 'останній крок маршруту: ' + finAll.join(', ')))) +
-    kpi('У роботі', bs.length, 'партій', fn(bs.reduce((a, b) => a + (DF.step ? b.wait[DF.step] : Math.max(0, b.rem)), 0)) + ' шт у тарі') +
-    kpi('Брак ' + perL, fn(scr), 'шт', chk ? pct(scr, chk) + ' від перевірених' : '') +
-    kpi('Без руху ≥ ' + d.idleDays + ' роб. дн.', stuck.length, 'партій', stuck.length ? '<span class="pill bad" style="margin:0">потребує уваги</span>' : 'усе рухається') +
-    (flagged ? kpi('Записи з невідомих акаунтів', flagged, '', 'чекають тімліда') : '') +
-    (d.noLot && d.noLot[DF.per] ? kpi('Деталі без номера партії ' + perL, d.noLot[DF.per], 'записів', 'в1 / в2 без номера — з часом мають зникнути') : '') + '</div>';
-  h += readyCard(d, perL, doneBy('MT'), recOk);   // v26: блок «Готово»
-  // незавершене виробництво за кроками: скільки штук чекає кожен крок; натискання — фільтр. v17: згруповано за поверхами (обрана локація)
+// =============================================================== v34: Р-2 «СТАН ЗАРАЗ» і Р-5 «АНАЛІЗ ТАРИ» (етап 2, прототип звітів v19)
+// Спільні компоненти звітів: фільтри-чипи, що згортаються (Р-0_09), картки з (?) і «показати ▾» (Р-0_10, Р-0_26), смуги (hbars з колонкою «!»),
+// згорнуті блоки, стан яких пам'ятає пристрій (Р-0_24)
+let ZF = {}; try { ZF = JSON.parse(store('mlp_fold') || '{}') || {}; } catch (e) { ZF = {}; }
+let ZSCROLL = '';
+function zFold(id, title, cnt, body) {
+  return '<details class="zfold" id="zf_' + id + '"' + (ZF[id] ? ' open' : '') + ' ontoggle="zFoldT(\'' + id + '\',this.open)"><summary>' + title +
+    (cnt !== '' && cnt !== undefined ? ' <span class="cnt">' + cnt + '</span>' : '') + '</summary><div class="zfb">' + body + '</div></details>';
+}
+function zFoldT(id, open) { ZF[id] = open; store('mlp_fold', JSON.stringify(ZF)); }
+/** картка, що відкриває згорнутий блок звіту і прокручує до нього (Р-0_26) */
+function zOpen(id) { ZF[id] = true; store('mlp_fold', JSON.stringify(ZF)); ZSCROLL = id; }
+function zAfter() { if (ZSCROLL) { const el = $('zf_' + ZSCROLL); ZSCROLL = ''; if (el) el.scrollIntoView({ block: 'start' }); } }
+let ZA = [];
+const zAct = f => ZA.push(f) - 1;
+function zA(i, v) { const f = ZA[i]; if (f) f(v); }
+function zKpi(l, v, u, d, tip, cls, act) {
+  return '<div class="zkpi ' + (cls || '') + (act !== undefined ? ' go' : '') + '"' + (act !== undefined ? ' onclick="zA(' + act + ')"' : '') + '><div class="l">' + l + (tip ? ' ' + info(tip) : '') + '</div>' +
+    '<div class="v">' + v + (u ? '<small>' + u + '</small>' : '') + '</div>' + (d ? '<div class="d">' + d + '</div>' : '') + '</div>';
+}
+function zChips(cur, list, set) {
+  return '<div class="chips">' + list.map(x => '<button type="button" class="' + (String(cur) === String(x[0]) ? 'on' : '') + '" onclick="zA(' + zAct(() => set(x[0])) + ')">' + esc(x[1]) + '</button>').join('') + '</div>';
+}
+function zSel(cur, label, list, set) {
+  return '<select onchange="zA(' + zAct(set) + ',this.value)"><option value="all">' + esc(label) + ': усі</option>' +
+    list.map(x => '<option value="' + esc(x) + '"' + (String(cur) === String(x) ? ' selected' : '') + '>' + esc(x) + '</option>').join('') + '</select>';
+}
+let ZFB = {};   // які блоки фільтрів розгорнуто на телефоні
+function zFbar(key, summary, nAct, inner) {
+  const wide = window.innerWidth >= 900;
+  return '<details class="zfbar"' + (wide || ZFB[key] ? ' open' : '') + ' ontoggle="ZFB[\'' + key + '\']=this.open"><summary><span>⚙ Фільтри · ' + esc(summary) + '</span><span class="muted">' +
+    (nAct ? nAct + ' активних ▾' : '▾') + '</span></summary><div class="zfrow">' + inner + '</div></details>';
+}
+/** горизонтальні смуги: r.hd — заголовок групи; r.x — позначка в окремій колонці; r.nos — окрема шкала */
+function zBars(rows) {
+  const mx = Math.max(1, ...rows.filter(r => !r.hd && !r.nos).map(r => r.v));
+  const x4 = rows.some(r => r.x !== undefined);
+  return '<div class="zhb' + (x4 ? ' x4' : '') + '">' + rows.map(r => {
+    if (r.hd) return '<div class="hd">' + r.hd + '</div>';
+    const on = r.on !== undefined ? ' onclick="zA(' + r.on + ')"' : '';
+    const cl = (r.on !== undefined ? 'click ' : '') + (r.dim ? 'dim' : '');
+    return '<div class="lb ' + cl + '"' + on + '>' + r.l + '</div><div class="bx ' + cl + '"' + on + '><div class="bar" style="width:' + (r.nos ? (r.v ? 100 : 0) : r.v / mx * 100).toFixed(1) + '%' +
+      (r.c ? ';background:' + r.c : '') + '"></div></div><div class="r ' + cl + '"' + on + '>' + r.t + '</div>' + (x4 ? '<div class="xm">' + (r.x || '') + '</div>' : '');
+  }).join('') + '</div>';
+}
+const xmark = t => '<span class="info xmark" data-tip="' + esc(t) + '" tabindex="0" role="button" aria-label="Пояснення">!</span>';
+const tl = code => code ? '<a class="lnk" href="' + esc(link('t=' + encodeURIComponent(code))) + '">' + esc(code) + '</a>' : '<span class="pill warn" style="margin:0">⚠ без тари</span>';
+const PLR = n => plural(n, 'партія', 'партії', 'партій');
+const IDLE_TIP = d => 'Без руху — ' + d + ' і більше робочих днів від останньої операції з партією (ПВ-14). Вихідні не рахуються.';
+const COLN = c => String(c || '').toLowerCase();
+
+// ---- Р-2 Стан зараз — тільки стан на зараз
+const Z2 = { loc: '', fl: 'all', flow: 'ST', typ: 'all', kv: 'all', col: 'all', step: '', view: 'proc', only: 'all', donek: 'all', more: false };
+function z2set(k, v) {
+  Z2[k] = (k === 'step' && Z2.step === v) ? '' : v;
+  if (k === 'flow') { Z2.step = ''; Z2.kv = 'all'; Z2.typ = 'all'; Z2.col = 'all'; }
+  if (k === 'loc') { Z2.fl = 'all'; Z2.step = ''; }
+  if (k === 'fl') Z2.step = '';
+  if (k !== 'more') Z2.more = false;
+  renderDash();
+}
+function r2() {
+  const d = DB, D = Z2;
+  if (!D.loc) D.loc = (d.me && d.me.site ? d.me.site.charAt(0) : '') || 'all';
+  const FL = D.flow === 'all' ? ['ST', 'RT', 'MT'] : [D.flow];
+  const routeOf = (f, typ) => (typ && d.routesT && d.routesT[f + '|' + typ]) || d.routes[f] || [];
+  const R0 = [].concat(...FL.map(f => routeOf(f, D.typ === 'all' ? '' : D.typ).map(x => [x[0], x[1], x[2], f])));
+  const flowOk = k => D.flow === 'all' || k === D.flow;
+  const locOf = b => String(b.loc || '').charAt(0);
+  const locOk = b => D.loc === 'all' || locOf(b) === D.loc;
+  const colOk = b => D.col === 'all' || COLN(b.color) === D.col || (b.colors || []).indexOf(D.col) >= 0;
+  const fit = b => (D.typ === 'all' || b.typ === D.typ) && (D.kv === 'all' || b.kv === D.kv) && colOk(b);
+  const flOn = D.loc !== 'all' && D.fl !== 'all';
+  const tp = D.typ === 'all' ? '' : D.typ;
+  const R = flOn ? R0.filter(x => floorOf(D.loc, x[0], tp) === D.fl) : R0;
+  const isReady = b => (b.stream === 'ST' || b.stream === 'RT') && (b.status === 'готово' || b.status === 'видано частково') && b.rem > 0;
+  const inWork = b => b.status === 'в роботі' || b.status === 'поза маршрутом';
+  const waitFl = b => Object.keys(b.wait).some(c => floorOf(locOf(b), c, b.typ) === D.fl);
+  const all0 = d.batches.filter(b => flowOk(b.stream) && locOk(b) && fit(b));
+  const inw0 = all0.filter(b => inWork(b) && (!flOn || waitFl(b)));
+  const inw = D.step ? inw0.filter(b => b.wait[D.step]) : inw0;
+  const stk = inw.filter(b => b.stuck);
+  const rdyB = k => all0.filter(b => b.stream === k && isReady(b)), rq = k => rdyB(k).reduce((a, b) => a + b.rem, 0);
+  const typs = [...new Set(d.batches.filter(b => flowOk(b.stream)).map(b => b.typ))].filter(x => x).sort();
+  const kvs = [...new Set(d.batches.filter(b => flowOk(b.stream) && (D.typ === 'all' || b.typ === D.typ)).map(b => b.kv))].filter(x => x).sort((a, b) => a - b);
+  const cols = [...new Set([].concat(...d.batches.filter(b => flowOk(b.stream)).map(b => b.stream === 'MT' ? (b.colors || []) : [COLN(b.color)])))].filter(x => x).sort((a, b) => a.localeCompare(b, 'uk'));
+  const fls = D.loc !== 'all' ? floorsAt(D.loc) : [];
+  const sum = [D.loc === 'all' ? 'усі локації' : LOCN[D.loc] + (D.fl !== 'all' ? ' · ' + D.fl + ' пов.' : ''), FLOWN[D.flow][0].toLowerCase()]
+    .concat(D.typ !== 'all' ? [D.typ] : [], D.kv !== 'all' ? ['KV ' + D.kv] : [], D.col !== 'all' ? [D.col] : [], D.step ? ['крок ' + D.step] : []).join(' · ');
+  let h = zFbar('r2', sum, [D.fl !== 'all', D.typ !== 'all', D.kv !== 'all', D.col !== 'all', !!D.step].filter(x => x).length,
+    zChips(D.loc, [['all', 'Усі'], ['П', 'Печерськ'], ['Ж', 'Жуляни']], v => z2set('loc', v)) +
+    (fls.length ? zChips(D.fl, [['all', 'Усі поверхи']].concat(fls.map(f => [f, f + ' поверх'])), v => z2set('fl', v)) : '') +
+    zChips(D.flow, [['all', 'Усі'], ['ST', 'Статори'], ['RT', 'Ротори'], ['MT', 'Двигуни']], v => z2set('flow', v)) +
+    zSel(D.typ, 'Типорозмір', typs, v => z2set('typ', v)) + zSel(D.kv, 'KV', kvs, v => z2set('kv', v)) + zSel(D.col, 'Колір', cols, v => z2set('col', v)) +
+    (D.step ? zChips(D.step, [[D.step, 'Крок ' + D.step + ' ✕']], v => z2set('step', v)) : ''));
+  // Р-2_02 — 4 картки стану на зараз
+  const RTIP = 'Пройшли маршрут і лежать у тарі, доки їх не візьмуть у партію двигунів.';
+  const goP = only => zAct(() => { D.only = only; zOpen('r2_05'); renderDash(); });
+  const goD = k => zAct(() => { D.donek = k; zOpen('r2_11'); renderDash(); });
+  const units = inw.reduce((a, b) => a + (D.step ? b.wait[D.step] || 0 : Math.max(0, b.rem)), 0), stU = stk.reduce((a, b) => a + Math.max(0, b.rem), 0);
+  h += '<div class="zkpis">' +
+    (flowOk('ST') ? zKpi('Статори готові до збирання', fn(rq('ST')), 'шт', rdyB('ST').length + ' ' + PLR(rdyB('ST').length) + ' · показати ▾', RTIP, 'kgood', goD('ST')) : '') +
+    (flowOk('RT') ? zKpi('Ротори готові до збирання', fn(rq('RT')), 'шт', rdyB('RT').length + ' ' + PLR(rdyB('RT').length) + ' · показати ▾', RTIP, 'kgood', goD('RT')) : '') +
+    zKpi('У роботі', fn(inw.length), 'партій', fn(units) + ' шт у них · показати ▾', 'Партії, що зараз ідуть маршрутом (без готових до збирання).', '', goP('all')) +
+    zKpi('З них без руху', fn(stk.length), 'партій', stk.length ? fn(stU) + ' шт · показати ▾' : 'усе рухається', IDLE_TIP(d.idleDays), stk.length ? 'kbad' : '', goP('stuck')) + '</div>';
+  // Р-2_04 Де зараз · за кроками (Р-2_10: за процесами / за поверхами)
+  const stepRow = (x, pool) => {
+    const q = pool.reduce((a, b) => a + (b.wait[x[0]] || 0), 0), sk = pool.filter(b => b.wait[x[0]] && b.stuck).length;
+    return { l: '<b>' + esc(x[0]) + '</b> <span class="muted">' + esc(x[1]) + '</span>', v: q, t: q ? fn(q) + ' шт' : '<span class="muted">—</span>',
+      x: sk ? xmark(sk + ' ' + PLR(sk) + ' на цьому кроці без руху ≥ ' + d.idleDays + ' роб. дн. Список — картка «З них без руху»') : '',
+      on: zAct(() => z2set('step', x[0])), dim: D.step && D.step !== x[0] };
+  };
+  const soldOk = s => (D.loc === 'all' || s.loc === D.loc) && (D.typ === 'all' || s.typ === D.typ) && (D.kv === 'all' || s.kv === D.kv) && (D.col === 'all' || s.colors.indexOf(D.col) >= 0);
+  const soldQ = (d.sold || []).filter(soldOk).reduce((a, s) => a + s.q, 0);
+  const endRow = k => k === 'MT'
+    ? { l: '<b>✓ Готово до реалізації</b> ' + info('Двигуни, що пройшли останній крок (K2) за всі дні. Реалізовані двигуни МЛП поки не списує — спишемо з модуля «Запаси». До того число лише зростає. Окрема шкала — не порівнюється з кроками.'), v: soldQ, t: '<b>' + fn(soldQ) + ' шт</b>', c: '#9BD8B0', nos: 1, x: '' }
+    : { l: '<b>✓ Готово до збирання</b> ' + info('Статори / ротори, що пройшли маршрут і лежать у тарі, доки їх не візьмуть у партію двигунів. Шкала спільна з кроками: видно, скільки можна взяти в збирання вже зараз і скільки підійде після останнього кроку.'), v: rq(k), t: '<b>' + fn(rq(k)) + ' шт</b>', c: '#1F7A4D', x: '' };
   const rows = [];
-  let lastFl = null, lastFlow = null;
-  R.forEach(x => {
-    if (DF.flow === 'all' && x[4] !== lastFlow) { if (DF.loc === 'all') rows.push({ head: FLOWN[x[4]][0] }); lastFlow = x[4]; lastFl = null; }   // v25
-    if (DF.loc !== 'all') { const f = floorOf(DF.loc, x[0], tp) || '—'; if (f !== lastFl) { rows.push({ head: (DF.flow === 'all' ? FLOWN[x[4]][0] + ' · ' : '') + (f === '—' ? 'поверх не вказано' : f + ' поверх') }); lastFl = f; } }
-    rows.push(stepRow(x));
-  });
-  function stepRow(x) {
-    const q = bs0.reduce((a, b) => a + (b.wait[x[0]] || 0), 0);
-    const sk = bs0.filter(b => b.wait[x[0]] && b.stuck).length;
-    return { l: '<b>' + esc(x[0]) + '</b> <span class="muted">' + esc(x[1]) + '</span>', v: q,
-      t: (q ? fn(q) + ' шт' : '<span class="muted">—</span>') + (sk ? ' <span class="pill bad" style="margin:0 0 0 4px">' + sk + ' стоять</span>' : ''),
-      cls: 'click' + (DF.step === x[0] ? ' on' : DF.step ? ' dim' : ''), on: "dset('step','" + esc(x[0]) + "')" };
+  if (D.view === 'proc') {
+    FL.forEach(f => {
+      const steps = R.filter(x => x[3] === f);
+      if (!steps.length && !(f !== 'MT' && rq(f))) return;
+      rows.push({ hd: { ST: 'Лінія статорів', RT: 'Лінія роторів', MT: 'Збирання двигунів' }[f] });
+      const pool = inw0.filter(b => b.stream === f);
+      steps.forEach(x => rows.push(stepRow(x, pool)));
+      rows.push(endRow(f));
+    });
+  } else {
+    const locs = D.loc === 'all' ? ['П', 'Ж'] : [D.loc];
+    locs.forEach(L => {
+      const pool = inw0.filter(b => locOf(b) === L);
+      floorsAt(L).concat(['']).filter(f => !flOn || f === D.fl).forEach(f => {
+        const steps = R0.filter(x => floorOf(L, x[0], tp) === f);
+        const shown = f ? steps : steps.filter(x => pool.some(b => b.wait[x[0]]));   // без поверху — тільки кроки, де щось чекає
+        if (!shown.length) return;
+        rows.push({ hd: (locs.length > 1 ? LOCN[L] + ' · ' : '') + (f ? f + ' поверх' : 'поверх не вказано') });
+        shown.forEach(x => rows.push(stepRow(x, pool)));
+      });
+    });
+    const ends = FL.filter(k => k === 'MT' ? soldQ : rq(k));
+    if (ends.length) { rows.push({ hd: 'Готово' }); ends.forEach(k => { const e = endRow(k); e.l = e.l.replace('✓ Готово', '✓ ' + FLOWN[k][0] + ' — готово'); rows.push(e); }); }
   }
-  const fin = bs0.reduce((a, b) => a + Math.max(0, b.rem - Object.keys(b.wait).reduce((s, k) => s + b.wait[k], 0)), 0);
-  if (fin) rows.push({ l: '<b>✓</b> <span class="muted">пройшли маршрут, у тарі</span>', v: fin, t: fn(fin) + ' шт', c: '#1F7A4D' });
-  h += dcard('Де зараз ' + FLOWN[DF.flow][1] + ' · за кроками', 'Скільки штук чекає кожен крок. Натисніть крок — решта покаже тільки його.' +
-    (DF.flow === 'RT' && DF.kv !== 'all' ? ' KV ротора до F4 відомий, лише якщо його вказали в «Новій партії».' : ''),
-    bs0.length || fin ? hbars(rows) : '<p class="muted">' + (DF.loc === 'Ж' && DF.flow !== 'MT' && DF.flow !== 'all' ? 'На Жулянах ' + FLOWN[DF.flow][1] + ' не виготовляють.' : 'За цими фільтрами партій у роботі немає.') + '</p>');
-  // партії
-  const list = (DF.only === 'stuck' ? stuck : bs).slice().sort((a, b) => b.idle - a.idle || a.no.localeCompare(b.no));
-  const shown = DF.more ? list : list.slice(0, 15);
-  h += dcard('Партії в роботі' + (DF.step ? ': крок ' + esc(DF.step) : ''), bs.length + ' партій, з них без руху ' + stuck.length,
-    chips('only', [['all', 'Усі'], ['stuck', 'Тільки без руху']]) + (list.length ? '<div class="tw" style="margin-top:10px"><table class="t"><tr><th>Партія</th><th>Тип · KV</th><th>Крок</th><th>Тара</th><th class="r">шт</th><th>Остання операція</th></tr>' +
-      shown.map(b => '<tr><td>' + bl(b.no) + '</td><td>' + esc(b.typ) + (b.kv ? ' · ' + esc(b.kv) : '') + '</td><td>' + esc(b.step || '—') +
-        (b.purpose ? ' <span class="pill warn" style="margin:0">' + esc(b.purpose) + '</span>' : '') + '</td><td>' + esc(b.tare ? b.tare + (b.tare2 ? ' + ' + b.tare2 : '') : '⚠ без тари') + '</td><td class="r">' +
-        fn(DF.step ? b.wait[DF.step] : b.rem) + '</td><td>' + esc(b.last || '—') + (b.stuck ? ' <span class="pill bad" style="margin:0">' + b.idle + ' роб. дн.</span>' : '') + '</td></tr>').join('') +
-      '</table></div>' + (list.length > 15 ? '<button type="button" class="ic" style="margin-top:8px" onclick="dset(\'more\',DF.more?\'\':\'1\')">' + (DF.more ? 'Згорнути' : 'Показати всі ' + list.length) + '</button>' : '')
+  const any = rows.some(r => !r.hd);
+  h += zFold('r2_04', 'Де зараз · за кроками', '', '<div class="muted" style="margin-bottom:8px">Скільки штук чекає кожен крок. Натисніть крок — решта покаже тільки його.</div>' +
+    '<div class="zctl"><span>Вид:</span>' + zChips(D.view, [['proc', 'За процесами'], ['floor', 'За поверхами']], v => { D.view = v; renderDash(); }) + '</div>' +
+    (any ? zBars(rows) : '<p class="muted">' + (D.loc === 'Ж' && D.flow !== 'MT' && D.flow !== 'all' ? 'На Жулянах ' + FLOWN[D.flow][1] + ' не виготовляють.' : 'За цими фільтрами партій немає.') + '</p>'));
+  // Р-2_05 Партії в роботі
+  const list = (D.only === 'stuck' ? stk : inw).slice().sort((a, b) => b.idle - a.idle || a.no.localeCompare(b.no));
+  const shown = D.more ? list : list.slice(0, 15);
+  h += zFold('r2_05', 'Партії в роботі', inw.length, '<div class="muted">' + (D.step ? 'Крок ' + esc(D.step) + ': ' : '') + inw.length + ' ' + PLR(inw.length) + ', з них без руху ' + stk.length + '</div>' +
+    zChips(D.only, [['all', 'Усі'], ['stuck', 'Тільки без руху']], v => { D.only = v; D.more = false; renderDash(); }) +
+    (list.length ? '<div class="tw" style="margin-top:10px"><table class="t"><tr><th>Партія</th><th>Тип · KV</th><th>Крок</th><th>Тара</th><th class="r">шт</th><th>Остання операція</th><th></th></tr>' +
+      shown.map(b => '<tr><td>' + bl(b.no) + '</td><td>' + esc(b.typ) + (b.kv ? ' · ' + esc(b.kv) : '') + (b.color ? '<br><span class="muted">' + esc(b.color) + '</span>' : '') + '</td><td>' + esc(b.step || '—') +
+        (b.purpose ? ' <span class="pill warn" style="margin:0">' + esc(b.purpose) + '</span>' : '') + '</td><td>' + tl(b.tare) + (b.tare2 ? ' + ' + esc(b.tare2) : '') + '</td><td class="r">' +
+        fn(D.step ? b.wait[D.step] : b.rem) + '</td><td>' + esc(b.last || '—') + '</td><td>' + (b.stuck ? xmark('Без руху ' + b.idle + ' роб. дн. (' + d.idleDays + ' і більше)') : '') + '</td></tr>').join('') + '</table></div>' +
+      (list.length > 15 ? '<button type="button" class="ic" style="margin-top:8px" onclick="zA(' + zAct(() => { D.more = !D.more; renderDash(); }) + ')">' + (D.more ? 'Згорнути' : 'Показати всі ' + list.length) + '</button>' : '')
       : '<p class="muted">Немає партій за цими фільтрами.</p>'));
-  // брак за причинами
-  const rz = {}; rs.forEach(r => { if (r.scrap) rz[r.reason || '—'] = (rz[r.reason || '—'] || 0) + r.scrap; });
-  const rr = Object.keys(rz).sort((a, b) => rz[b] - rz[a]);
-  h += dcard('Брак ' + perL + ' за причинами', DF.step ? 'Крок ' + esc(DF.step) : '', rr.length ? hbars(rr.map(k => ({ l: esc(k), v: rz[k], t: fn(rz[k]) + ' шт', c: '#B3261E' }))) : '<p class="muted">Браку немає.</p>');
-  // успішні операції за поверхами (v17: поверх — за кроком, аркуш «Поверхи»; локація — з запису)
-  // v23: усі потоки (ротори й двигуни — 3 поверх), обрані період і локація; поверх і типорозмір-фільтри тут не діють
-  const rsAll = d.recs.filter(r => r.isStep && r.p === DF.per && (DF.loc === 'all' || recLoc(r) === DF.loc));
-  const fl = {}; rsAll.forEach(r => { const f = floorOf(recLoc(r), r.step, r.typ); const k = f ? recLoc(r) + f : '—'; fl[k] = (fl[k] || 0) + r.good; });
-  const sn = c => (d.sites.find(x => x.code === c) || { name: c === '—' ? 'поверх не вказано' : (LOCN[c.charAt(0)] || c.charAt(0)) + ', ' + c.slice(1) + ' поверх' }).name;
-  const fk = Object.keys(fl).sort();
-  h += dcard('Успішні операції ' + perL + ' за поверхами', 'Усі потоки — статори, ротори, двигуни. Сума всіх кроків: деталь рахується стільки разів, скільки кроків пройшла',
-    fk.length ? hbars(fk.map(k => ({ l: '<b>' + esc(k) + '</b> <span class="muted">' + esc(sn(k)) + '</span>', v: fl[k], t: fn(fl[k]) + ' шт' }))) : '<p class="muted">Записів немає.</p>');
+  // Р-2_11 Партії завершені — статори й ротори в тарі
+  const dks = ['ST', 'RT'].filter(flowOk);
+  if (dks.length) {
+    const dAll = [].concat(...dks.map(rdyB));
+    const dl = [].concat(...dks.filter(k => D.donek === 'all' || D.donek === k).map(rdyB)).sort((a, b) => a.stream.localeCompare(b.stream) || b.idle - a.idle || a.no.localeCompare(b.no));
+    h += zFold('r2_11', 'Партії завершені', dAll.length, '<div class="muted">' + dAll.length + ' ' + PLR(dAll.length) + ', ' + fn(dAll.reduce((a, b) => a + b.rem, 0)) + ' шт — пройшли маршрут, чекають збирання</div>' +
+      (dks.length > 1 ? zChips(D.donek, [['all', 'Усі'], ['ST', 'Статори'], ['RT', 'Ротори']], v => { D.donek = v; renderDash(); }) : '') +
+      (dl.length ? '<div class="tw" style="margin-top:10px"><table class="t"><tr><th>Партія</th><th>Тип · KV</th><th>Колір</th><th>Тара</th><th class="r">шт</th><th>Завершено</th><th></th></tr>' +
+        dl.map(b => '<tr><td>' + bl(b.no) + '</td><td>' + esc(b.typ) + ' · ' + esc(b.kv || '—') + '</td><td>' + esc(b.color || '—') + '</td><td>' + tl(b.tare) + (b.tare2 ? ' + ' + esc(b.tare2) : '') + '</td><td class="r">' + fn(b.rem) +
+          '</td><td>' + esc(b.last || '—') + '</td><td>' + (b.stuck ? xmark('Лежить без руху ' + b.idle + ' роб. дн. (' + d.idleDays + ' і більше)') : '') + '</td></tr>').join('') + '</table></div>' : '<p class="muted">Немає.</p>'));
+  }
   return h;
 }
 
-/** v26: блок «Готово» у «Стан зараз». Статори / ротори — партії ST / RT, що пройшли маршрут і ще мають штуки в тарі
- *  (зникають, коли їх беруть у партію MT); у збиранні — залишок деталей у партіях MT, ще не зібраний (F1);
- *  двигуни — пройшли K2 за обраний день (передачі на склад у МЛП поки немає, тому залишок готових двигунів не показуємо).
- *  Фільтри: локація (тара партії), типорозмір, KV, потік; поверх і крок тут не діють. */
-function readyCard(d, perL, motorsDone, recOk) {
-  const locOk = l => DF.loc === 'all' || String(l || '').charAt(0) === DF.loc;
-  const fit = x => (DF.typ === 'all' || x.typ === DF.typ) && (DF.kv === 'all' || x.kv === DF.kv);
-  const showS = DF.flow === 'all' || DF.flow === 'ST', showR = DF.flow === 'all' || DF.flow === 'RT', showM = DF.flow === 'all' || DF.flow === 'MT';
-  const rdy = d.batches.filter(b => (b.stream === 'ST' || b.stream === 'RT') && (b.status === 'готово' || b.status === 'видано частково') && b.rem > 0 &&
-    locOk(b.loc) && fit(b) && (b.stream === 'ST' ? showS : showR));
-  const sum = s => { const x = rdy.filter(b => b.stream === s); return { n: x.length, q: x.reduce((a, b) => a + b.rem, 0) }; };
-  const S0 = sum('ST'), R0 = sum('RT');
-  const asm = d.batches.filter(b => b.stream === 'MT' && b.cl && b.status === 'в роботі' && locOk(b.loc) && fit(b));
-  const aS = asm.reduce((a, b) => a + b.cl.S, 0), aR = asm.reduce((a, b) => a + b.cl.R, 0);
-  const line = (l, v, sub) => '<div class="li"><div><b>' + l + '</b>' + (sub ? '<br><span class="muted">' + sub + '</span>' : '') + '</div><div class="r"><b>' + v + '</b></div></div>';
-  let body = '<div class="list" style="padding:0">' +
-    (showS ? line('Статори готові до збирання', fn(S0.q) + ' шт', S0.n + ' ' + plural(S0.n, 'партія', 'партії', 'партій') + ' у тарі') : '') +
-    (showR ? line('Ротори готові до збирання', fn(R0.q) + ' шт', R0.n + ' ' + plural(R0.n, 'партія', 'партії', 'партій') + ' у тарі · KV вигравіювано (F4)') : '') +
-    (showM && (aS || aR) ? line('У збиранні', fn(aS) + ' / ' + fn(aR) + ' шт', 'статори / ротори вже в партіях двигунів, ще не зібрані (F1) · партій MT: ' + asm.filter(b => b.cl.S || b.cl.R).length) : '') +
-    (showM ? line('Двигуни готові ' + perL, fn(motorsDone) + ' шт', 'пройшли K2 · передачі на склад у МЛП ще немає') : '') + '</div>';
-  // за типорозміром і KV: статори, ротори і скільки пар можна зібрати з наших
-  if (rdy.length && DF.flow === 'all') {
-    const g = {};
-    rdy.forEach(b => { const k = b.typ + '|' + (b.kv || '—'); const x = g[k] = g[k] || { ST: [0, 0], RT: [0, 0] }; x[b.stream][0]++; x[b.stream][1] += b.rem; });
-    const ks = Object.keys(g).sort((a, b) => a.split('|')[0].localeCompare(b.split('|')[0]) || (Number(a.split('|')[1]) || 0) - (Number(b.split('|')[1]) || 0));
-    const c = x => x[1] ? fn(x[1]) + ' <span class="muted">(' + x[0] + ')</span>' : '<span class="muted">—</span>';
-    body += '<div class="tw" style="margin-top:12px"><table class="t"><tr><th>Тип · KV</th><th class="r">Статори</th><th class="r">Ротори</th><th class="r">Пар з наших</th></tr>' +
-      ks.map(k => { const [t, kv] = k.split('|'); const x = g[k];
-        return '<tr><td>' + esc(t) + ' · ' + esc(kv) + '</td><td class="r">' + c(x.ST) + '</td><td class="r">' + c(x.RT) + '</td><td class="r">' + fn(Math.min(x.ST[1], x.RT[1])) + '</td></tr>'; }).join('') +
-      '</table></div><p class="muted" style="margin:6px 0 0">шт (партій). «Пар з наших» — без покупних (в1) статорів і роторів.</p>';
-  }
-  if (rdy.length) {
-    const ls = rdy.slice().sort((a, b) => a.stream.localeCompare(b.stream) || b.idle - a.idle || a.no.localeCompare(b.no));
-    body += '<details style="margin-top:10px"><summary>Партії (' + ls.length + ')</summary><div class="tw"><table class="t"><tr><th>Партія</th><th>Тип · KV</th><th>Тара</th><th class="r">шт</th><th>Остання операція</th></tr>' +
-      ls.map(b => '<tr><td>' + bl(b.no) + '</td><td>' + esc(b.typ) + (b.kv ? ' · ' + esc(b.kv) : '') + (b.color ? ' · ' + esc(b.color) : '') + '</td><td>' +
-        esc(b.tare ? b.tare + (b.tare2 ? ' + ' + b.tare2 : '') : '⚠ без тари') + '</td><td class="r">' + fn(b.rem) + '</td><td>' + esc(b.last || '—') +
-        (b.stuck ? ' <span class="pill bad" style="margin:0">' + b.idle + ' роб. дн.</span>' : '') + '</td></tr>').join('') + '</table></div></details>';
-  }
-  return dcard('Готово', 'Статори й ротори зникають звідси, коли їх беруть у партію двигунів («+ Статори / ротори» на картці MT).', body);
-}
-
-/** Р-5 «Тара» (ДШ-6): чи вистачає тари і яка тара зависла */
-function dashTare() {
-  const d = DB;
-  const locOk = l => DF.loc === 'all' || String(l || '').charAt(0) === DF.loc;
+// ---- Р-5 Аналіз тари
+const Z5 = { loc: '', fl: 'all', more: false, open: false };
+function r5() {
+  const d = DB, D = Z5;
+  if (!D.loc) D.loc = (d.me && d.me.site ? d.me.site.charAt(0) : '') || 'all';
+  const set = (k, v) => { D[k] = v; if (k === 'loc') D.fl = 'all'; D.more = false; renderDash(); };
+  const locOk = l => D.loc === 'all' || String(l || '').charAt(0) === D.loc;
   const gs = d.groups.filter(g => locOk(g.loc));
-  // v17: поверх тари — за наступним кроком партії в ній (аркуш «Поверхи»)
   d.busy.forEach(b => b.fl = b.next ? floorOf(String(b.loc || '').charAt(0), b.next, b.typ) : '');
-  const flOn = DF.loc !== 'all' && DF.fl !== 'all';
-  const busy = d.busy.filter(b => locOk(b.loc) && (!flOn || b.fl === DF.fl));
-  const shown = DF.more ? busy : busy.slice(0, 20);
-  let h = '<div class="fl">' + chips('loc', [['all', 'Усі'], ['П', 'Печерськ'], ['Ж', 'Жуляни']]) + floorChips() + '</div>';
+  const flOn = D.loc !== 'all' && D.fl !== 'all';
+  const busy = d.busy.filter(b => locOk(b.loc) && (!flOn || b.fl === D.fl));
+  const stuck = busy.filter(b => b.idle >= d.idleDays);
   const tot = gs.reduce((a, g) => [a[0] + g.busy, a[1] + g.free, a[2] + g.out], [0, 0, 0]);
-  h += '<div class="kpis" style="margin:12px">' + kpi('Зайнята', fn(tot[0]), 'шт', pct(tot[0], tot[0] + tot[1] + tot[2]) + ' усієї тари') +
-    kpi('Вільна', fn(tot[1]), 'шт', tot[2] ? 'виведено: ' + tot[2] : '') +
-    kpi('Без руху ≥ ' + d.idleDays + ' роб. дн.', busy.filter(b => b.idle >= d.idleDays).length, 'шт тари', 'партія в ній не рухається') + '</div>';
-  h += dcard('Тара за типами й локаціями', '<span style="color:#2F4858">■</span> зайнята · <span style="color:#C5D0D7">■</span> вільна · <span style="color:#66767F">■</span> виведена',
-    '<div class="tw"><table class="t"><tr><th>Тип</th><th>Локація</th><th style="width:34%">Стан</th><th class="r">Зайнято</th><th class="r">Вільно</th></tr>' + gs.map(g => {
+  const fls = D.loc !== 'all' ? floorsAt(D.loc) : [];
+  let h = zFbar('r5', D.loc === 'all' ? 'усі локації' : LOCN[D.loc] + (D.fl !== 'all' ? ' · ' + D.fl + ' пов.' : ''), D.fl !== 'all' ? 1 : 0,
+    zChips(D.loc, [['all', 'Усі'], ['П', 'Печерськ'], ['Ж', 'Жуляни']], v => set('loc', v)) + (fls.length ? zChips(D.fl, [['all', 'Усі поверхи']].concat(fls.map(f => [f, f + ' поверх'])), v => set('fl', v)) : ''));
+  h += '<div class="zkpis">' + zKpi('Зайнята', fn(tot[0]), 'шт', pct(tot[0], tot[0] + tot[1] + tot[2]) + ' усієї тари') + zKpi('Вільна', fn(tot[1]), 'шт', tot[2] ? 'виведено: ' + tot[2] : '') +
+    zKpi('Без руху', fn(stuck.length), 'шт тари', stuck.length ? (D.open ? 'сховати список ▴' : 'показати список ▾') : 'усе рухається', 'Тара, партія в якій без руху ' + d.idleDays + ' і більше робочих днів від останньої операції (ПВ-14).',
+      stuck.length ? 'kbad' : '', stuck.length ? zAct(() => { D.open = !D.open; renderDash(); }) : undefined) + '</div>';
+  const row = b => '<tr><td>' + tl(b.code) + (b.pair ? '<br><span class="muted">пара: ' + esc(b.pair) + '</span>' : '') + '</td><td>' + esc(b.fl || '—') + '</td><td>' + (b.batch ? bl(b.batch) : '—') + '</td><td>' + esc(b.step) + (b.next ? ' → ' + esc(b.next) : ' ✓') +
+    '</td><td class="r">' + fn(b.qty) + '</td><td>' + esc(b.since) + '</td><td class="r">' + (b.idle >= d.idleDays ? '<span class="pill bad" style="margin:0">' + b.idle + '</span>' : b.idle) + '</td></tr>';
+  const head = '<tr><th>Тара</th><th>Пов.</th><th>Партія</th><th>Крок</th><th class="r">шт</th><th>Зайнята з</th><th class="r">Без руху, роб. дн.</th></tr>';
+  if (D.open && stuck.length) h += '<div class="card"><div class="mid">Тара без руху</div><div class="tw" style="margin-top:8px;max-height:480px"><table class="t">' + head + stuck.map(row).join('') + '</table></div></div>';
+  const TN = { 'КР': 'КР · ящик', 'ПД': 'ПД · піддон печі', 'ТЧ': 'ТЧ · тачка', 'СК': 'СК · коробка зберігання' };
+  h += '<div class="card"><div class="mid">Тара за типами й локаціями</div><div class="muted"><span style="color:#2F4858">■</span> зайнята · <span style="color:#C5D0D7">■</span> вільна · <span style="color:#66767F">■</span> виведена</div>' +
+    '<div class="tw" style="margin-top:10px"><table class="t"><tr><th>Тип</th><th>Локація</th><th style="width:34%">Стан</th><th class="r">Зайнято</th><th class="r">Вільно</th></tr>' + gs.map(g => {
       const n = g.busy + g.free + g.out || 1;
-      return '<tr><td><b>' + esc(g.type) + '</b></td><td>' + esc(LOCN[g.loc] || g.loc) + '</td><td><div class="sp"><i style="display:block;width:' + (g.busy / n * 100) + '%;background:#2F4858"></i>' +
+      return '<tr><td><b>' + esc(TN[g.type] || g.type) + '</b></td><td>' + esc(LOCN[String(g.loc).charAt(0)] || g.loc) + '</td><td><div class="sp"><i style="display:block;width:' + (g.busy / n * 100) + '%;background:#2F4858"></i>' +
         '<i style="display:block;width:' + (g.free / n * 100) + '%;background:#C5D0D7"></i>' + (g.out ? '<i style="display:block;width:' + (g.out / n * 100) + '%;background:#66767F"></i>' : '') + '</div></td>' +
         '<td class="r">' + g.busy + ' з ' + n + '</td><td class="r">' + (g.free < n * 0.2 ? '<span class="pill warn" style="margin:0">' + g.free + '</span>' : g.free) + '</td></tr>';
-    }).join('') + '</table></div>');
-  h += dcard('Зайнята тара: найдовше без руху зверху', busy.length + ' шт',
-    busy.length ? '<div class="tw"><table class="t"><tr><th>Тара</th><th>Пов.</th><th>Партія</th><th>Крок</th><th class="r">шт</th><th>Зайнята з</th><th class="r">Без руху, роб. дн.</th></tr>' +
-      shown.map(b => '<tr><td><a class="lnk" href="' + esc(link('t=' + encodeURIComponent(b.code))) + '">' + esc(b.code) + '</a>' + (b.pair ? '<br><span class="muted">пара: ' + esc(b.pair) + '</span>' : '') + '</td><td>' + esc(b.fl || '—') + '</td><td>' + (b.batch ? bl(b.batch) : '—') + '</td><td>' + esc(b.step) + (b.next ? ' → ' + esc(b.next) : '') +
-        '</td><td class="r">' + fn(b.qty) + '</td><td>' + esc(b.since) + '</td><td class="r">' + (b.idle >= d.idleDays ? '<span class="pill bad" style="margin:0">' + b.idle + ' роб. дн.</span>' : b.idle + ' роб. дн.') + '</td></tr>').join('') +
-      '</table></div>' + (busy.length > 20 ? '<button type="button" class="ic" style="margin-top:8px" onclick="dset(\'more\',DF.more?\'\':\'1\')">' + (DF.more ? 'Згорнути' : 'Показати всі ' + busy.length) + '</button>' : '')
+    }).join('') + '</table></div></div>';
+  const shown = D.more ? busy : busy.slice(0, 20);
+  h += zFold('r5_04', 'Зайнята тара: найдовше без руху зверху', busy.length,
+    busy.length ? '<div class="tw"><table class="t">' + head + shown.map(row).join('') + '</table></div>' +
+      (busy.length > 20 ? '<button type="button" class="ic" style="margin-top:8px" onclick="zA(' + zAct(() => { D.more = !D.more; renderDash(); }) + ')">' + (D.more ? 'Згорнути' : 'Показати всі ' + busy.length) + '</button>' : '')
       : '<p class="muted">Уся тара вільна.</p>');
   return h;
 }
