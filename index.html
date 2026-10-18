@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- МЛП · index.html v40 · 18.10.2026 — Р-9 «Контроль» за прототипом звітів v19 (етап 7): фільтри (що, локація, поверх, хто виправив / вніс, працівник), картки (виправлень і % від записів кроків, скасувань і з них самим працівником, за працівника і з них минулою датою, хто вносить найбільше), графік у часі, за поверхами, хто виправляє / вносить, журнал «було → стало», звірка ЖЗР ↔ вечірня форма (тиждень, тільки розбіжності, > 2 % — червоним, «немає у формі / в ЖЗР», незіставлені види робіт). v39 · 18.10.2026 — Р-7 «Аналіз партій» за прототипом звітів v19 (етап 6): фільтри (вид, типорозмір, KV, версія, локація, колір, статус), картки (партій, у роботі, без руху → список, пройшли маршрут, час проходження, вихід придатних), «Пройшли маршрут» за періодами, середній час проходження, «Де партії чекають», таблиця партій із сортуванням; картка партії (шлях за кроками, «!» простій, записи, 🕘 Повна історія). У звітах номер партії веде на картку Р-7 (кому Р-7 доступний), інакше — на сторінку партії. v38 · 18.10.2026 — Р-8 «Виробіток» і Р-10 «Аналіз браку» за прототипом звітів v19 (етап 5): період і деталізація, фільтри з мультивибором і пошуком, чипи обраного, перехресний вибір (графік, легенда, рейтинги, матриця), картки, графік у часі (розріз, наростаючим, лінія % браку), рейтинги, брак за причинами, операції за поверхами, матриця з рівнями і CSV; 🔖 «Випуск для бухгалтерії»; тімлід — свій поверх за замовчуванням; бухгалтер — тільки випуск двигунів; примітка про історію до LIVE_FROM. v37 · 18.10.2026 — «оновити» у звітах рахує заново (Р-2 інакше — кеш сервера 60 с, Reports.gs v17); Кабінет зав. виробництва й адміністратора: «Підсумки для звітів» — коли пораховано, «Перерахувати зараз» (етап 4). v36 · 18.10.2026 — «Звіти»: пункт «Р-8с · Мій виробіток 👁» для тімліда, зав. виробництва, адміністратора (перегляд як працівник, Р-0_08). v35 · 18.10.2026 — Р-8с «Мій виробіток» за прототипом звітів v19 (етап 3): день / тиждень / місяць, ‹ ›, календар, «Сьогодні»; картки «Успішних операцій» і «За моїми цінами»; графік за годинами / днями з розрізом, шт / ₴ і лінією % браку; «Роботи й записи» з групуванням кроки / партії / дні; калькулятор ₴ (ціни тільки на пристрої); робота без партії; порожній період — «останній день із записами». 👁 «як працівник»: тімлід, зав. виробництва, адміністратор — будь-який працівник, тільки перегляд (С-29); 👁 у кабінеті біля людей сьогодні. Специфікація: MLP_specyfikacija, аркуш «21. Прототип» -->
+<!-- МЛП · index.html v41 · 18.10.2026 — прибрано старий «Мій виробіток» (Р-3а, вкладки) і старі фільтри «Стан зараз» (DF, chips, dset, dsel, hbars) — етап 8. v40 · 18.10.2026 — Р-9 «Контроль» за прототипом звітів v19 (етап 7): фільтри (що, локація, поверх, хто виправив / вніс, працівник), картки (виправлень і % від записів кроків, скасувань і з них самим працівником, за працівника і з них минулою датою, хто вносить найбільше), графік у часі, за поверхами, хто виправляє / вносить, журнал «було → стало», звірка ЖЗР ↔ вечірня форма (тиждень, тільки розбіжності, > 2 % — червоним, «немає у формі / в ЖЗР», незіставлені види робіт). v39 · 18.10.2026 — Р-7 «Аналіз партій» за прототипом звітів v19 (етап 6): фільтри (вид, типорозмір, KV, версія, локація, колір, статус), картки (партій, у роботі, без руху → список, пройшли маршрут, час проходження, вихід придатних), «Пройшли маршрут» за періодами, середній час проходження, «Де партії чекають», таблиця партій із сортуванням; картка партії (шлях за кроками, «!» простій, записи, 🕘 Повна історія). У звітах номер партії веде на картку Р-7 (кому Р-7 доступний), інакше — на сторінку партії. v38 · 18.10.2026 — Р-8 «Виробіток» і Р-10 «Аналіз браку» за прототипом звітів v19 (етап 5): період і деталізація, фільтри з мультивибором і пошуком, чипи обраного, перехресний вибір (графік, легенда, рейтинги, матриця), картки, графік у часі (розріз, наростаючим, лінія % браку), рейтинги, брак за причинами, операції за поверхами, матриця з рівнями і CSV; 🔖 «Випуск для бухгалтерії»; тімлід — свій поверх за замовчуванням; бухгалтер — тільки випуск двигунів; примітка про історію до LIVE_FROM. v37 · 18.10.2026 — «оновити» у звітах рахує заново (Р-2 інакше — кеш сервера 60 с, Reports.gs v17); Кабінет зав. виробництва й адміністратора: «Підсумки для звітів» — коли пораховано, «Перерахувати зараз» (етап 4). v36 · 18.10.2026 — «Звіти»: пункт «Р-8с · Мій виробіток 👁» для тімліда, зав. виробництва, адміністратора (перегляд як працівник, Р-0_08). v35 · 18.10.2026 — Р-8с «Мій виробіток» за прототипом звітів v19 (етап 3): день / тиждень / місяць, ‹ ›, календар, «Сьогодні»; картки «Успішних операцій» і «За моїми цінами»; графік за годинами / днями з розрізом, шт / ₴ і лінією % браку; «Роботи й записи» з групуванням кроки / партії / дні; калькулятор ₴ (ціни тільки на пристрої); робота без партії; порожній період — «останній день із записами». 👁 «як працівник»: тімлід, зав. виробництва, адміністратор — будь-який працівник, тільки перегляд (С-29); 👁 у кабінеті біля людей сьогодні. Специфікація: MLP_specyfikacija, аркуш «21. Прототип» -->
 <html>
 <head>
 <meta charset="utf-8">
@@ -227,7 +227,7 @@
 <div class="toast" id="toast"></div>
 
 <script>
-const PAGE_VERSION = 'index.html v40 · 18.10.2026';
+const PAGE_VERSION = 'index.html v41 · 18.10.2026';
 const API = 'https://script.google.com/macros/s/AKfycbx-JUajnAtVsxaLHDgwRpfzE12g4LUtlf6JnWYAQScAVZ5FCpxzGHSrA5PDESqP80KD/exec';
 window.STATIC_SELF = location.origin + location.pathname;
 const PARAMS = Object.fromEntries(new URLSearchParams(location.search));
@@ -463,9 +463,15 @@ function navRender() {
   $('backBtn').classList.toggle('hid', VIEW === 'home' && !location.search.replace(/^\?$/, ''));
 }
 /** v33: список звітів ролі (вкладка «Звіти» на телефоні) */
-function renderReports() {
+function renderReports(fetched) {
   document.body.classList.remove('nonav');
   setView('', 'Звіти', 'rep');
+  if (!fetched && !Object.keys(NAV.perms || {}).length) {   // v41: відкрили «Звіти» з QR, а прав ролі на телефоні ще немає — спершу спитати сервер
+    $('app').innerHTML = '<div class="center muted">Завантаження…</div>';
+    return google.script.run.withSuccessHandler(d => { if (d.me) navSave(d.me, d.perms); renderReports(true); })
+      .withFailureHandler(e => { if (/не зареєстровано/.test(e.message)) { forgetCode(); return loadPage(); } $('app').innerHTML = '<div class="card err">' + esc(e.message) + '</div>'; })
+      .apiCabinet({ code: CODE });
+  }
   const reps = navReports();
   $('app').innerHTML = (reps.length ? '<div class="tiles">' + reps.map(x => '<a class="tile" href="' + esc(link(x[0])) + '"><div class="tn">' + esc(DASHT[x[1]][0] + ' · ' + DASHT[x[1]][1] + (x[2] || '')) + '</div></a>').join('') + '</div>'
     : '<div class="card muted">Звітів для вашої ролі ще немає.</div>') + '<p class="muted" style="text-align:center">' + esc(PAGE_VERSION) + '</p>';
@@ -1481,14 +1487,9 @@ const CABO = {};   // які блоки кабінету розгорнуто (�
 
 // =============================================================== ДАШБОРДИ: «Стан зараз» (Р-2а), «Тара» (Р-5), «Мій виробіток» (Р-3а)
 let DB = null;
-const DF = { loc: '', flow: 'ST', typ: 'all', kv: 'all', step: '', per: 'today', only: 'all', more: '', fl: 'all' };   // v17: fl — поверх; loc '' — ще не обрано (за замовчуванням — локація тімліда)
 /** v17: поверх кроку code у локації loc для типорозміру typ (аркуш «Поверхи»); '' — не вказано */
 function floorOf(loc, code, typ) { const m = DB && DB.floors && DB.floors[loc] && DB.floors[loc][code]; return m ? (m[String(typ || '')] || m['*'] || '') : ''; }
 function floorsAt(loc) { const m = (DB && DB.floors && DB.floors[loc]) || {}; const o = {}; Object.keys(m).forEach(c => Object.keys(m[c]).forEach(t => o[m[c][t]] = 1)); return Object.keys(o).sort(); }
-function floorChips() {
-  if (DF.loc === 'all' || !floorsAt(DF.loc).length) return '';
-  return chips('fl', [['all', 'Усі поверхи']].concat(floorsAt(DF.loc).map(f => [f, f + ' поверх'])));
-}
 const FLOWN = { ST: ['Статори', 'статорів'], RT: ['Ротори', 'роторів'], MT: ['Двигуни', 'двигунів'], all: ['Усі', 'деталей і двигунів'] };   // v25: all — усі потоки
 const LOCN = { 'П': 'Печерськ', 'Ж': 'Жуляни' };
 function fn(n) { return Math.round(Number(n) || 0).toLocaleString('uk-UA'); }
@@ -1499,37 +1500,12 @@ function loadDash(fresh) {
   const t0 = Date.now();
   google.script.run.withSuccessHandler(d => { DB = d; DB.total = Date.now() - t0;
     if (d.me) { navSave(d.me, Object.assign({}, d.perms, { sklad: !!d.me.sklad })); const t = DASHT[d.d] || DASHT.stan; setView(t[0], t[1], d.d === 'my' && d.me.role === 'працівник' ? 'my' : 'rep'); }   // v33: меню й назва — за відповіддю сервера
-    if (!DF.loc) DF.loc = (d.me && d.me.site ? d.me.site.charAt(0) : '') || 'all'; renderDash(); })
+    renderDash(); })
     .withFailureHandler(e => {
       if (/не зареєстровано/.test(e.message)) { forgetCode(); return loadPage(); }
       $('app').innerHTML = '<div class="card err">' + esc(e.message) + '</div>' +
         '<a class="btn btn2" style="display:block;text-align:center;text-decoration:none;margin:12px;width:auto" href="' + esc(link('')) + '">На головну</a>';
     }).apiDash(Object.assign({ code: CODE, d: PARAMS.d, per: PARAMS.per || 'w', fresh: fresh ? 1 : 0 }, PARAMS.d === 'my' ? z8q() : (PARAMS.d === 'batches' && PARAMS.card) ? { card: PARAMS.card } : (PARAMS.d === 'out' || PARAMS.d === 'scrap' || PARAMS.d === 'batches' || PARAMS.d === 'control') ? zOutQ() : {}));   // v35: Р-8с — режим, дата, 👁
-}
-function dset(k, v) {
-  DF[k] = (k === 'step' && DF.step === v) ? '' : v;
-  if (k === 'flow') { DF.step = ''; DF.kv = 'all'; DF.typ = 'all'; }
-  if (k === 'loc') { DF.fl = 'all'; DF.step = ''; }
-  if (k === 'fl') DF.step = '';
-  if (k !== 'more') DF.more = '';
-  renderDash();
-}
-function chips(k, list) {
-  return '<div class="chips">' + list.map(x => '<button type="button" class="' + (String(DF[k]) === String(x[0]) ? 'on' : '') +
-    '" onclick="dset(\'' + k + '\',\'' + esc(x[0]) + '\')">' + esc(x[1]) + '</button>').join('') + '</div>';
-}
-function dsel(k, label, list) {
-  return '<select onchange="dset(\'' + k + '\',this.value)"><option value="all">' + label + ': усі</option>' +
-    list.map(x => '<option value="' + esc(x) + '"' + (String(DF[k]) === String(x) ? ' selected' : '') + '>' + esc(x) + '</option>').join('') + '</select>';
-}
-function hbars(rows) {
-  const mx = Math.max(1, ...rows.filter(r => !r.head).map(r => r.v));
-  return '<div class="hb">' + rows.map(r => {
-    if (r.head) return '<div class="hbh">' + r.head + '</div>';   // v17: заголовок групи (поверх)
-    const on = r.on ? ' onclick="' + r.on + '"' : '';
-    return '<div class="' + (r.cls || '') + '"' + on + '>' + r.l + '</div><div class="bx ' + (r.cls || '') + '"' + on + '><div class="bar" style="width:' +
-      (r.v / mx * 100).toFixed(1) + '%' + (r.c ? ';background:' + r.c : '') + '"></div></div><div class="r ' + (r.cls || '') + '"' + on + '>' + r.t + '</div>';
-  }).join('') + '</div>';
 }
 function kpi(l, v, u, d) {
   return '<div class="kpi"><div class="l">' + l + '</div><div class="v">' + v + (u ? '<small>' + u + '</small>' : '') + '</div>' +
@@ -1541,7 +1517,7 @@ function renderDash() {
   $('who').innerHTML = whoHtml(d.me, d.perms);
   ZA = []; ZDRAW = [];
   // v35: усі звіти без вкладок (переходи — у меню); «Мій виробіток» — Р-8с (старий dashMy лишається для відповіді без mode — прибрати на етапі 8)
-  let h = d.d === 'stan' ? r2() : d.d === 'tare' ? r5() : d.d === 'out' ? r8() : d.d === 'scrap' ? r10() : d.d === 'batches' ? (d.card ? r7card() : r7()) : d.d === 'control' ? r9() : d.recs ? r8c() : dashMy();
+  let h = d.d === 'stan' ? r2() : d.d === 'tare' ? r5() : d.d === 'out' ? r8() : d.d === 'scrap' ? r10() : d.d === 'batches' ? (d.card ? r7card() : r7()) : d.d === 'control' ? r9() : r8c();
   h += '<p class="muted" style="text-align:center">Дані на ' + esc(d.now) + (d.me.role === 'адміністратор' ? ' · ' + sec(d.ms) + ' / ' + sec(d.total) + (d.cached ? ' · кеш' : '') + (d.logSrc ? ' · ' + esc(d.logSrc) : '') : '') +
     ' · <a class="lnk" href="javascript:loadDash(1)">оновити</a></p><div style="height:30px"></div>';
   $('app').innerHTML = h;
@@ -2553,40 +2529,6 @@ function r5() {
 
 /** Р-3а «Мій виробіток» (ДШ-5): свої записи за тиждень або місяць */
 function setPer(v) { PARAMS.per = v; setUrl(); loadDash(); }
-function dashMy() {
-  const d = DB;
-  const rows = d.rows, nb = d.noBatch;
-  const good = rows.reduce((a, r) => a + r.good, 0), scr = rows.reduce((a, r) => a + r.scrap, 0);
-  const nbat = new Set(rows.map(r => r.batch)).size;
-  let h = '<div class="fl"><div class="chips">' + [['w', 'Тиждень'], ['m', 'Місяць']].map(x =>
-    '<button type="button" class="' + (d.per === x[0] ? 'on' : '') + '" onclick="setPer(\'' + x[0] + '\')">' + x[1] + '</button>').join('') + '</div>' +
-    '<span class="muted" style="align-self:center">з ' + esc(d.from) + '</span></div>';
-  h += '<div class="kpis" style="margin:12px">' + kpi('Успішних операцій', fn(good), 'шт', 'у ' + nbat + ' партіях') + kpi('Брак', fn(scr), 'шт', '') + '</div>';
-  // за днями
-  const byDay = {}; rows.forEach(r => byDay[r.date] = (byDay[r.date] || 0) + r.good);
-  const mx = Math.max(1, ...d.days.map(x => byDay[x] || 0));
-  const dense = d.days.length > 10;
-  h += dcard('За днями', 'Успішні операції, шт', '<div class="cols">' + d.days.map(x => '<div style="height:' + ((byDay[x] || 0) / mx * 100) + '%">' +
-      (!dense && byDay[x] ? '<span>' + fn(byDay[x]) + '</span>' : '') + '</div>').join('') + '</div>' +
-    '<div class="xl">' + d.days.map((x, i) => '<span>' + (!dense || i % 5 === 0 ? esc(x) : '') + '</span>').join('') + '</div>');
-  // за роботами
-  const bs = {}; rows.forEach(r => { const k = r.step; bs[k] = bs[k] || { n: r.name, g: 0, s: 0, ctl: r.ctl }; bs[k].g += r.good; bs[k].s += r.scrap; });
-  const ks = Object.keys(bs).sort((a, b) => bs[b].g - bs[a].g);
-  h += dcard('За роботами', ks.some(k => bs[k].ctl) ? 'Контроль (тест, перевірка): у ЗП рахуються перевірені — успішні + брак (З-05)' : '',
-    ks.length ? hbars(ks.map(k => ({ l: '<b>' + esc(k) + '</b> <span class="muted">' + esc(bs[k].n) + '</span>', v: bs[k].g,
-      t: fn(bs[k].g) + ' шт' + (bs[k].ctl && bs[k].s ? ' <span class="muted">· перевірено ' + fn(bs[k].g + bs[k].s) + '</span>' : '') }))) : '<p class="muted">Записів кроків немає.</p>');
-  // за партіями
-  const shown = DF.more ? rows : rows.slice(0, 20);
-  if (rows.length) h += dcard('За партіями', rows.length + ' записів',
-    '<div class="tw"><table class="t"><tr><th>Дата</th><th>Партія</th><th>Крок</th><th class="r">Успішних</th><th class="r">Брак</th></tr>' +
-    shown.map(r => '<tr><td>' + esc(r.date) + ' <span class="muted">' + esc(r.time) + '</span></td><td>' + bl(r.batch) + '</td><td>' + esc(r.step) + '</td><td class="r">' + fn(r.good) +
-      '</td><td class="r">' + (r.scrap || '—') + '</td></tr>').join('') + '</table></div>' +
-    (rows.length > 20 ? '<button type="button" class="ic" style="margin-top:8px" onclick="dset(\'more\',DF.more?\'\':\'1\')">' + (DF.more ? 'Згорнути' : 'Показати всі ' + rows.length) + '</button>' : ''));
-  if (nb.length) h += dcard('Робота без партії', '', '<div class="tw"><table class="t"><tr><th>Дата</th><th>Робота</th><th class="r">Кількість</th></tr>' +
-    nb.map(r => '<tr><td>' + esc(r.date) + '</td><td>' + esc(r.work) + (r.comment ? '<br><span class="muted">' + esc(r.comment) + '</span>' : '') + '</td><td class="r">' +
-      (r.hours ? String(r.hours).replace('.', ',') + ' год' : fn(r.qty) + ' шт') + '</td></tr>').join('') + '</table></div>');
-  return h;
-}
 
 // =============================================================== ІСТОРІЯ ПАРТІЇ (Р-7, тімлід і вище)
 let HB = null; let HF = 'all';
