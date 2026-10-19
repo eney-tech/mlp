@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- МЛП · index.html v41 · 18.10.2026 — прибрано старий «Мій виробіток» (Р-3а, вкладки) і старі фільтри «Стан зараз» (DF, chips, dset, dsel, hbars) — етап 8. v40 · 18.10.2026 — Р-9 «Контроль» за прототипом звітів v19 (етап 7): фільтри (що, локація, поверх, хто виправив / вніс, працівник), картки (виправлень і % від записів кроків, скасувань і з них самим працівником, за працівника і з них минулою датою, хто вносить найбільше), графік у часі, за поверхами, хто виправляє / вносить, журнал «було → стало», звірка ЖЗР ↔ вечірня форма (тиждень, тільки розбіжності, > 2 % — червоним, «немає у формі / в ЖЗР», незіставлені види робіт). v39 · 18.10.2026 — Р-7 «Аналіз партій» за прототипом звітів v19 (етап 6): фільтри (вид, типорозмір, KV, версія, локація, колір, статус), картки (партій, у роботі, без руху → список, пройшли маршрут, час проходження, вихід придатних), «Пройшли маршрут» за періодами, середній час проходження, «Де партії чекають», таблиця партій із сортуванням; картка партії (шлях за кроками, «!» простій, записи, 🕘 Повна історія). У звітах номер партії веде на картку Р-7 (кому Р-7 доступний), інакше — на сторінку партії. v38 · 18.10.2026 — Р-8 «Виробіток» і Р-10 «Аналіз браку» за прототипом звітів v19 (етап 5): період і деталізація, фільтри з мультивибором і пошуком, чипи обраного, перехресний вибір (графік, легенда, рейтинги, матриця), картки, графік у часі (розріз, наростаючим, лінія % браку), рейтинги, брак за причинами, операції за поверхами, матриця з рівнями і CSV; 🔖 «Випуск для бухгалтерії»; тімлід — свій поверх за замовчуванням; бухгалтер — тільки випуск двигунів; примітка про історію до LIVE_FROM. v37 · 18.10.2026 — «оновити» у звітах рахує заново (Р-2 інакше — кеш сервера 60 с, Reports.gs v17); Кабінет зав. виробництва й адміністратора: «Підсумки для звітів» — коли пораховано, «Перерахувати зараз» (етап 4). v36 · 18.10.2026 — «Звіти»: пункт «Р-8с · Мій виробіток 👁» для тімліда, зав. виробництва, адміністратора (перегляд як працівник, Р-0_08). v35 · 18.10.2026 — Р-8с «Мій виробіток» за прототипом звітів v19 (етап 3): день / тиждень / місяць, ‹ ›, календар, «Сьогодні»; картки «Успішних операцій» і «За моїми цінами»; графік за годинами / днями з розрізом, шт / ₴ і лінією % браку; «Роботи й записи» з групуванням кроки / партії / дні; калькулятор ₴ (ціни тільки на пристрої); робота без партії; порожній період — «останній день із записами». 👁 «як працівник»: тімлід, зав. виробництва, адміністратор — будь-який працівник, тільки перегляд (С-29); 👁 у кабінеті біля людей сьогодні. Специфікація: MLP_specyfikacija, аркуш «21. Прототип» -->
+<!-- МЛП · index.html v42 · 19.10.2026 — «Нова партія» з «Почати з кроку»: тімлід додає 1–3 фото паперового листа попередніх кроків (необов'язково, без розпізнавання; запит histPhoto), на картці партії — «📄 Фото попередніх кроків» і позначка «історія не внесена». S2 до закриття S1 — правило сервера (Code.gs v46). v41 · 18.10.2026 — прибрано старий «Мій виробіток» (Р-3а, вкладки) і старі фільтри «Стан зараз» (DF, chips, dset, dsel, hbars) — етап 8. v40 · 18.10.2026 — Р-9 «Контроль» за прототипом звітів v19 (етап 7): фільтри (що, локація, поверх, хто виправив / вніс, працівник), картки (виправлень і % від записів кроків, скасувань і з них самим працівником, за працівника і з них минулою датою, хто вносить найбільше), графік у часі, за поверхами, хто виправляє / вносить, журнал «було → стало», звірка ЖЗР ↔ вечірня форма (тиждень, тільки розбіжності, > 2 % — червоним, «немає у формі / в ЖЗР», незіставлені види робіт). v39 · 18.10.2026 — Р-7 «Аналіз партій» за прототипом звітів v19 (етап 6): фільтри (вид, типорозмір, KV, версія, локація, колір, статус), картки (партій, у роботі, без руху → список, пройшли маршрут, час проходження, вихід придатних), «Пройшли маршрут» за періодами, середній час проходження, «Де партії чекають», таблиця партій із сортуванням; картка партії (шлях за кроками, «!» простій, записи, 🕘 Повна історія). У звітах номер партії веде на картку Р-7 (кому Р-7 доступний), інакше — на сторінку партії. v38 · 18.10.2026 — Р-8 «Виробіток» і Р-10 «Аналіз браку» за прототипом звітів v19 (етап 5): період і деталізація, фільтри з мультивибором і пошуком, чипи обраного, перехресний вибір (графік, легенда, рейтинги, матриця), картки, графік у часі (розріз, наростаючим, лінія % браку), рейтинги, брак за причинами, операції за поверхами, матриця з рівнями і CSV; 🔖 «Випуск для бухгалтерії»; тімлід — свій поверх за замовчуванням; бухгалтер — тільки випуск двигунів; примітка про історію до LIVE_FROM. v37 · 18.10.2026 — «оновити» у звітах рахує заново (Р-2 інакше — кеш сервера 60 с, Reports.gs v17); Кабінет зав. виробництва й адміністратора: «Підсумки для звітів» — коли пораховано, «Перерахувати зараз» (етап 4). v36 · 18.10.2026 — «Звіти»: пункт «Р-8с · Мій виробіток 👁» для тімліда, зав. виробництва, адміністратора (перегляд як працівник, Р-0_08). v35 · 18.10.2026 — Р-8с «Мій виробіток» за прототипом звітів v19 (етап 3): день / тиждень / місяць, ‹ ›, календар, «Сьогодні»; картки «Успішних операцій» і «За моїми цінами»; графік за годинами / днями з розрізом, шт / ₴ і лінією % браку; «Роботи й записи» з групуванням кроки / партії / дні; калькулятор ₴ (ціни тільки на пристрої); робота без партії; порожній період — «останній день із записами». 👁 «як працівник»: тімлід, зав. виробництва, адміністратор — будь-який працівник, тільки перегляд (С-29); 👁 у кабінеті біля людей сьогодні. Специфікація: MLP_specyfikacija, аркуш «21. Прототип» -->
 <html>
 <head>
 <meta charset="utf-8">
@@ -227,7 +227,7 @@
 <div class="toast" id="toast"></div>
 
 <script>
-const PAGE_VERSION = 'index.html v41 · 18.10.2026';
+const PAGE_VERSION = 'index.html v42 · 19.10.2026';
 const API = 'https://script.google.com/macros/s/AKfycbx-JUajnAtVsxaLHDgwRpfzE12g4LUtlf6JnWYAQScAVZ5FCpxzGHSrA5PDESqP80KD/exec';
 window.STATIC_SELF = location.origin + location.pathname;
 const PARAMS = Object.fromEntries(new URLSearchParams(location.search));
@@ -776,19 +776,20 @@ function drawNew() {
     if (st === 'RT') h += '<label>Походження</label><div class="seg wrap"><label><input type="radio" name="org" value="" checked><span style="font-size:15px">Наші · з R1</span></label>' +
       '<label><input type="radio" name="org" value="v1"><span style="font-size:15px">Покупні в1 · одразу на ' + esc(S.v1Start || 'F4') + '</span></label></div>';   // v27
     h += lotField('lot', 'Партія постачальника (якщо є)') + '<label>Кількість на старті</label>' + numInput('qty', qty);   // v17: + 📷 етикетки
-    if (S.perms.startAt) h += '<div id="satW"><label>Почати з кроку</label><select id="sat"></select></div>';   // v27: тімлід — партія з переробки тощо
+    if (S.perms.startAt) h += '<div id="satW"><label>Почати з кроку</label><select id="sat"></select>' +   // v27: тімлід — партія з переробки тощо
+      (S.perms.histPhoto ? '<div id="hpW" style="display:none">' + histField() + '</div>' : '') + '</div>';   // v42: фото паперового листа попередніх кроків
     h += '<label id="ncmL">Коментар <span class="muted">(необов\'язково)</span></label><input type="text" id="ncm">';
   }
   if (st === 'RT') h += colorField('ncl', 'RT', '');   // v21: колір роторів — необов'язково
   h += '<button class="btn" id="go">Створити партію</button>';
   $('nf').innerHTML = h;
-  LOTF_reset();
+  LOTF_reset(); HP_reset();
   if (st === 'MT') {
     const ctx = () => ({ typ: $('typ').value, kv: $('kv') ? $('kv').value : '' });
     wireComp('S', 'nS', ctx, qty); wireComp('R', 'nR', ctx, qty);
     ['typ', 'kv'].forEach(id => $(id) && ($(id).onchange = () => { compRedraw('S', 'nS'); compRedraw('R', 'nR'); }));
   } else {
-    wireLot('lot', {});
+    wireLot('lot', {}); histWire();   // v42
     // v27: «Почати з кроку» — маршрут обраного типорозміру; «Покупні в1» — крок задає система
     const satDraw = () => {
       const v1 = !!document.querySelector('input[name=org][value=v1]:checked');
@@ -801,6 +802,7 @@ function drawNew() {
     };
     const satHint = () => {
       const need = $('sat') && $('sat').value && $('satW').style.display !== 'none';
+      if ($('hpW')) $('hpW').style.display = need ? 'block' : 'none';
       $('ncmL').innerHTML = 'Коментар ' + (need ? '<span class="muted">(обов\'язково: чому не з першого кроку, напр. «з переробки»)</span>' : '<span class="muted">(необов\'язково)</span>');
     };
     $('typ').onchange = satDraw; if ($('sat')) $('sat').onchange = satHint;
@@ -813,13 +815,14 @@ function drawNew() {
       if (!compSrc('nS') || !compSrc('nR')) { $('err').textContent = 'Оберіть, звідки статори і звідки ротори (або «Пізніше»)'; return; }
     }
     $('go').disabled = true;
-    lotWait().then(() => {
+    Promise.all([lotWait(), histWait()]).then(() => {
       $('go').disabled = false;
       if (st === 'MT') a.comps = { S: compVal('S', 'nS'), R: compVal('R', 'nR') };
       else {
         const l = lotVal('lot'); a.qty = $('qty').value; a.lot = l.lot; a.photo = l.photo; if ($('ncl')) a.color = $('ncl').value;
         const org = document.querySelector('input[name=org]:checked'); if (org && org.value) a.origin = org.value;   // v27
         if ($('sat') && !a.origin && $('sat').value) a.startAt = $('sat').value;
+        if (a.startAt) { const ids = HP.filter(x => x.id).map(x => x.id); if (ids.length) a.histPhotos = ids; }   // v42
         a.comment = $('ncm').value.trim();
         if (a.startAt && !a.comment) { $('err').textContent = 'Коментар обов\'язковий: чому партія починається з ' + a.startAt; return; }
       }
@@ -916,6 +919,41 @@ function lotVal(id) { return { lot: $(id) ? $(id).value.trim() : '', photo: (LOT
 /** Дочекатися фото, що ще надсилається (щоб запис отримав посилання на нього) */
 function lotWait() { return Promise.all(Object.keys(LOTF).map(k => LOTF[k].busy).filter(Boolean)).catch(() => { }); }
 
+// ---- v42: оцифрування партії, що вже на кроці X: фото паперового листа попередніх кроків (без розпізнавання, 1–3 фото).
+// Кожне фото надсилається одразу (histPhoto → id файлу), «Створити партію» чекає, поки всі дійдуть, і передає id.
+const HP_MAX = 3;
+let HP = [];
+function HP_reset() { HP = []; }
+function histField() {
+  return '<label>Фото паперового листа попередніх кроків <span class="muted">(необов\'язково)</span></label>' +
+    '<button type="button" class="btn btn2" id="hpCam" style="margin-top:0">📷 Додати фото</button>' +
+    '<input type="file" accept="image/*" capture="environment" id="hpFile" style="display:none">' +
+    '<div id="hpList" class="muted" style="margin-top:6px"></div>' +
+    '<p class="muted" style="margin:6px 0 0">Ми розпізнаємо його пізніше й внесемо попередні кроки — вам їх перевірити.</p>';
+}
+function histDraw() {
+  if (!$('hpList')) return;
+  $('hpList').innerHTML = HP.map((x, k) => '<div style="display:flex;align-items:center;gap:8px;margin-top:6px">' +
+    (x.img ? '<img src="' + x.img + '" style="height:56px;border-radius:8px">' : '') +
+    '<span style="flex:1">' + (x.err ? '<span style="color:#9B231A">' + esc(x.err) + '</span>' : x.id ? '✓ Фото ' + (k + 1) + ' збережено' : 'Надсилаю фото ' + (k + 1) + '…') + '</span>' +
+    (x.busy ? '' : '<button type="button" class="ic" data-hp="' + k + '" style="flex:0 0 44px;margin:0">✖</button>') + '</div>').join('');
+  document.querySelectorAll('[data-hp]').forEach(b => b.onclick = () => { HP.splice(Number(b.dataset.hp), 1); histDraw(); });
+  if ($('hpCam')) { const n = HP.filter(x => !x.err).length; $('hpCam').style.display = n >= HP_MAX ? 'none' : 'block'; $('hpCam').textContent = n ? '📷 Ще фото (до ' + HP_MAX + ')' : '📷 Додати фото'; }
+}
+function histWire() {
+  if (!$('hpCam')) return;
+  $('hpCam').onclick = () => $('hpFile').click();
+  $('hpFile').onchange = e => { const f = e.target.files && e.target.files[0]; if (f) histPhoto(f); e.target.value = ''; };
+}
+function histPhoto(file) {
+  const x = { id: '', img: '', err: '', busy: null }; HP.push(x); histDraw();
+  x.busy = skShrink(file).then(data => { x.img = data; histDraw(); return post('histPhoto', { code: CODE, img: data.split(',')[1] }); })
+    .then(r => { x.id = r.photo; }, e => { x.err = e.message + ' — можна створити без фото'; })
+    .then(() => { x.busy = null; HP = HP.filter(y => !y.err || y === x); histDraw(); });
+  histDraw();
+}
+function histWait() { return Promise.all(HP.map(x => x.busy).filter(Boolean)).catch(() => { }); }
+
 function statusPill(s) {
   const cls = { 'в роботі': 'warn', 'готово': 'ok', 'видано частково': 'ok', 'закрито': '', 'анульовано': 'bad', 'поза маршрутом': 'warn' }[s] || '';
   return '<span class="pill ' + cls + '">' + esc(s) + '</span>';
@@ -935,6 +973,13 @@ function skippable(b) {
   return b.route.filter((s, k) => s.avail > 0 && !s.blockedBy && ['split', 'kv', 'pack', 'ifPurchasedRotor'].indexOf(s.extra) < 0 && k > i1 &&
     s.code !== last.code && !(last.alt && s.alt === last.alt));
 }
+/** v42: посилання на фото попередніх кроків (оцифрування) і чи внесено їх у журнал */
+function histLinks(i) {
+  const l = String(i['Фото історії'] || '').split(/\s+/).filter(x => /^https:\/\//.test(x));
+  if (!l.length) return '';
+  return '<div class="muted" style="margin-top:6px">📄 Фото попередніх кроків: ' + l.map((u, k) => '<a href="' + esc(u) + '" target="_blank" rel="noopener">' + (k + 1) + '</a>').join(' · ') +
+    (i['Історія'] ? ' <span class="pill warn">історія ' + esc(String(i['Історія']).replace(/\s*\(.*\)/, '')) + '</span>' : '') + '</div>';
+}
 function renderBatch(extra) {
   const b = S.batch, i = b.info, p = S.perms;
   const stream = i['Потік'];
@@ -950,6 +995,7 @@ function renderBatch(extra) {
     (i['Варіант'] ? '<span class="pill">' + esc(i['Варіант']) + '</span>' : '') + (i['Колір'] ? '<span class="pill">🎨 ' + esc(i['Колір']) + '</span>' : '') + (b.comp && b.comp.mixed ? '<span class="pill warn">змішане походження</span>' : '') + statusPill(b.status) +
     (i['Змішана'] === 'так' ? '<span class="pill warn">змішана</span>' : '') + (i['Призначення'] ? '<span class="pill warn">' + esc(i['Призначення']) + '</span>' : '') +
     '<div class="muted" style="margin-top:10px">Є зараз: <b>' + b.remaining + ' шт</b> · брак: ' + b.scrapAll + (b.issued ? ' · видано: ' + b.issued : '') + '</div>' +
+    histLinks(i) +   // v42: фото паперового листа попередніх кроків
     '<div class="stepbar">' + b.route.map(s => '<span class="' + (s.code === pre ? 'n' : tails.indexOf(s) >= 0 ? 'w' : (s.skip && s.good === s.skip && !s.scrap ? 's' : s.good + s.scrap > 0 && s.avail === 0 ? 'd' : altSkipped(b, s) ? 's' : '')) + '"' + (s.skip ? ' title="пропущено ' + s.skip + ' шт"' : '') +
       (altSkipped(b, s) ? ' title="не потрібен — обрано ' + esc(altSkipped(b, s)) + '"' : '') + '>' + esc(s.code) + '</span>').join('') + '</div>' +
     nowHtml(b) +
