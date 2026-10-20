@@ -1,5 +1,8 @@
 <!DOCTYPE html>
-<!-- МЛП · index.html v44 · 20.10.2026 — «+ Статори / ротори» у партії двигунів: третій варіант «Двигуни» — скручені двигуни з резерву, що пройшли F3
+<!-- МЛП · index.html v45 · 20.10.2026 — K2: кнопка «🖨 Етикетки зараз» — PDF етикеток до запису кроку (запит k2Labels, Code.gs v51); запис K2 з тією самою
+     кількістю й ящиками етикетки вдруге не надсилає (labelsSent). Етикетки — термопринтер 100 × 100 мм (Labels.gs v5): у «✉ Етикетки ще раз» немає позиції на аркуші.
+     Сканер читає й штрихкоди (Code 128 / GS1-128 з етикетки ящика → картка партії): BarcodeDetector, де вміє; інакше ZXing (@zxing/library).
+     v44 · 20.10.2026 — «+ Статори / ротори» у партії двигунів: третій варіант «Двигуни» — скручені двигуни з резерву, що пройшли F3
      (запит addComp, comp = двигун, Code.gs v49): кількість, коментар необов'язковий, підказка про типорозмір і KV партії.
      v43 · 20.10.2026 — склад: зав. складу виправляє (✎) і скасовує (✖) будь-який запис зі списку «Усі записи» з причиною (запит skladEdit, Sklad.gs v6);
      пошук у списку (ім'я, позиція, ID, партія); у записах видно «виправлено → ВД-…», хто й чому змінив.
@@ -231,7 +234,7 @@
 <div class="toast" id="toast"></div>
 
 <script>
-const PAGE_VERSION = 'index.html v44 · 20.10.2026';
+const PAGE_VERSION = 'index.html v45 · 20.10.2026';
 const API = 'https://script.google.com/macros/s/AKfycbx-JUajnAtVsxaLHDgwRpfzE12g4LUtlf6JnWYAQScAVZ5FCpxzGHSrA5PDESqP80KD/exec';
 window.STATIC_SELF = location.origin + location.pathname;
 const PARAMS = Object.fromEntries(new URLSearchParams(location.search));
@@ -513,32 +516,53 @@ function homeOpen(kind, n) {
 }
 
 // ---- Р-0_19 сканер QR: камера (BarcodeDetector, де є; інакше jsQR), запасний варіант — фото
-const SC = { stream: null, timer: 0, det: null, busy: false };
+const SC = { stream: null, timer: 0, det: null, busy: false, zxNeed: false, zx: null, k: 0 };
+/** v45: ZXing (@zxing/library) — штрихкоди Code 128 там, де BarcodeDetector їх не читає (iPhone, частина Android) */
+function loadZX() { return window.ZXing ? Promise.resolve() : new Promise((ok, no) => { const sc = document.createElement('script'); sc.src = 'https://cdn.jsdelivr.net/npm/@zxing/library@0.21.3/umd/index.min.js'; sc.onload = ok; sc.onerror = () => no(new Error('Не вдалося завантажити розпізнавання штрихкодів')); document.head.appendChild(sc); }); }
+/** v45: Code 128 у смузі кадру (ZXing краще читає, коли в кадрі сам штрихкод, без таблиці етикетки). src — відео або фото; bands — частки висоти [від, до] */
+function zxRead(src, w, h, bands) {
+  const Z = window.ZXing; if (!Z) return null;
+  if (!SC.zx) { const hn = new Map(); hn.set(Z.DecodeHintType.POSSIBLE_FORMATS, [Z.BarcodeFormat.CODE_128]); hn.set(Z.DecodeHintType.TRY_HARDER, true); SC.zx = new Z.MultiFormatReader(); SC.zx.setHints(hn); }
+  for (const b of bands) {
+    const k = Math.min(1, 1000 / w), y0 = Math.round(h * b[0]), bh = Math.round(h * (b[1] - b[0]));
+    const c = document.createElement('canvas'); c.width = Math.round(w * k); c.height = Math.max(1, Math.round(bh * k));
+    c.getContext('2d').drawImage(src, 0, y0, w, bh, 0, 0, c.width, c.height);
+    try { return SC.zx.decode(new Z.BinaryBitmap(new Z.HybridBinarizer(new Z.HTMLCanvasElementLuminanceSource(c)))).getText(); } catch (e) { }
+  }
+  return null;
+}
 function loadJsQR() { return window.jsQR ? Promise.resolve() : new Promise((ok, no) => { const sc = document.createElement('script'); sc.src = 'https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.js'; sc.onload = ok; sc.onerror = () => no(new Error('Не вдалося завантажити розпізнавання QR — перевірте інтернет або зробіть фото')); document.head.appendChild(sc); }); }
 function scanStart() {
-  $('scan').classList.add('on'); $('sctx').textContent = 'Наведіть камеру на QR тари, піддона або плаката';
+  $('scan').classList.add('on'); $('sctx').textContent = 'Наведіть камеру на QR тари, піддона, плаката або на штрихкод ящика';
   if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) { $('sctx').textContent = 'Камера недоступна в цьому браузері — натисніть «Фото замість відео».'; return; }
   navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' }, audio: false }).then(st => {
     SC.stream = st; const v = $('scv'); v.srcObject = st; v.play();
-    SC.det = null; if ('BarcodeDetector' in window) { try { SC.det = new BarcodeDetector({ formats: ['qr_code'] }); } catch (e) { SC.det = null; } }
-    (SC.det ? Promise.resolve() : loadJsQR()).then(() => { SC.timer = setInterval(scanTick, 250); }).catch(e => $('sctx').textContent = e.message);
+    SC.det = null; SC.zxNeed = true;
+    const fmts = 'BarcodeDetector' in window && BarcodeDetector.getSupportedFormats ? BarcodeDetector.getSupportedFormats().catch(() => []) : Promise.resolve(null);
+    fmts.then(sup => {   // v45: + code_128, якщо браузер уміє; інакше штрихкоди — ZXing
+      if (sup) { const f = ['qr_code', 'code_128'].filter(x => sup.indexOf(x) >= 0); if (f.indexOf('qr_code') >= 0) { try { SC.det = new BarcodeDetector({ formats: f }); SC.zxNeed = f.indexOf('code_128') < 0; } catch (e) { SC.det = null; } } }
+      if (SC.zxNeed) loadZX().catch(() => { });
+      return SC.det ? null : loadJsQR();
+    }).then(() => { SC.timer = setInterval(scanTick, 250); }).catch(e => $('sctx').textContent = e.message);
   }).catch(() => { $('sctx').textContent = 'Немає доступу до камери. Дозвольте камеру в браузері або натисніть «Фото замість відео».'; });
 }
 function scanTick() {
   const v = $('scv'); if (SC.busy || !v.videoWidth) return; SC.busy = true;
   const done = t => { SC.busy = false; if (t) { scanStop(); scanGo(t); } };
-  if (SC.det) { SC.det.detect(v).then(r => done(r[0] && r[0].rawValue)).catch(() => done(null)); return; }
+  const zx = () => SC.zxNeed && (SC.k++ % 2 === 0) ? zxRead(v, v.videoWidth, v.videoHeight, [[0.3, 0.7]]) : null;   // v45: кожен другий кадр — штрихкод
+  if (SC.det) { SC.det.detect(v).then(r => done((r[0] && r[0].rawValue) || zx())).catch(() => done(zx())); return; }
   const c = document.createElement('canvas'); c.width = v.videoWidth; c.height = v.videoHeight; const x = c.getContext('2d'); x.drawImage(v, 0, 0);
-  const q = window.jsQR(x.getImageData(0, 0, c.width, c.height).data, c.width, c.height); done(q && q.data);
+  const q = window.jsQR(x.getImageData(0, 0, c.width, c.height).data, c.width, c.height); done((q && q.data) || zx());
 }
 function scanStop() { clearInterval(SC.timer); if (SC.stream) SC.stream.getTracks().forEach(t => t.stop()); SC.stream = null; $('scan').classList.remove('on'); }
 function scanPhoto() { $('scf').click(); }
 function scanFile(inp) {
   const f = inp.files && inp.files[0]; if (!f) return; inp.value = '';
-  const img = new Image(); img.onload = () => loadJsQR().then(() => {
+  const img = new Image(); img.onload = () => Promise.all([loadJsQR(), loadZX().catch(() => { })]).then(() => {
     const k = Math.min(1, 1200 / Math.max(img.width, img.height)); const c = document.createElement('canvas'); c.width = img.width * k; c.height = img.height * k;
     const x = c.getContext('2d'); x.drawImage(img, 0, 0, c.width, c.height); const q = window.jsQR(x.getImageData(0, 0, c.width, c.height).data, c.width, c.height);
-    if (q && q.data) { scanStop(); scanGo(q.data); } else $('sctx').textContent = 'QR на фото не знайдено. Спробуйте ближче й рівніше.';
+    const t = (q && q.data) || zxRead(img, img.width, img.height, [[0.3, 0.7], [0.45, 1], [0, 0.55], [0.15, 0.85]]);   // v45: і штрихкод
+    if (t) { scanStop(); scanGo(t); } else $('sctx').textContent = 'QR чи штрихкод на фото не знайдено. Спробуйте ближче й рівніше.';
   }).catch(e => $('sctx').textContent = e.message);
   img.src = URL.createObjectURL(f);
 }
@@ -552,9 +576,12 @@ function scanGo(text) {
     toast('Це не QR МЛП: ' + t.slice(0, 60), true); return;
   } catch (e) { }
   const up = t.toUpperCase().replace(/\s+/g, '');
+  // v45: штрихкод GS1-128 з етикетки ящика — «]C1», «(10)…» або «10M-00012…»: беремо номер партії
+  const g1 = /^(\]C1)?\(?10\)?[SRM]-?\d{5}/.test(up) ? up.match(/[SRM]-?(\d{5})/) : null;
+  if (g1) { location.href = link('b=' + encodeURIComponent(g1[0])); return; }
   if (/^[SRMСРМ][TТ]?-?\d+$/.test(up)) { location.href = link('b=' + encodeURIComponent(up)); return; }
   if (/^[А-ЯІЇЄҐA-Z]{2}-?\d+$/.test(up)) { location.href = link('t=' + encodeURIComponent(up)); return; }
-  toast('QR прочитано, але це не код тари чи партії: ' + t.slice(0, 60), true);
+  toast('Прочитано, але це не код тари чи партії: ' + t.slice(0, 60), true);
 }
 
 // ---- Р-0_10 підказка (?) — натисканням (телефон), на ПК — і наведенням
@@ -1134,7 +1161,8 @@ function stepChanged() {
   }
   if (s && s.extra === 'kv') x = '<label>KV — під який гравіюють</label><select id="kvs">' + opts(S.dict.kv, S.batch.info['KV'], '— оберіть —') + '</select>';
   if (s && s.extra === 'pack') x = '<div class="row"><div><label>Ящиків</label><input type="number" inputmode="numeric" id="x1"></div><div><label>Ложементів</label><input type="number" inputmode="numeric" id="x2"></div></div>' +
-    '<div id="k2plan" class="muted" style="margin-top:10px"></div>';
+    '<div id="k2plan" class="muted" style="margin-top:10px"></div>' +
+    '<button type="button" class="btn btn2" id="k2pre" style="margin-top:10px">🖨 Етикетки зараз (до запису кроку)</button><div id="k2sent" class="muted" style="margin-top:6px"></div>';   // v45
   if (s && s.extra === 'color') x = colorField('clr', S.batch.info['Потік'], S.batch.info['Колір']);   // v21: колір статорів на «Базі статора»
   if (s && s.extra.indexOf('check:') === 0) x = '<label style="display:flex;gap:10px;align-items:center;font-size:18px;color:#1D2B33"><input type="checkbox" id="chk" checked style="width:26px;height:26px"> ' + esc(s.extra.slice(6)) + '</label>';
   const lotOn = !!(s && (S.lotSteps || []).indexOf(s.code) >= 0);   // v17: партія постачальника компонента на цьому кроці
@@ -1154,14 +1182,25 @@ function stepChanged() {
       if (!$('x1').dataset.touched) $('x1').value = g > 0 ? Math.ceil(g / per) : '';
       const plan = labelsPlan(g, Number($('x1').value) || 0, per);
       $('k2plan').innerHTML = plan.length ? 'Етикетки: <b>' + esc(labelsSummary(plan)) + '</b> — PDF прийде на ' + esc(S.me.email) + (S.k2 && S.k2.copy ? ' і на адресу для друку' : '') +
-        '.<br>Друк: аркуш наліпок A4 2 × 3 (105 × 99 мм), масштаб 100 %.' : '';
+        '.<br>Друк: термопринтер, етикетка 100 × 100 мм, масштаб 100 %.' : '';
+      const same = K2SENT && K2SENT.batch === S.batch.info['Номер'] && K2SENT.good === g && K2SENT.boxes === (Number($('x1').value) || 0);
+      $('k2sent').innerHTML = K2SENT && K2SENT.batch === S.batch.info['Номер'] ? (same ? '✓ Етикетки вже надіслано — після «Записати крок» вдруге не прийдуть.'
+        : '<span style="color:#9B231A">Кількість або ящики змінились після друку — при записі прийдуть нові етикетки.</span>') : '';
     };
     // v16 (T-48): зміна кількості завжди перераховує ящики; ручне число ящиків діє до наступної зміни кількості
     $('good').oninput = () => { delete $('x1').dataset.touched; recalc(); };
     $('x1').oninput = () => { $('x1').dataset.touched = '1'; recalc(); };
     recalc();
+    $('k2pre').onclick = () => {   // v45: етикетки до запису кроку
+      const g = Number($('good').value) || 0, bx = Number($('x1').value) || 0;
+      if (!(g > 0)) { $('err').textContent = 'Вкажіть, скільки двигунів пакуєте'; return; }
+      act({ action: 'k2Labels', batch: S.batch.info['Номер'], good: g, x1: $('x1').value }, $('k2pre'), r => {
+        K2SENT = { batch: S.batch.info['Номер'], good: g, boxes: bx }; recalc();
+      });
+    };
   }
 }
+let K2SENT = null;   // v45: що вже надіслали кнопкою «Етикетки зараз» (партія, кількість, ящики)
 /** v13: двигунів у ящику за замовчуванням (BOX_QTY з «Налаштувань», за типорозміром) */
 function boxPer() { const m = (S.k2 && S.k2.box) || {}; return Number(m[String(S.batch.info['Типорозмір'])] || m['*'] || 200); }
 /** Те саме правило, що й на сервері (Labels.gs): повні ящики по per, в останньому — решта; ящиків вписано інакше — порівну */
@@ -1187,7 +1226,9 @@ function submitStep() {
     btn.disabled = false;
     const l = lotVal('slot');
     act(Object.assign({ action: 'step', batch: S.batch.info['Номер'], step: $('stp').value, good: v('good'), scrap: v('scrap'), reason: v('reason'),
-      x1: v('x1'), x2: v('x2'), kv: v('kvs'), check: $('chk') ? $('chk').checked : false, comment: v('cm'), lot: l.lot, photo: l.photo, color: v('clr') }, onbVal()), btn);
+      x1: v('x1'), x2: v('x2'), kv: v('kvs'), check: $('chk') ? $('chk').checked : false, comment: v('cm'), lot: l.lot, photo: l.photo, color: v('clr'),
+      labelsSent: !!(K2SENT && $('k2pre') && K2SENT.batch === S.batch.info['Номер'] && K2SENT.good === (Number(v('good')) || 0) && K2SENT.boxes === (Number(v('x1')) || 0)) }, onbVal()), btn,
+      $('k2pre') ? r => { K2SENT = null; showPage(r, {}); } : undefined);   // v45
   });
 }
 
@@ -1387,11 +1428,12 @@ function openAct(a) {
 function openLabels(id) {
   const x = S.batch.history.find(h => h.id === id);
   openModal('<div class="card"><div class="mid">✉ Етикетки ще раз</div><div class="muted">' + esc(id) + ' · K2 · ' + x.good + ' шт' + (x.x1 ? ' · ящиків ' + x.x1 : '') + '</div>' +
-    '<label>З якої наліпки на аркуші почати (1–6)</label>' + numInput('lpos', 1) +
-    '<p class="muted">Наліпки рахуються зліва направо, згори вниз. Так можна докінчити аркуш, з якого вже щось відклеїли.</p>' +
+    (S.k2 && S.k2.perPage > 1 ? '<label>З якої наліпки на аркуші почати (1–' + S.k2.perPage + ')</label>' + numInput('lpos', 1) +
+      '<p class="muted">Наліпки рахуються зліва направо, згори вниз. Так можна докінчити аркуш, з якого вже щось відклеїли.</p>'
+      : '<p class="muted">Ті самі номери ящиків, що й першого разу. Друк: термопринтер, етикетка 100 × 100 мм.</p>') +   // v45: рулон
     '<p class="muted">PDF прийде на ' + esc(S.me.email) + (S.k2 && S.k2.copy ? ' і на адресу для друку' : '') + '.</p>' +
     '<div class="err" id="merr"></div><div class="grid" style="margin-top:6px"><button class="btn btn2" onclick="closeModal()">Скасувати</button><button class="btn" id="mgo">Надіслати</button></div></div>');
-  $('mgo').onclick = () => act({ action: 'labels', ref: id, start: $('lpos').value }, $('mgo'), r => showPage(r, { openHist: 1 }));
+  $('mgo').onclick = () => act({ action: 'labels', ref: id, start: $('lpos') ? $('lpos').value : 1 }, $('mgo'), r => showPage(r, { openHist: 1 }));
 }
 function cancelRec(id) {
   const x = S.batch.history.find(h => h.id === id);
