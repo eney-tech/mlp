@@ -1,5 +1,6 @@
 <!DOCTYPE html>
-<!-- МЛП · index.html v45 · 20.10.2026 — K2: кнопка «🖨 Етикетки зараз» — PDF етикеток до запису кроку (запит k2Labels, Code.gs v51); запис K2 з тією самою
+<!-- МЛП · index.html v46 · 20.10.2026 — етикетки K2: «PDF прийде на …» — адреса друку з «Налаштувань» (res.k2.to, Code.gs v52), без пошти працівника; функція k2To().
+     v45 · 20.10.2026 — K2: кнопка «🖨 Етикетки зараз» — PDF етикеток до запису кроку (запит k2Labels, Code.gs v51); запис K2 з тією самою
      кількістю й ящиками етикетки вдруге не надсилає (labelsSent). Етикетки — термопринтер 100 × 100 мм (Labels.gs v5): у «✉ Етикетки ще раз» немає позиції на аркуші.
      Сканер читає й штрихкоди (Code 128 / GS1-128 з етикетки ящика → картка партії): BarcodeDetector, де вміє; інакше ZXing (@zxing/library).
      v44 · 20.10.2026 — «+ Статори / ротори» у партії двигунів: третій варіант «Двигуни» — скручені двигуни з резерву, що пройшли F3
@@ -234,7 +235,9 @@
 <div class="toast" id="toast"></div>
 
 <script>
-const PAGE_VERSION = 'index.html v45 · 20.10.2026';
+const PAGE_VERSION = 'index.html v46 · 20.10.2026';
+/** v46: куди прийдуть етикетки K2 — адреси друку (K2_LABEL_EMAILS), якщо задані; інакше — пошта працівника */
+function k2To() { const t = (S.k2 && S.k2.to) || []; return t.length ? t.join(', ') + ' (принтер етикеток)' : (S.me ? S.me.email : ''); }
 const API = 'https://script.google.com/macros/s/AKfycbx-JUajnAtVsxaLHDgwRpfzE12g4LUtlf6JnWYAQScAVZ5FCpxzGHSrA5PDESqP80KD/exec';
 window.STATIC_SELF = location.origin + location.pathname;
 const PARAMS = Object.fromEntries(new URLSearchParams(location.search));
@@ -1181,7 +1184,7 @@ function stepChanged() {
       const g = Number($('good').value) || 0;
       if (!$('x1').dataset.touched) $('x1').value = g > 0 ? Math.ceil(g / per) : '';
       const plan = labelsPlan(g, Number($('x1').value) || 0, per);
-      $('k2plan').innerHTML = plan.length ? 'Етикетки: <b>' + esc(labelsSummary(plan)) + '</b> — PDF прийде на ' + esc(S.me.email) + (S.k2 && S.k2.copy ? ' і на адресу для друку' : '') +
+      $('k2plan').innerHTML = plan.length ? 'Етикетки: <b>' + esc(labelsSummary(plan)) + '</b> — PDF прийде на ' + esc(k2To()) +
         '.<br>Друк: термопринтер, етикетка 100 × 100 мм, масштаб 100 %.' : '';
       const same = K2SENT && K2SENT.batch === S.batch.info['Номер'] && K2SENT.good === g && K2SENT.boxes === (Number($('x1').value) || 0);
       $('k2sent').innerHTML = K2SENT && K2SENT.batch === S.batch.info['Номер'] ? (same ? '✓ Етикетки вже надіслано — після «Записати крок» вдруге не прийдуть.'
@@ -1431,7 +1434,7 @@ function openLabels(id) {
     (S.k2 && S.k2.perPage > 1 ? '<label>З якої наліпки на аркуші почати (1–' + S.k2.perPage + ')</label>' + numInput('lpos', 1) +
       '<p class="muted">Наліпки рахуються зліва направо, згори вниз. Так можна докінчити аркуш, з якого вже щось відклеїли.</p>'
       : '<p class="muted">Ті самі номери ящиків, що й першого разу. Друк: термопринтер, етикетка 100 × 100 мм.</p>') +   // v45: рулон
-    '<p class="muted">PDF прийде на ' + esc(S.me.email) + (S.k2 && S.k2.copy ? ' і на адресу для друку' : '') + '.</p>' +
+    '<p class="muted">PDF прийде на ' + esc(k2To()) + '.</p>' +
     '<div class="err" id="merr"></div><div class="grid" style="margin-top:6px"><button class="btn btn2" onclick="closeModal()">Скасувати</button><button class="btn" id="mgo">Надіслати</button></div></div>');
   $('mgo').onclick = () => act({ action: 'labels', ref: id, start: $('lpos') ? $('lpos').value : 1 }, $('mgo'), r => showPage(r, { openHist: 1 }));
 }
