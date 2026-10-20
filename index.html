@@ -1,5 +1,10 @@
 <!DOCTYPE html>
-<!-- МЛП · index.html v46 · 20.10.2026 — етикетки K2: «PDF прийде на …» — адреса друку з «Налаштувань» (res.k2.to, Code.gs v52), без пошти працівника; функція k2To().
+<!-- МЛП · index.html v47 · 20.10.2026 — відкритий ящик ГП (Code.gs v53, Labels.gs v7): на K2 типорозміру з власним BOX_QTY поля «Ящиків» немає —
+     план рахується сам: повні ящики партії, остача — «докладіть у ящик M-00005 №2» (відкритий ящик специфікації) або новий відкритий ящик;
+     «📦 Відкриті ящики» на головній (тімлід і BOX_CLOSERS): 🖨 поточна етикетка, «Закрити неповним». Історія: ящики запису K2, «ящик закрито».
+     F2 / F3 / F5: «з них брак лише статора / лише ротора» — годна деталь лишається в партії (і у ✎ виправленні).
+     «Мій виробіток»: «У виробіток» — для контролю й тестів успішні + брак (показник, графік, таблиця), як у калькуляторі.
+     v46 · 20.10.2026 — етикетки K2: «PDF прийде на …» — адреса друку з «Налаштувань» (res.k2.to, Code.gs v52), без пошти працівника; функція k2To().
      v45 · 20.10.2026 — K2: кнопка «🖨 Етикетки зараз» — PDF етикеток до запису кроку (запит k2Labels, Code.gs v51); запис K2 з тією самою
      кількістю й ящиками етикетки вдруге не надсилає (labelsSent). Етикетки — термопринтер 100 × 100 мм (Labels.gs v5): у «✉ Етикетки ще раз» немає позиції на аркуші.
      Сканер читає й штрихкоди (Code 128 / GS1-128 з етикетки ящика → картка партії): BarcodeDetector, де вміє; інакше ZXing (@zxing/library).
@@ -235,7 +240,7 @@
 <div class="toast" id="toast"></div>
 
 <script>
-const PAGE_VERSION = 'index.html v46 · 20.10.2026';
+const PAGE_VERSION = 'index.html v47 · 20.10.2026';
 /** v46: куди прийдуть етикетки K2 — адреси друку (K2_LABEL_EMAILS), якщо задані; інакше — пошта працівника */
 function k2To() { const t = (S.k2 && S.k2.to) || []; return t.length ? t.join(', ') + ' (принтер етикеток)' : (S.me ? S.me.email : ''); }
 const API = 'https://script.google.com/macros/s/AKfycbx-JUajnAtVsxaLHDgwRpfzE12g4LUtlf6JnWYAQScAVZ5FCpxzGHSrA5PDESqP80KD/exec';
@@ -503,6 +508,7 @@ function renderHome() {
   if (p.noBatch) tiles.push('<a class="tile" href="' + esc(link('nb=1')) + '"><div class="tn">⏱ Записати роботу без партії</div><div class="td">' +
     (p.cabinet ? 'за себе або за працівника, сьогодні або минулою датою' : 'підготовка місця, перебирання залишків, навчання — у годинах або штуках') + '</div></a>');
   if (p.sklad) tiles.push('<a class="tile" href="' + esc(link('sklad=1')) + '"><div class="tn">⌂ Робота зі складом</div><div class="td">взяв / поклав / надходження</div></a>');
+  if (p.boxes) tiles.push(boxesTile(S.boxes || []));   // v47: відкриті ящики ГП
   if (tiles.length) h += '<div class="tiles">' + tiles.join('') + '</div>';
   h += helpHtml(!(prod || p.sklad)) + '<p class="muted" style="text-align:center">' + esc(PAGE_VERSION) + '</p>';
   $('app').innerHTML = h;
@@ -510,6 +516,24 @@ function renderHome() {
     const go = () => homeOpen($('hk').value, $('hn').value);
     $('hgo').onclick = go; $('hn').onkeydown = e => { if (e.key === 'Enter') go(); };
   }
+}
+/** v47: «📦 Відкриті ящики» — неповні ящики ГП на виробництві (по одному на специфікацію): 🖨 поточна етикетка, «Закрити неповним» */
+function boxesTile(list) {
+  const row = x => '<div class="li" style="display:block"><div><b>' + esc(x.name) + '</b> · ' + esc(x.mark) + ' · <b>' + x.total + '</b> з ' + x.per + ' шт</div>' +
+    '<div class="muted" style="margin:2px 0 6px">' + esc(x.comp) + (x.since ? ' · відкрито ' + esc(x.since) : '') + '</div>' +
+    '<div class="grid"><button type="button" class="btn btn2" onclick="boxLbl(\'' + esc(x.id) + '\', this)">🖨 Етикетка</button>' +
+    '<button type="button" class="btn btn2 btnr" onclick="boxCloseOpen(\'' + esc(x.id) + '\')">Закрити неповним</button></div></div>';
+  return '<div class="tile"><div class="tn">📦 Відкриті ящики</div><div class="td">' + (list.length ? 'неповні ящики ГП на виробництві — до них докладають остачі наступних партій'
+    : 'зараз немає — усі ящики повні') + '</div>' + (list.length ? '<div class="list" style="padding:0;margin-top:6px">' + list.map(row).join('') + '</div>' : '') + '</div>';
+}
+function boxLbl(id, btn) { act({ action: 'boxLabel', box: id }, btn); }
+function boxCloseOpen(id) {
+  const x = (S.boxes || []).find(b => b.id === id); if (!x) return;
+  openModal('<div class="card"><div class="mid">Закрити ящик ' + esc(x.name) + ' неповним?</div><div class="muted">' + esc(x.mark) + ' · ' + x.total + ' з ' + x.per + ' шт · ' + esc(x.comp) + '</div>' +
+    '<p>Ящик піде на склад із тим, що в ньому є. Прийде фінальна етикетка — наклейте її поверх. Наступна остача цієї специфікації відкриє новий ящик.</p>' +
+    '<label>Чому (необов\'язково)</label><input type="text" id="mcm" placeholder="напр. потрібно відвантажити, рідкісна специфікація">' +
+    '<div class="err" id="merr"></div><div class="grid" style="margin-top:6px"><button class="btn btn2" onclick="closeModal()">Ні</button><button class="btn btnr" id="mgo">Закрити ящик</button></div></div>');
+  $('mgo').onclick = () => act({ action: 'boxClose', box: id, comment: $('mcm').value }, $('mgo'));
 }
 /** Код тари (КР, ПД, ТЧ, СК + номер) або номер партії (M / S / R + номер) → сторінка тари / партії. Сервер сам доповнює нулі */
 function homeOpen(kind, n) {
@@ -1089,7 +1113,9 @@ function renderBatch(extra) {
   h += '<details' + (extra && extra.openHist ? ' open' : '') + '><summary>Історія (' + b.history.length + ')</summary><div class="list">' + b.history.map(x => {
     let what = esc(x.type);
     if (x.type === 'крок') what = '<b>' + esc(x.step) + '</b> · ' + x.good + ' / ' + x.scrap + (x.reason ? ' · ' + esc(x.reason) : '') +
-      (x.step === 'K2' && x.x1 ? ' · ящиків ' + x.x1 : '') + (x.d1 && (b.route.find(r => r.code === x.step) || {}).extra === 'color' ? ' · 🎨 ' + esc(x.d1) : '');   // v21
+      (x.step === 'K2' && x.boxes ? ' · ' + esc(boxesTxt(x.boxes)) : x.step === 'K2' && x.x1 ? ' · ящиків ' + x.x1 : '') + (x.d1 && (b.route.find(r => r.code === x.step) || {}).extra === 'color' ? ' · 🎨 ' + esc(x.d1) : '') +
+      (PART_SCRAP.indexOf(x.step) >= 0 && b.comp && (x.x1 || x.x2) ? ' · з них лише статора ' + (x.x1 || 0) + ', лише ротора ' + (x.x2 || 0) : '');   // v47
+    if (x.type === 'ящик закрито') what = '📦 ящик <b>' + esc(boxesTxt(x.boxes)) + '</b> закрито неповним · ' + x.qty + ' шт' + (x.d1 ? ' · ' + esc(x.d1) : '');   // v47
     if (x.type === 'нова партія') what = 'нова партія · ' + x.qty + ' шт' + (x.d1 && !b.comp ? ' · 🎨 ' + esc(x.d1) : '') + (x.d2 && !b.comp ? ' · старт з <b>' + esc(x.d2) + '</b>' : '');   // v27
     if (x.type === 'пропуск') what = '⏭ пропущено <b>' + esc(x.step) + '</b> · ' + x.qty + ' шт';   // v27
     if (x.type === 'колір') what = '🎨 колір: ' + esc(x.d2 || 'не вказано') + ' → <b>' + esc(x.d1 || 'не вказано') + '</b>';   // v21
@@ -1133,7 +1159,7 @@ function renderBatch(extra) {
   if (rel.length) h += '<details><summary>Зв\'язки</summary><div class="list">' + rel.map(r => '<div class="li"><div>' + r + '</div></div>').join('') + '</div></details>';
 
   $('app').innerHTML = h + '<div style="height:40px"></div>';
-  if ($('stp')) { $('stp').onchange = stepChanged; stepChanged(); $('scrap').oninput = () => $('rsn').style.display = Number($('scrap').value) > 0 ? 'block' : 'none'; $('go').onclick = submitStep; }
+  if ($('stp')) { $('stp').onchange = stepChanged; stepChanged(); $('scrap').oninput = () => { const on = Number($('scrap').value) > 0; $('rsn').style.display = on ? 'block' : 'none'; if ($('psw')) $('psw').style.display = on ? 'block' : 'none'; }; $('go').onclick = submitStep; }
   onbWire();
 }
 /** Що зараз лежить у тарі: напівфабрикат і скільки (після якого кроку, який крок чекає) */
@@ -1158,12 +1184,16 @@ function stepChanged() {
     x = '<label>Брак статорів</label>' + numInput('x1', 0) + '<label>Брак роторів</label>' + numInput('x2', 0) +
       '<p class="muted">Зібрано — успішно зібрані двигуни. Якщо бракований лише статор або лише ротор — пишіть брак тільки цієї деталі: друга лишиться в залишку.</p>';
   }
+  if (s && S.batch.comp && PART_SCRAP.indexOf(s.code) >= 0)   // v47: брак лише статора / лише ротора — годна деталь лишається в партії
+    x = '<div id="psw" style="display:none"><label>з них брак лише статора (ротор годний)</label>' + numInput('x1', 0) + '<label>з них брак лише ротора (статор годний)</label>' + numInput('x2', 0) +
+      '<p class="muted">Решта браку — увесь двигун. Годна деталь лишається в партії: доберіть до неї пару («+ Статори / ротори») і зберіть знову на F1.</p></div>';
   if (s && s.extra === 'split') {   // v24: «одразу на» — перший крок після балансування (R6 / OV4) за маршрутом
     const R = S.batch.route; let k = R.indexOf(s) + 1; while (R[k] && ['R6', 'OV4'].indexOf(R[k].code) >= 0) k++;
     x = '<div class="row"><div><label>На балансування</label>' + numInput('x1', s.avail) + '</div></div><label>Одразу на ' + esc(R[k] ? R[k].code : 'наступний крок') + '</label>' + numInput('x2', 0);
   }
   if (s && s.extra === 'kv') x = '<label>KV — під який гравіюють</label><select id="kvs">' + opts(S.dict.kv, S.batch.info['KV'], '— оберіть —') + '</select>';
-  if (s && s.extra === 'pack') x = '<div class="row"><div><label>Ящиків</label><input type="number" inputmode="numeric" id="x1"></div><div><label>Ложементів</label><input type="number" inputmode="numeric" id="x2"></div></div>' +
+  if (s && s.extra === 'pack') x = (k2New() ? '<label>Ложементів</label><input type="number" inputmode="numeric" id="x2">'   // v47: ящики — самі (відкритий ящик)
+    : '<div class="row"><div><label>Ящиків</label><input type="number" inputmode="numeric" id="x1"></div><div><label>Ложементів</label><input type="number" inputmode="numeric" id="x2"></div></div>') +
     '<div id="k2plan" class="muted" style="margin-top:10px"></div>' +
     '<button type="button" class="btn btn2" id="k2pre" style="margin-top:10px">🖨 Етикетки зараз (до запису кроку)</button><div id="k2sent" class="muted" style="margin-top:6px"></div>';   // v45
   if (s && s.extra === 'color') x = colorField('clr', S.batch.info['Потік'], S.batch.info['Колір']);   // v21: колір статорів на «Базі статора»
@@ -1180,28 +1210,52 @@ function stepChanged() {
   else $('good').oninput = null;
   if (s && s.extra === 'pack') {   // v13: ящиків рахується саме (BOX_QTY), план етикеток — до запису
     const per = boxPer();
+    const nw = k2New();
     const recalc = () => {
       const g = Number($('good').value) || 0;
-      if (!$('x1').dataset.touched) $('x1').value = g > 0 ? Math.ceil(g / per) : '';
-      const plan = labelsPlan(g, Number($('x1').value) || 0, per);
-      $('k2plan').innerHTML = plan.length ? 'Етикетки: <b>' + esc(labelsSummary(plan)) + '</b> — PDF прийде на ' + esc(k2To()) +
-        '.<br>Друк: термопринтер, етикетка 100 × 100 мм, масштаб 100 %.' : '';
-      const same = K2SENT && K2SENT.batch === S.batch.info['Номер'] && K2SENT.good === g && K2SENT.boxes === (Number($('x1').value) || 0);
+      if (nw) {   // v47: повні ящики партії, остача — у відкритий ящик специфікації або новий відкритий
+        const pl = k2PlanNew(g);
+        $('k2plan').innerHTML = pl.length ? 'Ящики й етикетки:<br>' + pl.join('<br>') + '<br>PDF прийде на ' + esc(k2To()) + '. Етикетку відкритого ящика клеять поверх попередньої.' : '';
+      } else {
+        if (!$('x1').dataset.touched) $('x1').value = g > 0 ? Math.ceil(g / per) : '';
+        const plan = labelsPlan(g, Number($('x1').value) || 0, per);
+        $('k2plan').innerHTML = plan.length ? 'Етикетки: <b>' + esc(labelsSummary(plan)) + '</b> — PDF прийде на ' + esc(k2To()) +
+          '.<br>Друк: термопринтер, етикетка 100 × 100 мм, масштаб 100 %.' : '';
+      }
+      const same = K2SENT && K2SENT.batch === S.batch.info['Номер'] && K2SENT.good === g && K2SENT.boxes === (nw ? 0 : Number($('x1').value) || 0);
       $('k2sent').innerHTML = K2SENT && K2SENT.batch === S.batch.info['Номер'] ? (same ? '✓ Етикетки вже надіслано — після «Записати крок» вдруге не прийдуть.'
         : '<span style="color:#9B231A">Кількість або ящики змінились після друку — при записі прийдуть нові етикетки.</span>') : '';
     };
     // v16 (T-48): зміна кількості завжди перераховує ящики; ручне число ящиків діє до наступної зміни кількості
-    $('good').oninput = () => { delete $('x1').dataset.touched; recalc(); };
-    $('x1').oninput = () => { $('x1').dataset.touched = '1'; recalc(); };
+    $('good').oninput = () => { if ($('x1')) delete $('x1').dataset.touched; recalc(); };
+    if ($('x1')) $('x1').oninput = () => { $('x1').dataset.touched = '1'; recalc(); };
     recalc();
     $('k2pre').onclick = () => {   // v45: етикетки до запису кроку
-      const g = Number($('good').value) || 0, bx = Number($('x1').value) || 0;
+      const g = Number($('good').value) || 0, bx = nw ? 0 : Number($('x1').value) || 0;
       if (!(g > 0)) { $('err').textContent = 'Вкажіть, скільки двигунів пакуєте'; return; }
-      act({ action: 'k2Labels', batch: S.batch.info['Номер'], good: g, x1: $('x1').value }, $('k2pre'), r => {
+      act({ action: 'k2Labels', batch: S.batch.info['Номер'], good: g, x1: nw ? '' : $('x1').value }, $('k2pre'), r => {
         K2SENT = { batch: S.batch.info['Номер'], good: g, boxes: bx }; recalc();
       });
     };
   }
+}
+/** v47: кроки двигунів, де брак може бути лише статора або лише ротора (Code.gs v53, PART_SCRAP_STEPS) */
+const PART_SCRAP = ['F2', 'F3', 'F5'];
+/** v47: відкритий ящик — типорозмір із власним BOX_QTY (сервер дає S.k2.per) */
+function k2New() { return !!(S.k2 && S.k2.per); }
+/** v47: те саме правило, що k2Plan_ у Labels.gs: повні ящики партії, остача — у відкритий ящик специфікації, решта — новий відкритий */
+function k2PlanNew(g) {
+  const k = S.k2, per = k.per, no = S.batch.info['Номер'], out = []; let next = k.next || 1;
+  if (!(g > 0)) return out;
+  const full = Math.floor(g / per); let rem = g - full * per;
+  for (let i = 0; i < full; i++) out.push('ящик <b>' + esc(no) + ' №' + (next++) + '</b> — ' + per + ' шт');
+  if (rem > 0 && k.open) {
+    const fill = Math.min(rem, k.open.per - k.open.total), aft = k.open.total + fill;
+    out.push('<b>' + fill + ' шт → докладіть у ящик ' + esc(k.open.name) + '</b> (там ' + k.open.total + ' → стане ' + aft + (aft >= k.open.per ? ' — повний, закриється' : ' з ' + k.open.per) + ')');
+    rem -= fill;
+  }
+  if (rem > 0) out.push('ящик <b>' + esc(no) + ' №' + (next++) + '</b> — ' + rem + ' шт · <b>відкритий</b>: лишається на виробництві, до нього докладатимуть');
+  return out;
 }
 let K2SENT = null;   // v45: що вже надіслали кнопкою «Етикетки зараз» (партія, кількість, ящики)
 /** v13: двигунів у ящику за замовчуванням (BOX_QTY з «Налаштувань», за типорозміром) */
@@ -1450,6 +1504,8 @@ function cancelRec(id) {
 const PARTS = ['видача', 'покупні', 'власні'];
 function partsKey(x) { return x.type === 'видача' ? (/^S/i.test(String(x.batch).trim()) ? 'S' : 'R') : (x.comp === 'ротор' ? 'R' : 'S'); }   // v31: S-00012 (і старий ST-00012) — статори
 function plural(n, one, few, many) { const a = Math.abs(n) % 100, b = a % 10; return a > 10 && a < 20 ? many : b === 1 ? one : b >= 2 && b <= 4 ? few : many; }
+/** v47: «M-00005#2:39; M-00006#1:160» → «M-00005 №2 — 39, M-00006 №1 — 160»; один ящик без кількості — «M-00005 №2» */
+function boxesTxt(v) { return String(v || '').split(/\s*;\s*/).filter(Boolean).map(x => { const m = x.match(/^(.+)#(\d+)(?::(\d+))?$/); return m ? m[1] + ' №' + m[2] + (m[3] ? ' — ' + m[3] : '') : x; }).join(', '); }
 function partsWhat(x, n) { n = n === undefined ? x.qty : n; return n + (partsKey(x) === 'S' ? ' статор' : ' ротор') + plural(n, '', 'и', 'ів'); }
 function partsVer(x) { return x.type === 'власні' ? 'в2 без номера' : x.comment ? 'в1 · партія постачальника ' + x.comment : 'в1 без номера'; }
 /** v14 (T-46): ✎ тімліда — нова кількість (більше або менше) або «Скасувати запис», з причиною */
@@ -1495,6 +1551,8 @@ function openCorrect(id) {
   openModal('<div class="card"><div class="mid">Виправити запис ' + esc(x.step) + '</div><div class="muted">' + esc(x.who) + ' · ' + esc(x.time) + ' · було ' + x.good + ' / ' + x.scrap + '</div>' +
     '<label>' + (x.step === 'F1' && S.batch.comp ? 'Зібрано двигунів' : 'Успішних') + '</label>' + numInput('cg', x.good) +
     (x.step === 'F1' && S.batch.comp ? '<label>Брак статорів</label>' + numInput('cx1', x.x1) + '<label>Брак роторів</label>' + numInput('cx2', x.x2) : '<label>Брак</label>' + numInput('cs', x.scrap)) +
+    (PART_SCRAP.indexOf(x.step) >= 0 && S.batch.comp ? '<label>з них брак лише статора (ротор годний)</label>' + numInput('cx1', x.x1 || 0) +
+      '<label>з них брак лише ротора (статор годний)</label>' + numInput('cx2', x.x2 || 0) : '') +   // v47
     '<label>Причина браку</label><select id="cr">' + opts(S.dict.reasons, x.reason, '—') + '</select>' +
     '<label>Причина виправлення (обов\'язково)</label><input type="text" id="mcm">' +
     '<div class="err" id="merr"></div><div class="grid" style="margin-top:6px"><button class="btn btn2 btnr" id="cdel">Скасувати запис</button><button class="btn" id="mgo">Зберегти</button></div>' +
@@ -1714,10 +1772,11 @@ function r8c() {
   d.recs.forEach(r => { const k = r.step + '|' + r.typ; (gw[k] = gw[k] || []).push(r); });
   const ord = c => { const i = (d.order || []).indexOf(c); return i < 0 ? 999 : i; };
   const works = Object.keys(gw).sort((a, b) => ord(a.split('|')[0]) - ord(b.split('|')[0]) || a.localeCompare(b));
-  const good = d.recs.reduce((a, r) => a + r.good, 0), scrap = d.recs.reduce((a, r) => a + r.scrap, 0);
+  const good = d.recs.reduce((a, r) => a + r.good, 0), scrap = d.recs.reduce((a, r) => a + r.scrap, 0), pay = d.recs.reduce((a, r) => a + zPayQ(r), 0);
   const nb = new Set(d.recs.map(r => r.batch)).size;
   const money = zMoney(d, prices);
-  h += '<div class="zkpis">' + zKpi('Успішних операцій', fn(good), 'шт', 'у ' + nb + ' ' + plural(nb, 'партії', 'партіях', 'партіях'), '', 'kgood') + '<div id="zkMoney" style="display:contents">' + zKpiMoney(money) + '</div></div>';
+  h += '<div class="zkpis">' + zKpi('У виробіток', fn(pay), 'шт', 'у ' + nb + ' ' + plural(nb, 'партії', 'партіях', 'партіях') + (pay !== good ? ' · успішних ' + fn(good) : ''),
+    'Тести й перевірки (контрольні кроки) рахуються за кількістю всіх перевірених — успішні + знайдений брак. Решта кроків — успішні.', 'kgood') + '<div id="zkMoney" style="display:contents">' + zKpiMoney(money) + '</div></div>';
   // Р-8с_09 графік
   const anyPrice = works.some(k => zNum(prices[k]) > 0);
   h += '<div class="card"><div class="mid">' + (d.mode === 'd' ? 'За годинами' : 'За днями') + '</div><div class="zctl"><span>Розріз:</span><select onchange="Z8.csplit=this.value;renderDash()">' +
@@ -1734,24 +1793,24 @@ function r8c() {
   const g1 = GR[S8.grp], g2 = GR[SUB[S8.grp]];
   const tg = (key, open) => '<button type="button" class="tg" onclick="zA(' + zAct(() => { if (S8.exp[key]) delete S8.exp[key]; else S8.exp[key] = 1; renderDash(); }) + ')">' + (open ? '▾' : '▸') + '</button>';
   const grpOf = (rs, f) => { const m = {}; rs.forEach(r => (m[f(r)] = m[f(r)] || []).push(r)); return m; };
-  const sumG = rs => rs.reduce((a, r) => a + r.good, 0), sumS = rs => rs.reduce((a, r) => a + r.scrap, 0);
+  const sumG = rs => rs.reduce((a, r) => a + r.good, 0), sumS = rs => rs.reduce((a, r) => a + r.scrap, 0), sumP = rs => rs.reduce((a, r) => a + zPayQ(r), 0);   // v47
   let gt = '<div class="zctl"><span>Групувати:</span>' + zChips(S8.grp, [['step', 'Кроки'], ['batch', 'Партії'], ['day', 'Дні']], v => { S8.grp = v; S8.exp = {}; renderDash(); }) + '</div>' +
-    '<div class="tw" style="max-height:560px"><table class="t zgrp"><tr><th></th><th class="r">Успішних</th><th class="r">Брак</th></tr>';
+    '<div class="tw" style="max-height:560px"><table class="t zgrp"><tr><th></th><th class="r">Успішних</th><th class="r">Брак</th><th class="r">У виробіток</th></tr>';
   const m1 = grpOf(d.recs, g1.f);
   Object.keys(m1).sort(g1.o).forEach(k1 => {
     const r1 = m1[k1], key1 = S8.grp + '¦' + k1, o1 = S8.exp[key1];
-    gt += '<tr class="g1"><td>' + tg(key1, o1) + g1.l(k1) + '</td><td class="r">' + fn(sumG(r1)) + '</td><td class="r">' + (sumS(r1) ? fn(sumS(r1)) : '—') + '</td></tr>';
+    gt += '<tr class="g1"><td>' + tg(key1, o1) + g1.l(k1) + '</td><td class="r">' + fn(sumG(r1)) + '</td><td class="r">' + (sumS(r1) ? fn(sumS(r1)) : '—') + '</td><td class="r"><b>' + fn(sumP(r1)) + '</b></td></tr>';
     if (!o1) return;
     const m2 = grpOf(r1, g2.f);
     Object.keys(m2).sort(g2.o).forEach(k2 => {
       const r2 = m2[k2], key2 = key1 + '¦' + k2, o2 = S8.exp[key2];
-      gt += '<tr class="g2"><td>' + tg(key2, o2) + g2.l(k2) + '</td><td class="r">' + fn(sumG(r2)) + '</td><td class="r">' + (sumS(r2) ? fn(sumS(r2)) : '—') + '</td></tr>';
+      gt += '<tr class="g2"><td>' + tg(key2, o2) + g2.l(k2) + '</td><td class="r">' + fn(sumG(r2)) + '</td><td class="r">' + (sumS(r2) ? fn(sumS(r2)) : '—') + '</td><td class="r">' + fn(sumP(r2)) + '</td></tr>';
       if (o2) r2.slice().sort((a, b) => (a.d + a.tm) < (b.d + b.tm) ? -1 : 1).forEach(r => {
-        gt += '<tr class="g3"><td>' + zDm(r.d) + ' ' + esc(r.tm) + ' · ' + (S8.grp === 'batch' ? '<b>' + esc(r.step) + '</b> ' + esc(nm(r.step)) : bl(r.batch) + (S8.grp === 'day' ? '' : ' · ' + esc(r.step))) + '</td><td class="r">' + fn(r.good) + '</td><td class="r">' + (r.scrap || '—') + '</td></tr>';
+        gt += '<tr class="g3"><td>' + zDm(r.d) + ' ' + esc(r.tm) + ' · ' + (S8.grp === 'batch' ? '<b>' + esc(r.step) + '</b> ' + esc(nm(r.step)) : bl(r.batch) + (S8.grp === 'day' ? '' : ' · ' + esc(r.step))) + '</td><td class="r">' + fn(r.good) + '</td><td class="r">' + (r.scrap || '—') + '</td><td class="r">' + fn(zPayQ(r)) + '</td></tr>';
       });
     });
   });
-  gt += '<tr class="tot"><td><b>Разом</b></td><td class="r"><b>' + fn(good) + '</b></td><td class="r">' + fn(scrap) + '</td></tr></table></div>' +
+  gt += '<tr class="tot"><td><b>Разом</b></td><td class="r">' + fn(good) + '</td><td class="r">' + fn(scrap) + '</td><td class="r"><b>' + fn(pay) + '</b></td></tr></table></div>' +
     '<p class="muted" style="margin:6px 0 0">▸ — розгорнути: ' + ({ step: 'крок → дні → записи', batch: 'партія → кроки → записи', day: 'день → кроки → записи' })[S8.grp] + '.</p>';
   h += zFold8('works', 'Роботи й записи', d.recs.length + ' ' + plural(d.recs.length, 'запис', 'записи', 'записів'), gt);
   // Р-8с_05 калькулятор
@@ -1779,7 +1838,7 @@ function r8c() {
 /** дані графіка Р-8с_09: кошики — години (день) або дні (тиждень / місяць), серії — розріз, лінія % браку */
 function z8chart(d, prices) {
   const price = r => zNum(prices[r.step + '|' + r.typ]);
-  const val = r => Z8.cunit === 'uah' ? zPayQ(r) * price(r) : r.good;
+  const val = r => Z8.cunit === 'uah' ? zPayQ(r) * price(r) : zPayQ(r);   // v47: шт — у виробіток (контроль: успішні + брак)
   const bucket = r => d.mode === 'd' ? r.tm.slice(0, 2) : r.d;
   const cats = [];
   if (d.mode === 'd') { const hs = d.recs.map(r => Number(r.tm.slice(0, 2))); const h0 = Math.min(8, ...hs), h1 = Math.max(17, ...hs); for (let x = h0; x <= h1; x++) cats.push(String(x).padStart(2, '0')); }
@@ -1793,7 +1852,7 @@ function z8chart(d, prices) {
     if (Z8.csplit === 'step') { const ord = c => { const i = (d.order || []).indexOf(c); return i < 0 ? 999 : i; }; keys.sort((a, b) => ord(a) - ord(b)); }
     if (keys.length > 7) { const top = new Set(keys.slice(0, 7)); keys = keys.slice(0, 7).concat('__oth'); kf = r => top.has(dm.f(r)) ? dm.f(r) : '__oth'; } else kf = dm.f;
   }
-  const series = keys.map((k, i) => ({ k: k, l: k === '__all' ? (Z8.cunit === 'uah' ? 'Сума, ₴' : 'Успішних, шт') : k === '__oth' ? 'Інші' : DM[Z8.csplit].l(k), c: k === '__all' ? ZPAL[0] : k === '__oth' ? '#9AA8B0' : ZPAL[i % 8], v: {} }));
+  const series = keys.map((k, i) => ({ k: k, l: k === '__all' ? (Z8.cunit === 'uah' ? 'Сума, ₴' : 'У виробіток, шт') : k === '__oth' ? 'Інші' : DM[Z8.csplit].l(k), c: k === '__all' ? ZPAL[0] : k === '__oth' ? '#9AA8B0' : ZPAL[i % 8], v: {} }));
   const si = {}; series.forEach(x => si[x.k] = x);
   d.recs.forEach(r => { const x = si[kf(r)], c = bucket(r); x.v[c] = (x.v[c] || 0) + val(r); });
   let line = null;
