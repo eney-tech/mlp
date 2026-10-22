@@ -1,5 +1,6 @@
 <!DOCTYPE html>
-<!-- МЛП · index.html v55 · 22.10.2026 — непарні деталі в партіях двигунів (Code.gs v60, Reports.gs v23, рішення 22.10): картка партії MT — у «Що в тарі зараз»
+<!-- МЛП · index.html v56 · 22.10.2026 — Р-11: таблиця «Партії двигунів» відкрита за замовчуванням.
+     v55 · 22.10.2026 — непарні деталі в партіях двигунів (Code.gs v60, Reports.gs v23, рішення 22.10): картка партії MT — у «Що в тарі зараз»
      окремі рядки «Статори / Ротори без пари» і пари, що чекають F1; рядки «Статори» / «Ротори»: у двигунах (зараз) · без пари · брак (разом із двигунами);
      новий звіт Р-11 «Двигуни в роботі» (d=motors, право dashStan): партії двигунів, скільки в них двигунів і непарних статорів / роторів.
      v54 · 22.10.2026 — «Ретро-історія»: працівник «невідомо» (Retro.gs v2) — перший у списку працівників і кнопка «?» біля поля:
@@ -323,7 +324,7 @@
 <div class="toast" id="toast"></div>
 
 <script>
-const PAGE_VERSION = 'index.html v55 · 22.10.2026';
+const PAGE_VERSION = 'index.html v56 · 22.10.2026';
 /** v46: куди прийдуть етикетки K2 — адреси друку (K2_LABEL_EMAILS), якщо задані; інакше — пошта працівника */
 function k2To() { const t = (S.k2 && S.k2.to) || []; return t.length ? t.join(', ') + ' (принтер етикеток)' : (S.me ? S.me.email : ''); }
 const API = 'https://script.google.com/macros/s/AKfycbx-JUajnAtVsxaLHDgwRpfzE12g4LUtlf6JnWYAQScAVZ5FCpxzGHSrA5PDESqP80KD/exec';
@@ -2959,6 +2960,7 @@ function r11() {
   const d = DB, D = Z11;
   if (!D.loc) D.loc = (d.me && d.me.site ? d.me.site.charAt(0) : '') || 'all';
   const set = (k, v) => { D[k] = v; renderDash(); };
+  if (ZF.r11_01 === undefined) ZF.r11_01 = true;   // v56: таблиця партій — головне в цьому звіті, відкрита за замовчуванням
   const locOf = b => String(b.loc || '').charAt(0);
   const pt = b => { const c = b.cl || { S: 0, R: 0 }; const P = c.P !== undefined ? c.P : Math.min(c.S, c.R);
     return { P: P, S: c.uS !== undefined ? c.uS : c.S - P, R: c.uR !== undefined ? c.uR : c.R - P }; };
