@@ -1,5 +1,8 @@
 <!DOCTYPE html>
-<!-- МЛП · index.html v54 · 22.10.2026 — «Ретро-історія»: працівник «невідомо» (Retro.gs v2) — перший у списку працівників і кнопка «?» біля поля:
+<!-- МЛП · index.html v55 · 22.10.2026 — непарні деталі в партіях двигунів (Code.gs v60, Reports.gs v23, рішення 22.10): картка партії MT — у «Що в тарі зараз»
+     окремі рядки «Статори / Ротори без пари» і пари, що чекають F1; рядки «Статори» / «Ротори»: у двигунах (зараз) · без пари · брак (разом із двигунами);
+     новий звіт Р-11 «Двигуни в роботі» (d=motors, право dashStan): партії двигунів, скільки в них двигунів і непарних статорів / роторів.
+     v54 · 22.10.2026 — «Ретро-історія»: працівник «невідомо» (Retro.gs v2) — перший у списку працівників і кнопка «?» біля поля:
      якщо з техкарти не встановити, хто робив, рядок усе одно можна підтвердити.
      v53 · 22.10.2026 — «Ретро-історія» (Code.gs v59, Retro.gs v1): тімлід і вище перевіряють записи попередніх кроків, розпізнані з фото паперових техкарт
      партій, заведених з кроку X. ?rh=1 — список партій (мої / тімлід / усі, чекають / підтверджені, лічильники ок · питання · не розпізнано);
@@ -320,7 +323,7 @@
 <div class="toast" id="toast"></div>
 
 <script>
-const PAGE_VERSION = 'index.html v54 · 22.10.2026';
+const PAGE_VERSION = 'index.html v55 · 22.10.2026';
 /** v46: куди прийдуть етикетки K2 — адреси друку (K2_LABEL_EMAILS), якщо задані; інакше — пошта працівника */
 function k2To() { const t = (S.k2 && S.k2.to) || []; return t.length ? t.join(', ') + ' (принтер етикеток)' : (S.me ? S.me.email : ''); }
 const API = 'https://script.google.com/macros/s/AKfycbx-JUajnAtVsxaLHDgwRpfzE12g4LUtlf6JnWYAQScAVZ5FCpxzGHSrA5PDESqP80KD/exec';
@@ -688,11 +691,12 @@ function navSave(me, perms) {
   else if (NAV.role !== me.role) n.perms = {};   // роль змінилась, а прав ще не знаємо — меню до наступного відкриття головної мінімальне
   NAV = n; store('mlp_nav', JSON.stringify(n)); navRender();
 }
-const DASHT = { stan: ['Р-2', 'Стан зараз'], tare: ['Р-5', 'Аналіз тари'], batches: ['Р-7', 'Аналіз партій'], out: ['Р-8', 'Виробіток'], scrap: ['Р-10', 'Аналіз браку'], control: ['Р-9', 'Контроль'], my: ['Р-8с', 'Мій виробіток'] };
+const DASHT = { stan: ['Р-2', 'Стан зараз'], motors: ['Р-11', 'Двигуни в роботі'], tare: ['Р-5', 'Аналіз тари'], batches: ['Р-7', 'Аналіз партій'], out: ['Р-8', 'Виробіток'], scrap: ['Р-10', 'Аналіз браку'], control: ['Р-9', 'Контроль'], my: ['Р-8с', 'Мій виробіток'] };
 /** Звіти ролі для меню (Р-0_07). «Мій виробіток» у меню — працівнику (окрема вкладка) і зав. відділу браку (рішення 18.10) */
 function navReports() {
   const p = NAV.perms || {}, r = [];
   if (p.dashStan) r.push(['d=stan', 'stan']);
+  if (p.dashStan) r.push(['d=motors', 'motors']);   // v55: Р-11
   if (p.dashTare) r.push(['d=tare', 'tare']);
   if (p.dashBatches) r.push(['d=batches', 'batches']);   // v39
   if (p.dashOut) r.push(['d=out', 'out']);   // v38
@@ -1307,9 +1311,16 @@ function renderBatch(extra) {
   if (b.boxes) h += boxesCard(b);   // v48: ящики ГП партії
   if (b.comp) {
     const vv = c => [c.v2 ? 'в2 ' + c.v2 : '', c.v1 ? 'в1 ' + c.v1 : ''].filter(x => x).join(' · ');   // v13: версії деталей
-    const row = (n, c) => '<div class="li"><div><b>' + n + '</b><br><span class="muted">прийшло ' + c.in + (vv(c) ? ' (' + vv(c) + ')' : '') +
-      ' · у двигунах ' + c.used + ' · брак ' + c.scrap + (c.ret ? ' · пішло ' + c.ret : '') + (c.waitF4 ? ' · чекають F4п ' + c.waitF4 : '') + '</span></div>' +
-      '<div class="r"><span class="pill ' + (c.left ? 'warn' : '') + '">залишок ' + c.left + '</span></div></div>';
+    // v55: у двигунах — скільки деталей зараз у двигунах партії; без пари — годна половина двигуна, забракованого на F2 / F3 / F5; брак — разом із двигунами
+    const P = b.comp.pairs || 0;
+    const row = (n, c) => c.mot === undefined
+      ? '<div class="li"><div><b>' + n + '</b><br><span class="muted">прийшло ' + c.in + (vv(c) ? ' (' + vv(c) + ')' : '') +
+        ' · у двигунах ' + c.used + ' · брак ' + c.scrap + (c.ret ? ' · пішло ' + c.ret : '') + (c.waitF4 ? ' · чекають F4п ' + c.waitF4 : '') + '</span></div>' +
+        '<div class="r"><span class="pill ' + (c.left ? 'warn' : '') + '">залишок ' + c.left + '</span></div></div>'
+      : '<div class="li"><div><b>' + n + '</b><br><span class="muted">' + ['прийшло ' + c.in + (vv(c) ? ' (' + vv(c) + ')' : ''), 'у двигунах ' + c.mot,
+        c.unp ? '<b style="color:#9B231A">без пари ' + c.unp + '</b>' : '', P ? 'чекають збирання ' + P : '', 'брак ' + c.lost, c.ret ? 'пішло ' + c.ret : '',
+        c.waitF4 ? 'чекають F4п ' + c.waitF4 : ''].filter(x => x).join(' · ') + '</span></div>' +
+        '<div class="r">' + (c.unp ? '<span class="pill warn">без пари ' + c.unp + '</span>' : P ? '<span class="pill">до F1: ' + P + '</span>' : '') + '</div></div>';
     h += '<div class="card" style="padding-top:8px"><div class="list" style="padding:0">' + row('Статори', b.comp.S) + row('Ротори', b.comp.R) + '</div></div>';
   }
 
@@ -1425,9 +1436,16 @@ function boxesCard(b) {
 }
 function nowHtml(b) {
   const st = b.stages || [];
-  if (!st.length) return '';
+  // v55: партія двигунів — крім двигунів, у тарі лежать деталі: пари до F1, статори / ротори без пари, покупні ротори до F4п
+  const c = b.comp && b.comp.S && b.comp.S.mot !== undefined ? b.comp : null, ex = [];
+  if (c && c.pairs) ex.push({ q: c.pairs, n: 'Статори й ротори, ще не зібрані (пари)', r: 'чекає F1' });
+  if (c && c.S.unp) ex.push({ q: c.S.unp, n: 'Статори без пари', r: 'потрібен ротор → F1', w: 1 });
+  if (c && c.R.unp) ex.push({ q: c.R.unp, n: 'Ротори без пари', r: 'потрібен статор → F1', w: 1 });
+  if (c && c.R.waitF4) ex.push({ q: c.R.waitF4, n: 'Покупні ротори', r: 'чекає F4п' });
+  if (!st.length && !ex.length) return '';
   return '<div class="now"><div class="muted">Що в тарі зараз</div><div class="list" style="padding:0">' + st.map(x =>
-    '<div class="li"><div><b>' + x.qty + ' шт</b> · ' + esc(x.name) + '</div><div class="r muted">' + (x.done ? 'усі кроки пройдено' : 'чекає ' + esc(x.wait)) + '</div></div>').join('') + '</div></div>';
+    '<div class="li"><div><b>' + x.qty + ' шт</b> · ' + esc(x.name) + '</div><div class="r muted">' + (x.done ? 'усі кроки пройдено' : 'чекає ' + esc(x.wait)) + '</div></div>').join('') +
+    ex.map(x => '<div class="li"><div><b' + (x.w ? ' style="color:#9B231A"' : '') + '>' + x.q + ' шт</b> · ' + esc(x.n) + '</div><div class="r muted">' + esc(x.r) + '</div></div>').join('') + '</div></div>';
 }
 function bl(no) {   // v39 (Р-0_02): у звітах — картка партії Р-7, якщо роль її бачить; інакше — сторінка партії
   const r7 = VIEW === 'rep' && (NAV.perms || {}).dashBatches;
@@ -1963,7 +1981,7 @@ function renderDash() {
   $('who').innerHTML = whoHtml(d.me, d.perms);
   ZA = []; ZDRAW = [];
   // v35: усі звіти без вкладок (переходи — у меню); «Мій виробіток» — Р-8с (старий dashMy лишається для відповіді без mode — прибрати на етапі 8)
-  let h = d.d === 'stan' ? r2() : d.d === 'tare' ? r5() : d.d === 'out' ? r8() : d.d === 'scrap' ? r10() : d.d === 'batches' ? (d.card ? r7card() : r7()) : d.d === 'control' ? r9() : r8c();
+  let h = d.d === 'stan' ? r2() : d.d === 'motors' ? r11() : d.d === 'tare' ? r5() : d.d === 'out' ? r8() : d.d === 'scrap' ? r10() : d.d === 'batches' ? (d.card ? r7card() : r7()) : d.d === 'control' ? r9() : r8c();
   h += '<p class="muted" style="text-align:center">Дані на ' + esc(d.now) + (d.me.role === 'адміністратор' ? ' · ' + sec(d.ms) + ' / ' + sec(d.total) + (d.cached ? ' · кеш' : '') + (d.logSrc ? ' · ' + esc(d.logSrc) : '') : '') +
     ' · <a class="lnk" href="javascript:loadDash(1)">оновити</a></p><div style="height:30px"></div>';
   $('app').innerHTML = h;
@@ -2932,6 +2950,54 @@ function r2() {
         dl.map(b => '<tr><td>' + bl(b.no) + '</td><td>' + esc(b.typ) + ' · ' + esc(b.kv || '—') + '</td><td>' + esc(b.color || '—') + '</td><td>' + tl(b.tare) + (b.tare2 ? ' + ' + esc(b.tare2) : '') + '</td><td class="r">' + fn(b.rem) +
           '</td><td>' + esc(b.last || '—') + '</td><td>' + (b.stuck ? xmark('Лежить без руху ' + b.idle + ' роб. дн. (' + d.idleDays + ' і більше)') : '') + '</td></tr>').join('') + '</table></div>' : '<p class="muted">Немає.</p>'));
   }
+  return h;
+}
+
+// ---- v55: Р-11 «Двигуни в роботі» — партії двигунів і непарні деталі в них (дані Р-2, сервер d=motors)
+const Z11 = { loc: '', typ: 'all', kv: 'all', col: 'all', only: 'all' };
+function r11() {
+  const d = DB, D = Z11;
+  if (!D.loc) D.loc = (d.me && d.me.site ? d.me.site.charAt(0) : '') || 'all';
+  const set = (k, v) => { D[k] = v; renderDash(); };
+  const locOf = b => String(b.loc || '').charAt(0);
+  const pt = b => { const c = b.cl || { S: 0, R: 0 }; const P = c.P !== undefined ? c.P : Math.min(c.S, c.R);
+    return { P: P, S: c.uS !== undefined ? c.uS : c.S - P, R: c.uR !== undefined ? c.uR : c.R - P }; };
+  const inWork = b => b.status === 'в роботі' || b.status === 'поза маршрутом';
+  const mt = d.batches.filter(b => b.stream === 'MT' && (inWork(b) || (b.cl && (b.cl.S || b.cl.R))));
+  const typs = [...new Set(mt.map(b => b.typ))].filter(x => x).sort();
+  const kvs = [...new Set(mt.filter(b => D.typ === 'all' || b.typ === D.typ).map(b => b.kv))].filter(x => x).sort((a, b) => a - b);
+  const cols = [...new Set([].concat(...mt.map(b => b.colors || [])))].filter(x => x).sort((a, b) => a.localeCompare(b, 'uk'));
+  const fit = b => (D.loc === 'all' || locOf(b) === D.loc) && (D.typ === 'all' || b.typ === D.typ) && (D.kv === 'all' || b.kv === D.kv) &&
+    (D.col === 'all' || (b.colors || []).indexOf(D.col) >= 0);
+  const all = mt.filter(fit);
+  const unp = b => { const x = pt(b); return x.S + x.R; };
+  const list = (D.only === 'unp' ? all.filter(b => unp(b) > 0) : all).slice().sort((a, b) => unp(b) - unp(a) || a.no.localeCompare(b.no));
+  const tot = all.reduce((a, b) => { const x = pt(b); a.m += Math.max(0, b.rem); a.S += x.S; a.R += x.R; a.P += x.P; if (x.S + x.R) a.n++; return a; }, { m: 0, S: 0, R: 0, P: 0, n: 0 });
+  const sum = [D.loc === 'all' ? 'усі локації' : LOCN[D.loc]].concat(D.typ !== 'all' ? [D.typ] : [], D.kv !== 'all' ? ['KV ' + D.kv] : [], D.col !== 'all' ? [D.col] : []).join(' · ');
+  let h = zFbar('r11', sum, [D.typ !== 'all', D.kv !== 'all', D.col !== 'all'].filter(x => x).length,
+    zChips(D.loc, [['all', 'Усі'], ['П', 'Печерськ'], ['Ж', 'Жуляни']], v => set('loc', v)) +
+    zSel(D.typ, 'Типорозмір', typs, v => set('typ', v)) + zSel(D.kv, 'KV', kvs, v => set('kv', v)) + zSel(D.col, 'Колір', cols, v => set('col', v)));
+  const UTIP = 'Годна половина двигуна, забракованого на F2 / F3 / F5 («з них брак лише статора / лише ротора»). Лежить у тарі партії, доки їй не доберуть пару.';
+  const goU = zAct(() => { D.only = 'unp'; zOpen('r11_01'); renderDash(); });
+  h += '<div class="zkpis">' +
+    zKpi('Партії двигунів у роботі', fn(all.length), 'партій', fn(tot.m) + ' двигунів у них', 'Партії двигунів, що йдуть маршрутом, і партії, де ще лежать деталі.') +
+    zKpi('Статори без пари', fn(tot.S), 'шт', tot.S ? 'показати ▾' : 'немає', UTIP, tot.S ? 'kbad' : '', goU) +
+    zKpi('Ротори без пари', fn(tot.R), 'шт', tot.R ? 'показати ▾' : 'немає', UTIP, tot.R ? 'kbad' : '', goU) +
+    zKpi('Пари до збирання', fn(tot.P), 'пар', 'статор + ротор у тарі, чекають F1', 'Деталі прийшли в партію, але двигун ще не зібрано (F1).') + '</div>';
+  const red = n => n ? '<b style="color:#9B231A">' + fn(n) + '</b>' : '<span class="muted">—</span>';
+  h += zFold('r11_01', 'Партії двигунів', all.length, '<div class="muted">' + all.length + ' ' + PLR(all.length) + ', з непарними деталями ' + tot.n + '</div>' +
+    zChips(D.only, [['all', 'Усі'], ['unp', 'Тільки з непарними']], v => set('only', v)) +
+    (list.length ? '<div class="tw" style="margin-top:10px"><table class="t"><tr><th>Партія</th><th>Тип · KV</th><th>Крок</th><th>Тара</th><th class="r">Двигунів</th>' +
+      '<th class="r">Статори без пари</th><th class="r">Ротори без пари</th><th class="r">Пари до F1</th><th>Остання операція</th><th></th></tr>' +
+      list.map(b => { const x = pt(b);
+        return '<tr><td>' + bl(b.no) + '</td><td>' + esc(b.typ) + (b.kv ? ' · ' + esc(b.kv) : '') + (b.color ? '<br><span class="muted">' + esc(b.color) + '</span>' : '') + '</td><td>' + esc(b.step || '—') +
+          '</td><td>' + tl(b.tare) + '</td><td class="r">' + fn(Math.max(0, b.rem)) + '</td><td class="r">' + red(x.S) + '</td><td class="r">' + red(x.R) + '</td><td class="r">' + (x.P ? fn(x.P) : '<span class="muted">—</span>') +
+          '</td><td>' + esc(b.last || '—') + '</td><td>' + (b.stuck ? xmark('Без руху ' + b.idle + ' роб. дн. (' + d.idleDays + ' і більше)') : '') + '</td></tr>'; }).join('') +
+      '<tr><td colspan="4"><b>Разом</b></td><td class="r"><b>' + fn(list.reduce((a, b) => a + Math.max(0, b.rem), 0)) + '</b></td><td class="r">' + red(list.reduce((a, b) => a + pt(b).S, 0)) +
+      '</td><td class="r">' + red(list.reduce((a, b) => a + pt(b).R, 0)) + '</td><td class="r">' + fn(list.reduce((a, b) => a + pt(b).P, 0)) + '</td><td colspan="2"></td></tr></table></div>'
+      : '<p class="muted">' + (D.only === 'unp' ? 'Непарних деталей немає.' : 'Немає партій двигунів за цими фільтрами.') + '</p>') +
+    '<p class="muted" style="margin-top:10px">Що робити з непарною деталлю: на картці партії «+ Статори / ротори» — доберіть пару і зберіть двигун знову на F1; ' +
+    'якщо пари немає — «✂ Відокремити» залишок. Якщо двигун пішов у брак цілим (не розбирали), виправте запис кроку ✎: «з них брак лише статора / ротора» = 0.</p>');
   return h;
 }
 
