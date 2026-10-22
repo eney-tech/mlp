@@ -1,5 +1,7 @@
 <!DOCTYPE html>
-<!-- МЛП · index.html v53 · 22.10.2026 — «Ретро-історія» (Code.gs v59, Retro.gs v1): тімлід і вище перевіряють записи попередніх кроків, розпізнані з фото паперових техкарт
+<!-- МЛП · index.html v54 · 22.10.2026 — «Ретро-історія»: працівник «невідомо» (Retro.gs v2) — перший у списку працівників і кнопка «?» біля поля:
+     якщо з техкарти не встановити, хто робив, рядок усе одно можна підтвердити.
+     v53 · 22.10.2026 — «Ретро-історія» (Code.gs v59, Retro.gs v1): тімлід і вище перевіряють записи попередніх кроків, розпізнані з фото паперових техкарт
      партій, заведених з кроку X. ?rh=1 — список партій (мої / тімлід / усі, чекають / підтверджені, лічильники ок · питання · не розпізнано);
      ?rh=1&rb=… — партія: фото зліва (повернути — запам'ятовується на пристрої, збільшити колесом або + −, тягнути), записи справа (крок, дата, працівник
      з довідника з пошуком, успішних, брак, примітка, ✖ / ↩, + рядок), «Зберегти зміни», «✔ Підтвердити історію партії» (сервер перевіряє повноту) → наступна партія;
@@ -289,7 +291,8 @@
   .rtab input[type=date]{width:132px;min-height:0}
   .rtab input[type=number]{width:60px;text-align:right}
   .rtab select{width:84px}
-  .rtab input[data-f=wid]{min-width:220px}
+  .rtab input[data-f=wid]{min-width:200px}
+  .rwho{display:flex;gap:4px;align-items:center}.rwho .ic{margin:0;padding:6px 9px;flex:none}
   .rtab textarea{min-width:120px;resize:vertical;line-height:1.3}
   .rtab .pill{display:block;margin:4px 0 0;font-size:11px;padding:1px 6px;text-align:center;white-space:nowrap}
   .rtab .rcard{font-size:12px;margin-top:2px}
@@ -317,7 +320,7 @@
 <div class="toast" id="toast"></div>
 
 <script>
-const PAGE_VERSION = 'index.html v53 · 22.10.2026';
+const PAGE_VERSION = 'index.html v54 · 22.10.2026';
 /** v46: куди прийдуть етикетки K2 — адреси друку (K2_LABEL_EMAILS), якщо задані; інакше — пошта працівника */
 function k2To() { const t = (S.k2 && S.k2.to) || []; return t.length ? t.join(', ') + ' (принтер етикеток)' : (S.me ? S.me.email : ''); }
 const API = 'https://script.google.com/macros/s/AKfycbx-JUajnAtVsxaLHDgwRpfzE12g4LUtlf6JnWYAQScAVZ5FCpxzGHSrA5PDESqP80KD/exec';
@@ -3306,6 +3309,7 @@ $('modal').addEventListener('click', e => { if (e.target.id === 'modal') closeMo
 let RL = null, RC = null, RN = [], RBAD = {}, RDIRTY = false, RNEW = 0;
 const RPH = {};   // фото, вже завантажені з сервера: id → data URL
 const RV = { rot: 0, z: 1, x: 0, y: 0 };
+const RUNK = 'невідомо';   // v54: працівник невідомий (Retro.gs v2)
 const RMARK = { 'ок': 'ok', 'питання': 'warn', 'не розпізнано': 'bad', 'виправлено': 'blu', 'додано': 'blu' };
 let RF = (() => { try { return JSON.parse(store('mlp_rf') || '{}') || {}; } catch (e) { return {}; } })();
 function rpost(q) { return post('retro', Object.assign({ code: CODE }, q)); }
@@ -3387,7 +3391,7 @@ function retroGo(no) {
 function renderRetroCard(fresh) {
   const c = RC, b = c.batch, done = b.status === 'підтверджено';
   const prev = retroNav(-1), next = retroNav(1);
-  const wname = id => { const p = c.people.find(x => x.id === id); return p ? p.name + ' · ' + p.id : id; };
+  const wname = id => { if (id === RUNK) return RUNK; const p = c.people.find(x => x.id === id); return p ? p.name + ' · ' + p.id : id; };
   const live = RN.filter(s => !s.inLog);
   const cnt = m => live.filter(s => !s.del && s.mark === m).length;
   let h = '<div class="rbar"><button class="ic" ' + (prev ? 'onclick="retroGo(\'' + esc(prev.no) + '\')"' : 'disabled') + '>‹ ' + esc(prev ? prev.no : '') + '</button>' +
@@ -3408,7 +3412,7 @@ function renderRetroCard(fresh) {
     '<span class="muted">Звірте з фото. Порожнє — допишіть, зайве — ✖. Рядки «є в ЖЗР» уже внесені на сторінці — тут не змінюються.</span></div></div>';
   if (c.bad && c.bad.length) h += '<div class="card err" style="margin:0 0 12px">' + esc(c.msg || '') + '<ul style="margin:6px 0 0;padding-left:20px;font-weight:400">' +
     c.bad.map(x => '<li>' + esc(x.step) + (x.card ? ' (' + esc(x.card) + ')' : '') + ': немає — ' + esc(x.miss.join(', ')) + '</li>').join('') + '</ul></div>';
-  h += '<datalist id="rwk">' + c.people.map(p => '<option value="' + esc(p.name + ' · ' + p.id) + '">').join('') + '</datalist>';
+  h += '<datalist id="rwk"><option value="' + RUNK + '">' + c.people.map(p => '<option value="' + esc(p.name + ' · ' + p.id) + '">').join('') + '</datalist>';
   h += '<div class="card" style="margin:0 0 12px;padding:10px 12px"><div class="tw"><table class="t rtab"><thead><tr><th>Крок</th><th>Дата</th><th>Працівник<br><span style="text-transform:none;font-weight:500">як на картці</span></th>' +
     '<th class="r">Успішних</th><th class="r">Брак</th><th>Примітка</th><th></th></tr></thead><tbody>' +
     RN.map((s, i) => {
@@ -3420,7 +3424,8 @@ function renderRetroCard(fresh) {
         '<td><select data-f="step" data-nocbx' + dis + '>' + '<option value="">—</option>' + c.route.map(r => '<option value="' + esc(r.code) + '"' + (r.code === s.step ? ' selected' : '') + ' title="' + esc(r.name) + '">' + esc(r.code) + '</option>').join('') + '</select>' +
         '<span class="pill ' + (RMARK[s.mark] || '') + '" title="' + esc(s.changed || '') + '">' + esc(s.mark) + '</span></td>' +
         '<td><input type="date" data-f="date" value="' + esc(s.date) + '"' + dis + '></td>' +
-        '<td><input type="text" data-f="wid" list="rwk" value="' + esc(wv) + '" placeholder="прізвище або W0…"' + dis + '>' + (s.card ? '<div class="muted rcard">' + esc(s.card) + '</div>' : '') + '</td>' +
+        '<td><div class="rwho"><input type="text" data-f="wid" list="rwk" value="' + esc(wv) + '" placeholder="прізвище, W0… або «невідомо»"' + dis + '>' +
+        (done || s.del ? '' : '<button class="ic" data-unk title="Працівник невідомий — з техкарти не встановити">?</button>') + '</div>' + (s.card ? '<div class="muted rcard">' + esc(s.card) + '</div>' : '') + '</td>' +
         '<td class="r"><input type="number" inputmode="numeric" data-f="good" value="' + esc(s.good) + '"' + dis + '></td>' +
         '<td class="r"><input type="number" inputmode="numeric" data-f="scrap" value="' + esc(s.scrap) + '"' + dis + '></td>' +
         '<td><textarea data-f="note" rows="1"' + dis + '>' + esc(s.note) + '</textarea>' + (RBAD[s.id] ? '<div class="err" style="font-size:13px;margin:2px 0 0">немає: ' + esc(RBAD[s.id]) + '</div>' : '') + '</td>' +
@@ -3445,7 +3450,10 @@ function retroWire() {
   tb.addEventListener('input', e => {
     const tr = e.target.closest('tr[data-i]'), f = e.target.dataset.f; if (!tr || !f) return;
     const s = RN[+tr.dataset.i];
-    if (f === 'wid') { const m = /\b(W\d{3,})\s*$/.exec(e.target.value.trim()); s.wid = m ? m[1] : ''; e.target.classList.toggle('rbadi', !!e.target.value.trim() && !m); }
+    if (f === 'wid') {
+      const v = e.target.value.trim(), m = /\b(W\d{3,})\s*$/.exec(v), unk = v.toLowerCase() === RUNK;
+      s.wid = unk ? RUNK : m ? m[1] : ''; e.target.classList.toggle('rbadi', !!v && !m && !unk);
+    }
     else s[f] = e.target.value;
     if (f === 'note') { e.target.style.height = 'auto'; e.target.style.height = e.target.scrollHeight + 'px'; }
     retroDirty();
@@ -3457,6 +3465,8 @@ function retroWire() {
     if (hit.length === 1) { s.wid = hit[0].id; e.target.value = hit[0].name + ' · ' + hit[0].id; e.target.classList.remove('rbadi'); retroDirty(); }
   });
   tb.addEventListener('click', e => {
+    const uk = e.target.closest('button[data-unk]');
+    if (uk) { const inp = uk.parentNode.querySelector('input'); inp.value = RUNK; inp.dispatchEvent(new Event('input', { bubbles: true })); return; }   // v54
     const bt = e.target.closest('button[data-del]'); if (!bt) return;
     const s = RN[+bt.closest('tr').dataset.i];
     if (s.id.indexOf('new') === 0) RN.splice(RN.indexOf(s), 1); else s.del = !s.del;
