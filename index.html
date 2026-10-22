@@ -1,5 +1,11 @@
 <!DOCTYPE html>
-<!-- МЛП · index.html v51 · 22.10.2026 — «Ящики ГП»: у ящику з кількох партій — «з цієї партії N, у ящику всього M» (Labels.gs v10).
+<!-- МЛП · index.html v52 · 22.10.2026 — пошук у випадних списках: у списку від 6 варіантів (працівники, партії, тара, позиції складу, кроки…) —
+     поле, куди вводять частину назви, і відфільтрований список під ним (стрілки, Enter); сам &lt;select&gt; лишається, зміни коду його не зачіпають.
+     Без пошуку — короткі коди типу тари (КР, ПД, ТЧ…) біля номера тари (data-nocbx).
+     Брак за кількома причинами (Code.gs v58): причин на одній деталі — кілька (вибір з позначками, пошук), «+ Додати брак з іншою причиною» —
+     ще один рядок «Брак + Причина»; спершу причини цього кроку, далі — решта («Довідники», колонка «Кроки (причина браку)»). Те саме у ✎ виправленні.
+     Калькулятор кроку: брак зростає так, що успішних + брак більше «доступно» — успішних зменшується саме; навпаки — ні.
+     v51 · 22.10.2026 — «Ящики ГП»: у ящику з кількох партій — «з цієї партії N, у ящику всього M» (Labels.gs v10).
      v50 · 22.10.2026 — без відкритого ящика (Code.gs v57): K2 — будь-яка кількість, план: повні ящики, остача — ще один ящик
      (⚠ неповний), «змішаний: …», якщо в партії є двигуни інших партій; «📦 Відкриті ящики» прибрано; «Ящики ГП» — повний / неповний, чистий / змішаний.
      v49 · 22.10.2026 — «✂ Відокремити» в партіях двигунів — усім працівникам і зав. відділу браку, як тімліду (Code.gs v56).
@@ -180,6 +186,37 @@
   input[type=date],input[type=time]{width:100%;font-size:18px;padding:11px;border:1px solid #C5D0D7;border-radius:10px;background:#fff;color:#1D2B33;font-family:inherit;min-height:50px}
   .onb{border:1px dashed #C5D0D7;border-radius:12px;padding:2px 12px 12px;margin-top:12px}.onb.on{border:2px solid #E0A100;background:#FFFAEE}
   .seg{display:flex;gap:6px}.seg label{flex:1;margin:0}.seg input{display:none}
+  /* v52: пошук у випадному списку */
+  .cbx{position:relative;min-width:0}.cbx>select.cbxs{display:none}
+  .cbx>input.cbxi{width:100%;font-size:19px;padding:12px 38px 12px 12px;border:1px solid #C5D0D7;border-radius:10px;background:#fff url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='%2366767F' stroke-width='2.4'%3E%3Ccircle cx='11' cy='11' r='7'/%3E%3Cpath d='M20 20l-4-4'/%3E%3C/svg%3E") no-repeat right 12px center;color:#1D2B33;font-family:inherit;text-overflow:ellipsis}
+  .cbx.open>input.cbxi{border-color:#2a78d6;border-radius:10px 10px 0 0}
+  .cbx>input.cbxi:disabled{background-color:#F4F7F9;color:#9AA8B0}
+  .cbxl{display:none;border:1px solid #2a78d6;border-top:0;border-radius:0 0 10px 10px;background:#fff;max-height:45vh;overflow:auto;-webkit-overflow-scrolling:touch}
+  .cbx.open>.cbxl{display:block}
+  .cbxl div{padding:11px 12px;font-size:17px;border-top:1px solid #EEF2F5;cursor:pointer;color:#1D2B33}
+  .cbxl div:first-child{border-top:0}.cbxl div.hi{background:#EAF2FC}.cbxl div.cur{font-weight:700}
+  .cbxl div.dis{color:#9AA8B0;cursor:default}.cbxl div.none{color:#66767F;cursor:default;font-size:15px}
+  .cbxl b{background:#FFF1D6;font-weight:inherit}
+  .zban .cbx>input.cbxi,.fl .cbx>input.cbxi{font-size:15px;padding:7px 32px 7px 9px;background-position:right 9px center}
+  /* v52: брак за причинами */
+  .rzr{border-top:1px dashed #C5D0D7;margin-top:14px}.rzr:first-child{border-top:0;margin-top:0}
+  .rzh{display:flex;justify-content:space-between;align-items:baseline;gap:8px}.rzh label{margin-bottom:6px}
+  .rzh button{border:0;background:transparent;color:#9B231A;font-size:14px;font-weight:600;padding:4px 0;font-family:inherit}
+  .rzb{display:flex;flex-wrap:wrap;gap:6px;align-items:center;width:100%;min-height:50px;text-align:left;font-size:17px;padding:8px 12px;border:1px solid #C5D0D7;border-radius:10px;background:#fff;color:#66767F;font-family:inherit;cursor:pointer}
+  .rzb.bad{border-color:#B3261E}
+  .rzb span{background:#FDE3E1;color:#7A1C15;border-radius:99px;padding:4px 10px;font-size:15px;font-weight:600}
+  .rzadd{border:1px dashed #9AA8B0;background:transparent;color:#2F4858;border-radius:10px;width:100%;padding:12px;font-size:16px;font-weight:600;margin-top:12px;font-family:inherit}
+  .rzsum{margin-top:8px}
+  .rzpop{position:fixed;inset:0;z-index:72;background:rgba(20,30,36,.55);display:flex;align-items:flex-end}
+  .rzpop>div{background:#fff;width:100%;max-height:88vh;display:flex;flex-direction:column;border-radius:18px 18px 0 0}
+  .rzpop .ph{padding:14px 16px 6px}.rzpop .ph input{margin-top:8px;font-size:17px;padding:10px}
+  .rzpop .pl{overflow:auto;padding:0 16px;flex:1;-webkit-overflow-scrolling:touch}
+  .rzpop .pl label{display:flex;gap:12px;align-items:center;margin:0;padding:11px 0;font-size:17px;color:#1D2B33;border-top:1px solid #EEF2F5}
+  .rzpop .pl label input{width:22px;height:22px;flex:0 0 22px}
+  .rzpop .pl .sep{font-size:12px;font-weight:700;color:#66767F;text-transform:uppercase;letter-spacing:.05em;padding:14px 0 6px;border-top:2px solid #E3EAEF}
+  .rzpop .pl .sep.first{border-top:0;padding-top:6px}
+  .rzpop .pf{display:flex;gap:10px;padding:10px 16px 16px;border-top:1px solid #EEF2F5}.rzpop .pf .btn{margin-top:0}
+  @media (min-width:700px){.rzpop{align-items:center;justify-content:center}.rzpop>div{max-width:520px;border-radius:18px;max-height:80vh}}
   .seg span{display:block;text-align:center;padding:13px 4px;border:1px solid #C5D0D7;border-radius:10px;font-size:17px;font-weight:600;background:#fff}
   .seg input:checked+span{background:#2F4858;color:#fff;border-color:#2F4858}
   details{margin:12px;background:#fff;border-radius:14px;box-shadow:0 1px 3px rgba(0,0,0,.08)}
@@ -246,7 +283,7 @@
 <div class="toast" id="toast"></div>
 
 <script>
-const PAGE_VERSION = 'index.html v51 · 22.10.2026';
+const PAGE_VERSION = 'index.html v52 · 22.10.2026';
 /** v46: куди прийдуть етикетки K2 — адреси друку (K2_LABEL_EMAILS), якщо задані; інакше — пошта працівника */
 function k2To() { const t = (S.k2 && S.k2.to) || []; return t.length ? t.join(', ') + ' (принтер етикеток)' : (S.me ? S.me.email : ''); }
 const API = 'https://script.google.com/macros/s/AKfycbx-JUajnAtVsxaLHDgwRpfzE12g4LUtlf6JnWYAQScAVZ5FCpxzGHSrA5PDESqP80KD/exec';
@@ -362,6 +399,186 @@ function numInput(id, val) {
 }
 function bump(id, d) { const i = $(id); i.value = Math.max(0, (Number(i.value) || 0) + d); i.dispatchEvent(new Event('input')); }
 function opts(list, sel, ph) { return (ph ? '<option value="">' + esc(ph) + '</option>' : '') + list.map(x => '<option' + (String(x) === String(sel) ? ' selected' : '') + '>' + esc(x) + '</option>').join(''); }
+// =============================================================== v52: ПОШУК У ВИПАДНИХ СПИСКАХ
+/** Кожен <select> від CBX_MIN варіантів отримує поле пошуку: вводять частину назви — під полем лишаються тільки збіги.
+ *  Сам select прихований і лишається джерелом значення: $('id').value, onchange, перебудова варіантів — як раніше; властивостей select не підміняємо */
+const CBX_MIN = 6, CBX_SKIP = '.zctl,.zmx,.zfrow,.zpop,.rzpop';
+const SELI = Object.getOwnPropertyDescriptor(HTMLSelectElement.prototype, 'selectedIndex');
+function cbxN(x) { return String(x).toLowerCase().replace(/[’ʼ`]/g, "'").replace(/ё/g, 'е'); }
+function cbxPh(o) { return !!o && o.value === '' && /^\s*[—–-]/.test(o.text); }   // «— оберіть —» — підказка, не значення
+function cbxWire(sel) {
+  if (!sel || sel.cbx || sel.multiple || sel.hasAttribute('data-nocbx') || sel.closest(CBX_SKIP) || sel.options.length < CBX_MIN) return;
+  const w = document.createElement('div'); w.className = 'cbx';
+  ['flex', 'width', 'maxWidth', 'minWidth', 'marginTop'].forEach(k => { if (sel.style[k]) w.style[k] = sel.style[k]; });
+  const inp = document.createElement('input'); inp.type = 'text'; inp.className = 'cbxi'; inp.autocomplete = 'off'; inp.spellcheck = false;
+  inp.setAttribute('autocorrect', 'off'); inp.setAttribute('autocapitalize', 'off'); inp.setAttribute('enterkeyhint', 'done');
+  if (sel.style.fontSize) inp.style.fontSize = sel.style.fontSize;
+  const ls = document.createElement('div'); ls.className = 'cbxl';
+  sel.parentNode.insertBefore(w, sel); w.appendChild(inp); w.appendChild(ls); w.appendChild(sel); sel.classList.add('cbxs');
+  const C = sel.cbx = { w: w, inp: inp, ls: ls, hi: -1, vis: [] };
+  const sync = () => {
+    C.si = SELI.get.call(sel); const o = sel.options[C.si];
+    inp.value = o && !cbxPh(o) ? o.text : ''; inp.placeholder = o && cbxPh(o) ? o.text.replace(/^\s*[—–-]\s*|\s*[—–-]\s*$/g, '') : 'Почніть вводити…';
+    inp.disabled = sel.disabled; inp.title = inp.value;
+  };
+  C.sync = sync;
+  new MutationObserver(() => { sync(); if (w.classList.contains('open')) draw(C.q || ''); }).observe(sel, { childList: true, subtree: true, attributes: true, attributeFilter: ['disabled', 'selected'] });
+  const draw = q => {
+    C.q = q; const words = cbxN(q).split(/\s+/).filter(Boolean), cur = SELI.get.call(sel);
+    C.vis = []; let h = '';
+    [...sel.options].forEach((o, i) => {
+      const t = cbxN(o.text);
+      if (words.length && (cbxPh(o) || !words.every(x => t.indexOf(x) >= 0))) return;
+      C.vis.push(i);
+      let txt = esc(o.text);
+      if (words.length) { const k = t.indexOf(words[0]); if (k >= 0) txt = esc(o.text.slice(0, k)) + '<b>' + esc(o.text.slice(k, k + words[0].length)) + '</b>' + esc(o.text.slice(k + words[0].length)); }
+      h += '<div data-i="' + i + '" class="' + (o.disabled ? 'dis' : '') + (i === cur ? ' cur' : '') + '">' + txt + '</div>';
+    });
+    ls.innerHTML = h || '<div class="none">Нічого не знайдено — спробуйте інакше</div>';
+    C.hi = -1; hiTo(C.vis.findIndex(i => !sel.options[i].disabled && (words.length || i === cur)));
+  };
+  const hiTo = k => {
+    const els = ls.querySelectorAll('div[data-i]'); els.forEach(e => e.classList.remove('hi'));
+    C.hi = k; if (k >= 0 && els[k]) { els[k].classList.add('hi'); const e = els[k], top = e.offsetTop, bot = top + e.offsetHeight;
+      if (top < ls.scrollTop) ls.scrollTop = top; else if (bot > ls.scrollTop + ls.clientHeight) ls.scrollTop = bot - ls.clientHeight; }
+  };
+  const open = () => {   // поле порожнє — вводять одразу, без стирання; поточне значення — підказкою
+    if (sel.disabled) return; w.classList.add('open'); const o = sel.options[SELI.get.call(sel)];
+    if (o && !cbxPh(o)) { inp.placeholder = o.text; inp.value = ''; } draw('');
+  };
+  const close = () => { w.classList.remove('open'); sync(); };
+  const pick = i => {
+    const o = sel.options[i]; if (!o || o.disabled) return;
+    const ch = SELI.get.call(sel) !== i; SELI.set.call(sel, i); close(); inp.blur();
+    if (ch) { sel.dispatchEvent(new Event('input', { bubbles: true })); sel.dispatchEvent(new Event('change', { bubbles: true })); }
+  };
+  inp.addEventListener('focus', open);
+  inp.addEventListener('click', () => { if (!w.classList.contains('open')) open(); });
+  inp.addEventListener('input', () => { w.classList.add('open'); draw(inp.value); });
+  inp.addEventListener('blur', () => setTimeout(() => { if (document.activeElement !== inp) close(); }, 150));
+  inp.addEventListener('keydown', e => {
+    if (e.key === 'ArrowDown' || e.key === 'ArrowUp') { e.preventDefault(); if (!w.classList.contains('open')) open();
+      const d = e.key === 'ArrowDown' ? 1 : -1; let k = C.hi; do { k += d; } while (k >= 0 && k < C.vis.length && sel.options[C.vis[k]].disabled); if (k >= 0 && k < C.vis.length) hiTo(k); }
+    else if (e.key === 'Enter') { e.preventDefault(); if (C.hi >= 0) pick(C.vis[C.hi]); else close(); }
+    else if (e.key === 'Escape') { close(); inp.blur(); }
+  });
+  ls.addEventListener('mousedown', e => e.preventDefault());   // фокус лишається в полі, поки обирають
+  ls.addEventListener('click', e => { const d = e.target.closest('div[data-i]'); if (d) pick(Number(d.dataset.i)); });
+  sync();
+}
+// значення змінили кодом ($('x').value = …, без події) — поле показує його не пізніше ніж за 0,4 с
+setInterval(() => document.querySelectorAll('select.cbxs').forEach(x => { const c = x.cbx; if (c && !c.w.classList.contains('open') && (c.si !== SELI.get.call(x) || c.inp.disabled !== x.disabled)) c.sync(); }), 400);
+function cbxScan(root) { (root.tagName === 'SELECT' ? [root] : root.querySelectorAll ? [...root.querySelectorAll('select')] : []).forEach(cbxWire); }
+new MutationObserver(ms => ms.forEach(m => {
+  if (m.target.tagName === 'SELECT') cbxWire(m.target);   // варіанти дописали пізніше (напр. «Почати з кроку»)
+  m.addedNodes.forEach(n => { if (n.nodeType === 1) cbxScan(n); });
+})).observe(document.documentElement, { childList: true, subtree: true });
+
+// =============================================================== v52: БРАК ЗА ПРИЧИНАМИ
+/** Рядки «Брак + Причина»: на одній деталі — одна чи кілька причин (« + »), рядків — скільки треба. Запис (Code.gs v58):
+ *  один рядок — «A» або «A + B»; кілька — «A: 4; B + C: 6». total — брак задано ззовні (F1: брак статорів + роторів, кількість у рядках — лише з другого) */
+const RZ = {};
+function rzParse(txt, scrap) {
+  const s = String(txt || '').trim(), sp = x => String(x).split(/\s+\+\s+/).map(y => y.trim()).filter(Boolean);
+  if (!s) return [{ q: Number(scrap) || 0, r: [] }];
+  const ps = s.split(/\s*;\s*/).filter(Boolean);
+  if (ps.length < 2 && !/:\s*\d+$/.test(s)) return [{ q: Number(scrap) || 0, r: sp(s) }];
+  return ps.map(p => { const m = p.match(/^(.*?):\s*(\d+)$/); return m ? { q: Number(m[2]), r: sp(m[1]) } : { q: 0, r: sp(p) }; });
+}
+/** Причини для кроку: спершу цього кроку, далі — решта («Довідники» → reasonSteps) */
+function rzLists(step) {
+  const all = (S.dict && S.dict.reasons) || [], rs = (S.dict && S.dict.reasonSteps) || {};
+  const mine = all.filter(x => (rs[x] || []).indexOf(step) >= 0);
+  const gen = all.filter(x => mine.indexOf(x) < 0 && !(rs[x] || []).length), other = all.filter(x => mine.indexOf(x) < 0 && (rs[x] || []).length);
+  return { mine: mine, rest: gen.concat(other) };
+}
+/** box — id контейнера; o: { step, init (рядок ЖЗР), scrap (брак для init), total: () => число | null, onTotal } */
+function rzInit(box, o) {
+  RZ[box] = { box: box, step: o.step, total: o.total || null, onTotal: o.onTotal || null, rows: rzParse(o.init, o.scrap) };
+  if (RZ[box].total && RZ[box].rows.length === 1) RZ[box].rows[0].q = 0;
+  rzDraw(box);
+}
+function rzSum(box) { const z = RZ[box]; return z ? z.rows.reduce((a, x) => a + (Number(x.q) || 0), 0) : 0; }
+function rzTotal(box) { const z = RZ[box]; return !z ? 0 : z.total ? z.total() : rzSum(box); }
+function rzDraw(box) {
+  const z = RZ[box], el = $(box); if (!z || !el) return;
+  const fx = !!z.total, many = z.rows.length > 1;
+  el.innerHTML = z.rows.map((x, k) => {
+    const qty = !fx || many;
+    return '<div class="rzr">' +
+      (qty ? '<div class="rzh"><label>' + (k ? 'Брак з іншою причиною' : 'Брак') + '</label>' + (k ? '<button type="button" onclick="rzDel(\'' + box + '\',' + k + ')">✖ прибрати</button>' : '') + '</div>' +
+        numInput(box + 'q' + k, x.q) : '') +
+      '<div id="' + box + 'p' + k + '"><label>Причина браку <span class="muted">— можна кілька</span></label>' +
+      '<button type="button" class="rzb" id="' + box + 'b' + k + '" onclick="rzOpen(\'' + box + '\',' + k + ')">' +
+      (x.r.length ? x.r.map(r => '<span>' + esc(r) + '</span>').join('') : '— оберіть —') + '</button></div></div>';
+  }).join('') + '<button type="button" class="rzadd" id="' + box + 'add" onclick="rzAdd(\'' + box + '\')">+ Додати брак з іншою причиною</button>' +
+    '<div class="muted rzsum" id="' + box + 'sum"></div>';
+  z.rows.forEach((x, k) => { const q = $(box + 'q' + k); if (q) q.oninput = () => { x.q = Math.max(0, Math.round(Number(q.value) || 0)); rzSync(box, true); }; });
+  rzSync(box, false);
+}
+/** Видимість причин і «+ Додати», підсумок; changed — кількість змінилась (калькулятор кроку) */
+function rzSync(box, changed) {
+  const z = RZ[box]; if (!z || !$(box)) return;
+  const fx = !!z.total, tot = rzTotal(box), many = z.rows.length > 1;
+  z.rows.forEach((x, k) => { const p = $(box + 'p' + k); if (p) p.style.display = (fx && !many ? tot > 0 : x.q > 0 || k > 0) ? 'block' : 'none'; });
+  $(box + 'add').style.display = tot > 0 && z.rows[z.rows.length - 1].r.length ? 'block' : 'none';
+  const s = $(box + 'sum');
+  if (many) { const sum = rzSum(box);
+    s.innerHTML = fx ? 'Розписано за причинами: <b' + (sum !== tot ? ' style="color:#9B231A"' : '') + '>' + sum + ' з ' + tot + ' шт</b>' : 'Усього браку: <b>' + sum + ' шт</b>'; }
+  else s.innerHTML = '';
+  if (changed && z.onTotal) z.onTotal(tot);
+}
+function rzAdd(box) {
+  const z = RZ[box]; if (!z) return;
+  if (z.total && z.rows.length === 1) z.rows[0].q = z.total();   // F1: з другим рядком — кількість у кожному
+  z.rows.push({ q: 0, r: [] }); rzDraw(box);
+  const q = $(box + 'q' + (z.rows.length - 1)); if (q) setTimeout(() => { q.focus(); q.select(); }, 30);
+}
+function rzDel(box, k) { const z = RZ[box]; if (!z) return; z.rows.splice(k, 1); if (z.total && z.rows.length === 1) z.rows[0].q = 0; rzDraw(box); rzSync(box, true); }
+/** Текст для запису і перевірка: '' — брак 0; помилка — { err } */
+function rzVal(box) {
+  const z = RZ[box]; if (!z) return { v: '' };
+  const tot = rzTotal(box); if (!(tot > 0)) return { v: '' };
+  const many = z.rows.length > 1, rows = z.rows.filter(x => !many || x.q > 0 || x.r.length);
+  const bad = rows.findIndex(x => !x.r.length);
+  if (bad >= 0) { const b = $(box + 'b' + z.rows.indexOf(rows[bad])); if (b) b.classList.add('bad'); return { err: 'Вкажіть причину браку' + (many ? ' в кожному рядку' : '') }; }
+  if (rows.length === 1) return { v: rows[0].r.join(' + ') };
+  if (rows.some(x => !(x.q > 0))) return { err: 'Брак з іншою причиною: вкажіть кількість або приберіть рядок' };
+  if (z.total && rzSum(box) !== tot) return { err: 'За причинами розписано ' + rzSum(box) + ' шт, а браку ' + tot + ' шт' };
+  return { v: rows.map(x => x.r.join(' + ') + ': ' + x.q).join('; ') };
+}
+let RZP = null;   // відкритий вибір причин: { box, k, sel }
+function rzOpen(box, k) {
+  const z = RZ[box]; if (!z) return;
+  RZP = { box: box, k: k, sel: z.rows[k].r.slice() };
+  const d = document.createElement('div'); d.className = 'rzpop'; d.id = 'rzpop';
+  const q = z.total && z.rows.length === 1 ? z.total() : z.rows[k].q;
+  d.innerHTML = '<div><div class="ph"><div class="mid">Причина браку' + (q ? ' · ' + q + ' шт' : '') + '</div>' +
+    '<div class="muted">Позначте одну або кілька — якщо на одній деталі кілька вад</div>' +
+    '<input type="text" id="rzq" placeholder="Пошук причини…" autocomplete="off" oninput="rzList()"></div><div class="pl" id="rzl"></div>' +
+    '<div class="pf"><button type="button" class="btn btn2" onclick="rzClose(false)">Скасувати</button><button type="button" class="btn" onclick="rzClose(true)">Готово</button></div></div>';
+  d.addEventListener('click', e => { if (e.target === d) rzClose(false); });
+  document.body.appendChild(d); rzList();
+}
+function rzList() {
+  if (!RZP) return;
+  const z = RZ[RZP.box], L = rzLists(z.step), w = cbxN($('rzq').value).split(/\s+/).filter(Boolean);
+  const f = x => w.every(y => cbxN(x).indexOf(y) >= 0);
+  const extra = RZP.sel.filter(x => L.mine.indexOf(x) < 0 && L.rest.indexOf(x) < 0);   // старі причини, яких уже немає в «Довідниках»
+  const it = x => '<label><input type="checkbox" value="' + esc(x) + '"' + (RZP.sel.indexOf(x) >= 0 ? ' checked' : '') + ' onchange="rzTog(this)"> ' + esc(x) + '</label>';
+  const m = L.mine.concat(extra).filter(f), r = L.rest.filter(f);
+  let h = '';
+  if (m.length) h += '<div class="sep first">Крок ' + esc(z.step) + '</div>' + m.map(it).join('');
+  if (r.length) h += (m.length ? '<div class="sep">Інші причини</div>' : '') + r.map(it).join('');
+  $('rzl').innerHTML = h || '<p class="muted">Нічого не знайдено. Немає потрібної причини — оберіть «інше» і напишіть у коментарі.</p>';
+}
+function rzTog(c) { const i = RZP.sel.indexOf(c.value); if (c.checked && i < 0) RZP.sel.push(c.value); if (!c.checked && i >= 0) RZP.sel.splice(i, 1); }
+function rzClose(ok) {
+  const d = $('rzpop'); if (d) d.remove(); if (!RZP) return;
+  const p = RZP; RZP = null; if (!ok) return;
+  const z = RZ[p.box]; if (!z || !z.rows[p.k]) return;
+  z.rows[p.k].r = p.sel; rzDraw(p.box);
+}
 /** v18: тімлід — «Хто виконав» і «Дата» (Code.gs v21: a.who, a.at). Вибір тримається в ONB, поки сторінка відкрита (дооформлення кількох кроків поспіль) */
 let ONB = { who: '', date: '', time: '' };
 function ymd(d) { return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0'); }
@@ -395,7 +612,7 @@ function onbWire() {
 function onbVal() { return $('onb') ? { who: ONB.who, at: ONB.date ? ONB.date + (ONB.time ? 'T' + ONB.time : '') : '' } : {}; }
 
 function tarePicker(id, types) {
-  return '<div class="row"><select id="' + id + 't" style="flex:0 0 38%">' + opts(types) + '</select>' +
+  return '<div class="row"><select id="' + id + 't" data-nocbx style="flex:0 0 38%">' + opts(types) + '</select>' +
     '<input type="number" inputmode="numeric" id="' + id + 'n" placeholder="номер"></div>';
 }
 function tareVal(id) { const n = $(id + 'n').value; return n ? $(id + 't').value + '-' + n : ''; }
@@ -509,7 +726,7 @@ function renderHome() {
     '<span>Сканувати QR<small>' + (prod ? 'тара, піддон, плакат поверху чи складу' : 'QR на дверях складу') + '</small></span></button></div>';
   const tiles = [];
   if (prod) tiles.push('<div class="tile"><div class="tn">▣ Відкрити тару або партію</div><div class="td">якщо QR не читається — введіть код</div>' +
-    '<div class="row" style="margin-top:8px"><select id="hk" style="flex:0 0 42%;font-size:17px">' + opts(['КР', 'ПД', 'ТЧ', 'СК', 'M', 'S', 'R']) + '</select>' +
+    '<div class="row" style="margin-top:8px"><select id="hk" data-nocbx style="flex:0 0 42%;font-size:17px">' + opts(['КР', 'ПД', 'ТЧ', 'СК', 'M', 'S', 'R']) + '</select>' +
     '<input type="number" inputmode="numeric" id="hn" placeholder="номер" style="font-size:17px"></div><button class="btn btn2" id="hgo" style="margin-top:8px">Відкрити</button></div>');
   if (p.noBatch) tiles.push('<a class="tile" href="' + esc(link('nb=1')) + '"><div class="tn">⏱ Записати роботу без партії</div><div class="td">' +
     (p.cabinet ? 'за себе або за працівника, сьогодні або минулою датою' : 'підготовка місця, перебирання залишків, навчання — у годинах або штуках') + '</div></a>');
@@ -1064,9 +1281,8 @@ function renderBatch(extra) {
     h += '<div class="card"><div class="mid">Додати крок</div>' + onbHtml() +
       '<label>Крок</label><select id="stp">' + b.route.map(s => '<option value="' + esc(s.code) + '"' + (s.avail && !s.blockedBy ? '' : ' disabled') + (s.code === pre ? ' selected' : '') + '>' +
         esc(s.code + ' · ' + s.name) + (altSkipped(b, s) ? ' — не потрібен, обрано ' + esc(altSkipped(b, s)) : s.altWith && s.altWith.length ? ' (або ' + esc(s.altWith.join(', ')) + ')' : '') + (s.avail ? (s.blockedBy ? ' — ' + s.avail + ' шт, спершу закрити ' + s.blockedBy : ' — доступно ' + s.avail) : '') + '</option>').join('') + '</select>' +
-      '<label id="goodLbl">Успішних</label>' + numInput('good', '') +
-      '<div id="scrapWrap"><label>Брак</label>' + numInput('scrap', 0) + '</div>' +
-      '<div id="rsn" style="display:none"><label>Причина браку</label><select id="reason">' + opts(S.dict.reasons, '', '— оберіть —') + '</select></div>' +
+      '<label id="goodLbl">Успішних</label>' + numInput('good', '') + '<div class="muted" id="goodHint" style="margin-top:6px"></div>' +
+      '<input type="hidden" id="scrap" value="0"><div id="xf0"></div><div id="rz" style="margin-top:14px"></div>' +   // v52: брак за причинами
       '<div id="xf"></div>' +
       '<label>Коментар (необов\'язково)</label><input type="text" id="cm">' +
       '<button class="btn" id="go">Записати</button><div class="err" id="err"></div></div>';
@@ -1148,7 +1364,7 @@ function renderBatch(extra) {
   if (rel.length) h += '<details><summary>Зв\'язки</summary><div class="list">' + rel.map(r => '<div class="li"><div>' + r + '</div></div>').join('') + '</div></details>';
 
   $('app').innerHTML = h + '<div style="height:40px"></div>';
-  if ($('stp')) { $('stp').onchange = stepChanged; stepChanged(); $('scrap').oninput = () => { const on = Number($('scrap').value) > 0; $('rsn').style.display = on ? 'block' : 'none'; if ($('psw')) $('psw').style.display = on ? 'block' : 'none'; }; $('go').onclick = submitStep; }
+  if ($('stp')) { $('stp').onchange = stepChanged; stepChanged(); $('good').addEventListener('input', () => goodHint(false)); $('go').onclick = submitStep; }
   onbWire();
 }
 /** Що зараз лежить у тарі: напівфабрикат і скільки (після якого кроку, який крок чекає) */
@@ -1180,14 +1396,14 @@ function bl(no) {   // v39 (Р-0_02): у звітах — картка парт�
 
 function stepChanged() {
   const s = S.batch.route.find(x => x.code === $('stp').value);
-  $('good').value = s ? s.avail : ''; $('scrap').value = 0; $('rsn').style.display = 'none';
-  $('scrapWrap').style.display = (s && s.code === 'F1' && S.batch.comp) ? 'none' : 'block';
-  $('goodLbl').textContent = (s && s.code === 'F1' && S.batch.comp) ? 'Зібрано двигунів' : 'Успішних';
+  $('good').value = s ? s.avail : ''; $('scrap').value = 0; $('goodHint').innerHTML = '';
+  const f1 = !!(s && s.code === 'F1' && S.batch.comp);
+  $('goodLbl').textContent = f1 ? 'Зібрано двигунів' : 'Успішних';
   let x = '';
-  if (s && s.code === 'F1' && S.batch.comp) {
-    x = '<label>Брак статорів</label>' + numInput('x1', 0) + '<label>Брак роторів</label>' + numInput('x2', 0) +
-      '<p class="muted">Зібрано — успішно зібрані двигуни. Якщо бракований лише статор або лише ротор — пишіть брак тільки цієї деталі: друга лишиться в залишку.</p>';
-  }
+  $('xf0').innerHTML = f1 ? '<label>Брак статорів</label>' + numInput('x1', 0) + '<label>Брак роторів</label>' + numInput('x2', 0) +
+      '<p class="muted">Зібрано — успішно зібрані двигуни. Якщо бракований лише статор або лише ротор — пишіть брак тільки цієї деталі: друга лишиться в залишку.</p>' : '';
+  // v52: брак — рядки «кількість + причини»; на F1 брак = статори + ротори, рядки лише ділять його за причинами
+  rzInit('rz', { step: s ? s.code : '', total: f1 ? () => (Number($('x1').value) || 0) + (Number($('x2').value) || 0) : null, onTotal: scrapChanged });
   if (s && S.batch.comp && PART_SCRAP.indexOf(s.code) >= 0)   // v47: брак лише статора / лише ротора — годна деталь лишається в партії
     x = '<div id="psw" style="display:none"><label>з них брак лише статора (ротор годний)</label>' + numInput('x1', 0) + '<label>з них брак лише ротора (статор годний)</label>' + numInput('x2', 0) +
       '<p class="muted">Решта браку — увесь двигун. Годна деталь лишається в партії: доберіть до неї пару («+ Статори / ротори») і зберіть знову на F1.</p></div>';
@@ -1205,10 +1421,7 @@ function stepChanged() {
   if (lotOn) x += lotField('slot', 'Партія постачальника компонента');
   $('xf').innerHTML = x;
   LOTF_reset(); if (lotOn) wireLot('slot', { batch: S.batch.info['Номер'], step: s.code });
-  if (s && s.code === 'F1' && S.batch.comp) {
-    const upd = () => $('rsn').style.display = (Number($('x1').value) || 0) + (Number($('x2').value) || 0) > 0 ? 'block' : 'none';
-    $('x1').oninput = upd; $('x2').oninput = upd;
-  }
+  if (f1) { const upd = () => rzSync('rz', true); $('x1').oninput = upd; $('x2').oninput = upd; }
   if (s && s.extra === 'split') $('good').oninput = () => { $('x1').value = Math.max(0, (Number($('good').value) || 0) - (Number($('x2').value) || 0)); };
   else $('good').oninput = null;
   if (s && s.extra === 'pack') {   // v13: ящиків рахується саме (BOX_QTY), план етикеток — до запису
@@ -1234,6 +1447,25 @@ function stepChanged() {
       });
     };
   }
+}
+/** v52: калькулятор кроку — брак зріс так, що успішних + брак більше «доступно»: успішних зменшується саме. Навпаки — ні:
+ *  менше успішних не означає браку (решту могли ще не зробити) */
+function scrapChanged(t) {
+  const s = S.batch && S.batch.route.find(x => x.code === ($('stp') || {}).value); if (!s || !$('good')) return;
+  const f1 = s.code === 'F1' && S.batch.comp;
+  $('scrap').value = f1 ? 0 : t;
+  if ($('psw')) $('psw').style.display = t > 0 ? 'block' : 'none';
+  const g = $('good'), gv = Number(g.value) || 0;
+  const max = f1 ? Math.min(S.batch.comp.S.left - (Number($('x1').value) || 0), S.batch.comp.R.left - (Number($('x2').value) || 0)) : s.avail - t;
+  if (gv > max) { g.value = Math.max(0, max); g.dispatchEvent(new Event('input')); }
+  goodHint(gv > max);
+}
+function goodHint(cut) {
+  const s = S.batch && S.batch.route.find(x => x.code === ($('stp') || {}).value), h = $('goodHint'); if (!s || !h) return;
+  if (s.code === 'F1' && S.batch.comp) { h.innerHTML = ''; return; }
+  const g = Number($('good').value) || 0, t = rzTotal('rz');
+  h.innerHTML = g + t > s.avail ? '<span style="color:#9B231A;font-weight:600">Успішних + брак = ' + (g + t) + ' — більше, ніж доступно (' + s.avail + ')</span>'
+    : cut && t ? 'Успішних — ' + g + ': доступно ' + s.avail + ', брак ' + t : '';
 }
 /** v47: кроки двигунів, де брак може бути лише статора або лише ротора (Code.gs v53, PART_SCRAP_STEPS) */
 const PART_SCRAP = ['F2', 'F3', 'F5'];
@@ -1273,7 +1505,8 @@ function submitStep() {
   lotWait().then(() => {   // v17: фото етикетки ще надсилається — дочекатися посилання
     btn.disabled = false;
     const l = lotVal('slot');
-    act(Object.assign({ action: 'step', batch: S.batch.info['Номер'], step: $('stp').value, good: v('good'), scrap: v('scrap'), reason: v('reason'),
+    const rz = rzVal('rz'); if (rz.err) { $('err').textContent = rz.err; return; }   // v52
+    act(Object.assign({ action: 'step', batch: S.batch.info['Номер'], step: $('stp').value, good: v('good'), scrap: v('scrap'), reason: rz.v,
       x1: v('x1'), x2: v('x2'), kv: v('kvs'), check: $('chk') ? $('chk').checked : false, comment: v('cm'), lot: l.lot, photo: l.photo, color: v('clr'),
       labelsSent: !!(K2SENT && $('k2pre') && K2SENT.batch === S.batch.info['Номер'] && K2SENT.good === (Number(v('good')) || 0) && K2SENT.boxes === (Number(v('x1')) || 0)) }, onbVal()), btn,
       $('k2pre') ? r => { K2SENT = null; showPage(r, {}); } : undefined);   // v45
@@ -1544,15 +1777,22 @@ function openCorrect(id) {
   const x = S.batch.history.find(h => h.id === id);
   openModal('<div class="card"><div class="mid">Виправити запис ' + esc(x.step) + '</div><div class="muted">' + esc(x.who) + ' · ' + esc(x.time) + ' · було ' + x.good + ' / ' + x.scrap + '</div>' +
     '<label>' + (x.step === 'F1' && S.batch.comp ? 'Зібрано двигунів' : 'Успішних') + '</label>' + numInput('cg', x.good) +
-    (x.step === 'F1' && S.batch.comp ? '<label>Брак статорів</label>' + numInput('cx1', x.x1) + '<label>Брак роторів</label>' + numInput('cx2', x.x2) : '<label>Брак</label>' + numInput('cs', x.scrap)) +
+    (x.step === 'F1' && S.batch.comp ? '<label>Брак статорів</label>' + numInput('cx1', x.x1) + '<label>Брак роторів</label>' + numInput('cx2', x.x2) : '<input type="hidden" id="cs" value="' + esc(x.scrap) + '">') +
+    '<div id="crz" style="margin-top:14px"></div>' +   // v52: брак за причинами
     (PART_SCRAP.indexOf(x.step) >= 0 && S.batch.comp ? '<label>з них брак лише статора (ротор годний)</label>' + numInput('cx1', x.x1 || 0) +
       '<label>з них брак лише ротора (статор годний)</label>' + numInput('cx2', x.x2 || 0) : '') +   // v47
-    '<label>Причина браку</label><select id="cr">' + opts(S.dict.reasons, x.reason, '—') + '</select>' +
     '<label>Причина виправлення (обов\'язково)</label><input type="text" id="mcm">' +
     '<div class="err" id="merr"></div><div class="grid" style="margin-top:6px"><button class="btn btn2 btnr" id="cdel">Скасувати запис</button><button class="btn" id="mgo">Зберегти</button></div>' +
     '<button class="btn btn2" onclick="closeModal()">Закрити</button></div>');
-  $('mgo').onclick = () => act({ action: 'correct', ref: id, good: $('cg').value, scrap: $('cs') ? $('cs').value : '', x1: $('cx1') ? $('cx1').value : '',
-    x2: $('cx2') ? $('cx2').value : '', reason: $('cr').value, comment: $('mcm').value }, $('mgo'), r => showPage(r, { openHist: 1 }));
+  const cf1 = x.step === 'F1' && S.batch.comp;
+  rzInit('crz', { step: x.step, init: x.reason, scrap: x.scrap, total: cf1 ? () => (Number($('cx1').value) || 0) + (Number($('cx2').value) || 0) : null,
+    onTotal: t => { if ($('cs')) $('cs').value = t; } });
+  if (cf1) ['cx1', 'cx2'].forEach(k => $(k).oninput = () => rzSync('crz', true));
+  $('mgo').onclick = () => {
+    const rz = rzVal('crz'); if (rz.err) { $('merr').textContent = rz.err; return; }
+    act({ action: 'correct', ref: id, good: $('cg').value, scrap: $('cs') ? $('cs').value : '', x1: $('cx1') ? $('cx1').value : '',
+      x2: $('cx2') ? $('cx2').value : '', reason: rz.v, comment: $('mcm').value }, $('mgo'), r => showPage(r, { openHist: 1 }));
+  };
   $('cdel').onclick = () => act({ action: 'correct', ref: id, cancel: true, comment: $('mcm').value }, $('cdel'), r => showPage(r, { openHist: 1 }));
 }
 
