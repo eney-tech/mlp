@@ -1,5 +1,6 @@
 <!DOCTYPE html>
-<!-- МЛП · index.html v50 · 22.10.2026 — без відкритого ящика (Code.gs v57): K2 — будь-яка кількість, план: повні ящики, остача — ще один ящик
+<!-- МЛП · index.html v51 · 22.10.2026 — «Ящики ГП»: у ящику з кількох партій — «з цієї партії N, у ящику всього M» (Labels.gs v10).
+     v50 · 22.10.2026 — без відкритого ящика (Code.gs v57): K2 — будь-яка кількість, план: повні ящики, остача — ще один ящик
      (⚠ неповний), «змішаний: …», якщо в партії є двигуни інших партій; «📦 Відкриті ящики» прибрано; «Ящики ГП» — повний / неповний, чистий / змішаний.
      v49 · 22.10.2026 — «✂ Відокремити» в партіях двигунів — усім працівникам і зав. відділу браку, як тімліду (Code.gs v56).
      v48 · 22.10.2026 — картка партії двигунів: блок «📦 Ящики ГП» — номер ящика, дата пакування, скільки двигунів (у збірному
@@ -245,7 +246,7 @@
 <div class="toast" id="toast"></div>
 
 <script>
-const PAGE_VERSION = 'index.html v50 · 22.10.2026';
+const PAGE_VERSION = 'index.html v51 · 22.10.2026';
 /** v46: куди прийдуть етикетки K2 — адреси друку (K2_LABEL_EMAILS), якщо задані; інакше — пошта працівника */
 function k2To() { const t = (S.k2 && S.k2.to) || []; return t.length ? t.join(', ') + ' (принтер етикеток)' : (S.me ? S.me.email : ''); }
 const API = 'https://script.google.com/macros/s/AKfycbx-JUajnAtVsxaLHDgwRpfzE12g4LUtlf6JnWYAQScAVZ5FCpxzGHSrA5PDESqP80KD/exec';
@@ -1159,6 +1160,7 @@ function boxesCard(b) {
   if (!bx.length && !k2.avail) return '';
   const st = x => (x.state === 'повний' ? '<span class="pill">повний</span>' : '<span class="pill warn">неповний</span>') + (x.comp ? ' <span class="pill warn">змішаний</span>' : '');
   const row = x => '<div class="li"><div><b>' + esc(x.name) + '</b>' + (x.other ? ' · <span class="muted">у партії ' + bl(x.other) + '</span>' : '') + ' · запаковано ' + esc(x.date) +
+    (x.total && x.total !== x.q ? '<br><span class="muted">з цієї партії ' + x.q + ' шт, у ящику всього <b>' + x.total + '</b></span>' : '') +   // v51
     (x.comp ? '<br><span class="muted">склад: ' + esc(x.comp) + '</span>' : '') + '</div><div class="r"><b>' + x.q + ' шт</b><br>' + st(x) + '</div></div>';
   return '<div class="card"><div class="mid">📦 Ящики ГП</div><div class="list" style="padding:0">' + (bx.length ? bx.map(row).join('') : '<div class="li muted">Ще нічого не запаковано</div>') + '</div>' +
     '<div class="muted" style="margin-top:8px">Запаковано: <b>' + packed + ' шт</b>' + (bx.filter(x => !x.other).length ? ' у ' + bx.filter(x => !x.other).length + ' ' + plural(bx.filter(x => !x.other).length, 'ящик', 'ящики', 'ящиків') : '') +
