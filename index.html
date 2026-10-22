@@ -1,5 +1,6 @@
 <!DOCTYPE html>
-<!-- МЛП · index.html v48 · 22.10.2026 — картка партії двигунів: блок «📦 Ящики ГП» — номер ящика, дата пакування, скільки двигунів (у збірному
+<!-- МЛП · index.html v49 · 22.10.2026 — «✂ Відокремити» в партіях двигунів — усім працівникам і зав. відділу браку, як тімліду (Code.gs v56).
+     v48 · 22.10.2026 — картка партії двигунів: блок «📦 Ящики ГП» — номер ящика, дата пакування, скільки двигунів (у збірному
      ящику — скільки з цієї партії і скільки всього, склад), стан (повний / відкритий / закрито неповним); «чекає K2» і «ще не дійшли до K2» (Code.gs v55).
      v47 · 20.10.2026 — відкритий ящик ГП (Code.gs v53, Labels.gs v7): на K2 типорозміру з власним BOX_QTY поля «Ящиків» немає —
      план рахується сам: повні ящики партії, остача — «докладіть у ящик M-00005 №2» (відкритий ящик специфікації) або новий відкритий ящик;
@@ -242,7 +243,7 @@
 <div class="toast" id="toast"></div>
 
 <script>
-const PAGE_VERSION = 'index.html v48 · 22.10.2026';
+const PAGE_VERSION = 'index.html v49 · 22.10.2026';
 /** v46: куди прийдуть етикетки K2 — адреси друку (K2_LABEL_EMAILS), якщо задані; інакше — пошта працівника */
 function k2To() { const t = (S.k2 && S.k2.to) || []; return t.length ? t.join(', ') + ' (принтер етикеток)' : (S.me ? S.me.email : ''); }
 const API = 'https://script.google.com/macros/s/AKfycbx-JUajnAtVsxaLHDgwRpfzE12g4LUtlf6JnWYAQScAVZ5FCpxzGHSrA5PDESqP80KD/exec';
@@ -1097,7 +1098,9 @@ function renderBatch(extra) {
   if (p.skip && !i['Призначення'] && skippable(b).length) acts.push(['skip', '⏭ Пропустити крок', '']);   // v27
   const hasLeft = (b.leftovers || []).length > 0;
   const isQC = S.me && S.me.role === 'зав. відділу браку';
-  if (isQC && ((b.stages || []).length || hasLeft) && ['анульовано', 'закрито'].indexOf(b.status) < 0) acts.push(['separate', '✂ Взяли на відбраковку', '']);   // v17
+  const mtSep = stream === 'MT' && p.separate;   // v49: у партіях двигунів «✂ Відокремити» — усім (Code.gs v56)
+  if (mtSep && ((b.stages || []).length || hasLeft) && ['анульовано', 'закрито'].indexOf(b.status) < 0) acts.push(['separate', '✂ Відокремити', '']);
+  else if (isQC && ((b.stages || []).length || hasLeft) && ['анульовано', 'закрито'].indexOf(b.status) < 0) acts.push(['separate', '✂ Взяли на відбраковку', '']);   // v17
   else if (p.separateAll && ((b.stages || []).length || hasLeft) && b.status !== 'анульовано') acts.push(['separate', '✂ Відокремити', '']);
   else if (p.separate && hasLeft && b.status === 'в роботі') acts.push(['separate', '✂ Залишок', '']);   // v13: працівник — тільки залишок деталей
   if (p.add && !i['Призначення'] && ['в роботі', 'готово', 'видано частково'].indexOf(b.status) >= 0) acts.push(['add', isQC ? '↩ Повернути з відбраковки' : '+ Додати', '']);   // v17: протилежність вибуттю; v19: зав. відділу браку
@@ -1377,9 +1380,10 @@ function openAct(a) {
   if (a === 'separate') {
     // v3: що саме (напівфабрикат на якому етапі) → куди: за маршрутом у тару або вибуття з циклу (без тари)
     // v13: + залишок статорів / роторів у партії MT; працівник бачить тільки залишок: в іншу партію MT або «годний залишок»
-    const qc = S.me.role === 'зав. відділу браку';   // v17: Василь — лише «взяли на відбраковку», з будь-якого етапу
-    const lead = !!S.perms.separateAll || qc;
-    const qcOk = qc || S.me.role === 'адміністратор';
+    const mtSep = S.batch.info['Потік'] === 'MT' && !!S.perms.separate;   // v49: у партіях двигунів — повне «Відокремити» всім
+    const qc = S.me.role === 'зав. відділу браку' && !mtSep;   // v17: Василь — лише «взяли на відбраковку», з будь-якого етапу (крім MT)
+    const lead = !!S.perms.separateAll || qc || mtSep;
+    const qcOk = S.me.role === 'зав. відділу браку' || S.me.role === 'адміністратор';   // v49: Василь і в MT може «взяли на відбраковку»
     const purp = S.dict.purposes.filter(x => qcOk || x !== S.qc);   // «відділ якості» при вибутті — тільки зав. відділу браку
     const st = (lead ? (S.batch.stages || []) : []).concat(S.batch.leftovers || []);
     const cap = t => t ? t.charAt(0).toUpperCase() + t.slice(1) : t;
