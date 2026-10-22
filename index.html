@@ -1,5 +1,7 @@
 <!DOCTYPE html>
-<!-- МЛП · index.html v47 · 20.10.2026 — відкритий ящик ГП (Code.gs v53, Labels.gs v7): на K2 типорозміру з власним BOX_QTY поля «Ящиків» немає —
+<!-- МЛП · index.html v48 · 22.10.2026 — картка партії двигунів: блок «📦 Ящики ГП» — номер ящика, дата пакування, скільки двигунів (у збірному
+     ящику — скільки з цієї партії і скільки всього, склад), стан (повний / відкритий / закрито неповним); «чекає K2» і «ще не дійшли до K2» (Code.gs v55).
+     v47 · 20.10.2026 — відкритий ящик ГП (Code.gs v53, Labels.gs v7): на K2 типорозміру з власним BOX_QTY поля «Ящиків» немає —
      план рахується сам: повні ящики партії, остача — «докладіть у ящик M-00005 №2» (відкритий ящик специфікації) або новий відкритий ящик;
      «📦 Відкриті ящики» на головній (тімлід і BOX_CLOSERS): 🖨 поточна етикетка, «Закрити неповним». Історія: ящики запису K2, «ящик закрито».
      F2 / F3 / F5: «з них брак лише статора / лише ротора» — годна деталь лишається в партії (і у ✎ виправленні).
@@ -240,7 +242,7 @@
 <div class="toast" id="toast"></div>
 
 <script>
-const PAGE_VERSION = 'index.html v47 · 20.10.2026';
+const PAGE_VERSION = 'index.html v48 · 22.10.2026';
 /** v46: куди прийдуть етикетки K2 — адреси друку (K2_LABEL_EMAILS), якщо задані; інакше — пошта працівника */
 function k2To() { const t = (S.k2 && S.k2.to) || []; return t.length ? t.join(', ') + ' (принтер етикеток)' : (S.me ? S.me.email : ''); }
 const API = 'https://script.google.com/macros/s/AKfycbx-JUajnAtVsxaLHDgwRpfzE12g4LUtlf6JnWYAQScAVZ5FCpxzGHSrA5PDESqP80KD/exec';
@@ -1060,6 +1062,7 @@ function renderBatch(extra) {
     tails.map(t => { const nx = b.route.filter(x => x.blockedBy === t.code).map(x => x.code);
       return '<div class="tail">На <b>' + esc(t.code) + '</b> лишилось <b>' + t.avail + ' шт</b>. Поки їх не записано (успішні або брак) або не відокремлено, ' + esc(nx.join(', ')) + ' не відкриється.</div>'; }).join('') +
     '</div>';
+  if (b.boxes) h += boxesCard(b);   // v48: ящики ГП партії
   if (b.comp) {
     const vv = c => [c.v2 ? 'в2 ' + c.v2 : '', c.v1 ? 'в1 ' + c.v1 : ''].filter(x => x).join(' · ');   // v13: версії деталей
     const row = (n, c) => '<div class="li"><div><b>' + n + '</b><br><span class="muted">прийшло ' + c.in + (vv(c) ? ' (' + vv(c) + ')' : '') +
@@ -1163,6 +1166,21 @@ function renderBatch(extra) {
   onbWire();
 }
 /** Що зараз лежить у тарі: напівфабрикат і скільки (після якого кроку, який крок чекає) */
+/** v48: ящики ГП партії двигунів: що запаковано (номер, дата, скільки) і що ще чекає K2 */
+function boxesCard(b) {
+  const bx = b.boxes || [], k2 = b.route.find(s => s.extra === 'pack') || { avail: 0 };
+  const packed = bx.reduce((a, x) => a + x.q, 0);
+  const before = Math.max(0, b.remaining - packed - k2.avail);   // ще не пройшли F5
+  if (!bx.length && !k2.avail) return '';
+  const st = x => x.state === 'повний' ? '<span class="pill">повний</span>' : x.state === 'відкритий' ? '<span class="pill warn">відкритий · ' + x.total + ' з ' + x.per + '</span>'
+    : '<span class="pill warn">' + esc(x.state) + '</span>';
+  const row = x => '<div class="li"><div><b>' + esc(x.name) + '</b> · ' + (x.own ? '' : 'збірний · ') + 'запаковано ' + esc(x.date) +
+    (x.q !== x.total ? '<br><span class="muted">з цієї партії ' + x.q + ' шт, у ящику всього ' + x.total + '</span>' : '') +
+    (x.comp ? '<br><span class="muted">склад: ' + esc(x.comp) + '</span>' : '') + '</div><div class="r"><b>' + x.q + ' шт</b><br>' + st(x) + '</div></div>';
+  return '<div class="card"><div class="mid">📦 Ящики ГП</div><div class="list" style="padding:0">' + (bx.length ? bx.map(row).join('') : '<div class="li muted">Ще нічого не запаковано</div>') + '</div>' +
+    '<div class="muted" style="margin-top:8px">Запаковано: <b>' + packed + ' шт</b>' + (bx.length ? ' у ' + bx.length + ' ' + plural(bx.length, 'ящик', 'ящики', 'ящиків') : '') +
+    (k2.avail ? ' · <b style="color:#9B231A">чекає K2: ' + k2.avail + ' шт</b>' : '') + (before ? ' · ще не дійшли до K2: ' + before + ' шт' : '') + '</div></div>';
+}
 function nowHtml(b) {
   const st = b.stages || [];
   if (!st.length) return '';
