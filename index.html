@@ -1,5 +1,12 @@
 <!DOCTYPE html>
-<!-- МЛП · index.html v66 · 23.10.2026 — іконка «Помічника» в нижньому меню — робот (як 🤖 на плитці й кнопці партії); підпис «Помічник» лишається.
+<!-- МЛП · index.html v67 · 23.10.2026 — екран очікування (рішення 23.10): замість кружечка — ротор, що обертається (швидшає з прогресом);
+     секунди прибрано; нелінійна смуга прогресу, калібрована за швидкодією 23.10 (запис ~8 с, склад з фото ~12 с, відкриття / звіти ~5 с),
+     в кінці — 100 % і 0,25 с паузи (натискання не проходять). Підказки лишились лише для довгого очікування (запис ≥ 20 с, відкриття ≥ 8 с).
+     Картки (з 1,2 с очікування): питання (4 с) → відповідь (2,5 с) → наступне; закінчилось очікування — стрічка на паузі й продовжується
+     з того самого місця наступного разу (питання показано ≥ 2 с — далі відповідь, інакше питання ще раз). Поради, мотиватори (не частіше
+     ніж раз на 2 дні) і пасхалка (раз на день) — окремі картки, не підряд. Вміст — файл zastavky.json поруч зі сторінкою (кеш на телефоні);
+     хто що бачив — localStorage для кожного працівника, без сервера.
+     v66 · 23.10.2026 — іконка «Помічника» в нижньому меню — робот (як 🤖 на плитці й кнопці партії); підпис «Помічник» лишається.
      v65 · 23.10.2026 — помічник МЛП (рішення 23.10, Assistant.gs v1, Code.gs v68): екран «Помічник» (?ai=1) — питання звичайною мовою,
      відповідь з таблицями й графіками (дані сервера, той самий графік, що у звітах), підказки наступних питань, «звідки цифри»; діалоги — на пристрої.
      Вхід: вкладка й пункт меню «Помічник», плитка на головній, «🤖 Запитати помічника» на сторінці й картці партії (?ai=1&ab=S-…). Право assist —
@@ -285,12 +292,24 @@
   .net.on{display:flex}
   .net.soft{background:rgba(238,242,245,.55)}
   .net .nb{background:#fff;border-radius:18px;padding:26px 22px 22px;width:100%;max-width:360px;text-align:center;box-shadow:0 10px 34px rgba(0,0,0,.28)}
-  .net .sp{width:56px;height:56px;margin:0 auto 14px;border-radius:50%;border:6px solid #DCE5EA;border-top-color:#1F7A4D;animation:netspin .9s linear infinite}
-  .net.soft .sp{border-top-color:#2F4858}
+  .net .rt{width:84px;height:84px;margin:0 auto 10px}
+  .net .rt svg{width:100%;height:100%;display:block}
   .net .nt{font-size:22px;font-weight:800;color:#1D2B33}
-  .net .ns{font-size:34px;font-weight:800;color:#1F7A4D;margin:6px 0 4px;font-variant-numeric:tabular-nums}
-  .net.soft .ns{font-size:18px;color:#66767F}
-  .net .nh{font-size:15px;color:#4A5A63;line-height:1.4;min-height:21px}
+  .net .ns{display:none}
+  .net .np{height:8px;border-radius:4px;background:#E3EAEF;overflow:hidden;margin:12px 4px 6px}
+  .net .np i{display:block;height:100%;width:0;background:#1F7A4D;border-radius:4px;transition:width .5s linear}
+  .net.soft .np i{background:#2F4858}
+  .net.chk .np{visibility:hidden}
+  .net .nh{font-size:15px;color:#4A5A63;line-height:1.4}
+  .net .nh:empty{display:none}
+  .net .zc{min-height:0;margin-top:12px;text-align:left;opacity:0;transition:opacity .35s ease}
+  .net .zc.rs{min-height:96px}
+  .net .zc.in{opacity:1}
+  .net .zk{font-size:12px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;color:#66767F;margin-bottom:4px}
+  .net .zq{font-size:18px;font-weight:700;color:#1D2B33;line-height:1.35}
+  .net .zs{font-size:14px;color:#66767F;line-height:1.35;margin-bottom:4px}
+  .net .za{font-size:19px;font-weight:800;color:#1F7A4D;line-height:1.35}
+  .net .zm{font-size:19px;font-weight:800;color:#1F7A4D;line-height:1.4;text-align:center;padding-top:8px}
   .net .nx{margin-top:14px;border:0;background:#E3EAEF;color:#1D2B33;border-radius:10px;padding:10px 16px;font-size:15px;font-weight:600;display:none}
   @keyframes netspin{to{transform:rotate(360deg)}}
   .sheet{background:#EEF2F5;width:100%;max-height:92vh;overflow:auto;border-radius:18px 18px 0 0;padding-bottom:20px}
@@ -400,10 +419,11 @@
 <div class="tip" id="tip"></div>
 <div class="modal" id="modal"><div class="sheet" id="sheet"></div></div>
 <div class="toast" id="toast"></div>
-<div class="net" id="net" role="alert" aria-live="assertive"><div class="nb"><div class="sp"></div><div class="nt" id="nett">Зберігаю…</div><div class="ns" id="nets"></div><div class="nh" id="neth"></div><button class="nx" id="netx" type="button">Не чекати</button></div></div>
+<div class="net" id="net" role="alert" aria-live="assertive"><div class="nb"><div class="rt" id="netr"></div><div class="nt" id="nett">Зберігаю…</div><div class="ns" id="nets"></div><div class="np"><i id="netp"></i></div><div class="nh" id="neth"></div><div class="zc" id="zc"></div><button class="nx" id="netx" type="button">Не чекати</button></div></div>
 
 <script>
-const PAGE_VERSION = 'index.html v66 · 23.10.2026';   // v66: іконка «Помічника» — робот
+const PAGE_VERSION = 'index.html v67 · 23.10.2026';   // v67: екран очікування — ротор, прогрес, картки «питання → відповідь»
+//   // v66: іконка «Помічника» — робот
 //   // v65: помічник МЛП (Assistant.gs v1, Code.gs v68)
 //   // v64: «ще обробляється» → перевірка запису за rid, не червона помилка (Code.gs v67)
 //   // v63: підказка — залишок і в готову партію S / R   // v62: партії залишків, «✂» — тара або номер партії, партія на склад / зі складу (Code.gs v65)
@@ -471,30 +491,140 @@ function netPf(api, q) {
 }
 /** Обробник відповіді: помилка в ньому — на екран, а не «немає зв'язку» */
 function netDeliver(f) { try { f(); } catch (x) { console.error(x); toast('Помилка сторінки: ' + (x && x.message || x) + '. Оновіть сторінку', true); } }
+/** v67: очікуваний час (мс) — за швидкодією 23.10: запис ~8 с, склад із фото ~12 с, відкриття / звіти ~5 с */
+function netT(tk) { return tk.k === 'w' ? (tk.api === 'skladSave' ? 12000 : 8000) : 5000; }
 function netDraw() {
   const box = $('net'); if (!box) return;
   const now = Date.now();
   const w = NET.list.filter(x => x.k === 'w'), r = NET.list.filter(x => x.k === 'r' && now - x.t0 > 700);
-  let title = '', sec = '', hint = '', soft = false, btn = false;
+  let title = '', hint = '', soft = false, btn = false, p = -1, t0 = 0, cards = false;
   if (NET.chk) {
-    const c = NET.chk; title = 'Перевіряю попередній запис…'; sec = Math.round((now - c.t0) / 1000) + ' с';
+    const c = NET.chk; title = 'Перевіряю попередній запис…';
     hint = c.hint || 'Сторінку оновили, поки йшов запис. Дізнаюсь у сервера, чи він збережений, — щоб не записати вдруге.'; btn = (now - c.t0) > 15000;
-  } else if (w.length) {
-    const t = Math.round((now - Math.min.apply(null, w.map(x => x.t0))) / 1000);
-    title = 'Зберігаю…'; sec = t + ' с';
-    hint = t < 4 ? 'Не натискайте повторно' : t < 20 ? 'Сервер записує. Не натискайте повторно й не оновлюйте сторінку' :
-      t < 60 ? 'Зараз записують кілька людей — ваш запис у черзі. Чекаємо…' :
-      'Довго, але запис не загубиться: навіть якщо закрити сторінку, при наступному відкритті вона покаже, чи він дійшов';
-  } else if (r.length) {
-    const t = Math.round((now - Math.min.apply(null, r.map(x => x.t0))) / 1000);
-    title = 'Відкриваю…'; sec = t >= 2 ? t + ' с' : ''; soft = true;
-    hint = t < 8 ? '' : 'Сервер відповідає повільно — зачекайте';
+  } else if (w.length || r.length) {
+    const ls = w.length ? w : r, old = ls.reduce((a, x) => x.t0 < a.t0 ? x : a, ls[0]);
+    t0 = old.t0; const ms = now - t0, t = ms / 1000;
+    p = 0.98 * (1 - Math.exp(-2.5 * ms / netT(old)));   // ~90 % на очікуваному часі, далі повільно до 98 %
+    cards = ms >= 1200;
+    if (w.length) {
+      title = 'Зберігаю…';
+      hint = t < 20 ? '' : t < 60 ? 'Зараз записують кілька людей — ваш запис у черзі. Чекаємо…' :
+        'Довго, але запис не загубиться: навіть якщо закрити сторінку, при наступному відкритті вона покаже, чи він дійшов';
+    } else { title = 'Відкриваю…'; soft = true; hint = t < 8 ? '' : 'Сервер відповідає повільно — зачекайте'; }
   }
-  box.classList.toggle('on', !!title); box.classList.toggle('soft', soft);
-  if (!title) return;
-  $('nett').textContent = title; $('nets').textContent = sec; $('neth').textContent = hint;
+  if (!title) {   // кінець очікування: 100 % і коротка пауза, щоб натискання не потрапило на нову кнопку
+    if (NET.shown && !NET.fin) { NET.fin = now + 250; $('netp').style.width = '100%'; setTimeout(netDraw, 260); return; }
+    if (NET.fin && now < NET.fin) return;
+    NET.fin = 0; NET.shown = false;
+    box.classList.remove('on'); zsTick(false); rotStop();
+    return;
+  }
+  NET.fin = 0; NET.shown = true;
+  box.classList.add('on'); box.classList.toggle('soft', soft); box.classList.toggle('chk', !!NET.chk);
+  $('nett').textContent = title; $('neth').textContent = hint;
+  if (p >= 0) $('netp').style.width = Math.round(p * 100) + '%';
   $('netx').style.display = btn ? 'inline-block' : 'none';
+  ROT.p = p < 0 ? 0.3 : p; rotStart();
+  zsTick(cards);
 }
+// ======================================================================= v67: ротор на екрані очікування
+const ROT = { raf: 0, a: 0, at: 0, p: 0, g: null };
+function rotSvg() {
+  const sec = (r1, r2, a0, a1) => { const c = Math.cos, s = Math.sin, d = Math.PI / 180;
+    const P = (r, a) => (r * c(a * d)).toFixed(2) + ' ' + (r * s(a * d)).toFixed(2);
+    return 'M' + P(r2, a0) + 'A' + r2 + ' ' + r2 + ' 0 0 1 ' + P(r2, a1) + 'L' + P(r1, a1) + 'A' + r1 + ' ' + r1 + ' 0 0 0 ' + P(r1, a0) + 'Z'; };
+  let mag = '', st = '';
+  for (let i = 0; i < 14; i++) { const a = i * 360 / 14; mag += '<path d="' + sec(34.5, 41, a + 1.5, a + 360 / 14 - 1.5) + '" fill="' + (i % 2 ? '#2F4858' : '#1F7A4D') + '"/>'; }
+  for (let i = 0; i < 12; i++) st += '<g transform="rotate(' + (i * 30) + ')"><rect x="11" y="-2.6" width="21" height="5.2" rx="1" fill="#9AA8B0"/><rect x="16" y="-4" width="9" height="8" rx="2" fill="#B87333"/></g>';
+  return '<svg viewBox="-50 -50 100 100" aria-hidden="true"><g id="netrg"><circle r="46" fill="#DCE5EA"/><circle r="42.5" fill="#fff"/>' + mag +
+    '<circle r="44" fill="none" stroke="#B8C5CC" stroke-width="2" stroke-dasharray="3 9"/></g>' + st + '<circle r="12" fill="#C9D3D9"/><circle r="4.5" fill="#66767F"/></svg>';
+}
+function rotStart() {
+  if (ROT.raf) return;
+  const el = $('netr'); if (!el) return;
+  if (!ROT.g) { el.innerHTML = rotSvg(); ROT.g = $('netrg'); }
+  let slow = false; try { slow = window.matchMedia('(prefers-reduced-motion: reduce)').matches; } catch (e) {}
+  ROT.at = performance.now();
+  const step = ts => {
+    const dt = Math.min(100, ts - ROT.at); ROT.at = ts;
+    ROT.a = (ROT.a + dt / 1000 * (slow ? 60 : 240 + 720 * ROT.p)) % 360;   // розкручується з прогресом
+    if (ROT.g) ROT.g.setAttribute('transform', 'rotate(' + ROT.a.toFixed(1) + ')');
+    ROT.raf = requestAnimationFrame(step);
+  };
+  ROT.raf = requestAnimationFrame(step);
+}
+function rotStop() { if (ROT.raf) cancelAnimationFrame(ROT.raf); ROT.raf = 0; }
+// ======================================================================= v67: картки на екрані очікування (zastavky.json)
+/** Стрічка: питання 4 с → відповідь 2,5 с → наступне. Очікування скінчилось — пауза; наступного разу — з того самого місця.
+ *  Хто що бачив — localStorage mlp_zs, окремо для кожного працівника (вкладки одного браузера — спільно). Без сервера. */
+const ZS = { items: null, cur: null, ph: '', st: 0 };
+function zsBase() { const p = location.pathname; return /\/$/.test(p) ? p : /\.html?$/.test(p) ? p.replace(/[^/]*$/, '') : p + '/'; }
+function zsLoad() {
+  try { const c = JSON.parse(store('mlp_zsd') || 'null'); if (c && Array.isArray(c.items)) ZS.items = c.items; } catch (e) {}
+  fetch(zsBase() + 'zastavky.json', { cache: 'no-cache', credentials: 'omit' }).then(r => r.ok ? r.json() : null).then(j => {
+    if (j && Array.isArray(j.items) && j.items.length) { ZS.items = j.items; store('mlp_zsd', JSON.stringify({ v: j.v, items: j.items })); }
+  }).catch(() => {});
+}
+function zsWho() { if (S && S.me && S.me.id) { if (store('mlp_zw') !== S.me.id) store('mlp_zw', S.me.id); return S.me.id; } return store('mlp_zw') || CODE || 'x'; }
+function zsGet() {
+  let all = {}; try { all = JSON.parse(store('mlp_zs') || '{}') || {}; } catch (e) { all = {}; }
+  const w = zsWho(), s = all[w] || {};
+  s.seen = s.seen || []; s.ts = s.ts || []; s.ms = s.ms || [];
+  return { all: all, w: w, s: s };
+}
+function zsPut(g) {
+  g.s.at = Date.now(); g.all[g.w] = g.s;
+  const ks = Object.keys(g.all); if (ks.length > 8) ks.sort((a, b) => (g.all[a].at || 0) - (g.all[b].at || 0)).slice(0, ks.length - 8).forEach(k => delete g.all[k]);
+  store('mlp_zs', JSON.stringify(g.all));
+}
+function zsRnd(a) { return a[Math.floor(Math.random() * a.length)]; }
+/** Наступна картка: незавершена (пауза) → мотиватор / пасхалка / порада (не підряд) → питання, якого ще не було */
+function zsPick(s) {
+  const it = ZS.items, now = Date.now(), by = t => it.filter(x => x.t === t);
+  if (s.cur) { const x = it.find(i => i.id === s.cur.id); if (x) return { x: x, ph: s.cur.ph }; s.cur = null; }
+  const next = (list, seen) => { let pool = list.filter(x => seen.indexOf(x.id) < 0); if (!pool.length) { seen.length = 0; pool = list; } const x = zsRnd(pool); seen.push(x.id); return x; };
+  if (!s.ps) {
+    const mo = by('mot'); if (mo.length && now - (s.lm || 0) > 40 * 3600e3 && Math.random() < 0.125) { s.lm = now; return { x: next(mo, s.ms), ph: 'x' }; }
+    const eg = by('egg'); if (eg.length && now - (s.le || 0) > 20 * 3600e3 && Math.random() < 1 / 15) { s.le = now; return { x: zsRnd(eg), ph: 'x' }; }
+    const tp = by('tip'); if (tp.length && Math.random() < 0.1) return { x: next(tp, s.ts), ph: 'x' };
+  }
+  const qs = by('q'); if (!qs.length) return null;
+  return { x: next(qs, s.seen), ph: 'q' };
+}
+function zsShow() {
+  const el = $('zc'), x = ZS.cur; if (!el || !x) return;
+  el.classList.remove('in');
+  el.innerHTML = ZS.ph === 'q' ? '<div class="zk">❓ Як думаєте?</div><div class="zq">' + esc(x.q) + '</div>' :
+    ZS.ph === 'a' ? '<div class="zk">✓ Відповідь</div><div class="zs">' + esc(x.q) + '</div><div class="za">' + esc(x.a) + '</div>' :
+    x.t === 'tip' ? '<div class="zk">💡 Порада</div><div class="zq">' + esc(x.x) + '</div>' : '<div class="zm">' + esc(x.x) + '</div>';
+  void el.offsetWidth; el.classList.add('in');
+}
+function zsSave(cur, single) { const g = zsGet(); g.s.cur = cur; if (!cur) g.s.ps = !!single; zsPut(g); }
+function zsTick(on) {
+  const el = $('zc'); if (!el) return;
+  if (!on) {
+    if (ZS.cur) {   // пауза: що показати наступного разу
+      const d = Date.now() - ZS.st, id = ZS.cur.id;
+      zsSave(ZS.ph === 'q' ? { id: id, ph: d >= 2000 ? 'a' : 'q' } : ZS.ph === 'a' ? (d >= 1000 ? null : { id: id, ph: 'a' }) : (d >= 2000 ? null : { id: id, ph: 'x' }), ZS.ph === 'x');
+      ZS.cur = null;
+    }
+    el.innerHTML = ''; el.classList.remove('in');
+    el.classList.toggle('rs', !!(ZS.items && ZS.items.length) && !NET.chk);
+    return;
+  }
+  if (!ZS.items || !ZS.items.length) return;
+  el.classList.add('rs');
+  const now = Date.now();
+  if (!ZS.cur) {
+    const g = zsGet(), p = zsPick(g.s); if (!p) return;
+    g.s.cur = { id: p.x.id, ph: p.ph }; zsPut(g);   // «забрати» картку одразу — друга вкладка її не повторить
+    ZS.cur = p.x; ZS.ph = p.ph; ZS.st = now; zsShow(); return;
+  }
+  const d = now - ZS.st;
+  if (ZS.ph === 'q' && d >= 4000) { ZS.ph = 'a'; ZS.st = now; zsSave({ id: ZS.cur.id, ph: 'a' }); zsShow(); }
+  else if ((ZS.ph === 'a' && d >= 2500) || (ZS.ph === 'x' && d >= 4000)) { zsSave(null, ZS.ph === 'x'); ZS.cur = null; el.classList.remove('in'); }
+}
+zsLoad();
 window.addEventListener('beforeunload', e => { if (NET.list.some(x => x.k === 'w')) { e.preventDefault(); e.returnValue = ''; return ''; } });
 /** Номер натискання «Записати» (rid) і що саме записували — на телефоні, доки сервер не відповів */
 function ridNew() { return Date.now().toString(36) + Math.random().toString(36).slice(2, 8); }
