@@ -1,5 +1,9 @@
 <!DOCTYPE html>
-<!-- МЛП · index.html v64 · 23.10.2026 — відповідь «Цей запис ще обробляється» (телефон на слабкій мережі сам повторив запит, а перший ще в черзі;
+<!-- МЛП · index.html v65 · 23.10.2026 — помічник МЛП (рішення 23.10, Assistant.gs v1, Code.gs v68): екран «Помічник» (?ai=1) — питання звичайною мовою,
+     відповідь з таблицями й графіками (дані сервера, той самий графік, що у звітах), підказки наступних питань, «звідки цифри»; діалоги — на пристрої.
+     Вхід: вкладка й пункт меню «Помічник», плитка на головній, «🤖 Запитати помічника» на сторінці й картці партії (?ai=1&ab=S-…). Право assist —
+     тімлід і вище, керівництво. Коди працівників у відповіді → імена.
+     v64 · 23.10.2026 — відповідь «Цей запис ще обробляється» (телефон на слабкій мережі сам повторив запит, а перший ще в черзі;
      23.10 — сім разів) більше не червона помилка: сторінка питає сервер за номером натискання (rid) і показує результат першого запиту
      (сервер теж дочікується першого — Code.gs v67).
      v61 · 23.10.2026 — режим аналітика у звітах (рішення 23.10, Code.gs v64, Reports.gs v27): право baMode (поки адміністратор);
@@ -355,6 +359,31 @@
   .rbtns{display:flex;gap:10px}.rbtns .btn{margin-top:0}
   .rlist tbody tr{cursor:pointer}.rlist tbody tr:hover td{background:#F4F7F9}
   @media (max-width:899px){.rgrid{grid-template-columns:minmax(0,1fr)}.rph{position:relative;top:0;height:62vh}.rbtns{flex-direction:column}}
+  /* v65: помічник МЛП (?ai=1) */
+  .aitop{display:flex;gap:8px;justify-content:flex-end;margin:12px 12px 0}
+  .aimsg{margin:10px 12px;line-height:1.45;font-size:16px;scroll-margin-top:72px}
+  .aimsg a.lnk{white-space:nowrap}  .aiv .t td{white-space:nowrap}.aiv .t td:first-child{max-width:220px;white-space:normal;min-width:90px}
+  .aimsg.u{margin-left:auto;max-width:85%;width:fit-content;background:#2F4858;color:#fff;border-radius:16px 16px 4px 16px;padding:10px 14px;white-space:pre-wrap}
+  .aimsg.a{background:#fff;border-radius:16px 16px 16px 4px;padding:12px 14px;box-shadow:0 1px 3px rgba(0,0,0,.08)}
+  .aimsg.a p{margin:0 0 8px}.aimsg.a ul{margin:4px 0 8px;padding-left:20px}.aimsg.a li{margin:3px 0}
+  .aimsg.a.bad{background:#FDE3E1;color:#9B231A}
+  .aiv{border:1px solid #E3EAEF;border-radius:12px;padding:10px 12px;margin:10px 0}
+  .aivt{font-weight:700;font-size:14px;margin-bottom:6px}
+  .aiv .more{font-size:13px;color:#66767F;margin-top:6px}.aiv .aiopen{display:inline-block;margin-top:8px;font-size:14px}
+  .aichips{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px}
+  .aichip{border:1px solid #C5D0D7;background:#fff;border-radius:99px;padding:8px 12px;font-size:14px;cursor:pointer;color:#1D2B33;font-family:inherit;text-align:left;line-height:1.3}
+  .aichip:hover{border-color:#2a78d6;background:#EAF2FC}
+  .aiin{display:flex;gap:8px;align-items:flex-end;margin:0 12px;padding:8px 0;position:sticky;bottom:0;background:#EEF2F5;z-index:2}
+  .aiin textarea{flex:1;border:1px solid #C5D0D7;border-radius:14px;padding:12px 14px;font-size:16px;font-family:inherit;resize:none;min-height:48px;max-height:140px;margin:0}
+  .aisend{flex:0 0 48px;height:48px;border:0;border-radius:50%;background:#1F7A4D;color:#fff;font-size:20px;cursor:pointer}
+  .aisend:disabled,.aiin textarea:disabled{opacity:.5}
+  .aimeta{font-size:12px;color:#66767F;margin-top:8px}
+  .aiused{display:inline}.aiused summary{display:inline;cursor:pointer;color:#1A5FB4;font-size:12px;font-weight:500;padding:0;list-style:none}.aiused summary::-webkit-details-marker{display:none}.aiused div{font-family:ui-monospace,Menlo,Consolas,monospace;font-size:11px;word-break:break-all;margin-top:4px}
+  .aitl .it{padding:6px 0;border-top:1px solid #EEF2F5;font-size:14px}.aitl .it:first-child{border-top:0}.aitl .tm{color:#66767F;font-variant-numeric:tabular-nums;margin-right:8px}
+  .aidot{display:inline-block;width:7px;height:7px;border-radius:50%;background:#2a78d6;margin-right:3px;animation:aip 1.2s infinite ease-in-out}
+  .aidot:nth-child(2){animation-delay:.2s}.aidot:nth-child(3){animation-delay:.4s;margin-right:8px}
+  @keyframes aip{0%,80%,100%{opacity:.25}40%{opacity:1}}
+  @media (max-width:899px){.aiin{bottom:calc(64px + env(safe-area-inset-bottom))}}
 </style>
 </head>
 <body>
@@ -373,7 +402,8 @@
 <div class="net" id="net" role="alert" aria-live="assertive"><div class="nb"><div class="sp"></div><div class="nt" id="nett">Зберігаю…</div><div class="ns" id="nets"></div><div class="nh" id="neth"></div><button class="nx" id="netx" type="button">Не чекати</button></div></div>
 
 <script>
-const PAGE_VERSION = 'index.html v64 · 23.10.2026';   // v64: «ще обробляється» → перевірка запису за rid, не червона помилка (Code.gs v67)
+const PAGE_VERSION = 'index.html v65 · 23.10.2026';   // v65: помічник МЛП (Assistant.gs v1, Code.gs v68)
+//   // v64: «ще обробляється» → перевірка запису за rid, не червона помилка (Code.gs v67)
 //   // v63: підказка — залишок і в готову партію S / R   // v62: партії залишків, «✂» — тара або номер партії, партія на склад / зі складу (Code.gs v65)
 /** v46: куди прийдуть етикетки K2 — адреси друку (K2_LABEL_EMAILS), якщо задані; інакше — пошта працівника */
 function k2To() { const t = (S.k2 && S.k2.to) || []; return t.length ? t.join(', ') + ' (принтер етикеток)' : (S.me ? S.me.email : ''); }
@@ -526,6 +556,7 @@ function load(extra) {
   if (PARAMS.h && CODE) return loadHistory();
   if ((PARAMS.s || PARAMS.sklad) && CODE) return loadSklad();
   if (PARAMS.rh && CODE) return loadRetro();   // v53
+  if (PARAMS.ai && CODE) return loadAssist();   // v65: помічник МЛП
   loadPage(extra);
 }
 function loadPage(extra) {
@@ -857,7 +888,7 @@ function whoHtml(me, perms, unknown) {
 // =============================================================== v33: ОБОЛОНКА — меню, шапка, Головна, сканер QR, довідка
 /** Роль і права для меню. Сторінки кабінету, звітів і складу не викликають apiPage, тож меню бере роль з пристрою (останнє відоме) */
 let NAV = (() => { try { return JSON.parse(store('mlp_nav') || '{}') || {}; } catch (e) { return {}; } })();
-const NAV_KEYS = ['step', 'separate', 'noBatch', 'sklad', 'dashStan', 'dashTare', 'dashMy', 'history', 'cabinet', 'dashOut', 'dashScrap', 'dashBatches', 'dashControl', 'retro', 'dashBoxes'];
+const NAV_KEYS = ['step', 'separate', 'noBatch', 'sklad', 'dashStan', 'dashTare', 'dashMy', 'history', 'cabinet', 'dashOut', 'dashScrap', 'dashBatches', 'dashControl', 'retro', 'dashBoxes', 'assist'];   // v65: + assist (помічник)
 function navSave(me, perms) {
   const n = { role: me.role, name: me.name, perms: NAV.perms || {} };
   if (perms) { n.perms = {}; NAV_KEYS.forEach(k => n.perms[k] = !!perms[k]); }
@@ -898,7 +929,8 @@ const NIC = {
   work: '<svg viewBox="0 0 24 24"><path d="M14.7 6.3a4 4 0 0 0-5.4 5.2L3.6 17.2a1.5 1.5 0 0 0 2.1 2.1l5.7-5.7a4 4 0 0 0 5.2-5.4l-2.4 2.4-2.2-.6-.6-2.2z"/><path d="M15 15l4.5 4.5M17.5 13.5l3 3-1.5 1.5-3-3"/></svg>',
   rep: '<svg viewBox="0 0 24 24"><path d="M4 20h16"/><rect x="5.5" y="11" width="3" height="7"/><rect x="10.5" y="6" width="3" height="12"/><rect x="15.5" y="13" width="3" height="5"/></svg>',
   sklad: '<svg viewBox="0 0 24 24"><path d="M3 9l9-5 9 5v11H3z"/><path d="M7 20v-7h10v7"/></svg>',
-  cab: '<svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="3.5"/><path d="M5 20c.8-3.6 3.6-5.5 7-5.5s6.2 1.9 7 5.5"/></svg>'
+  cab: '<svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="3.5"/><path d="M5 20c.8-3.6 3.6-5.5 7-5.5s6.2 1.9 7 5.5"/></svg>',
+  ai: '<svg viewBox="0 0 24 24"><path d="M4 5.5h16v10.5H10l-5 4v-4H4z"/><path d="M12 7.8l.9 1.9 1.9.9-1.9.9-.9 1.9-.9-1.9-1.9-.9 1.9-.9z"/></svg>'   // v65: помічник
 };
 /** Р-0_18 нижнє меню телефона і Р-0_07 ліве меню ПК — за роллю */
 function navRender() {
@@ -906,7 +938,7 @@ function navRender() {
   const worker = NAV.role === 'працівник', reps = navReports(), p = NAV.perms || {};
   const curD = PARAMS.d || '';
   const a = (href, inner, on) => '<a href="' + esc(link(href)) + '" class="' + (on ? 'on' : '') + '">' + inner + '</a>';
-  let h = a('', '<span>⌂</span>Головна', VIEW === 'home') + a('cab=1', '<span>☰</span>Кабінет', VIEW === 'cab');
+  let h = a('', '<span>⌂</span>Головна', VIEW === 'home') + (p.assist ? a('ai=1', '<span>🤖</span>Помічник', VIEW === 'ai') : '') + a('cab=1', '<span>☰</span>Кабінет', VIEW === 'cab');   // v65: + Помічник
   if (worker && p.dashMy) h += '<div class="sec">Звіти</div>' + a('d=my', '<span class="code">Р-8с</span>Мій виробіток', curD === 'my');
   else if (reps.length) h += '<div class="sec">Звіти</div>' + reps.map(x => a(x[0], '<span class="code">' + DASHT[x[1]][0] + '</span>' + DASHT[x[1]][1] + (x[2] || ''), curD === x[1])).join('');
   if (p.retro) h += '<div class="sec">Перевірка</div>' + a('rh=1', '<span>📄</span>Ретро-історія', VIEW === 'retro');   // v53
@@ -915,6 +947,7 @@ function navRender() {
   if (worker && p.dashMy) tabs.push(['d=my', NIC.work, 'Мій виробіток', VIEW === 'my']);
   else if (reps.length) tabs.push(['r=1', NIC.rep, 'Звіти', VIEW === 'rep']);
   if (p.sklad && !p.step) tabs.push(['sklad=1', NIC.sklad, 'Склад', false]);   // зав. складу; v57: і «Звіти» (Р-12)
+  if (p.assist) tabs.push(['ai=1', NIC.ai, 'Помічник', VIEW === 'ai']);   // v65
   tabs.push(['cab=1', NIC.cab, 'Кабінет', VIEW === 'cab']);
   tb.innerHTML = tabs.map(x => '<a href="' + esc(link(x[0])) + '" class="' + (x[3] ? 'on' : '') + '"><span class="i">' + x[1] + '</span>' + x[2] + '</a>').join('');
   $('backBtn').classList.toggle('hid', VIEW === 'home' && !location.search.replace(/^\?$/, ''));
@@ -944,6 +977,7 @@ function renderHome() {
   if (prod || p.sklad) h += '<div style="margin:12px"><button class="qrbtn" onclick="scanStart()"><svg viewBox="0 0 24 24"><path d="M3 7V4h3M18 4h3v3M21 17v3h-3M6 20H3v-3"/><rect x="7" y="7" width="4" height="4"/><rect x="13" y="13" width="4" height="4"/><path d="M13 7h4v3M7 17v-3h3"/></svg>' +
     '<span>Сканувати QR<small>' + (prod ? 'тара, піддон, плакат поверху чи складу' : 'QR на дверях складу') + '</small></span></button></div>';
   const tiles = [];
+  if (p.assist) tiles.push('<a class="tile" href="' + esc(link('ai=1')) + '" style="background:#EAF2FC"><div class="tn">🤖 Запитати помічника</div><div class="td">що зависло, що зроблено на поверсі, історія партії, брак, випуск — з таблицями й графіками</div></a>');   // v65
   if (prod) tiles.push('<div class="tile"><div class="tn">▣ Відкрити тару або партію</div><div class="td">якщо QR не читається — введіть код</div>' +
     '<div class="row" style="margin-top:8px"><select id="hk" data-nocbx style="flex:0 0 42%;font-size:17px">' + opts(['КР', 'ПД', 'ТЧ', 'СК', 'M', 'S', 'R']) + '</select>' +
     '<input type="number" inputmode="numeric" id="hn" placeholder="номер" style="font-size:17px"></div><button class="btn btn2" id="hgo" style="margin-top:8px">Відкрити</button></div>');
@@ -1563,6 +1597,7 @@ function renderBatch(extra) {
   if (p.batchFromWh && i['Склад'] && ['закрито', 'анульовано'].indexOf(b.status) < 0) acts.push(['fromWh', '↩ Повернути зі складу', '']);
   if (p.free && S.tare) acts.push(['free', 'Звільнити тару', '']);
   if (p.history) acts.push(['history', '🕘 Повна історія', '']);
+  if (p.assist) acts.push(['assist', '🤖 Запитати помічника', '']);   // v65
   if (p.annul && b.status !== 'анульовано' && b.status !== 'закрито') acts.push(['annul', '✖ Анулювати', 'btnr']);
   if (acts.length) h += '<div class="card"><div class="grid">' + acts.map(a => '<button class="btn btn2 ' + a[2] + '" onclick="openAct(\'' + a[0] + '\')">' + a[1] + '</button>').join('') + '</div></div>';
 
@@ -1900,6 +1935,7 @@ function boxUndoOpen() {
 function openAct(a) {
   const no = S.batch.info['Номер'];
   if (a === 'history') { location.href = link('h=' + encodeURIComponent(no)); return; }
+  if (a === 'assist') { location.href = link('ai=1&ab=' + encodeURIComponent(no)); return; }   // v65: помічник про цю партію
   const head = t => '<div class="card"><div class="mid">' + t + '</div><div class="muted">' + esc(no) + ' · є ' + S.batch.remaining + ' шт</div>';
   const foot = '<div class="err" id="merr"></div><div class="grid" style="margin-top:6px"><button class="btn btn2" onclick="closeModal()">Скасувати</button><button class="btn" id="mgo">Підтвердити</button></div></div>';
   if (a === 'skip') {   // v27: тімлід пропускає крок — усі штуки на ньому йдуть далі, без запису роботи
@@ -3121,7 +3157,7 @@ function r7card() {
   let h = '<div class="card"><div style="display:flex;flex-wrap:wrap;gap:6px;align-items:center"><span class="pill" style="margin:0">' + esc(ZKINDN[b.kind] || b.kind) + '</span><span class="pill" style="margin:0">' + esc(b.typ) + '</span><span class="pill" style="margin:0">KV ' + esc(b.kv || '—') + '</span>' +
     (b.ver ? '<span class="pill" style="margin:0">' + esc(b.ver) + '</span>' : '') + (b.color ? '<span class="pill" style="margin:0">' + esc(b.color) + '</span>' : '') + zStatusPill(b.status) + (b.stuck ? '<span class="pill bad" style="margin:0">без руху ' + b.idle + ' роб. дн.</span>' : '') + '</div>' +
     '<p class="muted" style="margin:8px 0 0">Почато ' + zDmy(b.created) + (b.reg !== b.created ? ' (у МЛП — з ' + zDmy(b.reg) + ')' : '') + ' · ' + esc(LOCN[b.loc] || b.loc || '—') + ' · тара ' + (b.tare ? '<a class="lnk" href="' + esc(link('t=' + encodeURIComponent(b.tare))) + '">' + esc(b.tare) + '</a>' : '—') + ' · остання операція ' + zDmy(b.lastOp) + '</p>' +
-    '<div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:10px"><a class="ic" style="text-decoration:none" href="' + esc(link('h=' + encodeURIComponent(b.no))) + '">🕘 Повна історія</a><a class="ic" style="text-decoration:none" href="' + esc(link('b=' + encodeURIComponent(b.no))) + '">Сторінка партії</a><a class="ic" style="text-decoration:none" href="' + esc(link('d=batches')) + '">← Аналіз партій</a></div></div>';
+    '<div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:10px"><a class="ic" style="text-decoration:none" href="' + esc(link('h=' + encodeURIComponent(b.no))) + '">🕘 Повна історія</a>' + ((NAV.perms || {}).assist ? '<a class="ic" style="text-decoration:none" href="' + esc(link('ai=1&ab=' + encodeURIComponent(b.no))) + '">🤖 Запитати помічника</a>' : '') + '<a class="ic" style="text-decoration:none" href="' + esc(link('b=' + encodeURIComponent(b.no))) + '">Сторінка партії</a><a class="ic" style="text-decoration:none" href="' + esc(link('d=batches')) + '">← Аналіз партій</a></div></div>';
   h += '<div class="zkpis">' + zKpi('На старті', fn(b.start), 'шт') + zKpi(b.done ? 'Готово' : 'Є зараз', fn(b.cur), 'шт', zPc(b.cur, b.start) + ' від старту') + zKpi('Брак', fn(b.scrap), 'шт', zPc(b.scrap, b.start), '', b.scrap ? 'kbad' : '') +
     zKpi(b.done ? 'Пройшла за' : 'У роботі', fn(b.lead), 'роб. дн.') + '</div>';
   const lastI = b.route.findIndex(x => x[0] === b.lastStep);
@@ -4133,6 +4169,148 @@ function retroRot(d) {
 function retroZoom(k) { RV.z = Math.min(8, Math.max(0.5, RV.z * k)); retroView(); }
 function retroFit() { RV.z = 1; RV.x = 0; RV.y = 0; retroView(); }
 window.addEventListener('resize', () => { if (RC && $('rimg')) retroView(); });
+
+// =============================================================== v65: ПОМІЧНИК МЛП (?ai=1; ?ai=1&ab=S-00010 — питання про партію) — Assistant.gs v1, Code.gs v68
+// Діалоги — на цьому пристрої (mlp_ai, до 20; таблиці й графіки — у 5 останніх). Сервер бачить лише текст останніх повідомлень діалогу.
+// Таблиці й графіки — дані сервера (views); модель лише вказує, що показати ([[vN]]). Коди працівників (W017) → імена з відповіді (names).
+const AIX = { dlg: null, busy: false, t0: 0, timer: 0 };
+const AI_EX = ['Які партії зараз зависли і чому?', 'Що зроблено на 2-му поверсі Печерська за цей тиждень?', 'Покажи історію найбільш завислої партії',
+  'Порівняй випуск двигунів цього тижня з минулим', 'Де найбільше браку за цей місяць і з яких причин?'];
+const AIC = ['#2a78d6', '#1F7A4D', '#C27C0E', '#7B4BA0', '#4F7F86', '#8A6D3B', '#5B6B73', '#B3261E'];
+function aiAll() { try { const v = JSON.parse(store('mlp_ai') || '[]'); return Array.isArray(v) ? v : []; } catch (e) { return []; } }
+function aiSave() {
+  const all = aiAll().filter(d => d.id !== AIX.dlg.id); if (AIX.dlg.msgs.length) all.unshift(AIX.dlg);
+  const list = all.slice(0, 20).map((d, i) => i < 5 ? d : Object.assign({}, d, { msgs: d.msgs.map(m => m.views ? Object.assign({}, m, { views: {} }) : m) }));
+  store('mlp_ai', JSON.stringify(list));
+}
+function aiNew() { AIX.dlg = { id: String(Date.now()), t: Date.now(), title: '', msgs: [] }; }
+function loadAssist() {
+  document.body.classList.remove('nonav');
+  setView('', 'Помічник', 'ai');
+  $('who').innerHTML = NAV.name ? esc(NAV.name) + '<br>' + esc(NAV.role || '') : '';
+  if (!AIX.dlg) { const a = aiAll()[0]; if (!PARAMS.ab && a && Date.now() - (a.t || 0) < 6 * 3600000) AIX.dlg = a; else aiNew(); }
+  renderAssist();
+  if (PARAMS.ab) { const no = PARAMS.ab; delete PARAMS.ab; setUrl(); aiAsk('Розкажи про партію ' + no + ': де вона зараз, скільки в ній, чи не зависла. Покажи її історію.'); }
+}
+function aiNum(v, pc) {
+  if (typeof v !== 'number') return v;
+  const s = Number.isInteger(v) ? fn(v) : String(Math.round(v * 10) / 10).replace('.', ',');
+  return s + (pc ? ' %' : '');
+}
+function aiInl(s, names) {
+  return esc(s).replace(/\*\*(.+?)\*\*/g, '<b>$1</b>')
+    .replace(/\b[SRM]-\d{5}\b/g, a => '<a class="lnk" href="' + esc(link('d=batches&card=' + encodeURIComponent(a))) + '">' + a + '</a>')
+    .replace(/\bW\d{2,4}\b/g, w => names && names[w] ? esc(names[w]) : w);
+}
+function aiCell(c, col, names) {
+  if (c && typeof c === 'object') {
+    const t = aiNum(c.v, /%/.test(col.l || ''));
+    return c.href ? '<a class="lnk" href="' + esc(link(c.href)) + '">' + esc(t) + '</a>' : '<span' + (c.bad ? ' style="color:#B3261E;font-weight:700"' : '') + '>' + aiInl(String(t), names) + '</span>';
+  }
+  if (c === null || c === undefined) return '';
+  if (typeof c === 'number') { const s = aiNum(c, /%/.test(col.l || '')); return /Зміна/.test(col.l || '') && c > 0 ? '+' + s : s; }
+  return aiInl(String(c), names);
+}
+function aiView(m, id, key) {
+  const v = (m.views || {})[id]; if (!v) return '';
+  const names = m.names || {};
+  let b = '';
+  if (v.kind === 'table') {
+    const cols = v.cols || [];
+    b = '<div class="tw"><table class="t"><tr>' + cols.map(c => '<th' + (c.r ? ' class="r"' : '') + '>' + esc(c.l) + '</th>').join('') + '</tr>' +
+      (v.rows || []).map(r => '<tr>' + r.map((c, j) => '<td' + ((cols[j] || {}).r ? ' class="r"' : '') + '>' + aiCell(c, cols[j] || {}, names) + '</td>').join('') + '</tr>').join('') +
+      (v.total ? '<tr style="font-weight:700">' + v.total.map((c, j) => '<td' + ((cols[j] || {}).r ? ' class="r"' : '') + ' style="border-top:2px solid #C5D0D7">' + aiCell(c, cols[j] || {}, names) + '</td>').join('') + '</tr>' : '') +
+      '</table></div>' + (v.more ? '<div class="more">' + esc(v.more) + '</div>' : '');
+  } else if (v.kind === 'bar') {
+    const cl = v.cat === 'day' ? (c, l) => zBkLabel(c, 'd', l) : v.cat === 'week' ? (c, l) => zBkLabel(c, 'w', l) : c => (names[c] || c);
+    b = zChart('aic' + key + '_' + id, { cats: v.cats || [], series: (v.series || []).map((s, i) => ({ k: s.k, l: names[s.l] || s.l, c: s.c || AIC[i % AIC.length], v: s.v || {} })),
+      line: v.line && Object.keys(v.line.v || {}).length ? v.line : null, catLabel: cl, fmt: fn });
+  } else if (v.kind === 'timeline') {
+    const it = v.items || [];
+    b = it.length ? '<div class="aitl">' + it.map(x => '<div class="it"><span class="tm">' + esc(zDm(x.d) + ' ' + x.tm) + '</span><b>' + esc(x.step) + '</b> ' + esc(x.name || '') +
+      ' · ' + aiInl(x.w || '', names) + (x.loc ? ' · ' + esc(x.loc) : '') + ' · ✓ ' + fn(x.g) + (x.s ? ' · <span style="color:#B3261E">брак ' + fn(x.s) + (x.rs ? ' (' + esc(x.rs) + ')' : '') + '</span>' : '') + '</div>').join('') + '</div>'
+      : '<p class="muted">Записів кроків ще немає.</p>';
+  }
+  return '<div class="aiv"><div class="aivt">' + esc(v.title || '') + '</div>' + b + (v.link ? '<a class="lnk aiopen" href="' + esc(link(v.link)) + '">Відкрити у звіті →</a>' : '') + '</div>';
+}
+function aiText(m, key) {
+  const names = m.names || {}, parts = String(m.t || '').split(/\[\[\s*(v\d+)\s*\]\]/), shown = {};
+  let h = '';
+  parts.forEach((seg, i) => {
+    if (i % 2) { if (!shown[seg]) { shown[seg] = 1; h += aiView(m, seg, key); } return; }
+    let ul = false;
+    seg.split('\n').forEach(ln => {
+      const t = ln.trim(), li = t.match(/^(?:[-*•]|\d+[.)])\s+(.*)$/);
+      if (li) { if (!ul) { h += '<ul>'; ul = true; } h += '<li>' + aiInl(li[1], names) + '</li>'; return; }
+      if (ul) { h += '</ul>'; ul = false; }
+      if (!t) return;
+      const hd = t.match(/^#{1,4}\s+(.*)$/);
+      h += hd ? '<p><b>' + aiInl(hd[1], names) + '</b></p>' : '<p>' + aiInl(t, names) + '</p>';
+    });
+    if (ul) h += '</ul>';
+  });
+  return h;
+}
+function aiMsgHtml(m, i, last) {
+  if (m.r === 'u') return '<div class="aimsg u">' + esc(m.t) + '</div>';
+  if (m.err) return '<div class="aimsg a bad">⚠ ' + esc(m.err) + (last ? '<div><button class="zfbtn" style="margin-top:8px" onclick="aiRetry()">Спробувати ще раз</button></div>' : '') + '</div>';
+  const admin = NAV.role === 'адміністратор';
+  return '<div class="aimsg a">' + aiText(m, i) +
+    (last && (m.follow || []).length ? '<div class="aichips">' + m.follow.map(q => '<button type="button" class="aichip" data-q="' + esc(q) + '">' + esc(q) + '</button>').join('') + '</div>' : '') +
+    '<div class="aimeta">' + sec(m.ms || 0) + (admin && m.model ? ' · ' + esc(m.model) : '') +
+    ((m.used || []).length ? ' · <details class="aiused"><summary>звідки цифри</summary>' + m.used.map(u => '<div>' + esc(u) + '</div>').join('') + '</details>' : '') + '</div></div>';
+}
+function renderAssist() {
+  ZDRAW = [];
+  const d = AIX.dlg, n = d.msgs.length;
+  let h = '<div class="aitop"><button class="zfbtn" onclick="aiHist()">🕘 Діалоги</button>' + (n ? '<button class="zfbtn" onclick="aiNew();renderAssist()">＋ Новий</button>' : '') + '</div>';
+  if (!n) h += '<div class="card"><div class="mid">Запитайте про виробництво</div><p class="muted">Помічник рахує за даними МЛП: що зроблено, що зависло, історія партії, брак, випуск. ' +
+    'Відповідає з таблицями й графіками і дає посилання на звіти. Можна диктувати голосом — мікрофон на клавіатурі.</p>' +
+    '<div class="aichips">' + AI_EX.map(q => '<button type="button" class="aichip" data-q="' + esc(q) + '">' + esc(q) + '</button>').join('') + '</div></div>';
+  d.msgs.forEach((m, i) => h += aiMsgHtml(m, i, i === n - 1 && !AIX.busy));
+  if (AIX.busy) h += '<div class="aimsg a" id="aibusy"><span class="aidot"></span><span class="aidot"></span><span class="aidot"></span> Рахую за даними МЛП… <span id="aisec">' + Math.round((Date.now() - AIX.t0) / 1000) + '</span> с</div>';
+  h += '<div class="aiin"><textarea id="aiq" rows="1" placeholder="Ваше питання…"' + (AIX.busy ? ' disabled' : '') + '></textarea>' +
+    '<button class="aisend" id="aigo"' + (AIX.busy ? ' disabled' : '') + ' aria-label="Надіслати">➤</button></div>' +
+    '<p class="muted" style="text-align:center;font-size:12px;margin:4px 12px">Відповідь пише ШІ, цифри — з МЛП. Важливе перевіряйте у звітах. ' + esc(PAGE_VERSION) + '</p><div style="height:16px"></div>';
+  $('app').innerHTML = h;
+  ZDRAW.forEach(f => f());
+  document.querySelectorAll('#app [data-q]').forEach(b => b.onclick = () => aiAsk(b.dataset.q));
+  const q = $('aiq');
+  if (AIX.draft) q.value = AIX.draft;
+  q.oninput = () => { AIX.draft = q.value; q.style.height = 'auto'; q.style.height = Math.min(140, q.scrollHeight) + 'px'; };
+  q.onkeydown = e => { if (e.key === 'Enter' && !e.shiftKey && window.innerWidth >= 900) { e.preventDefault(); aiAsk(q.value); } };
+  $('aigo').onclick = () => aiAsk(q.value);
+  const tgt = AIX.busy ? $('aibusy') : [].slice.call(document.querySelectorAll('#app .aimsg')).pop();
+  if (tgt) tgt.scrollIntoView({ block: AIX.busy ? 'end' : 'start' });
+}
+function aiHistText(m) { return String(m.t || '').replace(/\[\[\s*v\d+\s*\]\]/g, '(показано таблицю / графік)') + ((m.used || []).length ? '\n[дані: ' + m.used.join('; ') + ']' : ''); }
+function aiAsk(t) {
+  t = String(t || '').trim(); if (!t || AIX.busy) return;
+  const d = AIX.dlg;
+  const hist = d.msgs.filter(m => !m.err).slice(-8).map(m => ({ r: m.r, t: m.r === 'a' ? aiHistText(m) : m.t }));
+  d.msgs.push({ r: 'u', t: t }); if (!d.title) d.title = t.slice(0, 80); d.t = Date.now();
+  AIX.busy = true; AIX.t0 = Date.now(); AIX.draft = '';
+  aiSave(); renderAssist();
+  clearInterval(AIX.timer); AIX.timer = setInterval(() => { const e = $('aisec'); if (e) e.textContent = Math.round((Date.now() - AIX.t0) / 1000); }, 1000);
+  post('assist', { code: CODE, text: t, hist: hist }).then(r => {
+    d.msgs.push({ r: 'a', t: r.text, views: r.views || {}, names: r.names || {}, follow: r.follow || [], used: r.used || [], model: r.model || '', ms: Date.now() - AIX.t0 });
+  }, e => {
+    d.msgs.push({ r: 'a', err: (e && e.message) || 'Помилка', q: t });
+  }).then(() => { clearInterval(AIX.timer); AIX.busy = false; aiSave(); if (VIEW === 'ai' && AIX.dlg === d) renderAssist(); });
+}
+function aiRetry() {
+  const d = AIX.dlg, m = d.msgs[d.msgs.length - 1]; if (!m || !m.err) return;
+  d.msgs.splice(d.msgs.length - 2, 2); aiAsk(m.q);
+}
+function aiHist() {
+  const a = aiAll();
+  openModal('<div class="card"><div class="mid">Діалоги</div><p class="muted">Зберігаються на цьому телефоні (останні 20).</p>' +
+    '<button class="btn btn2" onclick="closeModal();aiNew();renderAssist()">＋ Новий діалог</button>' +
+    (a.length ? a.map((d, i) => '<button class="btn btn2" style="text-align:left;font-weight:500" onclick="aiOpen(' + i + ')">' + esc(d.title || 'Без назви') +
+      '<div class="muted" style="font-size:12px">' + esc(new Date(d.t || 0).toLocaleString('uk-UA', { day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' })) + ' · ' + d.msgs.filter(m => m.r === 'u').length + ' пит.</div></button>').join('') : '') +
+    '<button class="btn btn2" onclick="closeModal()">Закрити</button></div>');
+}
+function aiOpen(i) { const d = aiAll()[i]; if (d) AIX.dlg = d; closeModal(); renderAssist(); }
 
 load();
 </script>
