@@ -1,5 +1,11 @@
 <!DOCTYPE html>
-<!-- МЛП · index.html v57 · 23.10.2026 — чисті ящики (рішення 23.10, Code.gs v61, Labels.gs v11, Reports.gs v24): K2 «Куди пакуємо» — у новий чистий ящик
+<!-- МЛП · index.html v58 · 23.10.2026 — рішення 23.10 (Code.gs v62, Labels.gs v12, Sklad.gs v7, Reports.gs v25): роль «зав. відділу якості» (QC_ROLE) — у списках
+     тімлідів (LEAD_ROLES): 👁 «Мій виробіток» за будь-кого, «✂ Відокремити» і «+ Додати» як тімлід, окремо «↩ Повернути з відбраковки». Ящики ГП → склад:
+     картка ящика — локація складу («на складі · П1 · авто»), «Перемістити на склад» з вибором локації (boxWhModal); Р-12 — «→ склад» у рядку ящика на
+     виробництві, колонка «Де» з локацією складу; «Робота зі складом» → «Поклав» → «ГП з виробництва» — вибір ящика (скан етикетки 📷, номер або список
+     ящиків на виробництві, skladBoxes) замість позиції й кількості, запис — skladBox; рядки рухів ящика в «Моїх записах» — «📦 ящик», без ✎.
+     Сканер: SC.cb — результат у форму, а не перехід (scanRes); boxFromCode — номер ящика з GS1-128 / ?bx= / «M-00005 №2».
+     v57 · 23.10.2026 — чисті ящики (рішення 23.10, Code.gs v61, Labels.gs v11, Reports.gs v24): K2 «Куди пакуємо» — у новий чистий ящик
      (скільки ящиків — за нормою або вписати) або в існуючий неповний ящик тієї самої специфікації (список з сервера, res.k2.open); підказка «було → стане,
      норма N» без ліміту. Картка ящика (?bx=M-00005%232): склад, кількість проти норми, де ящик, «Передати на склад», «Взяти двигуни з ящика»,
      «Повернути» за записом взяття, «Взяти ящик зі складу», «🖨 Етикетка зараз», рух ящика і ✖ останнього запису. Сканер: GS1-128 з номером ящика (21)
@@ -330,7 +336,7 @@
 <div class="toast" id="toast"></div>
 
 <script>
-const PAGE_VERSION = 'index.html v57 · 23.10.2026';
+const PAGE_VERSION = 'index.html v58 · 23.10.2026';
 /** v46: куди прийдуть етикетки K2 — адреси друку (K2_LABEL_EMAILS), якщо задані; інакше — пошта працівника */
 function k2To() { const t = (S.k2 && S.k2.to) || []; return t.length ? t.join(', ') + ' (принтер етикеток)' : (S.me ? S.me.email : ''); }
 const API = 'https://script.google.com/macros/s/AKfycbx-JUajnAtVsxaLHDgwRpfzE12g4LUtlf6JnWYAQScAVZ5FCpxzGHSrA5PDESqP80KD/exec';
@@ -699,8 +705,11 @@ function navSave(me, perms) {
   else if (NAV.role !== me.role) n.perms = {};   // роль змінилась, а прав ще не знаємо — меню до наступного відкриття головної мінімальне
   NAV = n; store('mlp_nav', JSON.stringify(n)); navRender();
 }
+/** v58 (рішення 23.10): «зав. відділу браку» → «зав. відділу якості»; Василь заміщує тімліда — у списках тімлідів */
+const QC_ROLE = 'зав. відділу якості';
+const LEAD_ROLES = ['тімлід', 'зав. виробництва', 'адміністратор', QC_ROLE];
 const DASHT = { stan: ['Р-2', 'Стан зараз'], motors: ['Р-11', 'Двигуни в роботі'], boxes: ['Р-12', 'Чисті ящики'], tare: ['Р-5', 'Аналіз тари'], batches: ['Р-7', 'Аналіз партій'], out: ['Р-8', 'Виробіток'], scrap: ['Р-10', 'Аналіз браку'], control: ['Р-9', 'Контроль'], my: ['Р-8с', 'Мій виробіток'] };
-/** Звіти ролі для меню (Р-0_07). «Мій виробіток» у меню — працівнику (окрема вкладка) і зав. відділу браку (рішення 18.10) */
+/** Звіти ролі для меню (Р-0_07). «Мій виробіток» у меню — працівнику (окрема вкладка); тімлідам і зав. відділу якості — 👁 за будь-кого (v58) */
 function navReports() {
   const p = NAV.perms || {}, r = [];
   if (p.dashStan) r.push(['d=stan', 'stan']);
@@ -711,8 +720,7 @@ function navReports() {
   if (p.dashOut) r.push(['d=out', 'out']);   // v38
   if (p.dashScrap) r.push(['d=scrap', 'scrap']);
   if (p.dashControl) r.push(['d=control', 'control']);   // v40
-  if (p.dashMy && NAV.role === 'зав. відділу браку') r.push(['d=my', 'my']);
-  if (p.dashMy && ['тімлід', 'зав. виробництва', 'адміністратор'].indexOf(NAV.role) >= 0) r.push(['d=my', 'my', ' 👁']);   // v36: перегляд як працівник (Р-0_08)
+  if (p.dashMy && LEAD_ROLES.indexOf(NAV.role) >= 0) r.push(['d=my', 'my', ' 👁']);   // v36: перегляд як працівник (Р-0_08)
   return r;
 }
 let VIEW = '';
@@ -833,13 +841,26 @@ function scanStart() {
 }
 function scanTick() {
   const v = $('scv'); if (SC.busy || !v.videoWidth) return; SC.busy = true;
-  const done = t => { SC.busy = false; if (t) { scanStop(); scanGo(t); } };
+  const done = t => { SC.busy = false; if (t) scanRes(t); };
   const zx = () => SC.zxNeed && (SC.k++ % 2 === 0) ? zxRead(v, v.videoWidth, v.videoHeight, [[0.3, 0.7]]) : null;   // v45: кожен другий кадр — штрихкод
   if (SC.det) { SC.det.detect(v).then(r => done((r[0] && r[0].rawValue) || zx())).catch(() => done(zx())); return; }
   const c = document.createElement('canvas'); c.width = v.videoWidth; c.height = v.videoHeight; const x = c.getContext('2d'); x.drawImage(v, 0, 0);
   const q = window.jsQR(x.getImageData(0, 0, c.width, c.height).data, c.width, c.height); done((q && q.data) || zx());
 }
-function scanStop() { clearInterval(SC.timer); if (SC.stream) SC.stream.getTracks().forEach(t => t.stop()); SC.stream = null; $('scan').classList.remove('on'); }
+function scanStop() { clearInterval(SC.timer); if (SC.stream) SC.stream.getTracks().forEach(t => t.stop()); SC.stream = null; $('scan').classList.remove('on'); SC.cb = null; }
+/** v58: прочитаний код — у SC.cb, якщо сканер відкрила форма (напр. ящик ГП на «Роботі зі складом»), інакше — перехід за кодом */
+function scanRes(t) { const cb = SC.cb; scanStop(); if (cb) cb(t); else scanGo(t); }
+/** v58: номер ящика з коду: GS1-128 етикетки «(10)M-00005(30)160(21)2», посилання з ?bx=, або вписаний «M-00005 №2» → «M-00005#2» */
+function boxFromCode(text) {
+  const t = String(text || '').trim();
+  try { const u = new URL(t); const bx = u.searchParams.get('bx'); if (bx) return bx; } catch (e) { }
+  const up = t.toUpperCase().replace(/\s+/g, '');
+  const g1 = /^(\]C1)?\(?10\)?[SRM]-?\d{5}/.test(up) ? up.match(/[SRM]-?(\d{5})/) : null;
+  const g21 = g1 ? (t.match(/\(21\)(\d+)/) || t.match(/\x1d21(\d+)\s*$/)) : null;
+  if (g1 && g21) return g1[0].replace(/^([SRM])-?/, '$1-') + '#' + Number(g21[1]);
+  const m = t.match(/^([SRMСРМ]\s*-?\s*\d+)\s*(?:#|№|N|\/)\s*(\d+)$/i);
+  return m ? m[1].replace(/\s+/g, '') + '#' + Number(m[2]) : '';
+}
 function scanPhoto() { $('scf').click(); }
 function scanFile(inp) {
   const f = inp.files && inp.files[0]; if (!f) return; inp.value = '';
@@ -847,7 +868,7 @@ function scanFile(inp) {
     const k = Math.min(1, 1200 / Math.max(img.width, img.height)); const c = document.createElement('canvas'); c.width = img.width * k; c.height = img.height * k;
     const x = c.getContext('2d'); x.drawImage(img, 0, 0, c.width, c.height); const q = window.jsQR(x.getImageData(0, 0, c.width, c.height).data, c.width, c.height);
     const t = (q && q.data) || zxRead(img, img.width, img.height, [[0.3, 0.7], [0.45, 1], [0, 0.55], [0.15, 0.85]]);   // v45: і штрихкод
-    if (t) { scanStop(); scanGo(t); } else $('sctx').textContent = 'QR чи штрихкод на фото не знайдено. Спробуйте ближче й рівніше.';
+    if (t) scanRes(t); else $('sctx').textContent = 'QR чи штрихкод на фото не знайдено. Спробуйте ближче й рівніше.';
   }).catch(e => $('sctx').textContent = e.message);
   img.src = URL.createObjectURL(f);
 }
@@ -1361,13 +1382,15 @@ function renderBatch(extra) {
   if (b.comp && p.addComp && b.status === 'в роботі') acts.push(['addComp', '+ Статори / ротори / двигуни', '']);   // v13; v44: + двигуни з резерву
   if (p.skip && !i['Призначення'] && skippable(b).length) acts.push(['skip', '⏭ Пропустити крок', '']);   // v27
   const hasLeft = (b.leftovers || []).length > 0;
-  const isQC = S.me && S.me.role === 'зав. відділу браку';
+  const isQC = S.me && S.me.role === QC_ROLE;
   const mtSep = stream === 'MT' && p.separate;   // v49: у партіях двигунів «✂ Відокремити» — усім (Code.gs v56)
   if (mtSep && ((b.stages || []).length || hasLeft) && ['анульовано', 'закрито'].indexOf(b.status) < 0) acts.push(['separate', '✂ Відокремити', '']);
-  else if (isQC && ((b.stages || []).length || hasLeft) && ['анульовано', 'закрито'].indexOf(b.status) < 0) acts.push(['separate', '✂ Взяли на відбраковку', '']);   // v17
   else if (p.separateAll && ((b.stages || []).length || hasLeft) && b.status !== 'анульовано') acts.push(['separate', '✂ Відокремити', '']);
   else if (p.separate && hasLeft && b.status === 'в роботі') acts.push(['separate', '✂ Залишок', '']);   // v13: працівник — тільки залишок деталей
-  if (p.add && !i['Призначення'] && ['в роботі', 'готово', 'видано частково'].indexOf(b.status) >= 0) acts.push(['add', isQC ? '↩ Повернути з відбраковки' : '+ Додати', '']);   // v17: протилежність вибуттю; v19: зав. відділу браку
+  if (p.add && !i['Призначення'] && ['в роботі', 'готово', 'видано частково'].indexOf(b.status) >= 0) {
+    acts.push(['add', '+ Додати', '']);   // v17: протилежність вибуттю
+    if (isQC) acts.push(['addQC', '↩ Повернути з відбраковки', '']);   // v19; v58: у зав. відділу якості — і «+ Додати», як у тімліда
+  }
   if (p.setColor && (stream === 'ST' || stream === 'RT') && b.status !== 'анульовано') acts.push(['color', '🎨 Колір', '']);   // v21
   if (p.free && S.tare) acts.push(['free', 'Звільнити тару', '']);
   if (p.history) acts.push(['history', '🕘 Повна історія', '']);
@@ -1612,13 +1635,13 @@ function renderBox() {
   const under = x.total < x.per, over = x.total > x.per;
   let h = '<div class="card"><div class="big">📦 ' + esc(x.name) + '</div>' +
     '<span class="pill">' + esc(x.typ) + '</span>' + (x.kv ? '<span class="pill">KV ' + esc(x.kv) + '</span>' : '') + (x.color ? '<span class="pill">🎨 ' + esc(x.color) + '</span>' : '') +
-    (x.state === 'на складі' ? '<span class="pill">на складі</span>' : '<span class="pill warn">на виробництві</span>') + (x.comp.length > 1 ? '<span class="pill warn">кілька партій</span>' : '') +
+    (x.state === 'на складі' ? '<span class="pill">на складі' + (x.wh ? ' · ' + esc(x.whName || x.wh) : '') + (x.whAuto ? ' · авто' : '') + '</span>' : '<span class="pill warn">на виробництві</span>') + (x.comp.length > 1 ? '<span class="pill warn">кілька партій</span>' : '') +
     '<div style="margin-top:12px;font-size:20px">У ящику: <b' + (under ? ' style="color:#9B231A"' : '') + '>' + x.total + ' шт</b> <span class="muted" style="font-size:15px">· норма ' + x.per +
     (under ? ' — неповний' : over ? ' — більше за норму' : '') + '</span></div>' +
     (x.comp.length ? '<div class="list" style="padding:0;margin-top:8px">' + x.comp.map(c => '<div class="li"><div>' + bl(c[0]) + '</div><div class="r"><b>' + c[1] + ' шт</b></div></div>').join('') + '</div>' : '') +
     '<div class="muted" style="margin-top:8px">Відкрито ' + esc(x.created) + ' · остання зміна ' + esc(x.last) + '</div></div>';
   const acts = [];
-  if (x.state === 'відкритий' && p.boxToWh && x.total > 0) acts.push('<button class="btn" onclick="boxToWhGo()">Передати на склад</button>');
+  if (x.state === 'відкритий' && p.boxToWh && x.total > 0) acts.push('<button class="btn" onclick="boxToWhGo()">Перемістити на склад</button>');   // v58: з вибором локації складу
   if (x.state === 'на складі' && sk) {
     if (x.total > 0) acts.push('<button class="btn btn2" onclick="boxTakeOpen()">Взяти двигуни з ящика</button>');
     acts.push('<button class="btn btn2" onclick="boxFromWhGo()">Взяти ящик зі складу</button>');
@@ -1642,16 +1665,27 @@ function renderBox() {
 }
 function boxEvHtml(e) {
   if (e.type === 'крок') return '<b>K2</b> · запаковано <b>' + e.q + ' шт</b> · ' + bl(e.batch) + (e.items && e.items.indexOf('·') >= 0 ? '<br><span class="muted">' + esc(e.items) + '</span>' : '');
-  if (e.type === 'ящик на склад') return '→ передано на склад · ' + e.q + ' шт';
+  if (e.type === 'ящик на склад') return '→ на склад' + (e.wh ? ' <b>' + esc(e.wh) + '</b>' : '') + ' · ' + e.q + ' шт' + (e.ref ? ' · <span class="pill" style="margin:0">авто</span>' : '');
   if (e.type === 'ящик зі складу') return '← взято зі складу (на виробництво)';
   if (e.type === 'взято з ящика') return '− взято <b>' + e.q + ' шт</b> · ' + bl(e.batch);
   if (e.type === 'повернуто в ящик') return '+ повернуто <b>' + e.q + ' шт</b> · ' + bl(e.batch);
   return esc(e.text || e.type);
 }
+/** v58: «Перемістити на склад» — вибір локації складу (за замовчуванням — куди йдуть повні ящики цієї локації). Той самий запис робить
+ *  «Робота зі складом» → «Поклав» → «ГП з виробництва». after — що робити після запису (Р-12 — оновити звіт) */
+function boxWhModal(x, locs, def, after) {
+  openModal('<div class="card"><div class="mid">Перемістити ящик ' + esc(x.name) + ' на склад</div>' +
+    '<div class="muted">' + x.total + ' шт' + (x.total < x.per ? ' — неповний (норма ' + x.per + ')' : '') + (x.comp ? ' · ' + esc(x.comp) : '') + '</div>' +
+    '<label>Локація складу</label><select id="mwh">' + (locs || []).map(l => '<option value="' + esc(l.code) + '"' + (l.code === def ? ' selected' : '') + '>' +
+      esc(l.code + (l.name && l.name !== l.code ? ' · ' + l.name : '')) + '</option>').join('') + '</select>' +
+    '<label>Коментар (необов\'язково)</label><input type="text" id="mcm">' +
+    '<p class="muted">Докласти в ящик потім можна буде лише після «Взяти ящик зі складу». Запис з\'явиться і в журналі складу.</p>' +
+    '<div class="err" id="merr"></div><div class="grid" style="margin-top:6px"><button class="btn btn2" onclick="closeModal()">Скасувати</button><button class="btn" id="mgo">На склад</button></div></div>');
+  $('mgo').onclick = () => act(Object.assign({ action: 'boxToWh', box: x.id, loc: $('mwh').value, comment: $('mcm').value }, after ? { view: false } : {}), $('mgo'), after);
+}
 function boxToWhGo() {
   const x = S.box;
-  confirmBox('Передати ящик ' + x.name + ' (' + x.total + ' шт' + (x.total < x.per ? ', неповний' : '') + ') на склад? Докласти в нього потім можна буде лише після «Взяти ящик зі складу».',
-    () => act({ action: 'boxToWh', box: x.id }, null));
+  boxWhModal({ id: x.id, name: x.name, total: x.total, per: x.per, comp: x.comp.length > 1 ? x.comp.map(c => c[0] + ' — ' + c[1]).join(' · ') : '' }, x.whLocs, x.whDef);
 }
 function boxFromWhGo() {
   const x = S.box;
@@ -1762,10 +1796,10 @@ function openAct(a) {
     // v3: що саме (напівфабрикат на якому етапі) → куди: за маршрутом у тару або вибуття з циклу (без тари)
     // v13: + залишок статорів / роторів у партії MT; працівник бачить тільки залишок: в іншу партію MT або «годний залишок»
     const mtSep = S.batch.info['Потік'] === 'MT' && !!S.perms.separate;   // v49: у партіях двигунів — повне «Відокремити» всім
-    const qc = S.me.role === 'зав. відділу браку' && !mtSep;   // v17: Василь — лише «взяли на відбраковку», з будь-якого етапу (крім MT)
+    const qc = false;   // v58: зав. відділу якості — як тімлід (до v58 — лише «взяли на відбраковку»); «Взяли на відбраковку» — серед «Куди»
     const lead = !!S.perms.separateAll || qc || mtSep;
-    const qcOk = S.me.role === 'зав. відділу браку' || S.me.role === 'адміністратор';   // v49: Василь і в MT може «взяли на відбраковку»
-    const purp = S.dict.purposes.filter(x => qcOk || x !== S.qc);   // «відділ якості» при вибутті — тільки зав. відділу браку
+    const qcOk = S.me.role === QC_ROLE || S.me.role === 'адміністратор';   // v49: Василь і в MT може «взяли на відбраковку»
+    const purp = S.dict.purposes.filter(x => qcOk || x !== S.qc);   // «відділ якості» при вибутті — тільки зав. відділу якості
     const st = (lead ? (S.batch.stages || []) : []).concat(S.batch.leftovers || []);
     const cap = t => t ? t.charAt(0).toUpperCase() + t.slice(1) : t;
     const qcName = x => x === S.qc ? 'Взяли на відбраковку' : cap(x);
@@ -1853,11 +1887,11 @@ function openAct(a) {
       });
     };
   }
-  if (a === 'add') {   // v17: «+ Додати» — деталі ззовні циклу (з відділу якості, R&D …) на обраний етап; коментар обов'язковий
+  if (a === 'add' || a === 'addQC') {   // v17: «+ Додати» — деталі ззовні циклу (з відділу якості, R&D …) на обраний етап; коментар обов'язковий
     const R = S.batch.route; const i1 = S.batch.comp ? R.findIndex(x => x.code === 'F1') : -1;
     const stages = (S.batch.comp ? [] : [['', 'до першого кроку · ' + ({ ST: 'ядро статора', RT: 'ротортоп і вал' }[S.batch.info['Потік']] || '')]])
       .concat(R.filter((x, k) => k >= i1).map(x => [x.code, 'після ' + x.code + ' · ' + (x.product || x.name)]));
-    if (S.me && S.me.role === 'зав. відділу браку') {   // v19: повернення з відбраковки — етап як востаннє брали з цієї партії
+    if (a === 'addQC') {   // v19: повернення з відбраковки — етап як востаннє брали з цієї партії (v58: окрема кнопка зав. відділу якості)
       const live = S.batch.history.filter(x => !x.cancelled && x.purpose === S.qc);
       const took = live.filter(x => x.type === 'вибуття').reduce((t, x) => t + (Number(x.qty) || 0), 0);
       const back = live.filter(x => x.type === 'додавання').reduce((t, x) => t + (Number(x.qty) || 0), 0);
@@ -2514,7 +2548,7 @@ function zPopClose() { ZPOP = null; const p = $('zpop'); if (p) p.style.display 
 document.addEventListener('pointerdown', e => { const p = $('zpop'); if (ZPOP && p && !p.contains(e.target) && !e.target.closest('.zfbtn')) zPopClose(); });
 document.addEventListener('keydown', e => { if (e.key === 'Escape') zPopClose(); });
 // ---- посилання: партія → сторінка партії, працівник → 👁 (Р-0_02)
-const zViewer = () => ['тімлід', 'зав. виробництва', 'адміністратор'].indexOf(DB.me.role) >= 0;
+const zViewer = () => LEAD_ROLES.indexOf(DB.me.role) >= 0;   // v58: + зав. відділу якості
 const zEye = w => zViewer() && /^W/.test(w || '') ? ' <a class="lnk" title="Мій виробіток очима працівника" onclick="event.stopPropagation()" href="' + esc(link('d=my&as=' + encodeURIComponent(w))) + '">👁</a>' : '';
 // ---- Р-0_12 матриця з рівнями і CSV
 function zMatrix(rid, recs, M, cfg) {
@@ -2825,7 +2859,7 @@ function r7card() {
   h += '<div class="card"><div class="mid">Шлях партії за кроками</div>' + ('<p class="muted">Успішних на кожному кроці, червоне — брак. «!» — простій перед кроком ' + idl + ' і більше роб. дн. (у «наступний» — якщо стільки чекає зараз). Жовті смуги — контроль.</p>' + zBars(rows)) + '</div>';
   h += zFold('r7recs', 'Записи', b.recs.length, '<div class="tw"><table class="t"><tr><th>Час</th><th>Крок</th><th>Хто</th><th>Дільниця</th><th class="r">Успішних</th><th class="r">Брак</th><th>Причина</th></tr>' +
     b.recs.slice().reverse().map(r => '<tr><td>' + zDm(r.d) + ' <span class="muted">' + esc(r.tm) + '</span></td><td><b>' + esc(r.step) + '</b> <span class="muted">' + esc(zSN(r.step) || (b.route.find(x => x[0] === r.step) || ['', ''])[1]) + '</span></td><td>' + esc(r.who) +
-      (['тімлід', 'зав. виробництва', 'адміністратор'].indexOf(DB.me.role) >= 0 && /^W/.test(r.w) ? ' <a class="lnk" href="' + esc(link('d=my&as=' + encodeURIComponent(r.w))) + '">👁</a>' : '') + '</td><td>' + esc(r.loc) + '</td><td class="r">' + fn(r.g) + '</td><td class="r">' + (r.s || '—') + '</td><td>' + esc(r.rs) + '</td></tr>').join('') + '</table></div>');
+      (LEAD_ROLES.indexOf(DB.me.role) >= 0 && /^W/.test(r.w) ? ' <a class="lnk" href="' + esc(link('d=my&as=' + encodeURIComponent(r.w))) + '">👁</a>' : '') + '</td><td>' + esc(r.loc) + '</td><td class="r">' + fn(r.g) + '</td><td class="r">' + (r.s || '—') + '</td><td>' + esc(r.rs) + '</td></tr>').join('') + '</table></div>');
   return h;
 }
 
@@ -3150,17 +3184,25 @@ function r12() {
     zKpi('На виробництві', fn(open.length), 'ящиків', fn(sum(open)) + ' двигунів', 'Ящики, які ще не передали на склад: у них можна докласти на K2 («Куди пакуємо»).', '', zAct(() => { D.st = 'open'; D.under = false; renderDash(); })) +
     zKpi('Неповні на виробництві', fn(under.length), 'ящиків', under.length ? 'показати ▾' : 'немає', 'Кількість менша за норму вкладення (BOX_QTY) для типорозміру. Норма — підказка, не ліміт.',
       under.length ? 'kbad' : '', under.length ? zAct(() => { D.st = 'open'; D.under = true; renderDash(); }) : undefined) +
-    zKpi('На складі', fn(wh.length), 'ящиків', fn(sum(wh)) + ' двигунів', 'Передані на склад («Передати на склад»). Склад таких ящиків змінюють лише дії складу.', '', zAct(() => { D.st = 'wh'; D.under = false; renderDash(); })) +
+    zKpi('На складі', fn(wh.length), 'ящиків', fn(sum(wh)) + ' двигунів', 'Повні ящики переміщуються на склад самі після K2 (Печерськ → П1, Жуляни → Ж1); неповні — «→ склад» тут, на картці ящика або в «Роботі зі складом». Склад таких ящиків змінюють лише дії складу.', '', zAct(() => { D.st = 'wh'; D.under = false; renderDash(); })) +
     (outN ? zKpi('Видано з ящиків', fn(outN), 'шт', 'взято й не повернуто', 'Двигуни, взяті зі складу з ящиків («Взяти двигуни з ящика»). Куди далі — облік у тому контурі.') : '') + '</div>';
   const red = b => b.total < b.per ? '<b style="color:#9B231A">' + fn(b.total) + '</b>' : '<b>' + fn(b.total) + '</b>';
+  const canWh = !!((d.perms || {}).boxToWh) && (d.whLocs || []).length > 0;   // v58: «→ склад» прямо зі звіту
   h += '<div class="card"><div class="mid">Ящики</div><div class="muted">' + list.length + ' ' + plural(list.length, 'ящик', 'ящики', 'ящиків') + ' · ' + fn(sum(list)) + ' двигунів · найновіші зміни зверху</div>' +
     (list.length ? '<div class="tw" style="margin-top:10px"><table class="t"><tr><th>Ящик</th><th>Маркування</th><th class="r">У ящику</th><th class="r">Норма</th><th>Склад</th><th>Де</th><th>Остання зміна</th><th class="r">Видано</th></tr>' +
       list.map(b => '<tr><td>' + bxl(b.id, b.name) + '</td><td>' + esc(b.mark) + '</td><td class="r">' + red(b) + '</td><td class="r">' + fn(b.per) + '</td><td>' +
         (b.batches > 1 ? '<span class="pill warn" style="margin:0">' + b.batches + ' партії</span><br><span class="muted">' + esc(b.comp) + '</span>' : esc(b.comp)) + '</td><td>' +
-        (b.state === 'на складі' ? 'на складі' : '<span class="pill warn" style="margin:0">виробництво</span>') + '</td><td>' + esc(b.last) + '</td><td class="r">' + (b.out ? fn(b.out) : '<span class="muted">—</span>') + '</td></tr>').join('') +
+        (b.state === 'на складі' ? 'склад ' + esc(b.wh || '') + (b.whAuto ? ' <span class="muted">авто</span>' : '') : '<span class="pill warn" style="margin:0">виробництво</span>' +
+          (canWh ? '<br><button type="button" class="ic" style="margin-top:4px" onclick="r12Wh(\'' + esc(b.id) + '\')">→ склад</button>' : '')) +
+        '</td><td>' + esc(b.last) + '</td><td class="r">' + (b.out ? fn(b.out) : '<span class="muted">—</span>') + '</td></tr>').join('') +
       '</table></div>' : '<p class="muted">Немає ящиків за цими фільтрами.</p>') +
-    '<p class="muted" style="margin-top:10px">Облік ящиків — з 20.10 (ящики з номером у записі K2). Ящик відкривається посиланням: склад, рух, «Передати на склад», дії складу.</p></div>';
+    '<p class="muted" style="margin-top:10px">Облік ящиків — з 20.10 (ящики з номером у записі K2). Ящик відкривається посиланням: склад, рух, «Перемістити на склад», дії складу.</p></div>';
   return h;
+}
+/** v58: «→ склад» з Р-12 — неповний (або будь-який ще не переміщений) ящик на склад з вибором локації; після запису звіт оновлюється */
+function r12Wh(id) {
+  const b = (DB.boxes || []).find(x => x.id === id); if (!b) return;
+  boxWhModal({ id: b.id, name: b.name, total: b.total, per: b.per, comp: b.batches > 1 ? b.comp : '' }, DB.whLocs, b.whDef, () => loadDash(true));
 }
 
 // ---- Р-5 Аналіз тари
@@ -3321,8 +3363,15 @@ function renderSklad() {
     '<label>Дія</label><div class="seg"><label><input type="radio" name="skAct" value="взяв" checked><span>Взяв</span></label>' +
     '<label><input type="radio" name="skAct" value="поклав"><span>Поклав</span></label></div>' +
     // v17: «поклав» — і повернення з виробництва, і прихід від постачальника (наповнення складу)
-    '<div id="skFromBox" style="display:none"><label>Звідки</label><div class="seg"><label><input type="radio" name="skFrom" value="з виробництва"><span>З виробництва</span></label>' +
-    '<label><input type="radio" name="skFrom" value="від постачальника"><span>Від постачальника</span></label></div></div>' +
+    '<div id="skFromBox" style="display:none"><label>Звідки</label><div class="seg wrap"><label><input type="radio" name="skFrom" value="з виробництва"><span>З виробництва</span></label>' +
+    '<label><input type="radio" name="skFrom" value="від постачальника"><span>Від постачальника</span></label>' +
+    '<label><input type="radio" name="skFrom" value="ГП з виробництва"><span>ГП з виробництва</span></label></div></div>' +   // v58: ящик готової продукції
+    '<div id="skGp" style="display:none"><label>Ящик готової продукції</label>' +
+    '<div class="row" style="align-items:center"><input type="text" id="skBox" placeholder="скан або M-00008 №2" autocapitalize="characters" style="min-width:0">' +
+    '<button type="button" class="ic" id="skBoxScan" style="flex:0 0 58px;font-size:22px;padding:10px 0;margin:0">📷</button></div>' +
+    '<div id="skBoxes" class="list" style="padding:0;margin-top:8px"><p class="muted">Завантажую ящики на виробництві…</p></div>' +
+    '<p class="muted">Повні ящики МЛП кладе на склад сам після пакування. Тут — неповні або ті, що лишились на столі пакування. Той самий запис — «Перемістити на склад» на картці ящика.</p></div>' +
+    '<div id="skReg">' +
     (d.photo ? '<label>Фото етикетки <span class="muted">(необов\'язково — заповнить поля саме)</span></label>' +
       '<input type="file" accept="image/*" capture="environment" id="skFile" style="display:none">' +
       '<button type="button" class="btn btn2" id="skCam" style="margin-top:0">📷 Сфотографувати етикетку</button>' +
@@ -3337,6 +3386,7 @@ function renderSklad() {
     '<label>Одиниця</label><select id="skUnit">' + opts(d.units, 'шт') + '</select>' +
     '<label>Партія постачальника <span class="muted">(з коробки, якщо є)</span></label><input type="text" id="skLot">' +
     '<label>Партія МЛП <span class="muted">(необов\'язково)</span></label><input type="text" id="skMlp" placeholder="напр. M-00012" autocapitalize="characters">' +
+    '</div>' +   // v58: skReg
     '<label>Коментар</label><textarea id="skCm"></textarea>' +
     '<button class="btn" id="skGo">Записати</button><div class="err" id="err"></div></div>';
   h += '<div id="skMy"></div><p class="muted" style="text-align:center">' + esc(PAGE_VERSION) + ' · ' + esc(d.version) + '</p><div style="height:20px"></div>';
@@ -3348,10 +3398,16 @@ function renderSklad() {
     const p = d.positions.find(x => x.name === v); if (p && !SKF.unitTouched) $('skUnit').value = p.unit;
   };
   $('skUnit').onchange = () => SKF.unitTouched = true;
-  document.querySelectorAll('input[name=skAct]').forEach(r => r.onchange = () => {
+  const skMode = () => {   // v58: «ГП з виробництва» — вибір ящика замість позиції й кількості
     const put = (document.querySelector('input[name=skAct]:checked') || {}).value === 'поклав';
+    const gp = put && (document.querySelector('input[name=skFrom]:checked') || {}).value === 'ГП з виробництва';
     $('skFromBox').style.display = put ? 'block' : 'none'; $('skPosL').textContent = put ? 'Що поклали' : 'Що взяли';
-  });
+    $('skReg').style.display = gp ? 'none' : 'block'; $('skGp').style.display = gp ? 'block' : 'none';
+    if (gp && !SKB.list) skBoxesLoad();
+  };
+  document.querySelectorAll('input[name=skAct], input[name=skFrom]').forEach(r => r.onchange = skMode);
+  $('skBox').oninput = () => { SKB.sel = ''; skBoxesDraw(); };
+  $('skBoxScan').onclick = () => { SC.cb = t => { const id = boxFromCode(t); if (!id) return toast('Це не етикетка ящика: ' + String(t).slice(0, 40), true); $('skBox').value = id.replace('#', ' №'); skBoxPick(id); }; scanStart(); };
   $('skQty').oninput = skShowSum;
   $('skPlus').onclick = () => { const q = $('skQty'); if (q.value && !/[+\-]$/.test(q.value)) q.value += '+'; q.focus(); skShowSum(); };
   if (d.photo) {
@@ -3410,9 +3466,42 @@ function skFill(f) {
   if (u && !SKF.unitTouched && SKD.units.indexOf(u) >= 0) $('skUnit').value = u;
   if (f.qty_in_box) { SKF.hint = f.qty_in_box + (f.unit ? ' ' + f.unit : ''); skShowSum(); }
 }
+// v58: ящики ГП на виробництві для «Поклав» → «ГП з виробництва» (сервер skladBoxes, Sklad.gs v7)
+let SKB = { list: null, sel: '' };
+function skBoxesLoad() {
+  post('skladBoxes', { code: CODE, s: SKD.loc ? SKD.loc.code : '' }).then(r => { SKB.list = r.boxes || []; skBoxesDraw(); })
+    .catch(e => { $('skBoxes').innerHTML = '<p class="err">' + esc(e.message) + '</p>'; });
+}
+function skBoxesDraw() {
+  const box = $('skBoxes'); if (!box || !SKB.list) return;
+  const q = ($('skBox').value || '').toUpperCase().replace(/\s+/g, '');
+  const l = SKB.list.filter(b => !q || b.name.toUpperCase().replace(/\s+/g, '').indexOf(q) >= 0 || b.id.toUpperCase().indexOf(q) >= 0);
+  box.innerHTML = l.length ? l.slice(0, 30).map(b => '<label class="opt"><input type="radio" name="skBx" value="' + esc(b.id) + '"' + (b.id === SKB.sel ? ' checked' : '') + ' onchange="skBoxPick(this.value)">' +
+    '<b>' + esc(b.name) + '</b> · ' + esc(b.mark) + ' · <b' + (b.total < b.per ? ' style="color:#9B231A"' : '') + '>' + b.total + '</b> з ' + b.per +
+    '<br><span class="muted">' + esc(b.loc || '') + ' · ' + esc(b.last) + (b.comp && b.comp.indexOf('·') >= 0 ? ' · ' + esc(b.comp) : '') + '</span></label>').join('')
+    : '<p class="muted">' + (SKB.list.length ? 'Такого ящика на виробництві немає (можливо, він уже на складі).' : 'Ящиків на виробництві немає — усі на складі.') + '</p>';
+}
+function skBoxPick(id) {
+  SKB.sel = id; skBoxesDraw();
+  const b = (SKB.list || []).find(x => x.id === id);
+  if (b && !SKD.loc && $('skLoc') && !$('skLoc').value) { const o = [...$('skLoc').options].find(x => x.value.split(' ')[0] === b.whDef); if (o) $('skLoc').value = o.value; }
+}
+function skSaveBox(btn) {
+  const raw = SKB.sel || boxFromCode($('skBox').value) || $('skBox').value.trim();
+  const loc = SKD.loc ? SKD.loc.code : ($('skLoc').value || '').split(' ')[0];
+  if (!raw) { $('err').textContent = 'Оберіть ящик зі списку або відскануйте етикетку'; return; }
+  if (!loc) { $('err').textContent = 'Оберіть локацію складу'; return; }
+  btn.disabled = true; btn._t = btn.textContent; btn.textContent = 'Зберігаю…';
+  post('skladBox', { code: CODE, loc: loc, box: raw, comment: $('skCm').value }).then(r => {
+    btn.disabled = false; btn.textContent = btn._t; toast(r.msg || 'Записано');
+    SKD.my = r.my || SKD.my; SKB = { list: null, sel: '' }; $('skBox').value = ''; $('skCm').value = '';
+    skBoxesLoad(); renderSkMy(); window.scrollTo(0, 0);
+  }).catch(e => { btn.disabled = false; btn.textContent = btn._t; const m = String(e.message || e).replace(/^Error:\s*/, ''); $('err').textContent = m; toast(m, true); });
+}
 function skSave() {
   const btn = $('skGo'); if (btn.disabled) return;
   $('err').textContent = '';
+  if ($('skGp') && $('skGp').style.display === 'block') return skSaveBox(btn);   // v58
   const n = skCalc($('skQty').value);
   if (!$('skQty').value || isNaN(n) || !(n > 0)) { $('err').textContent = 'Вкажіть кількість (число або 1+2+5)'; return; }
   btn.disabled = true; btn._t = btn.textContent; btn.textContent = SKF.busy ? 'Чекаю фото…' : 'Зберігаю…';
@@ -3455,6 +3544,7 @@ function renderSkMy() {
     '<div class="list">' +
     (my.length ? my.map(x => '<div class="li"><div><div class="' + (x.cancelled || x.fixed ? 'x' : '') + '">' +
       (x.act === 'повернув' || x.act === 'поклав' ? '<span class="pill warn" style="margin:0 6px 0 0">поклав' + (x.from ? ' · ' + esc(x.from) : '') + '</span>' : '') +
+      (x.zr ? '<span class="pill" style="margin:0 6px 0 0">📦 ящик</span>' : '') +   // v58: рух ящика ГП (є і в ЖЗР)
       '<b>' + esc(x.pos) + (x.typ ? ' ' + esc(x.typ) : '') + '</b> — ' + esc(skNum(x.qty)) + ' ' + esc(x.unit) +
       '<br><span class="muted">' + (x.who ? esc(x.who) + ' · ' : '') + esc(x.loc) + (x.det ? ' · ' + esc(x.det) : '') + (x.lot ? ' · партія ' + esc(x.lot) : '') + (x.mlp ? ' · ' + esc(x.mlp) : '') +
       (x.photo ? ' · 📷' : '') + '</span></div><span class="muted" style="font-size:13px">' + esc(x.id) + st(x) + '</span>' + was(x) + '</div>' +
