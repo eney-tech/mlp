@@ -1,5 +1,11 @@
 <!DOCTYPE html>
-<!-- МЛП · index.html v56 · 22.10.2026 — Р-11: таблиця «Партії двигунів» відкрита за замовчуванням.
+<!-- МЛП · index.html v57 · 23.10.2026 — чисті ящики (рішення 23.10, Code.gs v61, Labels.gs v11, Reports.gs v24): K2 «Куди пакуємо» — у новий чистий ящик
+     (скільки ящиків — за нормою або вписати) або в існуючий неповний ящик тієї самої специфікації (список з сервера, res.k2.open); підказка «було → стане,
+     норма N» без ліміту. Картка ящика (?bx=M-00005%232): склад, кількість проти норми, де ящик, «Передати на склад», «Взяти двигуни з ящика»,
+     «Повернути» за записом взяття, «Взяти ящик зі складу», «🖨 Етикетка зараз», рух ящика і ✖ останнього запису. Сканер: GS1-128 з номером ящика (21)
+     відкриває картку ящика. «📦 Ящики ГП» на картці партії й записи K2 в історії — посилання на ящики. Р-12 «Чисті ящики» (d=boxes): на виробництві /
+     на складі, неповні — червоним; плитка «📦 Чисті ящики» на головній.
+     v56 · 22.10.2026 — Р-11: таблиця «Партії двигунів» відкрита за замовчуванням.
      v55 · 22.10.2026 — непарні деталі в партіях двигунів (Code.gs v60, Reports.gs v23, рішення 22.10): картка партії MT — у «Що в тарі зараз»
      окремі рядки «Статори / Ротори без пари» і пари, що чекають F1; рядки «Статори» / «Ротори»: у двигунах (зараз) · без пари · брак (разом із двигунами);
      новий звіт Р-11 «Двигуни в роботі» (d=motors, право dashStan): партії двигунів, скільки в них двигунів і непарних статорів / роторів.
@@ -324,7 +330,7 @@
 <div class="toast" id="toast"></div>
 
 <script>
-const PAGE_VERSION = 'index.html v56 · 22.10.2026';
+const PAGE_VERSION = 'index.html v57 · 23.10.2026';
 /** v46: куди прийдуть етикетки K2 — адреси друку (K2_LABEL_EMAILS), якщо задані; інакше — пошта працівника */
 function k2To() { const t = (S.k2 && S.k2.to) || []; return t.length ? t.join(', ') + ' (принтер етикеток)' : (S.me ? S.me.email : ''); }
 const API = 'https://script.google.com/macros/s/AKfycbx-JUajnAtVsxaLHDgwRpfzE12g4LUtlf6JnWYAQScAVZ5FCpxzGHSrA5PDESqP80KD/exec';
@@ -382,7 +388,7 @@ function loadPage(extra) {
 }
 
 /** Яку сторінку показати після дії: сервер повертає її в тій самій відповіді (v3 — без другого звернення) */
-function viewParams() { const v = {}; ['t', 'b'].forEach(k => { if (PARAMS[k]) v[k] = PARAMS[k]; }); return v; }
+function viewParams() { const v = {}; ['t', 'b', 'bx'].forEach(k => { if (PARAMS[k]) v[k] = PARAMS[k]; }); return v; }   // v57: + bx — картка ящика
 /** Для адміністратора: сервер усього (старт · черга · читання · запис · сторінка) / разом із мережею */
 function timing(r, total) {
   const p = r.parts || {}; const d = (a, b) => sec(Math.max(0, (p[a] || 0) - (b ? p[b] || 0 : 0)));
@@ -674,6 +680,7 @@ function render(extra) {
     return;
   }
   if (S.poster) return renderPoster();
+  if (S.box) return renderBox();   // v57: картка ящика
   if (S.tare && !S.batch) { setView('', S.tare.code, 'home'); return renderNew(); }
   if (S.batch) { setView(S.tare ? S.tare.code : '', S.batch.info && S.batch.info['Номер'] ? S.batch.info['Номер'] : (S.tare ? S.tare.code : 'Партія'), 'home'); return renderBatch(extra); }
   renderHome();
@@ -685,19 +692,20 @@ function whoHtml(me, perms, unknown) {
 // =============================================================== v33: ОБОЛОНКА — меню, шапка, Головна, сканер QR, довідка
 /** Роль і права для меню. Сторінки кабінету, звітів і складу не викликають apiPage, тож меню бере роль з пристрою (останнє відоме) */
 let NAV = (() => { try { return JSON.parse(store('mlp_nav') || '{}') || {}; } catch (e) { return {}; } })();
-const NAV_KEYS = ['step', 'separate', 'noBatch', 'sklad', 'dashStan', 'dashTare', 'dashMy', 'history', 'cabinet', 'dashOut', 'dashScrap', 'dashBatches', 'dashControl', 'retro'];
+const NAV_KEYS = ['step', 'separate', 'noBatch', 'sklad', 'dashStan', 'dashTare', 'dashMy', 'history', 'cabinet', 'dashOut', 'dashScrap', 'dashBatches', 'dashControl', 'retro', 'dashBoxes'];
 function navSave(me, perms) {
   const n = { role: me.role, name: me.name, perms: NAV.perms || {} };
   if (perms) { n.perms = {}; NAV_KEYS.forEach(k => n.perms[k] = !!perms[k]); }
   else if (NAV.role !== me.role) n.perms = {};   // роль змінилась, а прав ще не знаємо — меню до наступного відкриття головної мінімальне
   NAV = n; store('mlp_nav', JSON.stringify(n)); navRender();
 }
-const DASHT = { stan: ['Р-2', 'Стан зараз'], motors: ['Р-11', 'Двигуни в роботі'], tare: ['Р-5', 'Аналіз тари'], batches: ['Р-7', 'Аналіз партій'], out: ['Р-8', 'Виробіток'], scrap: ['Р-10', 'Аналіз браку'], control: ['Р-9', 'Контроль'], my: ['Р-8с', 'Мій виробіток'] };
+const DASHT = { stan: ['Р-2', 'Стан зараз'], motors: ['Р-11', 'Двигуни в роботі'], boxes: ['Р-12', 'Чисті ящики'], tare: ['Р-5', 'Аналіз тари'], batches: ['Р-7', 'Аналіз партій'], out: ['Р-8', 'Виробіток'], scrap: ['Р-10', 'Аналіз браку'], control: ['Р-9', 'Контроль'], my: ['Р-8с', 'Мій виробіток'] };
 /** Звіти ролі для меню (Р-0_07). «Мій виробіток» у меню — працівнику (окрема вкладка) і зав. відділу браку (рішення 18.10) */
 function navReports() {
   const p = NAV.perms || {}, r = [];
   if (p.dashStan) r.push(['d=stan', 'stan']);
   if (p.dashStan) r.push(['d=motors', 'motors']);   // v55: Р-11
+  if (p.dashBoxes && NAV.role !== 'працівник') r.push(['d=boxes', 'boxes']);   // v57: Р-12 (працівнику — плитка на головній)
   if (p.dashTare) r.push(['d=tare', 'tare']);
   if (p.dashBatches) r.push(['d=batches', 'batches']);   // v39
   if (p.dashOut) r.push(['d=out', 'out']);   // v38
@@ -739,7 +747,7 @@ function navRender() {
   const tabs = [['', NIC.home, 'Головна', VIEW === 'home']];
   if (worker && p.dashMy) tabs.push(['d=my', NIC.work, 'Мій виробіток', VIEW === 'my']);
   else if (reps.length) tabs.push(['r=1', NIC.rep, 'Звіти', VIEW === 'rep']);
-  else if (p.sklad && !p.step) tabs.push(['sklad=1', NIC.sklad, 'Склад', false]);   // зав. складу — звітів немає
+  if (p.sklad && !p.step) tabs.push(['sklad=1', NIC.sklad, 'Склад', false]);   // зав. складу; v57: і «Звіти» (Р-12)
   tabs.push(['cab=1', NIC.cab, 'Кабінет', VIEW === 'cab']);
   tb.innerHTML = tabs.map(x => '<a href="' + esc(link(x[0])) + '" class="' + (x[3] ? 'on' : '') + '"><span class="i">' + x[1] + '</span>' + x[2] + '</a>').join('');
   $('backBtn').classList.toggle('hid', VIEW === 'home' && !location.search.replace(/^\?$/, ''));
@@ -775,6 +783,7 @@ function renderHome() {
   if (p.noBatch) tiles.push('<a class="tile" href="' + esc(link('nb=1')) + '"><div class="tn">⏱ Записати роботу без партії</div><div class="td">' +
     (p.cabinet ? 'за себе або за працівника, сьогодні або минулою датою' : 'підготовка місця, перебирання залишків, навчання — у годинах або штуках') + '</div></a>');
   if (p.sklad) tiles.push('<a class="tile" href="' + esc(link('sklad=1')) + '"><div class="tn">⌂ Робота зі складом</div><div class="td">взяв / поклав / надходження</div></a>');
+  if (p.dashBoxes && (prod || p.sklad)) tiles.push('<a class="tile" href="' + esc(link('d=boxes')) + '"><div class="tn">📦 Чисті ящики</div><div class="td">неповні ящики на виробництві, ящики на складі</div></a>');   // v57: Р-12
   if (p.retro) tiles.push('<a class="tile" href="' + esc(link('rh=1')) + '"><div class="tn">📄 Ретро-історія партій</div><div class="td">звірити записи, розпізнані з паперових техкарт, і підтвердити</div></a>');   // v53
   if (tiles.length) h += '<div class="tiles">' + tiles.join('') + '</div>';
   h += helpHtml(!(prod || p.sklad)) + '<p class="muted" style="text-align:center">' + esc(PAGE_VERSION) + '</p>';
@@ -854,6 +863,9 @@ function scanGo(text) {
   const up = t.toUpperCase().replace(/\s+/g, '');
   // v45: штрихкод GS1-128 з етикетки ящика — «]C1», «(10)…» або «10M-00012…»: беремо номер партії
   const g1 = /^(\]C1)?\(?10\)?[SRM]-?\d{5}/.test(up) ? up.match(/[SRM]-?(\d{5})/) : null;
+  // v57: (21) — номер ящика: «(10)M-00005(30)160(21)2» або з роздільником GS (\x1d) — картка ящика
+  const g21 = g1 ? (t.match(/\(21\)(\d+)/) || t.match(/\x1d21(\d+)\s*$/)) : null;
+  if (g1 && g21) { location.href = link('bx=' + encodeURIComponent(g1[0].replace(/^([SRM])-?/, '$1-') + '#' + Number(g21[1]))); return; }
   if (g1) { location.href = link('b=' + encodeURIComponent(g1[0])); return; }
   if (/^[SRMСРМ][TТ]?-?\d+$/.test(up)) { location.href = link('b=' + encodeURIComponent(up)); return; }
   if (/^[А-ЯІЇЄҐA-Z]{2}-?\d+$/.test(up)) { location.href = link('t=' + encodeURIComponent(up)); return; }
@@ -1371,7 +1383,7 @@ function renderBatch(extra) {
   h += '<details' + (extra && extra.openHist ? ' open' : '') + '><summary>Історія (' + b.history.length + ')</summary><div class="list">' + b.history.map(x => {
     let what = esc(x.type);
     if (x.type === 'крок') what = '<b>' + esc(x.step) + '</b> · ' + x.good + ' / ' + x.scrap + (x.reason ? ' · ' + esc(x.reason) : '') +
-      (x.step === 'K2' && x.boxes ? ' · ' + esc(boxesTxt(x.boxes)) : x.step === 'K2' && x.x1 ? ' · ящиків ' + x.x1 : '') + (x.d1 && (b.route.find(r => r.code === x.step) || {}).extra === 'color' ? ' · 🎨 ' + esc(x.d1) : '') +
+      (x.step === 'K2' && x.boxes ? ' · ' + boxesLinks(x.boxes) : x.step === 'K2' && x.x1 ? ' · ящиків ' + x.x1 : '') + (x.d1 && (b.route.find(r => r.code === x.step) || {}).extra === 'color' ? ' · 🎨 ' + esc(x.d1) : '') +
       (PART_SCRAP.indexOf(x.step) >= 0 && b.comp && (x.x1 || x.x2) ? ' · з них лише статора ' + (x.x1 || 0) + ', лише ротора ' + (x.x2 || 0) : '');   // v47
     if (x.type === 'нова партія') what = 'нова партія · ' + x.qty + ' шт' + (x.d1 && !b.comp ? ' · 🎨 ' + esc(x.d1) : '') + (x.d2 && !b.comp ? ' · старт з <b>' + esc(x.d2) + '</b>' : '');   // v27
     if (x.type === 'пропуск') what = '⏭ пропущено <b>' + esc(x.step) + '</b> · ' + x.qty + ' шт';   // v27
@@ -1387,6 +1399,10 @@ function renderBatch(extra) {
     if (x.type === 'вибуття') what = (x.purpose === S.qc ? 'взято на відбраковку ' + x.qty + ' шт' : 'вибуло ' + x.qty + ' шт → <b>' + esc(x.purpose) + '</b>') + ' · ' + esc(x.product);
     if (x.type === 'додавання') what = x.purpose === S.qc ? '↩ повернуто з відбраковки ' + x.qty + ' шт · ' + esc(x.product)   // v19
       : '+ додано ' + x.qty + ' шт · ' + esc(x.product) + ' · звідки: <b>' + esc(x.purpose) + '</b>';   // v17
+    if (x.type === 'ящик на склад') what = '📦 ' + bxl(x.boxes) + ' передано на склад · ' + x.qty + ' шт';   // v57: дії з ящиком
+    if (x.type === 'ящик зі складу') what = '📦 ' + bxl(x.boxes) + ' взято зі складу · ' + x.qty + ' шт';
+    if (x.type === 'взято з ящика') what = '📦 взято з ящика ' + bxl(x.boxes) + ' · ' + x.qty + ' шт';
+    if (x.type === 'повернуто в ящик') what = '📦 повернуто в ящик ' + bxl(x.boxes) + ' · ' + x.qty + ' шт';
     if (x.lot || x.photo) what += ' · партія постач. ' + esc(x.lot || '—') + (x.photo ? ' <a class="lnk" target="_blank" href="' + esc(x.photo) + '">📷</a>' : '');   // v17
     const btns = (x.canCancel ? '<button class="ic" onclick="cancelRec(\'' + x.id + '\')">✖</button>' : '') +
       (x.canBack && p.move ? '<button class="ic" onclick="moveBack(\'' + x.id + '\')">↩ назад</button>' : '') +
@@ -1423,16 +1439,20 @@ function renderBatch(extra) {
 /** v48: ящики ГП партії двигунів: що запаковано (номер, дата, скільки) і що ще чекає K2 */
 function boxesCard(b) {
   const bx = b.boxes || [], k2 = b.route.find(s => s.extra === 'pack') || { avail: 0 };
-  const packed = bx.filter(x => !x.other).reduce((a, x) => a + x.q, 0);   // v50: запаковане в інших партіях — окремо, у «Є зараз» його вже немає
+  // v57: own — ящики, куди пакувала ця партія (і чужі ящики, куди вона доклала); via — її двигуни запакувала інша партія (після ✂ Відокремити)
+  const own = bx.filter(x => !x.via), via = bx.filter(x => x.via);
+  const packed = own.reduce((a, x) => a + x.q, 0);
   const before = Math.max(0, b.remaining - packed - k2.avail);   // ще не пройшли F5
   if (!bx.length && !k2.avail) return '';
-  const st = x => (x.state === 'повний' ? '<span class="pill">повний</span>' : '<span class="pill warn">неповний</span>') + (x.comp ? ' <span class="pill warn">змішаний</span>' : '');
-  const row = x => '<div class="li"><div><b>' + esc(x.name) + '</b>' + (x.other ? ' · <span class="muted">у партії ' + bl(x.other) + '</span>' : '') + ' · запаковано ' + esc(x.date) +
+  const st = x => (x.state === 'повний' ? '<span class="pill">повний</span>' : '<span class="pill warn">неповний</span>') + (x.comp ? ' <span class="pill warn">змішаний</span>' : '') +
+    (x.where === 'на складі' ? ' <span class="pill">на складі</span>' : '');
+  const row = x => '<div class="li"><div><b>' + (x.id ? bxl(x.id, x.name) : esc(x.name)) + '</b>' + (x.via ? ' · <span class="muted">запакувала партія ' + bl(x.via) + '</span>'
+      : x.other ? ' · <span class="muted">ящик партії ' + bl(x.other) + '</span>' : '') + ' · запаковано ' + esc(x.date) +
     (x.total && x.total !== x.q ? '<br><span class="muted">з цієї партії ' + x.q + ' шт, у ящику всього <b>' + x.total + '</b></span>' : '') +   // v51
     (x.comp ? '<br><span class="muted">склад: ' + esc(x.comp) + '</span>' : '') + '</div><div class="r"><b>' + x.q + ' шт</b><br>' + st(x) + '</div></div>';
   return '<div class="card"><div class="mid">📦 Ящики ГП</div><div class="list" style="padding:0">' + (bx.length ? bx.map(row).join('') : '<div class="li muted">Ще нічого не запаковано</div>') + '</div>' +
-    '<div class="muted" style="margin-top:8px">Запаковано: <b>' + packed + ' шт</b>' + (bx.filter(x => !x.other).length ? ' у ' + bx.filter(x => !x.other).length + ' ' + plural(bx.filter(x => !x.other).length, 'ящик', 'ящики', 'ящиків') : '') +
-    (bx.some(x => x.other) ? ' · в інших партіях: ' + bx.filter(x => x.other).reduce((a, x) => a + x.q, 0) + ' шт' : '') +
+    '<div class="muted" style="margin-top:8px">Запаковано: <b>' + packed + ' шт</b>' + (own.length ? ' у ' + own.length + ' ' + plural(own.length, 'ящик', 'ящики', 'ящиків') : '') +
+    (via.length ? ' · запаковано іншими партіями: ' + via.reduce((a, x) => a + x.q, 0) + ' шт' : '') +
     (k2.avail ? ' · <b style="color:#9B231A">чекає K2: ' + k2.avail + ' шт</b>' : '') + (before ? ' · ще не дійшли до K2: ' + before + ' шт' : '') + '</div></div>';
 }
 function nowHtml(b) {
@@ -1471,7 +1491,9 @@ function stepChanged() {
     x = '<div class="row"><div><label>На балансування</label>' + numInput('x1', s.avail) + '</div></div><label>Одразу на ' + esc(R[k] ? R[k].code : 'наступний крок') + '</label>' + numInput('x2', 0);
   }
   if (s && s.extra === 'kv') x = '<label>KV — під який гравіюють</label><select id="kvs">' + opts(S.dict.kv, S.batch.info['KV'], '— оберіть —') + '</select>';
-  if (s && s.extra === 'pack') x = '<label>Ложементів</label><input type="number" inputmode="numeric" id="x2">' +   // v50: ящики рахуються самі
+  if (s && s.extra === 'pack') x = '<label>Куди пакуємо</label><select id="k2to" data-nocbx>' + k2ToOpts() + '</select>' +   // v57: новий чистий ящик або існуючий неповний
+    '<div id="k2new"><label>Ящиків <span class="muted">(порожньо — за нормою ' + boxPer() + ' шт у ящику)</span></label><input type="number" inputmode="numeric" id="x1"></div>' +
+    '<label>Ложементів</label><input type="number" inputmode="numeric" id="x2">' +
     '<div id="k2plan" class="muted" style="margin-top:10px"></div>' +
     '<button type="button" class="btn btn2" id="k2pre" style="margin-top:10px">🖨 Етикетки зараз (до запису кроку)</button><div id="k2sent" class="muted" style="margin-top:6px"></div>';   // v45
   if (s && s.extra === 'color') x = colorField('clr', S.batch.info['Потік'], S.batch.info['Колір']);   // v21: колір статорів на «Базі статора»
@@ -1484,25 +1506,24 @@ function stepChanged() {
   if (s && s.extra === 'split') $('good').oninput = () => { $('x1').value = Math.max(0, (Number($('good').value) || 0) - (Number($('x2').value) || 0)); };
   else $('good').oninput = null;
   if (s && s.extra === 'pack') {   // v13: ящиків рахується саме (BOX_QTY), план етикеток — до запису
-    const per = boxPer();
-    const nw = true;   // v50: ящики завжди рахуються самі
     const recalc = () => {
-      const g = Number($('good').value) || 0;
-      const pl = k2PlanTxt(g);
-      $('k2plan').innerHTML = pl.length ? 'Ящики й етикетки:<br>' + pl.join('<br>') + '<br>PDF прийде на ' + esc(k2To()) + '. Друк: термопринтер, 100 × 100 мм, масштаб 100 %.' : '';
-      const same = K2SENT && K2SENT.batch === S.batch.info['Номер'] && K2SENT.good === g && K2SENT.boxes === 0;
+      const g = Number($('good').value) || 0, to = $('k2to').value;
+      $('k2new').style.display = to === 'new' ? 'block' : 'none';
+      const pl = k2PlanTxt(g, to, Number($('x1').value) || 0);
+      $('k2plan').innerHTML = pl.length ? (to === 'new' ? 'Ящики й етикетки:<br>' : 'Етикетка всього ящика:<br>') + pl.join('<br>') + '<br>PDF прийде на ' + esc(k2To()) +
+        '. Друк: термопринтер, 100 × 100 мм, масштаб 100 %.' + (to === 'new' ? '' : ' Нову етикетку клеїть замість старої.') : '';
+      const same = K2SENT && K2SENT.batch === S.batch.info['Номер'] && K2SENT.good === g && K2SENT.box === to && K2SENT.boxes === (to === 'new' ? Number($('x1').value) || 0 : 0);
       $('k2sent').innerHTML = K2SENT && K2SENT.batch === S.batch.info['Номер'] ? (same ? '✓ Етикетки вже надіслано — після «Записати крок» вдруге не прийдуть.'
         : '<span style="color:#9B231A">Кількість або ящики змінились після друку — при записі прийдуть нові етикетки.</span>') : '';
     };
     // v16 (T-48): зміна кількості завжди перераховує ящики; ручне число ящиків діє до наступної зміни кількості
-    $('good').oninput = () => { if ($('x1')) delete $('x1').dataset.touched; recalc(); };
-    if ($('x1')) $('x1').oninput = () => { $('x1').dataset.touched = '1'; recalc(); };
+    $('good').oninput = recalc; $('x1').oninput = recalc; $('k2to').onchange = recalc;
     recalc();
-    $('k2pre').onclick = () => {   // v45: етикетки до запису кроку
-      const g = Number($('good').value) || 0, bx = nw ? 0 : Number($('x1').value) || 0;
+    $('k2pre').onclick = () => {   // v45: етикетки до запису кроку; v57: + куди (ящик) і скільки нових ящиків
+      const g = Number($('good').value) || 0, to = $('k2to').value, bx = to === 'new' ? Number($('x1').value) || 0 : 0;
       if (!(g > 0)) { $('err').textContent = 'Вкажіть, скільки двигунів пакуєте'; return; }
-      act({ action: 'k2Labels', batch: S.batch.info['Номер'], good: g, x1: nw ? '' : $('x1').value }, $('k2pre'), r => {
-        K2SENT = { batch: S.batch.info['Номер'], good: g, boxes: bx }; recalc();
+      act({ action: 'k2Labels', batch: S.batch.info['Номер'], good: g, box: to, x1: to === 'new' ? $('x1').value : '' }, $('k2pre'), r => {
+        K2SENT = { batch: S.batch.info['Номер'], good: g, box: to, boxes: bx }; recalc();
       });
     };
   }
@@ -1529,12 +1550,20 @@ function goodHint(cut) {
 /** v47: кроки двигунів, де брак може бути лише статора або лише ротора (Code.gs v53, PART_SCRAP_STEPS) */
 const PART_SCRAP = ['F2', 'F3', 'F5'];
 /** v50: те саме правило, що k2Plan_ у Labels.gs: повні ящики по BOX_QTY, остача — ще один ящик; склад — свої першими, далі чужі */
-function k2PlanTxt(g) {
-  const k = S.k2 || {}, per = k.per || boxPer(), no = S.batch.info['Номер'], out = []; let next = k.next || 1, left = g;
+/** v57: «Куди пакуємо» — «У новий чистий ящик» і неповні ящики тієї самої специфікації на виробництві (сервер: res.k2.open) */
+function k2ToOpts() {
+  const op = (S.k2 && S.k2.open) || [];
+  return '<option value="new">У новий чистий ящик</option>' + op.map(o => '<option value="' + esc(o.id) + '">В існуючий: ' + esc(o.name) + ' · ' + o.total + ' шт · ' + esc(o.comp) + '</option>').join('');
+}
+/** v57: план K2 — нові ящики (за нормою або вписано, те саме правило, що k2Plan_ у Labels.gs) або «було → стане» в існуючому; ліміту немає, норма — підказка */
+function k2PlanTxt(g, to, nBoxes) {
+  const k = S.k2 || {}, per = k.per || boxPer(), no = S.batch.info['Номер'], out = []; let next = k.next || 1;
   if (!(g > 0)) return out;
-  while (left > 0) { const q = Math.min(per, left);
-    out.push('ящик <b>' + esc(no) + ' №' + (next++) + '</b> — ' + q + ' шт' + (q < per ? ' · <b style="color:#9B231A">⚠ неповний</b> (повний — ' + per + ')' : '')); left -= q; }
-  const comp = []; left = g;
+  const norm = n => n === per ? '' : n < per ? ' · <b style="color:#9B231A">неповний</b> (норма ' + per + ')' : ' · більше за норму ' + per;
+  const ex = to && to !== 'new' ? (k.open || []).find(o => o.id === to) : null;
+  if (ex) out.push('у ящик <b>' + esc(ex.name) + '</b> +' + g + ': було ' + ex.total + ' → стане <b>' + (ex.total + g) + ' шт</b>' + norm(ex.total + g));
+  else labelsPlan(g, nBoxes, per).forEach(q => out.push('ящик <b>' + esc(no) + ' №' + (next++) + '</b> — ' + q + ' шт' + norm(q)));
+  let left = g; const comp = [];
   (k.pool || []).forEach(x => { if (left <= 0) return; const q = Math.min(left, x[1]); if (q > 0) { comp.push([x[0], q]); left -= q; } });
   if (comp.some(x => x[0] !== no)) out.push('<span class="muted">змішаний: ' + esc(comp.map(x => x[0] + ' — ' + x[1]).join(' · ')) + '</span>');
   return out;
@@ -1567,9 +1596,99 @@ function submitStep() {
     const rz = rzVal('rz'); if (rz.err) { $('err').textContent = rz.err; return; }   // v52
     act(Object.assign({ action: 'step', batch: S.batch.info['Номер'], step: $('stp').value, good: v('good'), scrap: v('scrap'), reason: rz.v,
       x1: v('x1'), x2: v('x2'), kv: v('kvs'), check: $('chk') ? $('chk').checked : false, comment: v('cm'), lot: l.lot, photo: l.photo, color: v('clr'),
-      labelsSent: !!(K2SENT && $('k2pre') && K2SENT.batch === S.batch.info['Номер'] && K2SENT.good === (Number(v('good')) || 0) && K2SENT.boxes === (Number(v('x1')) || 0)) }, onbVal()), btn,
+      box: v('k2to'),   // v57: куди пакуємо (new — новий чистий ящик)
+      labelsSent: !!(K2SENT && $('k2pre') && K2SENT.batch === S.batch.info['Номер'] && K2SENT.good === (Number(v('good')) || 0) && K2SENT.box === v('k2to') &&
+        K2SENT.boxes === (v('k2to') === 'new' ? Number(v('x1')) || 0 : 0)) }, onbVal()), btn,
       $('k2pre') ? r => { K2SENT = null; showPage(r, {}); } : undefined);   // v45
   });
+}
+
+// =============================================================== v57: КАРТКА ЯЩИКА (ДП-22 … ДП-26, Labels.gs v11)
+// Ящик відкривають посиланням з картки партії, з Р-12 або скануванням штрихкоду етикетки (GS1-128 з номером ящика)
+function renderBox() {
+  const x = S.box, p = S.perms || {}, sk = !!p.sklad;
+  document.body.classList.remove('nonav');
+  setView('Ящик ГП', x.name, 'home');
+  const under = x.total < x.per, over = x.total > x.per;
+  let h = '<div class="card"><div class="big">📦 ' + esc(x.name) + '</div>' +
+    '<span class="pill">' + esc(x.typ) + '</span>' + (x.kv ? '<span class="pill">KV ' + esc(x.kv) + '</span>' : '') + (x.color ? '<span class="pill">🎨 ' + esc(x.color) + '</span>' : '') +
+    (x.state === 'на складі' ? '<span class="pill">на складі</span>' : '<span class="pill warn">на виробництві</span>') + (x.comp.length > 1 ? '<span class="pill warn">кілька партій</span>' : '') +
+    '<div style="margin-top:12px;font-size:20px">У ящику: <b' + (under ? ' style="color:#9B231A"' : '') + '>' + x.total + ' шт</b> <span class="muted" style="font-size:15px">· норма ' + x.per +
+    (under ? ' — неповний' : over ? ' — більше за норму' : '') + '</span></div>' +
+    (x.comp.length ? '<div class="list" style="padding:0;margin-top:8px">' + x.comp.map(c => '<div class="li"><div>' + bl(c[0]) + '</div><div class="r"><b>' + c[1] + ' шт</b></div></div>').join('') + '</div>' : '') +
+    '<div class="muted" style="margin-top:8px">Відкрито ' + esc(x.created) + ' · остання зміна ' + esc(x.last) + '</div></div>';
+  const acts = [];
+  if (x.state === 'відкритий' && p.boxToWh && x.total > 0) acts.push('<button class="btn" onclick="boxToWhGo()">Передати на склад</button>');
+  if (x.state === 'на складі' && sk) {
+    if (x.total > 0) acts.push('<button class="btn btn2" onclick="boxTakeOpen()">Взяти двигуни з ящика</button>');
+    acts.push('<button class="btn btn2" onclick="boxFromWhGo()">Взяти ящик зі складу</button>');
+  }
+  if (x.total > 0 && p.boxLabel) acts.push('<button class="btn btn2" onclick="act({ action: \'boxLabel\', box: S.box.id }, this)">🖨 Етикетка зараз</button>');
+  if (acts.length || (x.state === 'на складі' && !sk)) h += '<div class="card">' + (acts.length ? '<div class="grid">' + acts.join('') + '</div>' : '') +
+    (x.state === 'на складі' && !sk ? '<p class="muted">Брати двигуни з ящика й забирати ящик зі складу — тим, у кого відкрито склад.</p>'
+      : x.state === 'на складі' ? '<p class="muted">Докласти в ящик можна після «Взяти ящик зі складу» — тоді він з\'явиться на K2 у «Куди пакуємо».</p>'
+      : '<p class="muted">Докладають на K2 партії тієї самої специфікації: «Куди пакуємо» → цей ящик. Етикетку друкують після кожного пакування — дійсна та, де час пізніший.</p>') + '</div>';
+  const live = x.takes.filter(t => t.left > 0);
+  if (x.takes.length) h += '<div class="card"><div class="mid">Видано з ящика</div><div class="list" style="padding:0">' + x.takes.map(t =>
+    '<div class="li"><div>' + t.q + ' шт · ' + bl(t.batch) + (t.ret ? ' · <span class="muted">повернуто ' + t.ret + '</span>' : '') +
+    '<br><span class="muted">' + esc(t.who) + ' · ' + esc(t.time) + (t.comment ? ' · ' + esc(t.comment) : '') + '</span></div>' +
+    '<div class="r">' + (t.left > 0 ? '<b>' + t.left + ' шт</b>' + (sk ? '<br><button class="ic" onclick="boxReturnOpen(\'' + t.id + '\')">↩ Повернути</button>' : '') : '<span class="muted">усе повернуто</span>') + '</div></div>').join('') + '</div>' +
+    (live.length ? '<div class="muted" style="margin-top:8px">Не повернуто: <b>' + live.reduce((a, t) => a + t.left, 0) + ' шт</b> — видано зі складу; куди далі — облік у тому контурі (R&D, тести, продажі)</div>' : '') + '</div>';
+  h += '<details open><summary>Рух ящика (' + x.events.length + ')</summary><div class="list">' + x.events.map((e, k) =>
+    '<div class="li"><div>' + boxEvHtml(e) + '<br><span class="muted">' + esc(e.who) + (e.comment ? ' · ' + esc(e.comment) : '') + '</span></div>' +
+    '<div class="r muted">' + esc(e.time) + (k === 0 && x.canUndo ? '<button class="ic" onclick="boxUndoOpen()">✖</button>' : '') + '</div></div>').join('') + '</div></details>';
+  h += '<p class="muted" style="margin:12px">Скасувати можна тільки останній запис ящика (✖): свій — протягом 15 хв, пізніше — тімлід (зав. складу — дії складу).</p>';
+  $('app').innerHTML = h + '<div style="height:40px"></div>';
+}
+function boxEvHtml(e) {
+  if (e.type === 'крок') return '<b>K2</b> · запаковано <b>' + e.q + ' шт</b> · ' + bl(e.batch) + (e.items && e.items.indexOf('·') >= 0 ? '<br><span class="muted">' + esc(e.items) + '</span>' : '');
+  if (e.type === 'ящик на склад') return '→ передано на склад · ' + e.q + ' шт';
+  if (e.type === 'ящик зі складу') return '← взято зі складу (на виробництво)';
+  if (e.type === 'взято з ящика') return '− взято <b>' + e.q + ' шт</b> · ' + bl(e.batch);
+  if (e.type === 'повернуто в ящик') return '+ повернуто <b>' + e.q + ' шт</b> · ' + bl(e.batch);
+  return esc(e.text || e.type);
+}
+function boxToWhGo() {
+  const x = S.box;
+  confirmBox('Передати ящик ' + x.name + ' (' + x.total + ' шт' + (x.total < x.per ? ', неповний' : '') + ') на склад? Докласти в нього потім можна буде лише після «Взяти ящик зі складу».',
+    () => act({ action: 'boxToWh', box: x.id }, null));
+}
+function boxFromWhGo() {
+  const x = S.box;
+  confirmBox('Взяти ящик ' + x.name + ' зі складу на виробництво? У нього знову можна буде докласти на K2.', () => act({ action: 'boxFromWh', box: x.id }, null));
+}
+function boxTakeOpen() {
+  const x = S.box;
+  openModal('<div class="card"><div class="mid">Взяти двигуни з ящика ' + esc(x.name) + '</div><div class="muted">У ящику ' + x.total + ' шт</div>' +
+    (x.comp.length > 1 ? '<label>З якої партії</label><select id="mbt" data-nocbx><option value="">зверху — остання запакована</option>' +
+      x.comp.map(c => '<option value="' + esc(c[0]) + '">' + esc(c[0]) + ' · ' + c[1] + ' шт</option>').join('') + '</select>' : '') +
+    '<label>Скільки</label>' + numInput('mq', 1) +
+    '<label>Для чого / куди (необов\'язково)</label><input type="text" id="mcm" placeholder="напр. R&D, тести, зразки для продажів">' +
+    '<p class="muted">Прийде нова етикетка ящика — на вашу пошту. Наклейте її замість старої.</p>' +
+    '<div class="err" id="merr"></div><div class="grid" style="margin-top:6px"><button class="btn btn2" onclick="closeModal()">Скасувати</button><button class="btn" id="mgo">Взяти</button></div></div>');
+  $('mgo').onclick = () => act({ action: 'boxTake', box: x.id, batch: $('mbt') ? $('mbt').value : '', qty: $('mq').value, comment: $('mcm').value }, $('mgo'));
+}
+function boxReturnOpen(id) {
+  const x = S.box, t = x.takes.find(z => z.id === id); if (!t) return;
+  openModal('<div class="card"><div class="mid">Повернути в ящик ' + esc(x.name) + '</div><div class="muted">Взято ' + t.q + ' шт (' + esc(t.batch) + ') · ' + esc(t.time) +
+    (t.ret ? ' · уже повернуто ' + t.ret : '') + '</div><label>Скільки повертаєте</label>' + numInput('mq', t.left) +
+    '<label>Коментар (необов\'язково)</label><input type="text" id="mcm">' +
+    '<p class="muted">Двигуни повертаються в ту саму партію й той самий ящик. Прийде нова етикетка — на вашу пошту.</p>' +
+    '<div class="err" id="merr"></div><div class="grid" style="margin-top:6px"><button class="btn btn2" onclick="closeModal()">Скасувати</button><button class="btn" id="mgo">Повернути</button></div></div>');
+  $('mgo').onclick = () => act({ action: 'boxReturn', ref: id, qty: $('mq').value, comment: $('mcm').value }, $('mgo'));
+}
+/** ✖ останнього запису ящика: K2 — як скасування кроку (свій — cancelOwn, тімлід — correct), дії складу — boxUndo */
+function boxUndoOpen() {
+  const x = S.box, e = x.events[0]; if (!e) return;
+  openModal('<div class="card"><div class="mid">Скасувати останній запис ящика?</div><div class="muted">' + boxEvHtml(e) + ' · ' + esc(e.who) + ' · ' + esc(e.time) + '</div>' +
+    (x.lastOwn ? '' : '<label>Причина</label><input type="text" id="mcm">') +
+    (e.type === 'крок' ? '<p class="muted">Двигуни повернуться в партію ' + esc(e.batch) + ' на K2. Прийде нова етикетка ящика з позначкою «після скасування».</p>' : '') +
+    '<div class="err" id="merr"></div><div class="grid" style="margin-top:6px"><button class="btn btn2" onclick="closeModal()">Ні</button><button class="btn btnr" id="mgo">Скасувати запис</button></div></div>');
+  $('mgo').onclick = () => {
+    const cm = $('mcm') ? $('mcm').value : '';
+    if (e.type === 'крок') act(x.lastOwn ? { action: 'cancelOwn', ref: e.id, comment: cm } : { action: 'correct', ref: e.id, cancel: 1, comment: cm }, $('mgo'));
+    else act({ action: 'boxUndo', box: x.id, ref: e.id, comment: cm }, $('mgo'));
+  };
 }
 
 // =============================================================== ACTIONS
@@ -1789,6 +1908,13 @@ const PARTS = ['видача', 'покупні', 'власні'];
 function partsKey(x) { return x.type === 'видача' ? (/^S/i.test(String(x.batch).trim()) ? 'S' : 'R') : (x.comp === 'ротор' ? 'R' : 'S'); }   // v31: S-00012 (і старий ST-00012) — статори
 function plural(n, one, few, many) { const a = Math.abs(n) % 100, b = a % 10; return a > 10 && a < 20 ? many : b === 1 ? one : b >= 2 && b <= 4 ? few : many; }
 /** v47: «M-00005#2:39; M-00006#1:160» → «M-00005 №2 — 39, M-00006 №1 — 160»; один ящик без кількості — «M-00005 №2» */
+/** v57: посилання на картку ящика: «M-00005#2» → «M-00005 №2» */
+function boxNm(id) { const m = String(id || '').match(/^(.+)#(\d+)$/); return m ? m[1] + ' №' + m[2] : String(id || ''); }
+function bxl(id, name) { return '<a class="lnk" href="' + esc(link('bx=' + encodeURIComponent(id))) + '">' + esc(name || boxNm(id)) + '</a>'; }
+/** v57: «Ящики» запису K2 — посилання на ящики з кількістю; склад запису — текстом */
+function boxesLinks(v) { const p = String(v || '').split(' | ');
+  return p[0].split(/\s*;\s*/).filter(Boolean).map(x => { const m = x.match(/^(.+#\d+)(?::(\d+))?$/); return m ? bxl(m[1]) + (m[2] ? ' — ' + m[2] : '') : esc(x); }).join(', ') +
+    (p[1] ? ' · <span class="muted">змішаний: ' + esc(p[1]) + '</span>' : ''); }
 function boxesTxt(v) { const p = String(v || '').split(' | ');
   return p[0].split(/\s*;\s*/).filter(Boolean).map(x => { const m = x.match(/^(.+)#(\d+)(?::(\d+))?$/); return m ? m[1] + ' №' + m[2] + (m[3] ? ' — ' + m[3] : '') : x; }).join(', ') +
     (p[1] ? ' · змішаний: ' + p[1] : ''); }
@@ -1982,7 +2108,7 @@ function renderDash() {
   $('who').innerHTML = whoHtml(d.me, d.perms);
   ZA = []; ZDRAW = [];
   // v35: усі звіти без вкладок (переходи — у меню); «Мій виробіток» — Р-8с (старий dashMy лишається для відповіді без mode — прибрати на етапі 8)
-  let h = d.d === 'stan' ? r2() : d.d === 'motors' ? r11() : d.d === 'tare' ? r5() : d.d === 'out' ? r8() : d.d === 'scrap' ? r10() : d.d === 'batches' ? (d.card ? r7card() : r7()) : d.d === 'control' ? r9() : r8c();
+  let h = d.d === 'stan' ? r2() : d.d === 'motors' ? r11() : d.d === 'boxes' ? r12() : d.d === 'tare' ? r5() : d.d === 'out' ? r8() : d.d === 'scrap' ? r10() : d.d === 'batches' ? (d.card ? r7card() : r7()) : d.d === 'control' ? r9() : r8c();
   h += '<p class="muted" style="text-align:center">Дані на ' + esc(d.now) + (d.me.role === 'адміністратор' ? ' · ' + sec(d.ms) + ' / ' + sec(d.total) + (d.cached ? ' · кеш' : '') + (d.logSrc ? ' · ' + esc(d.logSrc) : '') : '') +
     ' · <a class="lnk" href="javascript:loadDash(1)">оновити</a></p><div style="height:30px"></div>';
   $('app').innerHTML = h;
@@ -3000,6 +3126,40 @@ function r11() {
       : '<p class="muted">' + (D.only === 'unp' ? 'Непарних деталей немає.' : 'Немає партій двигунів за цими фільтрами.') + '</p>') +
     '<p class="muted" style="margin-top:10px">Що робити з непарною деталлю: на картці партії «+ Статори / ротори» — доберіть пару і зберіть двигун знову на F1; ' +
     'якщо пари немає — «✂ Відокремити» залишок. Якщо двигун пішов у брак цілим (не розбирали), виправте запис кроку ✎: «з них брак лише статора / ротора» = 0.</p>');
+  return h;
+}
+
+// ---- v57: Р-12 «Чисті ящики» — ящики ГП на виробництві й на складі (Labels.gs v11, сервер d=boxes)
+const Z12 = { st: 'open', typ: 'all', under: false };
+function r12() {
+  const d = DB, D = Z12;
+  const set = (k, v) => { D[k] = v; if (k !== 'under') D.under = false; renderDash(); };
+  const all = (d.boxes || []).filter(b => b.total > 0 || D.st === 'all');
+  const typs = [...new Set(all.map(b => b.typ))].filter(x => x).sort();
+  const inSt = b => D.st === 'all' || (D.st === 'open' ? b.state === 'відкритий' : b.state === 'на складі');
+  const list = all.filter(b => inSt(b) && (D.typ === 'all' || b.typ === D.typ) && (!D.under || b.total < b.per));
+  const open = (d.boxes || []).filter(b => b.state === 'відкритий' && b.total > 0 && (D.typ === 'all' || b.typ === D.typ));
+  const wh = (d.boxes || []).filter(b => b.state === 'на складі' && b.total > 0 && (D.typ === 'all' || b.typ === D.typ));
+  const under = open.filter(b => b.total < b.per), outN = (d.boxes || []).reduce((a, b) => a + (b.out || 0), 0);
+  const sum = l => l.reduce((a, b) => a + b.total, 0);
+  const stN = { open: 'на виробництві', wh: 'на складі', all: 'усі' };
+  let h = zFbar('r12', stN[D.st] + (D.typ !== 'all' ? ' · ' + D.typ : '') + (D.under ? ' · неповні' : ''), (D.typ !== 'all' ? 1 : 0) + (D.under ? 1 : 0),
+    zChips(D.st, [['open', 'На виробництві'], ['wh', 'На складі'], ['all', 'Усі']], v => set('st', v)) + zSel(D.typ, 'Типорозмір', typs, v => set('typ', v)) +
+    zChips(D.under ? 1 : 0, [[0, 'Усі ящики'], [1, 'Тільки неповні']], v => { D.under = !!v; renderDash(); }));
+  h += '<div class="zkpis">' +
+    zKpi('На виробництві', fn(open.length), 'ящиків', fn(sum(open)) + ' двигунів', 'Ящики, які ще не передали на склад: у них можна докласти на K2 («Куди пакуємо»).', '', zAct(() => { D.st = 'open'; D.under = false; renderDash(); })) +
+    zKpi('Неповні на виробництві', fn(under.length), 'ящиків', under.length ? 'показати ▾' : 'немає', 'Кількість менша за норму вкладення (BOX_QTY) для типорозміру. Норма — підказка, не ліміт.',
+      under.length ? 'kbad' : '', under.length ? zAct(() => { D.st = 'open'; D.under = true; renderDash(); }) : undefined) +
+    zKpi('На складі', fn(wh.length), 'ящиків', fn(sum(wh)) + ' двигунів', 'Передані на склад («Передати на склад»). Склад таких ящиків змінюють лише дії складу.', '', zAct(() => { D.st = 'wh'; D.under = false; renderDash(); })) +
+    (outN ? zKpi('Видано з ящиків', fn(outN), 'шт', 'взято й не повернуто', 'Двигуни, взяті зі складу з ящиків («Взяти двигуни з ящика»). Куди далі — облік у тому контурі.') : '') + '</div>';
+  const red = b => b.total < b.per ? '<b style="color:#9B231A">' + fn(b.total) + '</b>' : '<b>' + fn(b.total) + '</b>';
+  h += '<div class="card"><div class="mid">Ящики</div><div class="muted">' + list.length + ' ' + plural(list.length, 'ящик', 'ящики', 'ящиків') + ' · ' + fn(sum(list)) + ' двигунів · найновіші зміни зверху</div>' +
+    (list.length ? '<div class="tw" style="margin-top:10px"><table class="t"><tr><th>Ящик</th><th>Маркування</th><th class="r">У ящику</th><th class="r">Норма</th><th>Склад</th><th>Де</th><th>Остання зміна</th><th class="r">Видано</th></tr>' +
+      list.map(b => '<tr><td>' + bxl(b.id, b.name) + '</td><td>' + esc(b.mark) + '</td><td class="r">' + red(b) + '</td><td class="r">' + fn(b.per) + '</td><td>' +
+        (b.batches > 1 ? '<span class="pill warn" style="margin:0">' + b.batches + ' партії</span><br><span class="muted">' + esc(b.comp) + '</span>' : esc(b.comp)) + '</td><td>' +
+        (b.state === 'на складі' ? 'на складі' : '<span class="pill warn" style="margin:0">виробництво</span>') + '</td><td>' + esc(b.last) + '</td><td class="r">' + (b.out ? fn(b.out) : '<span class="muted">—</span>') + '</td></tr>').join('') +
+      '</table></div>' : '<p class="muted">Немає ящиків за цими фільтрами.</p>') +
+    '<p class="muted" style="margin-top:10px">Облік ящиків — з 20.10 (ящики з номером у записі K2). Ящик відкривається посиланням: склад, рух, «Передати на склад», дії складу.</p></div>';
   return h;
 }
 
