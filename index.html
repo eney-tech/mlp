@@ -1,5 +1,9 @@
 <!DOCTYPE html>
-<!-- МЛП · index.html v60 · 23.10.2026 — замір часу кожного звернення (разом із мережею), а не лише повільних: до 20 замірів чекають у браузері
+<!-- МЛП · index.html v61 · 23.10.2026 — режим аналітика у звітах (рішення 23.10, Code.gs v64, Reports.gs v27): право baMode (поки адміністратор);
+     перемикач «🏷 Індекси: вкл / викл» унизу звіту (пам'ятає пристрій). Увімкнено — у кутку кожного блоку звіту індекс (Р-8_04 тощо, як у прототипі
+     звітів); натискання копіює контекст блоку: індекс і назву, звіт і адресу, фільтри, версії коду, час даних і що зараз видно в блоці.
+     Індекси — таблиця BAIX (фільтри _01, картки _02, згорнуті блоки — за ключем, картки — за назвою); блок без індексу — «?».
+     v60 · 23.10.2026 — замір часу кожного звернення (разом із мережею), а не лише повільних: до 20 замірів чекають у браузері
      й ідуть на сервер наступним запитом (pf — масив) → аркуш «Швидкодія» (Snap.gs v2), щоб порахувати середній час.
      v59 · 23.10.2026 — швидкодія й видимий запис (Code.gs v63, Snap.gs v1): плашка на весь екран «Зберігаю… N с» на час запису
      (крок, склад, ретро, підтвердження): натискання під нею не проходять, підказка змінюється з часом («у черзі», «не оновлюйте»), оновлення
@@ -158,6 +162,14 @@
   /* v35: Р-8с «Мій виробіток» — період, графік, групування, калькулятор, 👁 */
   .zban{margin:12px;background:#FFF1D6;color:#5C3D00;border-radius:12px;padding:10px 12px;display:flex;flex-wrap:wrap;gap:8px;align-items:center;font-size:14px}
   .zban select{width:auto;font-size:15px;padding:7px 9px;min-height:0}
+  /* v61: режим аналітика — індекси блоків звітів (baTag) */
+  body.ba #app>.zfbar,body.ba #app>.zkpis,body.ba #app>.card,body.ba #app>details.zfold,body.ba #app>.zban{position:relative}
+  body.ba #app>.card>.mid,body.ba #app>details.zfold>summary,body.ba #app>.zfbar>summary,body.ba #app>.zban{padding-right:84px}
+  body.ba #app>.zkpis{margin-top:22px}
+  .baix{position:absolute;top:6px;right:8px;z-index:3;font:600 11px/1.6 ui-monospace,Menlo,Consolas,monospace;background:#FFF1D6;color:#8A5A00;
+    border:1px dashed #8A5A00;border-radius:6px;padding:0 6px;cursor:copy;white-space:nowrap;user-select:none}
+  .baix.unk{background:#FDE3E1;color:#B3261E;border-color:#B3261E}
+  body.ba #app>.zkpis>.baix{top:-19px;right:2px}
   .znav{display:flex;align-items:center;gap:6px}.znav b{font-size:15px;white-space:nowrap}
   .zctl select{width:auto;font-size:15px;padding:7px 9px;min-height:0}
   .zfrow input.zdate,input.zdate{width:auto;flex:0 0 auto;font-size:15px;padding:7px 8px;min-height:0;font-size:15px;padding:7px 8px;border:1px solid #C5D0D7;border-radius:10px;background:#fff;color:#1D2B33;font-family:inherit}
@@ -358,7 +370,7 @@
 <div class="net" id="net" role="alert" aria-live="assertive"><div class="nb"><div class="sp"></div><div class="nt" id="nett">Зберігаю…</div><div class="ns" id="nets"></div><div class="nh" id="neth"></div><button class="nx" id="netx" type="button">Не чекати</button></div></div>
 
 <script>
-const PAGE_VERSION = 'index.html v60 · 23.10.2026';
+const PAGE_VERSION = 'index.html v61 · 23.10.2026';
 /** v46: куди прийдуть етикетки K2 — адреси друку (K2_LABEL_EMAILS), якщо задані; інакше — пошта працівника */
 function k2To() { const t = (S.k2 && S.k2.to) || []; return t.length ? t.join(', ') + ' (принтер етикеток)' : (S.me ? S.me.email : ''); }
 const API = 'https://script.google.com/macros/s/AKfycbx-JUajnAtVsxaLHDgwRpfzE12g4LUtlf6JnWYAQScAVZ5FCpxzGHSrA5PDESqP80KD/exec';
@@ -2286,10 +2298,93 @@ function renderDash() {
   // v35: усі звіти без вкладок (переходи — у меню); «Мій виробіток» — Р-8с (старий dashMy лишається для відповіді без mode — прибрати на етапі 8)
   let h = d.d === 'stan' ? r2() : d.d === 'motors' ? r11() : d.d === 'boxes' ? r12() : d.d === 'tare' ? r5() : d.d === 'out' ? r8() : d.d === 'scrap' ? r10() : d.d === 'batches' ? (d.card ? r7card() : r7()) : d.d === 'control' ? r9() : r8c();
   h += '<p class="muted" style="text-align:center">Дані на ' + esc(d.now) + (d.me.role === 'адміністратор' ? ' · ' + sec(d.ms) + ' / ' + sec(d.total) + (d.cached ? ' · кеш' : '') + (d.logSrc ? ' · ' + esc(d.logSrc) : '') : '') +
-    ' · <a class="lnk" href="javascript:loadDash(1)">оновити</a></p><div style="height:30px"></div>';
+    ' · <a class="lnk" href="javascript:loadDash(1)">оновити</a>' +
+    ((d.perms || {}).baMode ? ' · <a class="lnk" href="javascript:baToggle()">🏷 Індекси: ' + (baOn() ? 'вимкнути' : 'увімкнути') + '</a>' : '') +   // v61
+    '</p><div style="height:30px"></div>';
   $('app').innerHTML = h;
+  try { baTag(); } catch (e) { document.body.classList.remove('ba'); }   // v61: режим аналітика — помилка тут не ламає звіт
   ZDRAW.forEach(f => f());
   zAfter();
+}
+// =============================================================== v61: РЕЖИМ АНАЛІТИКА — індекси блоків звітів і «копіювати контекст»
+// Право baMode (Code.gs v64, поки — адміністратор). Вкл / викл — посилання «🏷 Індекси» унизу звіту, пам'ятає цей пристрій (mlp_ba).
+// Індекс ставиться на блоки верхнього рівня звіту: фільтри — _01, картки показників — _02, згорнуті блоки — за ключем zFold, картки — за назвою.
+// Індекси — як у прототипі звітів (Р-8_04 тощо); нові блоки без індексу показують «?» — додати в BAIX.
+const BAIX = {
+  'Р-2': { f: { r2_04: 'Р-2_04', r2_05: 'Р-2_05', r2_11: 'Р-2_11' }, c: {} },
+  'Р-11': { f: { r11_01: 'Р-11_03' }, c: {} },
+  'Р-12': { f: {}, c: { 'Ящики': 'Р-12_03' } },
+  'Р-5': { f: { r5_04: 'Р-5_04' }, c: { 'Тара без руху': 'Р-5_05', 'Тара за типами': 'Р-5_03' } },
+  'Р-7': { f: { r7idle: 'Р-7_12', r7lead: 'Р-7_04', r7wait: 'Р-7_05', r7tbl: 'Р-7_06', r7recs: 'Р-7_07' }, c: { 'Пройшли маршрут': 'Р-7_03', 'Шлях партії': 'Р-7_07', '': 'Р-7_07' } },
+  'Р-8': { f: { r8w: 'Р-8_05', r8s: 'Р-8_05', r8r: 'Р-8_12', r8f: 'Р-8_13', r8m: 'Р-8_06' }, c: { 'Виробіток за': 'Р-8_04', 'Випуск за': 'Р-8_04' } },
+  'Р-10': { f: { r10s: 'Р-10_03', r10r: 'Р-10_06', r10m: 'Р-10_05' }, c: { 'Брак у часі': 'Р-10_04' } },
+  'Р-9': { f: { r9fl: 'Р-9_04', r9by: 'Р-9_05', r9log: 'Р-9_06', r9form: 'Р-9_07' }, c: { 'Виправлення, скасування': 'Р-9_03' } },
+  'Р-8с': { f: { works: 'Р-8с_03', calc: 'Р-8с_05', nb: 'Р-8с_07' }, c: { 'За годинами': 'Р-8с_09', 'За днями': 'Р-8с_09', '': 'Р-8с_08' } }
+};
+let BAITEMS = [];
+function baOn() { return !!(DB && DB.perms && DB.perms.baMode) && store('mlp_ba') === '1'; }
+function baToggle() { store('mlp_ba', store('mlp_ba') === '1' ? null : '1'); renderDash(); toast(baOn() ? 'Індекси увімкнено: натисніть індекс — скопіюється контекст блоку' : 'Індекси вимкнено'); }
+const baTxt = el => (el ? el.innerText || el.textContent || '' : '').replace(/[ \t]+/g, ' ').replace(/\s*\n\s*/g, '\n').trim();
+/** Індекс і назва блоку верхнього рівня (el — дочірній елемент #app) */
+function baIdOf(el, code) {
+  const M = BAIX[code] || { f: {}, c: {} };
+  if (el.classList.contains('zfbar')) return { id: code + '_01', t: 'Фільтри' };
+  if (el.classList.contains('zkpis')) return { id: code === 'Р-7' && DB.card ? 'Р-7_07' : code + '_02', t: 'Картки показників' };
+  if (el.classList.contains('zban')) return { id: 'Р-0_08', t: 'Перегляд як працівник' };
+  if (el.matches('details.zfold')) {
+    const k = (el.id || '').replace(/^zf_/, ''), sm = el.querySelector(':scope>summary'), cn = sm && sm.querySelector('.cnt');
+    const t = baTxt(sm).replace(cn ? baTxt(cn) : '\u0000', '').trim();
+    return { id: M.f[k] || '', t: t, key: k };
+  }
+  if (el.classList.contains('card')) {
+    const t = baTxt(el.querySelector(':scope>.mid'));
+    const hit = Object.keys(M.c).filter(p => p ? t.indexOf(p) === 0 : !t).sort((a, b) => b.length - a.length)[0];
+    return { id: hit !== undefined ? M.c[hit] : '', t: t || (code === 'Р-7' && DB.card ? 'Картка партії' : '(без назви)') };
+  }
+  return null;
+}
+/** Ставить індекси на блоки звіту, якщо режим аналітика увімкнено */
+function baTag() {
+  const on = baOn(); document.body.classList.toggle('ba', on); BAITEMS = [];
+  if (!on) return;
+  const code = (DASHT[DB.d] || ['?'])[0];
+  [...$('app').children].forEach(el => {
+    const x = baIdOf(el, code); if (!x) return;
+    const i = BAITEMS.push({ el: el, id: x.id, t: x.t, key: x.key, code: code }) - 1;
+    const b = document.createElement('span'); b.className = 'baix' + (x.id ? '' : ' unk'); b.textContent = x.id || code + ' ?';
+    b.title = 'Натисніть — скопіювати контекст блоку для Claude'; b.setAttribute('role', 'button');
+    b.addEventListener('click', e => { e.preventDefault(); e.stopPropagation(); baCopy(i); });
+    let host = el.matches('details') ? el.querySelector(':scope>summary') : el;   // у згорнутому блоці — у заголовку, інакше не видно
+    if (host && host !== el && getComputedStyle(host).display === 'none') host = el.querySelector(':scope>.zfrow') || el;   // фільтри на ПК: заголовка немає
+    host.insertBefore(b, host.firstChild);
+  });
+}
+/** Текст для чату: індекс, назва, звіт, адреса, фільтри, версії, час даних і що видно в блоці */
+function baCopy(i) {
+  const it = BAITEMS[i]; if (!it) return;
+  const d = DB, rep = DASHT[d.d] || ['?', '?'];
+  const fb = $('app').querySelector(':scope>.zfbar'), ch = $('app').querySelector(':scope>.zchiprow');
+  const sum = fb && fb.querySelector('summary>span');
+  const filt = [sum ? baTxt(sum).replace(/^⚙\s*Фільтри\s*·\s*/, '') : ''].concat(ch ? [...ch.querySelectorAll('.chip')].map(c => baTxt(c).replace(/✕/g, '').trim()) : []).filter(Boolean).join(' · ');
+  const clone = it.el.cloneNode(true); clone.querySelectorAll('.baix,svg,select,script,summary').forEach(n => n.remove());
+  const m = clone.querySelector(':scope>.mid'); if (m) m.remove();
+  let seen = it.el.classList.contains('zkpis') ? [...clone.querySelectorAll('.zkpi')].map(k => baTxt(k).replace(/\n/g, ' ')).join(' | ') : baTxt(clone);
+  if (it.el.classList.contains('zfbar')) seen = '';
+  else if (it.el.matches('details') && !it.el.open) seen = '(блок згорнуто — розгорніть, щоб скопіювати і вміст)';
+  if (seen.length > 900) seen = seen.slice(0, 900) + ' …';
+  const txt = ['[МЛП · ' + (it.id || rep[0] + ' без індексу') + '] ' + it.t,
+    'Звіт: ' + rep[0] + ' «' + rep[1] + '» · ' + (location.search || '?d=' + d.d) + (it.key ? ' · блок ' + it.key : ''),
+    filt ? 'Фільтри: ' + filt : '',
+    'Версії: ' + [PAGE_VERSION].concat(d.ver || []).join(' · '),
+    'Дані на ' + d.now + ' · ' + (d.me ? d.me.name + ' (' + d.me.role + ')' : ''),
+    seen ? 'Видно: ' + seen : ''].filter(Boolean).join('\n');
+  baClip(txt, () => toast('Скопійовано: ' + (it.id || rep[0] + ' ?') + ' — вставте в чат'));
+}
+function baClip(txt, done) {
+  const fb = () => { const ta = document.createElement('textarea'); ta.value = txt; ta.setAttribute('readonly', ''); ta.style.position = 'fixed'; ta.style.top = '-1000px';
+    document.body.appendChild(ta); ta.select(); let ok = false; try { ok = document.execCommand('copy'); } catch (e) { } ta.remove();
+    if (ok) done(); else openModal('<div class="mid">Скопіюйте вручну</div><textarea style="width:100%;height:220px;font-size:13px" readonly>' + esc(txt) + '</textarea><button type="button" class="btn" onclick="closeModal()">Закрити</button>'); };
+  try { if (navigator.clipboard && window.isSecureContext) navigator.clipboard.writeText(txt).then(done, fb); else fb(); } catch (e) { fb(); }
 }
 let ZRSZ = 0; window.addEventListener('resize', () => { clearTimeout(ZRSZ); ZRSZ = setTimeout(() => ZDRAW.forEach(f => f()), 200); });
 
