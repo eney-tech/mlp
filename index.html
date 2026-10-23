@@ -370,7 +370,7 @@
 <div class="net" id="net" role="alert" aria-live="assertive"><div class="nb"><div class="sp"></div><div class="nt" id="nett">Зберігаю…</div><div class="ns" id="nets"></div><div class="nh" id="neth"></div><button class="nx" id="netx" type="button">Не чекати</button></div></div>
 
 <script>
-const PAGE_VERSION = 'index.html v61 · 23.10.2026';
+const PAGE_VERSION = 'index.html v62 · 23.10.2026';   // v62: партії залишків, «✂» — тара або номер партії, партія на склад / зі складу (Code.gs v65)
 /** v46: куди прийдуть етикетки K2 — адреси друку (K2_LABEL_EMAILS), якщо задані; інакше — пошта працівника */
 function k2To() { const t = (S.k2 && S.k2.to) || []; return t.length ? t.join(', ') + ' (принтер етикеток)' : (S.me ? S.me.email : ''); }
 const API = 'https://script.google.com/macros/s/AKfycbx-JUajnAtVsxaLHDgwRpfzE12g4LUtlf6JnWYAQScAVZ5FCpxzGHSrA5PDESqP80KD/exec';
@@ -823,7 +823,7 @@ function tarePicker(id, types) {
   return '<div class="row"><select id="' + id + 't" data-nocbx style="flex:0 0 38%">' + opts(types) + '</select>' +
     '<input type="number" inputmode="numeric" id="' + id + 'n" placeholder="номер"></div>';
 }
-function tareVal(id) { const n = $(id + 'n').value; return n ? $(id + 't').value + '-' + n : ''; }
+function tareVal(id) { const n = $(id + 'n').value; if (!n) return ''; const t = $(id + 't').value; const m = /^партія (\S)/.exec(t); return m ? m[1] + '-' + n : t + '-' + n; }   // v62: «партія M / S / R» → номер партії
 
 // =============================================================== RENDER
 function render(extra) {
@@ -1358,7 +1358,8 @@ function compRedraw(k, p) {
     const c = compCtx(p); const list = readyFor(k, c);
     const tr = r => r.tare ? r.tare + (r.tare2 ? ' + ' + r.tare2 : '') : 'без тари';
     h = '<label>Тара або номер партії ' + st + '</label><select id="' + p + 'sel"><option value="">— без номера (старий запас) —</option>' +
-      list.map(r => '<option value="' + esc(r.no) + '">' + esc(tr(r) + ' · ' + r.no + (r.kv ? ' · KV ' + r.kv : '') + ' · ' + r.qty + ' шт') + '</option>').join('') + '</select>' +
+      list.map(r => '<option value="' + esc(r.no) + '">' + esc((r.left ? '♻ ' : '') + tr(r) + ' · ' + r.no + (r.kv ? ' · KV ' + r.kv : '') + ' · ' + r.qty + ' шт' +
+        (r.ver === 'в1' ? ' · в1' : '') + (r.left ? ' · залишки' : '') + (r.wh ? ' · 📦 склад ' + r.wh : '')) + '</option>').join('') + '</select>' +   // v62
       '<div id="' + p + 'info" class="muted" style="margin-top:6px;min-height:18px">' + (list.length ? 'Лише готові партії ' + esc(st + ' ' + (c.typ || '')) + (c.kv ? ' KV ' + esc(c.kv) : '') + '.'
         : 'Готових партій ' + esc(st + ' ' + (c.typ || '')) + (c.kv ? ' KV ' + esc(c.kv) : '') + ' немає — «без номера» або «Пізніше».') + '</div>';
   }
@@ -1488,6 +1489,7 @@ function renderBatch(extra) {
     '<span class="pill">' + esc(i['Типорозмір']) + '</span>' + (i['KV'] ? '<span class="pill">KV ' + esc(i['KV']) + '</span>' : '') +
     (i['Варіант'] ? '<span class="pill">' + esc(i['Варіант']) + '</span>' : '') + (i['Колір'] ? '<span class="pill">🎨 ' + esc(i['Колір']) + '</span>' : '') + (b.comp && b.comp.mixed ? '<span class="pill warn">змішане походження</span>' : '') + statusPill(b.status) +
     (i['Змішана'] === 'так' ? '<span class="pill warn">змішана</span>' : '') + (i['Призначення'] ? '<span class="pill warn">' + esc(i['Призначення']) + '</span>' : '') +
+    (i['Залишки'] === 'так' ? '<span class="pill">ящик залишків</span>' : '') + (i['Склад'] ? '<span class="pill warn">📦 на складі ' + esc(i['Склад']) + '</span>' : '') +   // v62
     '<div class="muted" style="margin-top:10px">Є зараз: <b>' + b.remaining + ' шт</b> · брак: ' + b.scrapAll + (b.issued ? ' · видано: ' + b.issued : '') + '</div>' +
     histLinks(i) +   // v42: фото паперового листа попередніх кроків
     '<div class="stepbar">' + b.route.map(s => '<span class="' + (s.code === pre ? 'n' : tails.indexOf(s) >= 0 ? 'w' : (s.skip && s.good === s.skip && !s.scrap ? 's' : s.good + s.scrap > 0 && s.avail === 0 ? 'd' : altSkipped(b, s) ? 's' : '')) + '"' + (s.skip ? ' title="пропущено ' + s.skip + ' шт"' : '') +
@@ -1516,6 +1518,12 @@ function renderBatch(extra) {
     h += '<div class="card muted">Партія: ' + esc(b.status) + '. Записи неможливі.</div>';
   } else if (i['Призначення']) {
     h += '<div class="card muted">Партія поза маршрутом (' + esc(i['Призначення']) + '): кроки не записуються.</div>';
+  } else if (i['Склад']) {   // v62: партія на складі — кроки не записуються
+    h += '<div class="card"><div class="mid">📦 Партія на складі ' + esc(i['Склад']) + '</div><div class="muted">Кроки не записуються. Щоб продовжити роботу — «↩ Повернути зі складу».' +
+      (stream !== 'MT' && (b.status === 'готово' || b.status === 'видано частково') ? ' Брати деталі на збирання можна й зі складу: «+ Статори / ротори» на картці партії двигунів.' : '') + '</div></div>';
+  } else if (i['Залишки'] === 'так' && (b.status === 'готово' || b.status === 'видано частково')) {   // v62
+    h += '<div class="card"><div class="mid">Ящик залишків</div><div class="muted">Тут лежать ' + (stream === 'ST' ? 'статори' : 'ротори') + ' ' + esc(i['Варіант'] || '') +
+      ', що лишились без пари. Взяти на збирання — «+ Статори / ротори» на картці партії двигунів (вкажіть цю тару або ' + esc(i['Номер']) + '). Покласти сюди — «✂» на картці партії двигунів. 1 ящик = 1 версія.</div></div>';
   } else if (p.step && avail.length) {
     h += '<div class="card"><div class="mid">Додати крок</div>' + onbHtml() +
       '<label>Крок</label><select id="stp">' + b.route.map(s => '<option value="' + esc(s.code) + '"' + (s.avail && !s.blockedBy ? '' : ' disabled') + (s.code === pre ? ' selected' : '') + '>' +
@@ -1546,6 +1554,8 @@ function renderBatch(extra) {
     if (isQC) acts.push(['addQC', '↩ Повернути з відбраковки', '']);   // v19; v58: у зав. відділу якості — і «+ Додати», як у тімліда
   }
   if (p.setColor && (stream === 'ST' || stream === 'RT') && b.status !== 'анульовано') acts.push(['color', '🎨 Колір', '']);   // v21
+  if (p.batchToWh && (b.tares || []).length && ['закрито', 'анульовано'].indexOf(b.status) < 0) acts.push(['toWh', i['Склад'] ? '📦 На інший склад' : '📦 На склад', '']);   // v62
+  if (p.batchFromWh && i['Склад'] && ['закрито', 'анульовано'].indexOf(b.status) < 0) acts.push(['fromWh', '↩ Повернути зі складу', '']);
   if (p.free && S.tare) acts.push(['free', 'Звільнити тару', '']);
   if (p.history) acts.push(['history', '🕘 Повна історія', '']);
   if (p.annul && b.status !== 'анульовано' && b.status !== 'закрито') acts.push(['annul', '✖ Анулювати', 'btnr']);
@@ -1576,6 +1586,8 @@ function renderBatch(extra) {
     if (x.type === 'вибуття') what = (x.purpose === S.qc ? 'взято на відбраковку ' + x.qty + ' шт' : 'вибуло ' + x.qty + ' шт → <b>' + esc(x.purpose) + '</b>') + ' · ' + esc(x.product);
     if (x.type === 'додавання') what = x.purpose === S.qc ? '↩ повернуто з відбраковки ' + x.qty + ' шт · ' + esc(x.product)   // v19
       : '+ додано ' + x.qty + ' шт · ' + esc(x.product) + ' · звідки: <b>' + esc(x.purpose) + '</b>';   // v17
+    if (x.type === 'партія на склад') what = '📦 на склад <b>' + esc(x.d2) + '</b>' + (x.d1 && x.d1 !== 'виробництво' ? ' (зі складу ' + esc(x.d1) + ')' : '') + ' · ' + x.qty + ' шт';   // v62
+    if (x.type === 'партія зі складу') what = '↩ зі складу ' + esc(x.d2) + ' на виробництво';
     if (x.type === 'ящик на склад') what = '📦 ' + bxl(x.boxes) + ' передано на склад · ' + x.qty + ' шт';   // v57: дії з ящиком
     if (x.type === 'ящик зі складу') what = '📦 ' + bxl(x.boxes) + ' взято зі складу · ' + x.qty + ' шт';
     if (x.type === 'взято з ящика') what = '📦 взято з ящика ' + bxl(x.boxes) + ' · ' + x.qty + ' шт';
@@ -1961,7 +1973,7 @@ function openAct(a) {
       '<label>Що відокремлюєте</label>' + st.map((x, k) => '<label class="opt"><input type="radio" name="stg" value="' + k + '"' + (k === 0 ? ' checked' : '') + '>' +
         '<b>' + x.qty + ' шт</b> · ' + esc(x.name) + ' <span class="muted">(' + (x.left ? 'без пари або ще не в двигунах' + (x.ver ? ' · ' + esc(x.ver) : '') : x.done ? 'усі кроки пройдено' : 'чекає ' + esc(x.wait)) + ')</span></label>').join('') +
       '<label>Куди</label><div class="seg wrap" id="dstBox"></div>' +
-      '<div id="sepTare"><p class="muted" id="sepTareTxt"></p>' + tarePicker('tg', ['КР', 'СК', 'ПД', 'ТЧ']) + '</div>' +
+      '<div id="sepTare"><p class="muted" id="sepTareTxt"></p>' + tarePicker('tg', ['КР', 'СК', 'ПД', 'ТЧ', 'партія M', 'партія S', 'партія R']) + '<div id="sepVer"></div></div>' +
       '<p class="muted" id="sepExit" style="display:none">Деталі виходять із виробничого циклу партії. У журнал запишеться, що саме вибуло і куди. Тара не потрібна.</p>' +
       '<label id="mqL">Кількість, шт</label>' + numInput('mq', '') +
       '<label id="cmL">Причина / коментар</label><input type="text" id="mcm">' + foot);
@@ -1970,18 +1982,24 @@ function openAct(a) {
     const drawDst = o => {
       const left = !!(o && o.left);
       const list = qc ? [[S.qc, 'Взяли на відбраковку']]
-        : left ? [['tare', 'В іншу партію MT']].concat((lead ? purp : ['годний залишок']).map(x => [x, qcName(x)]))
-        : [['tare', 'За маршрутом, у тару']].concat(purp.filter(x => x !== 'годний залишок').map(x => [x, qcName(x)]));
+        : left ? [['tare', 'В іншу партію / тару']].concat((lead ? purp : []).map(x => [x, qcName(x)]))   // v62: «годний залишок» прибрано (Code.gs v65)
+        : [['tare', 'За маршрутом — тара або партія']].concat(purp.map(x => [x, qcName(x)]));
       $('dstBox').innerHTML = list.map((x, k) => '<label><input type="radio" name="dst" value="' + esc(x[0]) + '"' + (k === 0 ? ' checked' : '') + '><span style="font-size:15px">' + esc(x[1]) + '</span></label>').join('');
-      $('sepTareTxt').textContent = left ? 'Тара, де лежить інша партія двигунів (MT) у роботі — того самого типорозміру і KV.'
-        : 'Вільна тара → нова партія з новим номером. Зайнята тара → деталі додадуться до партії в ній (стане «змішаною»).';
-      const tt = $('tgt'); if (tt) tt.innerHTML = opts(left ? ['ТЧ', 'КР'] : ['КР', 'СК', 'ПД', 'ТЧ']);
+      $('sepTareTxt').textContent = left ? 'Тара або номер партії: інша партія двигунів (MT) у роботі або ящик залишків ' + (o.left === 'S' ? 'статорів' : 'роторів') +
+          ' (той самий типорозмір, KV і версія). Вільна тара — нова партія залишків (створює тімлід).'
+        : 'Вільна тара → нова партія з новим номером. Зайнята тара або номер партії → деталі додадуться до неї (стане «змішаною»).';
+      const tt = $('tgt'); if (tt) tt.innerHTML = opts(left ? ['КР', 'ТЧ', 'СК', 'партія M', 'партія ' + o.left] : ['КР', 'СК', 'ПД', 'ТЧ', 'партія M', 'партія S', 'партія R']);
+      // v62: у партії і в1, і в2 цієї деталі — версію залишку вказують (1 ящик залишків = 1 версія)
+      const c = left && S.batch.comp ? S.batch.comp[o.left] || {} : {};
+      $('sepVer').innerHTML = c.v1 > 0 && c.v2 > 0 ? '<label>Версія залишку</label><div class="seg"><label><input type="radio" name="mver" value="в2"><span>в2 · наші</span></label>' +
+        '<label><input type="radio" name="mver" value="в1"><span>в1 · покупні</span></label></div>' : '';
       document.querySelectorAll('input[name=dst]').forEach(r => r.onchange = upd);
       if (left && !$('mq').value) $('mq').value = o.qty;
     };
     const upd = () => {
       const o = st[Number(g('stg'))] || {};
-      if (lastLeft !== !!o.left) { lastLeft = !!o.left; drawDst(o); }
+      const ok = (o.stage || '') + '|' + (o.wait || '');   // v62: інша деталь (статори / ротори) — інший список тари й версії
+      if (lastLeft !== ok) { lastLeft = ok; drawDst(o); }
       const d = g('dst');
       $('mqL').textContent = 'Кількість, шт' + (o.qty ? ' (до ' + o.qty + ')' : '');
       $('sepTare').style.display = d === 'tare' ? 'block' : 'none'; $('sepExit').style.display = d === 'tare' ? 'none' : 'block';
@@ -1992,8 +2010,23 @@ function openAct(a) {
       const o = st[Number(g('stg'))]; const d = g('dst');
       if (!o) { $('merr').textContent = 'Оберіть, що відокремлюєте'; return; }
       act({ action: 'separate', batch: no, stage: o.stage, wait: o.wait, qty: $('mq').value, mode: d === 'tare' ? 'tare' : 'exit',
-        target: d === 'tare' ? tareVal('tg') : '', purpose: d === 'tare' ? '' : d, comment: $('mcm').value }, $('mgo'));
+        target: d === 'tare' ? tareVal('tg') : '', purpose: d === 'tare' ? '' : d, comment: $('mcm').value, ver: g('mver') }, $('mgo'));
     };
+  }
+  if (a === 'toWh') {   // v62: партія (тара) на склад або між складами
+    const b = S.batch, i = b.info, locs = (b.whLocs || []).filter(l => l.code !== i['Склад']);
+    if (!locs.length) { toast('Немає локацій складу — зверніться до зав. складу', true); return; }
+    const tt = (b.tares || []).map(x => x.code).join(' + ');
+    openModal(head(i['Склад'] ? '📦 На інший склад' : '📦 Перемістити на склад') +
+      '<p class="muted">Тара ' + esc(tt) + ' з партією' + (i['Склад'] ? ' зараз на складі ' + esc(i['Склад']) : '') + '. Поки партія на складі, кроки не записуються; брати з неї деталі можна — запис піде і в журнал складу.</p>' +
+      '<label>Локація складу</label><select id="mwh">' + locs.map(l => '<option value="' + esc(l.code) + '"' + (l.code === b.whDef ? ' selected' : '') + '>' +
+        esc(l.code + (l.name && l.name !== l.code ? ' · ' + l.name : '')) + '</option>').join('') + '</select>' +
+      '<label>Коментар (необов\'язково)</label><input type="text" id="mcm">' + foot);
+    $('mgo').onclick = () => act({ action: 'batchToWh', batch: no, loc: $('mwh').value, comment: $('mcm').value }, $('mgo'));
+  }
+  if (a === 'fromWh') {
+    confirmBox('Повернути ' + no + ' зі складу ' + (S.batch.info['Склад'] || '') + ' на виробництво?', () => act({ action: 'batchFromWh', batch: no }, null));
+    return;
   }
   if (a === 'color') {   // v21: тімлід і вище — колір партії
     openModal(head('🎨 Колір партії') + colorField('mcl', S.batch.info['Потік'], S.batch.info['Колір']) + '<label>Коментар (необов\'язково)</label><input type="text" id="mcm">' + foot);
