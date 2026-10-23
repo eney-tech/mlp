@@ -1,5 +1,7 @@
 <!DOCTYPE html>
-<!-- МЛП · index.html v59 · 23.10.2026 — швидкодія й видимий запис (Code.gs v63, Snap.gs v1): плашка на весь екран «Зберігаю… N с» на час запису
+<!-- МЛП · index.html v60 · 23.10.2026 — замір часу кожного звернення (разом із мережею), а не лише повільних: до 20 замірів чекають у браузері
+     й ідуть на сервер наступним запитом (pf — масив) → аркуш «Швидкодія» (Snap.gs v2), щоб порахувати середній час.
+     v59 · 23.10.2026 — швидкодія й видимий запис (Code.gs v63, Snap.gs v1): плашка на весь екран «Зберігаю… N с» на час запису
      (крок, склад, ретро, підтвердження): натискання під нею не проходять, підказка змінюється з часом («у черзі», «не оновлюйте»), оновлення
      сторінки — з попередженням браузера. Відкриття екрана довше 0,7 с — та сама плашка «Відкриваю…». Кожне натискання «Записати» має номер
      (rid): якщо сторінку оновили / закрили посеред запису або обірвався зв'язок — сторінка питає сервер (?api=rid), чи дійшов запис,
@@ -356,7 +358,7 @@
 <div class="net" id="net" role="alert" aria-live="assertive"><div class="nb"><div class="sp"></div><div class="nt" id="nett">Зберігаю…</div><div class="ns" id="nets"></div><div class="nh" id="neth"></div><button class="nx" id="netx" type="button">Не чекати</button></div></div>
 
 <script>
-const PAGE_VERSION = 'index.html v59 · 23.10.2026';
+const PAGE_VERSION = 'index.html v60 · 23.10.2026';
 /** v46: куди прийдуть етикетки K2 — адреси друку (K2_LABEL_EMAILS), якщо задані; інакше — пошта працівника */
 function k2To() { const t = (S.k2 && S.k2.to) || []; return t.length ? t.join(', ') + ' (принтер етикеток)' : (S.me ? S.me.email : ''); }
 const API = 'https://script.google.com/macros/s/AKfycbx-JUajnAtVsxaLHDgwRpfzE12g4LUtlf6JnWYAQScAVZ5FCpxzGHSrA5PDESqP80KD/exec';
@@ -402,9 +404,14 @@ function netStart(api, q) {
 function netEnd(tk, j) {
   NET.list = NET.list.filter(x => x !== tk);
   const ms = Date.now() - tk.t0, q = tk.q || {};
-  // повільне звернення (разом із мережею) — повідомити серверу наступним запитом
-  if (ms > 10000 && tk.api !== 'rid') store('mlp_pf', JSON.stringify({ a: q.action || q.op || tk.api, api: tk.api, ms: ms, at: Date.now(),
-    sv: j && j.data && j.data.ms ? j.data.ms : '', ref: q.batch || q.b || q.t || q.tare || q.bx || '', r: j ? (j.ok ? 'ок' : 'помилка: ' + String(j.error || '').slice(0, 80)) : 'немає зв\'язку' }));
+  // v60: час кожного звернення (разом із мережею) — серверу наступним запитом (до 20 замірів у черзі браузера)
+  if (tk.api !== 'rid') {
+    let a = []; try { a = JSON.parse(store('mlp_pf') || '[]'); } catch (e) { a = []; }
+    if (!Array.isArray(a)) a = [a];
+    a.push({ a: q.action || q.op || tk.api, api: tk.api, ms: ms, at: Date.now(), sv: j && j.data && j.data.ms ? j.data.ms : '',
+      ref: q.batch || q.b || q.t || q.tare || q.bx || '', r: j ? (j.ok ? 'ок' : 'помилка: ' + String(j.error || '').slice(0, 80)) : 'немає зв\'язку' });
+    store('mlp_pf', JSON.stringify(a.slice(-20)));
+  }
   if (!NET.list.length && !NET.chk) { clearInterval(NET.timer); NET.timer = null; }
   netDraw();
 }
@@ -412,7 +419,7 @@ function netPf(api, q) {
   if (api === 'rid' || !q || typeof q !== 'object') return q;
   const pf = store('mlp_pf'); if (!pf) return q;
   store('mlp_pf', null);
-  try { return Object.assign({}, q, { pf: JSON.parse(pf) }); } catch (e) { return q; }
+  try { const a = JSON.parse(pf); return Object.assign({}, q, { pf: Array.isArray(a) ? a : [a] }); } catch (e) { return q; }
 }
 /** Обробник відповіді: помилка в ньому — на екран, а не «немає зв'язку» */
 function netDeliver(f) { try { f(); } catch (x) { console.error(x); toast('Помилка сторінки: ' + (x && x.message || x) + '. Оновіть сторінку', true); } }
