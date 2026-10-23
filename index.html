@@ -1,5 +1,11 @@
 <!DOCTYPE html>
-<!-- МЛП · index.html v58 · 23.10.2026 — рішення 23.10 (Code.gs v62, Labels.gs v12, Sklad.gs v7, Reports.gs v25): роль «зав. відділу якості» (QC_ROLE) — у списках
+<!-- МЛП · index.html v59 · 23.10.2026 — швидкодія й видимий запис (Code.gs v63, Snap.gs v1): плашка на весь екран «Зберігаю… N с» на час запису
+     (крок, склад, ретро, підтвердження): натискання під нею не проходять, підказка змінюється з часом («у черзі», «не оновлюйте»), оновлення
+     сторінки — з попередженням браузера. Відкриття екрана довше 0,7 с — та сама плашка «Відкриваю…». Кожне натискання «Записати» має номер
+     (rid): якщо сторінку оновили / закрили посеред запису або обірвався зв'язок — сторінка питає сервер (?api=rid), чи дійшов запис,
+     і показує результат (щоб не записували вдруге). Повільне звернення (> 10 с разом із мережею) — повідомляється серверу наступним запитом (pf)
+     і потрапляє в «Повільні_запити».
+     v58 · 23.10.2026 — рішення 23.10 (Code.gs v62, Labels.gs v12, Sklad.gs v7, Reports.gs v25): роль «зав. відділу якості» (QC_ROLE) — у списках
      тімлідів (LEAD_ROLES): 👁 «Мій виробіток» за будь-кого, «✂ Відокремити» і «+ Додати» як тімлід, окремо «↩ Повернути з відбраковки». Ящики ГП → склад:
      картка ящика — локація складу («на складі · П1 · авто»), «Перемістити на склад» з вибором локації (boxWhModal); Р-12 — «→ склад» у рядку ящика на
      виробництві, колонка «Де» з локацією складу; «Робота зі складом» → «Поклав» → «ГП з виробництва» — вибір ящика (скан етикетки 📷, номер або список
@@ -252,6 +258,19 @@
   .ic{border:0;background:#E3EAEF;border-radius:8px;padding:6px 10px;font-size:15px;margin-left:4px}
   .toast{position:fixed;left:12px;right:12px;bottom:16px;padding:16px;border-radius:12px;color:#fff;font-size:17px;font-weight:600;display:none;z-index:9;box-shadow:0 4px 14px rgba(0,0,0,.25)}
   .modal{position:fixed;inset:0;background:rgba(20,30,36,.55);display:none;align-items:flex-end;z-index:8}
+  /* v59: плашка запису / відкриття на весь екран */
+  .net{position:fixed;inset:0;z-index:30;display:none;align-items:center;justify-content:center;padding:24px;background:rgba(20,30,36,.62);touch-action:none}
+  .net.on{display:flex}
+  .net.soft{background:rgba(238,242,245,.55)}
+  .net .nb{background:#fff;border-radius:18px;padding:26px 22px 22px;width:100%;max-width:360px;text-align:center;box-shadow:0 10px 34px rgba(0,0,0,.28)}
+  .net .sp{width:56px;height:56px;margin:0 auto 14px;border-radius:50%;border:6px solid #DCE5EA;border-top-color:#1F7A4D;animation:netspin .9s linear infinite}
+  .net.soft .sp{border-top-color:#2F4858}
+  .net .nt{font-size:22px;font-weight:800;color:#1D2B33}
+  .net .ns{font-size:34px;font-weight:800;color:#1F7A4D;margin:6px 0 4px;font-variant-numeric:tabular-nums}
+  .net.soft .ns{font-size:18px;color:#66767F}
+  .net .nh{font-size:15px;color:#4A5A63;line-height:1.4;min-height:21px}
+  .net .nx{margin-top:14px;border:0;background:#E3EAEF;color:#1D2B33;border-radius:10px;padding:10px 16px;font-size:15px;font-weight:600;display:none}
+  @keyframes netspin{to{transform:rotate(360deg)}}
   .sheet{background:#EEF2F5;width:100%;max-height:92vh;overflow:auto;border-radius:18px 18px 0 0;padding-bottom:20px}
   .err{color:#9B231A;font-weight:600;margin-top:10px;font-size:16px}
   .center{text-align:center;padding:40px 16px}
@@ -334,9 +353,10 @@
 <div class="tip" id="tip"></div>
 <div class="modal" id="modal"><div class="sheet" id="sheet"></div></div>
 <div class="toast" id="toast"></div>
+<div class="net" id="net" role="alert" aria-live="assertive"><div class="nb"><div class="sp"></div><div class="nt" id="nett">Зберігаю…</div><div class="ns" id="nets"></div><div class="nh" id="neth"></div><button class="nx" id="netx" type="button">Не чекати</button></div></div>
 
 <script>
-const PAGE_VERSION = 'index.html v58 · 23.10.2026';
+const PAGE_VERSION = 'index.html v59 · 23.10.2026';
 /** v46: куди прийдуть етикетки K2 — адреси друку (K2_LABEL_EMAILS), якщо задані; інакше — пошта працівника */
 function k2To() { const t = (S.k2 && S.k2.to) || []; return t.length ? t.join(', ') + ' (принтер етикеток)' : (S.me ? S.me.email : ''); }
 const API = 'https://script.google.com/macros/s/AKfycbx-JUajnAtVsxaLHDgwRpfzE12g4LUtlf6JnWYAQScAVZ5FCpxzGHSrA5PDESqP80KD/exec';
@@ -344,9 +364,10 @@ window.STATIC_SELF = location.origin + location.pathname;
 const PARAMS = Object.fromEntries(new URLSearchParams(location.search));
 var google = { script: { get run() {
   let ok = () => {}, fail = () => {};
-  const call = (api, q) => fetch(API + '?api=' + api + '&q=' + encodeURIComponent(JSON.stringify(q)), { credentials: 'omit', redirect: 'follow' })
-    .then(r => r.json()).then(j => j.ok ? ok(j.data) : fail({ message: j.error }))
-    .catch(e => fail({ message: 'Немає зв\'язку з сервером. Перевірте інтернет і спробуйте ще раз.' }));
+  const call = (api, q) => { const tk = netStart(api, q);   // v59: плашка й вимір часу
+    fetch(API + '?api=' + api + '&q=' + encodeURIComponent(JSON.stringify(netPf(api, q))), { credentials: 'omit', redirect: 'follow' })
+    .then(r => r.json()).then(j => { netEnd(tk, j); netDeliver(() => j.ok ? ok(j.data) : fail({ message: j.error })); },
+      e => { netEnd(tk, null); netDeliver(() => fail({ message: 'Немає зв\'язку з сервером. Перевірте інтернет і спробуйте ще раз.', net: true })); }); };
   const o = { withSuccessHandler(f) { ok = f; return o; }, withFailureHandler(f) { fail = f; return o; },
     apiPage(q) { call('page', q); }, apiAct(q) { call('act', q); }, apiApprove(q) { call('approve', q); }, apiCabinet(q) { call('cabinet', q); }, apiDash(q) { call('dash', q); }, apiHistory(q) { call('hist', q); },
     apiSkladPage(q) { call('skladPage', q); }, apiSkladCancel(q) { call('skladCancel', q); }, apiPeek(q) { call('peek', q); } };
@@ -354,9 +375,109 @@ var google = { script: { get run() {
 } } };
 /** v9: POST — для великих запитів (фото). text/plain, щоб не було попереднього запиту CORS. */
 function post(api, q) {
-  return fetch(API, { method: 'POST', headers: { 'Content-Type': 'text/plain;charset=utf-8' }, body: JSON.stringify({ api: api, q: q }), credentials: 'omit', redirect: 'follow' })
-    .then(r => r.json(), () => { throw new Error('Немає зв\'язку з сервером. Перевірте інтернет і спробуйте ще раз.'); })
-    .then(j => { if (!j.ok) throw new Error(j.error); return j.data; });
+  const tk = netStart(api, q);   // v59
+  return fetch(API, { method: 'POST', headers: { 'Content-Type': 'text/plain;charset=utf-8' }, body: JSON.stringify({ api: api, q: netPf(api, q) }), credentials: 'omit', redirect: 'follow' })
+    .then(r => r.json(), () => { netEnd(tk, null); const e = new Error('Немає зв\'язку з сервером. Перевірте інтернет і спробуйте ще раз.'); e.net = true; throw e; })
+    .then(j => { netEnd(tk, j); if (!j.ok) throw new Error(j.error); return j.data; });
+}
+
+// ======================================================================= v59: плашка «Зберігаю… / Відкриваю…», стан запису після оновлення
+/** Звернення: 'w' — запис (плашка одразу, натискання заблоковані, попередження при оновленні сторінки), 'r' — відкриття екрана
+ *  (плашка, якщо довше за 0,7 с), '' — без плашки (перевірка партії у формі, фото, списки у формі) */
+function netKind(api, q) {
+  q = q || {};
+  if (api === 'act' || api === 'skladSave' || api === 'skladCancel' || api === 'skladEdit' || api === 'skladBox') return 'w';
+  if (api === 'approve') return q.confirm ? 'w' : 'r';
+  if (api === 'retro') return /^(save|confirm|reopen)$/.test(q.op || '') ? 'w' : (q.op === 'photo' ? '' : 'r');
+  if (api === 'page' || api === 'cabinet' || api === 'dash' || api === 'hist' || api === 'skladPage') return 'r';
+  return '';
+}
+const NET = { list: [], timer: null, chk: null };
+function netStart(api, q) {
+  const tk = { api: api, q: q || {}, k: netKind(api, q), t0: Date.now() };
+  NET.list.push(tk); netDraw();
+  if (!NET.timer) NET.timer = setInterval(netDraw, 500);
+  return tk;
+}
+function netEnd(tk, j) {
+  NET.list = NET.list.filter(x => x !== tk);
+  const ms = Date.now() - tk.t0, q = tk.q || {};
+  // повільне звернення (разом із мережею) — повідомити серверу наступним запитом
+  if (ms > 10000 && tk.api !== 'rid') store('mlp_pf', JSON.stringify({ a: q.action || q.op || tk.api, api: tk.api, ms: ms, at: Date.now(),
+    sv: j && j.data && j.data.ms ? j.data.ms : '', ref: q.batch || q.b || q.t || q.tare || q.bx || '', r: j ? (j.ok ? 'ок' : 'помилка: ' + String(j.error || '').slice(0, 80)) : 'немає зв\'язку' }));
+  if (!NET.list.length && !NET.chk) { clearInterval(NET.timer); NET.timer = null; }
+  netDraw();
+}
+function netPf(api, q) {
+  if (api === 'rid' || !q || typeof q !== 'object') return q;
+  const pf = store('mlp_pf'); if (!pf) return q;
+  store('mlp_pf', null);
+  try { return Object.assign({}, q, { pf: JSON.parse(pf) }); } catch (e) { return q; }
+}
+/** Обробник відповіді: помилка в ньому — на екран, а не «немає зв'язку» */
+function netDeliver(f) { try { f(); } catch (x) { console.error(x); toast('Помилка сторінки: ' + (x && x.message || x) + '. Оновіть сторінку', true); } }
+function netDraw() {
+  const box = $('net'); if (!box) return;
+  const now = Date.now();
+  const w = NET.list.filter(x => x.k === 'w'), r = NET.list.filter(x => x.k === 'r' && now - x.t0 > 700);
+  let title = '', sec = '', hint = '', soft = false, btn = false;
+  if (NET.chk) {
+    const c = NET.chk; title = 'Перевіряю попередній запис…'; sec = Math.round((now - c.t0) / 1000) + ' с';
+    hint = c.hint || 'Сторінку оновили, поки йшов запис. Дізнаюсь у сервера, чи він збережений, — щоб не записати вдруге.'; btn = (now - c.t0) > 15000;
+  } else if (w.length) {
+    const t = Math.round((now - Math.min.apply(null, w.map(x => x.t0))) / 1000);
+    title = 'Зберігаю…'; sec = t + ' с';
+    hint = t < 4 ? 'Не натискайте повторно' : t < 20 ? 'Сервер записує. Не натискайте повторно й не оновлюйте сторінку' :
+      t < 60 ? 'Зараз записують кілька людей — ваш запис у черзі. Чекаємо…' :
+      'Довго, але запис не загубиться: навіть якщо закрити сторінку, при наступному відкритті вона покаже, чи він дійшов';
+  } else if (r.length) {
+    const t = Math.round((now - Math.min.apply(null, r.map(x => x.t0))) / 1000);
+    title = 'Відкриваю…'; sec = t >= 2 ? t + ' с' : ''; soft = true;
+    hint = t < 8 ? '' : 'Сервер відповідає повільно — зачекайте';
+  }
+  box.classList.toggle('on', !!title); box.classList.toggle('soft', soft);
+  if (!title) return;
+  $('nett').textContent = title; $('nets').textContent = sec; $('neth').textContent = hint;
+  $('netx').style.display = btn ? 'inline-block' : 'none';
+}
+window.addEventListener('beforeunload', e => { if (NET.list.some(x => x.k === 'w')) { e.preventDefault(); e.returnValue = ''; return ''; } });
+/** Номер натискання «Записати» (rid) і що саме записували — на телефоні, доки сервер не відповів */
+function ridNew() { return Date.now().toString(36) + Math.random().toString(36).slice(2, 8); }
+function ridKeep(p) { store('mlp_wr', JSON.stringify({ rid: p.rid, t: Date.now(), a: p.action || '', b: p.batch || p.tare || p.ref || '' })); }
+function ridDrop(rid) { try { const x = JSON.parse(store('mlp_wr') || 'null'); if (!x || !rid || x.rid === rid) store('mlp_wr', null); } catch (e) { store('mlp_wr', null); } }
+/** Чи дійшов запис rid: питає сервер кожні 3 с, поки «черга»; done(стан) — 'записано' / 'помилка' / 'невідомо' */
+function ridWait(rid, t0, done, hint) {
+  NET.chk = { t0: Date.now(), hint: hint }; if (!NET.timer) NET.timer = setInterval(netDraw, 500); netDraw();
+  let stop = false; $('netx').onclick = () => { stop = true; fin({ s: 'перервано' }); };
+  const fin = x => { NET.chk = null; netDraw(); if (!NET.list.length) { clearInterval(NET.timer); NET.timer = null; } done(x); };
+  const ask = n => {
+    if (stop) return;
+    fetch(API + '?api=rid&q=' + encodeURIComponent(JSON.stringify({ rid: rid })), { credentials: 'omit', redirect: 'follow' }).then(r => r.json())
+      .then(j => {
+        if (stop) return;
+        const x = j && j.ok ? j.data : { s: 'невідомо' };
+        const age = Date.now() - t0;
+        if (x.s === 'черга' && age < 7 * 60000) { NET.chk.hint = 'Попередній запис ще в черзі на сервері (' + (x.sec || 0) + ' с). Зачекайте — він не загубиться'; return setTimeout(() => ask(n + 1), 3000); }
+        if (x.s === 'невідомо' && age < 25000 && n < 6) return setTimeout(() => ask(n + 1), 3000);   // запит міг ще не дійти до сервера
+        fin(x);
+      }, () => { if (stop) return; if (n < 20) setTimeout(() => ask(n + 1), 4000); else fin({ s: 'невідомо' }); });
+  };
+  ask(0);
+}
+/** Відкриття сторінки: лишився незавершений запис (оновили / закрили посеред «Зберігаю…») — спершу дізнатися, чи він дійшов */
+function ridCheckOnLoad() {
+  let x = null; try { x = JSON.parse(store('mlp_wr') || 'null'); } catch (e) { x = null; }
+  if (!x || !x.rid) return false;
+  if (Date.now() - x.t > 8 * 60000) { store('mlp_wr', null); return false; }
+  ridWait(x.rid, x.t, st => {
+    store('mlp_wr', null);
+    const what = x.b ? ' (' + x.b + ')' : '';
+    if (st.s === 'записано') toast('✔ Попередній запис' + what + ' збережено: ' + (st.msg || 'записано'));
+    else if (st.s === 'помилка') toast('Попередній запис' + what + ' НЕ збережено' + (st.msg ? ': ' + st.msg : '') + '. Запишіть ще раз', true);
+    else if (st.s !== 'перервано') toast('Не вдалося з\'ясувати, чи дійшов попередній запис' + what + '. Перевірте історію партії, перш ніж записувати ще раз', true);
+    load();
+  });
+  return true;
 }
 let S = {};           // дані сторінки
 let CODE = store('mlp_code');
@@ -374,6 +495,7 @@ function link(q) { return (window.STATIC_SELF || S.webapp || '') + '?' + q; }
 
 function load(extra) {
   navRender();
+  if (ridCheckOnLoad()) return;   // v59: незавершений запис з минулого відкриття — спершу його стан
   if (PARAMS.approve) return loadApprove();
   if (PARAMS.r && CODE) return renderReports();   // v33: список звітів ролі (вкладка «Звіти» на телефоні)
   if (PARAMS.cab && CODE) return loadCabinet();   // без коду телефону — звичайний шлях: екран реєстрації
@@ -410,8 +532,8 @@ function setUrl() { try { const q = new URLSearchParams(PARAMS).toString(); hist
 let BUSY = false;
 function busy(on) {
   BUSY = on; const t = $('toast');
-  if (on) { clearTimeout(t._h); t.textContent = 'Зберігаю…'; t.style.background = '#2F4858'; t.style.display = 'block'; }
-  else if (t.textContent === 'Зберігаю…') t.style.display = 'none';
+  // v59: «Зберігаю…» показує плашка на весь екран (netDraw), смужка внизу більше не потрібна
+  if (!on && t.textContent === 'Зберігаю…') t.style.display = 'none';
 }
 function act(payload, btn, after) {
   const t0 = Date.now();
@@ -419,7 +541,9 @@ function act(payload, btn, after) {
   if (btn) { btn.disabled = true; btn._t = btn.textContent; btn.textContent = 'Зберігаю…'; } else busy(true);
   payload.code = CODE;
   if (payload.view === undefined) payload.view = viewParams();
-  google.script.run.withSuccessHandler(r => {
+  payload.rid = ridNew(); ridKeep(payload);   // v59: номер натискання — сервер не запише його двічі; після оновлення сторінки — перевірка
+  const done = r => {
+    ridDrop(payload.rid);
     if (btn) { btn.disabled = false; btn.textContent = btn._t; } else busy(false);
     if (r && r.warn) { confirmBox(r.warn, () => { payload.force = true; act(payload, btn, after); }); return; }
     closeModal();
@@ -429,7 +553,18 @@ function act(payload, btn, after) {
     toast(msg, !!r.alert);   // v13: напр. «⚠ Етикетки не надіслано» — червоним
     if (r.showBatch) { PARAMS.b = r.showBatch; delete PARAMS.t; setUrl(); }   // v13: після останнього K2 — картка партії, а не вільна тара
     if (after) after(r); else showPage(r, {});
-  }).withFailureHandler(e => {
+  };
+  google.script.run.withSuccessHandler(done).withFailureHandler(e => {
+    // v59: обірвався зв'язок — запис міг дійти. Спершу спитати сервер за rid, лише потім показувати помилку
+    if (e.net && !e.ridChecked) return ridWait(payload.rid, Date.now(), st => {
+      if (st.s === 'записано') return done({ ok: true, msg: (st.msg || 'Записано') + ' (зв\'язок переривався, але запис дійшов)' });
+      ridDrop(payload.rid);
+      const m0 = st.s === 'помилка' && st.msg ? st.msg : 'Немає зв\'язку з сервером, запис не дійшов. Перевірте інтернет і спробуйте ще раз.';
+      fail0({ message: m0 });
+    }, 'Зв\'язок з сервером перервався. Перевіряю, чи запис дійшов…');
+    ridDrop(payload.rid); fail0(e);
+  }).apiAct(payload);
+  function fail0(e) {
     if (btn) { btn.disabled = false; btn.textContent = btn._t; } else busy(false);
     const m = String(e.message || e).replace(/^Error:\s*/, '');
     const box = $('err'); const inModal = $('modal').style.display === 'flex';
@@ -437,7 +572,7 @@ function act(payload, btn, after) {
     const mb = $('merr'); if (mb && inModal) mb.textContent = m;
     // v16: повідомлення один раз — у формі; червона смужка внизу лише коли поля для помилки немає
     if (!((box && !inModal) || (mb && inModal))) toast(m, true);
-  }).apiAct(payload);
+  }
 }
 
 function confirmBox(text, yes) {
