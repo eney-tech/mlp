@@ -1,5 +1,9 @@
 <!DOCTYPE html>
-<!-- МЛП · index.html v68 · 24.10.2026 — звіти (рішення 24.10, Reports.gs v29):
+<!-- МЛП · index.html v69 · 24.10.2026 — Р-2_04 «Де зараз» (рішення 24.10): наведення на кубик — номер тари першим (його видно на ящику, номер партії — ні);
+     натискання (і на телефоні) — віконце з посиланнями: тара, партія або ящик ГП; колір — тільки заливкою; колонки — «типорозмір · KV» (колір видно
+     з кубиків), підписи по центру; шапка таблиці закріплена при прокручуванні; колонка «Крок» вузька (назва переноситься), клітинки кубиків ширші
+     й розділені тонкою лінією; у «Разом» — тільки число, без смуги.
+     v68 · 24.10.2026 — звіти (рішення 24.10, Reports.gs v29):
      • Фільтри всіх звітів — один рядок на фільтр, кнопки з мультивибором («Усі» — скинути); список із пошуком лише для довгих переліків
        (працівники, партії, кроки, понад 12 значень). Р-2: локація, поверх, продукт, типорозмір, KV, колір; так само Р-11, Р-12, Р-5 і періодні звіти.
      • Кожна візуалка звітів згортається (графіки й нові блоки — розгорнуті, поки людина не згорне; стан пам'ятає пристрій); після розгортання
@@ -166,14 +170,18 @@
   @media (max-width:520px){.zfl{flex-basis:76px;font-size:10.5px}}
   .zkpi .d .zkx{color:#B3261E;font-weight:600;text-decoration:none}
   /* v68: Р-2 «Де зараз» — матриця специфікацій, шкали в клітинках, кубики-ящики */
-  table.zm2 td,table.zm2 th{padding:5px 8px;vertical-align:middle}table.zm2 th{white-space:normal;line-height:1.25;min-width:64px}
-  table.zm2 tr.st td:first-child{white-space:nowrap}table.zm2 tr.click td:first-child{cursor:pointer}table.zm2 tr.dim{opacity:.35}
+  table.zm2 td,table.zm2 th{padding:5px 8px;vertical-align:middle}table.zm2 th{white-space:nowrap;line-height:1.25;text-align:center;position:sticky;top:0;z-index:2;background:#fff}
+  table.zm2 th:first-child{z-index:3;text-align:left}table.zm2 td:first-child{min-width:92px;max-width:150px;font-size:13.5px;line-height:1.3}
+  table.zm2 td+td{border-left:1px solid #EEF2F5}table.zm2 td.cb{min-width:130px;text-align:left}
+  table.zm2 tr.click td:first-child{cursor:pointer}table.zm2 tr.dim{opacity:.35}
+  .zcpop{position:fixed;z-index:72;background:#fff;border:1px solid #C5D0D7;border-radius:12px;box-shadow:0 10px 30px rgba(0,0,0,.18);padding:10px 12px;min-width:210px;max-width:290px;font-size:14px;display:none}
+  .zcpop .r{display:flex;justify-content:space-between;gap:12px;padding:3px 0}.zcpop a.ic{display:block;text-align:center;text-decoration:none;margin-top:8px}
   table.zm2 td:first-child,table.zm2 th:first-child,table.zdt td:first-child,table.zdt th:first-child{position:sticky;left:0;background:#fff;z-index:1}
   table.zm2 tr.whs td{border-top:3px solid #2F4858}table.zm2 .zwh{background:#EEF4F8}
   .zq{min-width:56px}.zq span{display:block;text-align:right;font-variant-numeric:tabular-nums}
   .zq i{display:block;height:5px;background:#2a78d6;border-radius:3px;margin-top:2px;margin-left:auto}
-  .zcbs{display:flex;flex-wrap:wrap;gap:3px;align-items:flex-end;max-width:340px}
-  .zcb{display:inline-block;border-radius:2px;flex:0 0 auto;position:relative;box-sizing:border-box}
+  .zcbs{display:flex;flex-wrap:wrap;gap:3px;align-items:flex-end;max-width:420px}
+  .zcb{display:inline-block;border-radius:2px;flex:0 0 auto;position:relative;box-sizing:border-box;cursor:pointer}
   .zcb.stk::after{content:'';position:absolute;top:-3px;right:-3px;width:6px;height:6px;border-radius:50%;background:#B3261E;border:1px solid #fff}
   .zcbn{font-size:12px;color:#66767F;white-space:nowrap;margin-top:2px}
   .zcleg{display:flex;flex-wrap:wrap;gap:4px 14px;align-items:center;font-size:13px;color:#55656E;margin:4px 0 8px}.zcleg span{display:inline-flex;gap:6px;align-items:center}
@@ -469,7 +477,8 @@
 <div class="net" id="net" role="alert" aria-live="assertive"><div class="nb"><div class="rt" id="netr"></div><div class="nt" id="nett">Зберігаю…</div><div class="ns" id="nets"></div><div class="np"><i id="netp"></i></div><div class="nh" id="neth"></div><div class="zc" id="zc"></div><button class="nx" id="netx" type="button">Не чекати</button></div></div>
 
 <script>
-const PAGE_VERSION = 'index.html v68 · 24.10.2026';   // v68: звіти — фільтри рядками з мультивибором, згортання всіх візуалок, Р-2 ящики-кубики, Р-9 звірка за днями, Р-10 брак за днями
+const PAGE_VERSION = 'index.html v69 · 24.10.2026';   // v69: Р-2_04 кубики — номер тари в підказці, віконце з посиланнями, тільки заливка, колонки «типорозмір · KV», закріплена шапка
+//   // v68   // v68: звіти — фільтри рядками з мультивибором, згортання всіх візуалок, Р-2 ящики-кубики, Р-9 звірка за днями, Р-10 брак за днями
 //   // v67: екран очікування — ротор, прогрес, картки «питання → відповідь»
 //   // v66: іконка «Помічника» — робот
 //   // v65: помічник МЛП (Assistant.gs v1, Code.gs v68)
@@ -3625,34 +3634,52 @@ const COLN = c => String(c || '').toLowerCase();
 // ---- Р-2 Стан зараз — тільки стан на зараз
 // v68: фільтри рядками з мультивибором (порожньо = усі); «Де зараз» — колонки «типорозмір · KV · колір» зі шкалами, штуки або ящики-кубики,
 // рядок «Відкриті ящики на пакуванні» після K2, окрема група «Склад готової продукції»; «Партії завершені» (Р-2_11) — у списку партій
-const Z2 = { loc: null, fl: [], flow: ['ST'], typ: [], kv: [], col: [], step: '', view: 'proc', cols: 'none', unit: 'qty', cmode: 'fill', only: 'all', rk: 'all', more: false };
-try { const v = JSON.parse(store('mlp_z2') || 'null'); if (v) ['view', 'cols', 'unit', 'cmode'].forEach(k => { if (v[k]) Z2[k] = v[k]; }); } catch (e) { }
+const Z2 = { loc: null, fl: [], flow: ['ST'], typ: [], kv: [], col: [], step: '', view: 'proc', cols: 'none', unit: 'qty', only: 'all', rk: 'all', more: false };   // v69: колір кубиків — тільки заливкою
+try { const v = JSON.parse(store('mlp_z2') || 'null'); if (v) ['view', 'cols', 'unit'].forEach(k => { if (v[k]) Z2[k] = v[k]; }); } catch (e) { }
 function z2set(k, v) {
   Z2[k] = (k === 'step' && Z2.step === v) ? '' : v;
   if (k === 'loc') { Z2.fl = []; Z2.step = ''; }
   if (k === 'fl' || k === 'flow') Z2.step = '';
-  if (['view', 'cols', 'unit', 'cmode'].indexOf(k) >= 0) store('mlp_z2', JSON.stringify({ view: Z2.view, cols: Z2.cols, unit: Z2.unit, cmode: Z2.cmode }));
+  if (['view', 'cols', 'unit'].indexOf(k) >= 0) store('mlp_z2', JSON.stringify({ view: Z2.view, cols: Z2.cols, unit: Z2.unit }));
   if (k !== 'more') Z2.more = false;
   renderDash();
 }
 /** кольори кубиків: колір партії (статори — на S11 «База статора», ротори — при створенні; двигуни — кольори їхніх роторів) */
 const ZCOLC = { 'чорний': '#1F2326', 'синій': '#2a78d6', 'кольоровий': '#eb6834', 'інший': '#8a63d2' };
 const zColC = c => ZCOLC[COLN(c)] || '#8a63d2';
-/** кубик = ящик або партія: стандарт (норма чистого ящика ГП для типорозміру, BOX_QTY) — 16 px, менше — менший, більше — більший (площа ~ шт) */
-function zCube(u, mode) {
+/** кубик = ящик або партія: стандарт (норма чистого ящика ГП для типорозміру, BOX_QTY) — 16 px, менше — менший, більше — більший (площа ~ шт).
+ *  v69: колір — заливкою; наведення — номер тари першим (його видно на ящику), натискання — віконце з посиланнями на тару / партію / ящик */
+function zCube(u) {
   const side = Math.max(6, Math.min(40, Math.round(16 * Math.sqrt(Math.max(.02, u.q / (u.per || 160))))));
   const cs = (u.cols || []).map(zColC), none = !cs.length;
-  let st = 'width:' + side + 'px;height:' + side + 'px;';
-  if (mode === 'fill') st += none ? 'background:#fff;border:1.5px dashed #9AA8B0' : 'background:' + (cs.length > 1 ? 'linear-gradient(135deg,' + cs[0] + ' 50%,' + cs[1] + ' 50%)' : cs[0]);
-  else st += 'background:#1F2326;border:' + (side < 9 ? 2 : 3) + 'px solid ' + (none ? '#B8C2C8' : cs[0]) + (cs.length > 1 ? ';border-right-color:' + cs[1] + ';border-bottom-color:' + cs[1] : '');
-  const tip = u.t + ' · ' + fn(u.q) + ' шт' + (u.per ? ' (' + Math.round(u.q / u.per * 100) + ' % ящика)' : '') + ' · ' + (u.cols && u.cols.length ? u.cols.join(' / ') : 'колір не вказано') + (u.stk ? ' · без руху' : '');
-  return '<a class="zcb' + (u.stk ? ' stk' : '') + '" style="' + st + '" data-tip="' + esc(tip) + '"' + (u.href ? ' href="' + esc(u.href) + '"' : '') + '></a>';
+  const st = 'width:' + side + 'px;height:' + side + 'px;' + (none ? 'background:#fff;border:1.5px dashed #9AA8B0' : 'background:' + (cs.length > 1 ? 'linear-gradient(135deg,' + cs[0] + ' 50%,' + cs[1] + ' 50%)' : cs[0]));
+  const tip = (u.tare || u.t || '') + (u.no && u.tare ? ' · ' + u.no : '') + ' · ' + fn(u.q) + ' шт' + (u.per ? ' (' + Math.round(u.q / u.per * 100) + ' % ящика)' : '') + (u.stk ? ' · без руху' : '');
+  return '<span class="zcb' + (u.stk ? ' stk' : '') + '" style="' + st + '" data-tip="' + esc(tip) + '"' + (u.t ? ' onclick="zA(' + zAct(e => zCubePop(u, e)) + ',event)"' : '') + '></span>';
 }
-function zCubes(us, mode) {
+function zCubes(us) {
   if (!us.length) return '<span class="muted">·</span>';
   const o = us.slice().sort((a, b) => String(a.cols).localeCompare(String(b.cols)) || b.q - a.q);
-  return '<div class="zcbs">' + o.map(u => zCube(u, mode)).join('') + '</div><div class="zcbn">' + o.length + ' · ' + fn(o.reduce((a, u) => a + u.q, 0)) + ' шт</div>';
+  return '<div class="zcbs">' + o.map(u => zCube(u)).join('') + '</div><div class="zcbn">' + o.length + ' · ' + fn(o.reduce((a, u) => a + u.q, 0)) + ' шт</div>';
 }
+/** віконце кубика: тара (або ящик ГП), партія, скільки, колір, без руху — з посиланнями */
+function zCubePop(u, e) {
+  if (e) e.stopPropagation(); infoHide();
+  let p = $('zcpop'); if (!p) { p = document.createElement('div'); p.id = 'zcpop'; p.className = 'zcpop'; document.body.appendChild(p); }
+  const row = (l, v) => '<div class="r"><span class="muted">' + l + '</span><b>' + v + '</b></div>';
+  p.innerHTML = '<div style="display:flex;justify-content:space-between;align-items:center;gap:8px"><b style="font-size:16px">' + esc(u.box ? u.t : (u.tare || 'без тари')) + '</b><button type="button" class="ic" onclick="zCubeClose()">✕</button></div>' +
+    (u.box ? row('Ящик ГП', u.st === 'wh' ? 'на складі' : 'на пакуванні') + (u.owner ? row('Партія', esc(u.owner)) : '') : row('Партія', esc(u.no)) + (u.tare2 ? row('Пара тари', esc(u.tare2)) : '')) +
+    row('Штук', fn(u.q) + (u.per ? ' <span class="muted">· ' + Math.round(u.q / u.per * 100) + ' % ящика</span>' : '')) + row('Типорозмір · KV', esc(u.typ + ' · ' + (u.kv || '—'))) +
+    row('Колір', esc((u.cols || []).join(' / ') || 'не вказано')) + (u.stk ? row('Без руху', '<span style="color:#B3261E">' + u.idle + ' роб. дн.</span>') : '') +
+    (u.box ? '<a class="ic" href="' + esc(link('bx=' + encodeURIComponent(u.id))) + '">Відкрити ящик</a>' + (u.owner ? '<a class="ic" href="' + esc(blHref(u.owner)) + '">Партія ' + esc(u.owner) + '</a>' : '')
+      : (u.tare ? '<a class="ic" href="' + esc(link('t=' + encodeURIComponent(u.tare))) + '">Відкрити тару ' + esc(u.tare) + '</a>' : '') + '<a class="ic" href="' + esc(u.href) + '">Партія ' + esc(u.no) + '</a>');
+  p.style.display = 'block';
+  const x = e ? e.clientX : window.innerWidth / 2, y = e ? e.clientY : 120;
+  p.style.left = Math.max(8, Math.min(x + 10, window.innerWidth - p.offsetWidth - 8)) + 'px';
+  p.style.top = Math.max(8, Math.min(y + 10, window.innerHeight - p.offsetHeight - 8)) + 'px';
+}
+function zCubeClose() { const p = $('zcpop'); if (p) p.style.display = 'none'; }
+document.addEventListener('pointerdown', e => { const p = $('zcpop'); if (p && p.style.display !== 'none' && !p.contains(e.target) && !e.target.closest('.zcb')) zCubeClose(); });
+document.addEventListener('keydown', e => { if (e.key === 'Escape') zCubeClose(); });
 function r2() {
   const d = DB, D = Z2;
   if (D.loc === null) D.loc = d.me && /^[ПЖ]/.test(d.me.site || '') ? [d.me.site.charAt(0)] : [];
@@ -3709,8 +3736,8 @@ function r2() {
     (flowOk('RT') ? zKpi('Ротори готові до збирання', fn(rq('RT')), 'шт', rdyB('RT').length + ' ' + PLR(rdyB('RT').length) + ' · показати ▾', RTIP, 'kgood', goD('RT')) : '') +
     zKpi('У роботі', fn(inw.length), 'партій', fn(units) + ' шт у них · показати ▾<br>' + stLine, 'Партії, що зараз ідуть маршрутом (без готових до збирання). ' + IDLE_TIP(d.idleDays), '', goP('all')) + '</div>';
   // Р-2_04 Де зараз — рядки: заголовки груп, кроки, «готово до збирання», відкриті ящики, склад ГП
-  const U = (b, q) => ({ q: q, typ: b.typ, kv: b.kv || '', cols: bCols(b), t: b.no, href: blHref(b.no), per: per(b.typ), stk: b.stuck });
-  const UB = x => ({ q: x.total, typ: x.typ, kv: x.kv || '', cols: x.colors || [], t: x.name, href: link('bx=' + encodeURIComponent(x.id)), per: x.per || per(x.typ) });
+  const U = (b, q) => ({ q: q, typ: b.typ, kv: b.kv || '', cols: bCols(b), t: b.no, no: b.no, tare: b.tare || '', tare2: b.tare2 || '', href: blHref(b.no), per: per(b.typ), stk: b.stuck, idle: b.idle });
+  const UB = x => ({ box: 1, id: x.id, q: x.total, typ: x.typ, kv: x.kv || '', cols: x.colors || [], t: x.name, owner: x.owner || '', st: x.st, per: x.per || per(x.typ) });
   const rows = [];
   const stepRow = (x, pool) => {
     const us = pool.filter(b => b.wait[x[0]]).map(b => U(b, b.wait[x[0]])), sk = us.filter(u => u.stk).length;
@@ -3757,8 +3784,8 @@ function r2() {
   }
   const any = rows.some(r => r.us && r.us.length || r.q);
   // колонки — специфікації «типорозмір · KV · колір», лише ті, що є в рядках
-  const spec = u => u.typ + '|' + (u.kv || '—') + '|' + ((u.cols || []).join(' / ') || '—');
-  const specs = D.cols === 'spec' ? zUniq([].concat(...rows.filter(r => r.us).map(r => r.us.map(spec)))).sort((a, b) => { const x = a.split('|'), y = b.split('|'); return x[0].localeCompare(y[0]) || zKvSort(x[1], y[1]) || x[2].localeCompare(y[2], 'uk'); }) : [];
+  const spec = u => u.typ + '|' + (u.kv || '—');   // v69: колонки — типорозмір · KV (колір видно з кубиків)
+  const specs = D.cols === 'spec' ? zUniq([].concat(...rows.filter(r => r.us).map(r => r.us.map(spec)))).sort((a, b) => { const x = a.split('|'), y = b.split('|'); return x[0].localeCompare(y[0]) || zKvSort(x[1], y[1]); }) : [];
   const qOf = us => us.reduce((a, u) => a + u.q, 0);
   let body;
   if (!any) body = '<p class="muted">' + (D.loc.length === 1 && D.loc[0] === 'Ж' && FL.indexOf('MT') < 0 ? 'На Жулянах ' + FL.map(f => FLOWN[f][1]).join(' й ') + ' не виготовляють.' : 'За цими фільтрами партій немає.') + '</p>';
@@ -3768,10 +3795,11 @@ function r2() {
   } else {   // таблиця: колонки специфікацій і / або кубики
     const mxC = Math.max(1, ...rows.filter(r => r.us && !r.nos).map(r => Math.max(...(specs.length ? specs.map(c => qOf(r.us.filter(u => spec(u) === c))) : [0]))));
     const mxT = Math.max(1, ...rows.filter(r => r.us && !r.nos).map(r => qOf(r.us)));
-    const cell = (us, mx, c, nos) => D.unit === 'cube' ? zCubes(us, D.cmode) : us.length ? '<div class="zq"><span>' + fn(qOf(us)) + '</span><i style="width:' + (nos ? 100 : Math.max(4, qOf(us) / mx * 100)).toFixed(0) + '%' + (c ? ';background:' + c : '') + '"></i></div>' : '<span class="muted">·</span>';
-    const sl = c => { const p = c.split('|'); return esc(p[0]) + ' · ' + esc(p[1]) + '<br><span style="font-weight:500">' + esc(p[2] === '—' ? 'колір —' : p[2]) + '</span>'; };
+    const cell = (us, mx, c, nos) => D.unit === 'cube' ? zCubes(us) : us.length ? '<div class="zq"><span>' + fn(qOf(us)) + '</span><i style="width:' + (nos ? 100 : Math.max(4, qOf(us) / mx * 100)).toFixed(0) + '%' + (c ? ';background:' + c : '') + '"></i></div>' : '<span class="muted">·</span>';
+    const sl = c => { const p = c.split('|'); return esc(p[0]) + ' · ' + esc(p[1]); };
     const nc = specs.length + 3;
-    let t = '<div class="tw" style="max-height:640px"><table class="t zm2"><tr><th>Крок</th>' + specs.map(c => '<th class="r">' + sl(c) + '</th>').join('') + (specs.length ? '<th class="r">Разом</th>' : '<th>' + (D.unit === 'cube' ? 'Ящики й партії' : 'шт') + '</th>') + '<th></th></tr>';
+    const cb = D.unit === 'cube' ? ' class="r cb"' : ' class="r"';
+    let t = '<div class="tw" style="max-height:72vh"><table class="t zm2"><tr><th>Крок</th>' + specs.map(c => '<th>' + sl(c) + '</th>').join('') + (specs.length ? '<th>Разом</th>' : '<th>' + (D.unit === 'cube' ? 'Ящики й партії' : 'шт') + '</th>') + '<th></th></tr>';
     let wh = false;
     rows.forEach(r => {
       if (r.hd) { t += '<tr><td colspan="' + nc + '" class="zgh">' + r.hd + '</td></tr>'; return; }
@@ -3779,22 +3807,22 @@ function r2() {
       if (r.k === 'sold') { t += '<tr><td>' + r.l + '</td>' + specs.map(() => '<td></td>').join('') + '<td class="r"><b>' + fn(r.q) + ' шт</b></td><td></td></tr>'; return; }
       const tot = qOf(r.us);
       t += '<tr class="' + (r.k === 'st' ? 'st click' : '') + (r.dim ? ' dim' : '') + '"' + (wh ? ' style="background:#F7FAFC"' : '') + '><td' + (r.on !== undefined ? ' onclick="zA(' + r.on + ')"' : '') + '>' + r.l + '</td>' +
-        specs.map(c => '<td class="r">' + cell(r.us.filter(u => spec(u) === c), mxC, r.c, r.nos) + '</td>').join('') +
-        (specs.length ? '<td class="r">' + (tot ? '<div class="zq"><b><span>' + fn(tot) + '</span></b><i style="width:' + (r.nos ? 100 : Math.max(4, tot / mxT * 100)).toFixed(0) + '%' + (r.c ? ';background:' + r.c : '') + '"></i></div>' : '<span class="muted">·</span>') + '</td>'
-          : '<td>' + cell(r.us, mxT, r.c, r.nos) + '</td>') + '<td>' + (r.x || '') + '</td></tr>';
+        specs.map(c => '<td' + cb + '>' + cell(r.us.filter(u => spec(u) === c), mxC, r.c, r.nos) + '</td>').join('') +
+        (specs.length ? '<td class="r">' + (tot ? '<b>' + fn(tot) + '</b>' : '<span class="muted">·</span>') + '</td>'   // v69: «Разом» — без смуги
+          : '<td' + (D.unit === 'cube' ? ' class="cb"' : '') + '>' + cell(r.us, mxT, r.c, r.nos) + '</td>') + '<td>' + (r.x || '') + '</td></tr>';
     });
     body = t + '</table></div>';
   }
-  const leg = D.unit === 'cube' ? '<div class="zcleg"><span>' + zCube({ q: 160, per: 160, cols: ['чорний'], t: '' }, D.cmode) + 'повний ящик (' + Object.keys(norm).filter(t => t !== '*').map(t => t + ' — ' + norm[t]).join(', ') + ' шт)</span><span>' +
-    zCube({ q: 60, per: 160, cols: ['чорний'], t: '' }, D.cmode) + 'менше ящика</span><span>' + zCube({ q: 640, per: 160, cols: ['чорний'], t: '' }, D.cmode) + 'партія на кілька ящиків</span>' +
-    ['чорний', 'синій', 'кольоровий', 'інший'].map(c => '<span>' + zCube({ q: 160, per: 160, cols: [c], t: '' }, D.cmode) + c + '</span>').join('') + '<span>' + zCube({ q: 160, per: 160, cols: [], t: '' }, D.cmode) + 'колір не вказано</span>' +
-    '<span><i class="zcb stk" style="width:12px;height:12px;background:#C5D0D7"></i>без руху</span></div>' : '';
+  const lc = (q, c) => '<i class="zcb" style="cursor:default;width:' + Math.max(6, Math.min(40, Math.round(16 * Math.sqrt(q / 160)))) + 'px;height:' + Math.max(6, Math.min(40, Math.round(16 * Math.sqrt(q / 160)))) + 'px;' + (c ? 'background:' + zColC(c) : 'background:#fff;border:1.5px dashed #9AA8B0') + '"></i>';
+  const leg = D.unit === 'cube' ? '<div class="zcleg"><span>' + lc(160, 'чорний') + 'повний ящик (' + Object.keys(norm).filter(t => t !== '*').map(t => t + ' — ' + norm[t]).join(', ') + ' шт)</span><span>' +
+    lc(60, 'чорний') + 'менше ящика</span><span>' + lc(640, 'чорний') + 'партія на кілька ящиків</span>' +
+    ['чорний', 'синій', 'кольоровий', 'інший'].map(c => '<span>' + lc(160, c) + c + '</span>').join('') + '<span>' + lc(160, '') + 'колір не вказано</span>' +
+    '<span><i class="zcb stk" style="cursor:default;width:12px;height:12px;background:#C5D0D7"></i>без руху</span></div>' : '';
   h += zFold('r2_04', 'Де зараз · за кроками', '', '<div class="muted" style="margin-bottom:6px">Скільки штук чекає кожен крок. Натисніть крок — решта покаже тільки його.</div>' +
     '<div class="zctl"><span class="zg">Вид:' + zChips(D.view, [['proc', 'За процесами'], ['floor', 'За поверхами']], v => z2set('view', v)) + '</span>' +
-    '<span class="zg">Колонки:' + zChips(D.cols, [['none', 'Разом'], ['spec', 'Типорозмір · KV · колір']], v => z2set('cols', v)) + '</span>' +
-    '<span class="zg">Показати:' + zChips(D.unit, [['qty', 'Штуки'], ['cube', 'Ящики ▣']], v => z2set('unit', v)) + '</span>' +
-    (D.unit === 'cube' ? '<span class="zg">Колір:' + zChips(D.cmode, [['fill', 'заливкою'], ['edge', 'обідком']], v => z2set('cmode', v)) + '</span>' : '') + '</div>' + leg + body +
-    (D.unit === 'cube' ? '<p class="muted" style="margin:6px 0 0">Кубик — партія на кроці або ящик ГП. Розмір — від норми чистого ящика для типорозміру. Наведіть / натисніть — партія чи ящик.</p>' : ''), true);
+    '<span class="zg">Колонки:' + zChips(D.cols, [['none', 'Разом'], ['spec', 'Типорозмір · KV']], v => z2set('cols', v)) + '</span>' +
+    '<span class="zg">Показати:' + zChips(D.unit, [['qty', 'Штуки'], ['cube', 'Ящики ▣']], v => z2set('unit', v)) + '</span></div>' + leg + body +
+    (D.unit === 'cube' ? '<p class="muted" style="margin:6px 0 0">Кубик — партія в тарі на кроці або ящик ГП. Розмір — від норми чистого ящика для типорозміру. Наведіть — номер тари; натисніть — віконце з посиланнями на тару, партію чи ящик.</p>' : ''), true);
   // Р-2_05 Партії: у роботі / без руху / готові до збирання (v68: колишній Р-2_11 «Партії завершені» — тут)
   const rdyAll = [].concat(...['ST', 'RT'].filter(flowOk).map(rdyB));
   const list = (D.only === 'stuck' ? stk : D.only === 'ready' ? rdyAll.filter(b => D.rk === 'all' || b.stream === D.rk) : inw).slice()
