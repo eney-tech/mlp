@@ -1,5 +1,11 @@
 <!DOCTYPE html>
-<!-- МЛП · index.html v69 · 24.10.2026 — Р-2_04 «Де зараз» (рішення 24.10): наведення на кубик — номер тари першим (його видно на ящику, номер партії — ні);
+<!-- МЛП · index.html v70 · 24.10.2026 — Р-13 «Цех наживо» (рішення 24.10, Reports.gs v30; право dashStan, пункт меню після Р-2):
+     план поверхів Печерська (ENEY_MLP_Plan-poverhiv_Pechersk_v1) з робочими місцями за SOP; кубики Р-2_04 — ящики, що чекають крок, стоять
+     перед місцем кроку рядами, три ряди — наступний шар зверху; готові статори / ротори — біля F1; відкриті ящики ГП — біля K2; на складі —
+     у «Гаражі». Вид: поверх 1 / 2 / 3 або «Будівля 3D» (прозорі поверхи один над одним, ⟲ ⟳). Натиснути місце — черга праворуч; ящик —
+     віконце тари / партії. Р-13_04 повтор: сьогодні / попередній роб. день / 7 днів, ▶, повзунок, ×1 ×3 ×8 — ящики переходять між місцями.
+     Звіт — на всю ширину екрана (body.wide).
+     v69 · 24.10.2026 — Р-2_04 «Де зараз» (рішення 24.10): наведення на кубик — номер тари першим (його видно на ящику, номер партії — ні);
      натискання (і на телефоні) — віконце з посиланнями: тара, партія або ящик ГП; колір — тільки заливкою; колонки — «типорозмір · KV» (колір видно
      з кубиків), підписи по центру; шапка таблиці закріплена при прокручуванні; колонка «Крок» вузька (назва переноситься), клітинки кубиків ширші
      й розділені тонкою лінією; у «Разом» — тільки число, без смуги.
@@ -174,6 +180,27 @@
   table.zm2 th:first-child{z-index:3;text-align:left}table.zm2 td:first-child{min-width:92px;max-width:150px;font-size:13.5px;line-height:1.3}
   table.zm2 td+td{border-left:1px solid #EEF2F5}table.zm2 td.cb{min-width:130px;text-align:left}
   table.zm2 tr.click td:first-child{cursor:pointer}table.zm2 tr.dim{opacity:.35}
+  /* v70: Р-13 «Цех наживо» — план поверхів, ящики, «Будівля 3D», повтор */
+  .z13wrap{display:grid;grid-template-columns:minmax(0,1fr) 300px;gap:14px;align-items:start}
+  @media (max-width:1099px){.z13wrap{grid-template-columns:minmax(0,1fr)}}
+  .z13side{background:#F7FAFC;border-radius:12px;padding:12px;font-size:14px;position:sticky;top:8px}
+  .z13one svg{display:block;width:100%;height:auto;max-width:1100px;margin:0 auto}
+  .z13svg{font-family:inherit;user-select:none}.z13room{fill:#F8FAFB;stroke:#2F4858;stroke-width:4}.z13wall{fill:none;stroke:#2F4858;stroke-width:4}
+  .z13store{fill:#E4E8EB;stroke:#2F4858;stroke-width:3}.z13st{fill:#66767F;font-size:30px;font-weight:600}
+  .z13zone{fill:none;stroke:#A06E00;stroke-width:2.5;stroke-dasharray:4 6}.z13np{fill:#FFF8E6;stroke:#E0B54A;stroke-width:2;stroke-dasharray:8 6}.z13nt{fill:#8A5A00;font-size:22px;font-weight:600}
+  .z13wp rect{stroke-width:3}.z13wp[data-wp]{cursor:pointer}.z13wp .n{font-size:24px;font-weight:700;fill:#1D2B33}.z13wp .s{font-size:19px;fill:#66767F;font-family:ui-monospace,Menlo,Consolas,monospace}
+  .z13wp.g>rect{fill:#E3EFE8;stroke:#1F7A4D}.z13wp.s31>rect{fill:#DCE8F7;stroke:#1A5FB4}.z13wp.s43>rect{fill:#F8E3D3;stroke:#B4581A}.z13wp.ov>rect{fill:#F3E6C8;stroke:#8A6A1F}
+  .z13wp.tl>rect{fill:#E4E8EB;stroke:#2F4858}.z13wp.nu>rect{fill:none;stroke:#C5CED4;stroke-dasharray:8 6}.z13wp.t>rect{fill:#FFF4D6;stroke:#A06E00;stroke-dasharray:10 6}
+  .z13wp.t .n{font-size:20px;fill:#A06E00}.z13wp.p>rect{stroke-dasharray:12 6}.z13wp.sel>rect{stroke:#E0A800;stroke-width:8}
+  .z13q rect{fill:#2F4858}.z13q text{fill:#fff;font-size:18px;font-weight:700}
+  .z13b{transition:transform .5s ease,opacity .4s;cursor:pointer}.z13b.up rect{filter:drop-shadow(0 3px 2px rgba(0,0,0,.35))}
+  .z13b3d{perspective:3200px;height:min(94vh,1040px);overflow:hidden;position:relative;background:linear-gradient(#F4F7F9,#E4EAEF);border-radius:12px}
+  .z13rig{position:absolute;left:50%;top:76%;width:560px;height:620px;margin:-310px 0 0 -280px;transform-style:preserve-3d;transition:transform .6s}
+  .z13lvl{position:absolute;left:0;top:0;width:560px;transform-style:preserve-3d}.z13lvl svg{display:block;width:560px;height:auto}
+  .z13b3d .z13room{fill:rgba(248,250,251,.72)}.z13b3d .z13np{fill:rgba(255,248,230,.6)}
+  .z13lt{position:absolute;left:0;top:-40px;font-weight:700;color:#2F4858;font-size:26px;white-space:nowrap}
+  @media (max-width:700px){.z13b3d{height:78vh}.z13rig{top:66%;scale:.6}}
+  .z13ctl{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin:6px 0 10px}.z13ctl input[type=range]{flex:1;min-width:180px}.z13tm{font-variant-numeric:tabular-nums;min-width:130px}
   .zcpop{position:fixed;z-index:72;background:#fff;border:1px solid #C5D0D7;border-radius:12px;box-shadow:0 10px 30px rgba(0,0,0,.18);padding:10px 12px;min-width:210px;max-width:290px;font-size:14px;display:none}
   .zcpop .r{display:flex;justify-content:space-between;gap:12px;padding:3px 0}.zcpop a.ic{display:block;text-align:center;text-decoration:none;margin-top:8px}
   table.zm2 td:first-child,table.zm2 th:first-child,table.zdt td:first-child,table.zdt th:first-child{position:sticky;left:0;background:#fff;z-index:1}
@@ -477,7 +504,8 @@
 <div class="net" id="net" role="alert" aria-live="assertive"><div class="nb"><div class="rt" id="netr"></div><div class="nt" id="nett">Зберігаю…</div><div class="ns" id="nets"></div><div class="np"><i id="netp"></i></div><div class="nh" id="neth"></div><div class="zc" id="zc"></div><button class="nx" id="netx" type="button">Не чекати</button></div></div>
 
 <script>
-const PAGE_VERSION = 'index.html v69 · 24.10.2026';   // v69: Р-2_04 кубики — номер тари в підказці, віконце з посиланнями, тільки заливка, колонки «типорозмір · KV», закріплена шапка
+const PAGE_VERSION = 'index.html v70 · 24.10.2026';   // v70: Р-13 «Цех наживо» — план поверхів Печерська з ящиками, «Будівля 3D», повтор руху (Reports.gs v30)
+//   // v69   // v69: Р-2_04 кубики — номер тари в підказці, віконце з посиланнями, тільки заливка, колонки «типорозмір · KV», закріплена шапка
 //   // v68   // v68: звіти — фільтри рядками з мультивибором, згортання всіх візуалок, Р-2 ящики-кубики, Р-9 звірка за днями, Р-10 брак за днями
 //   // v67: екран очікування — ротор, прогрес, картки «питання → відповідь»
 //   // v66: іконка «Помічника» — робот
@@ -1087,11 +1115,12 @@ function navSave(me, perms) {
 /** v58 (рішення 23.10): «зав. відділу браку» → «зав. відділу якості»; Василь заміщує тімліда — у списках тімлідів */
 const QC_ROLE = 'зав. відділу якості';
 const LEAD_ROLES = ['тімлід', 'зав. виробництва', 'адміністратор', QC_ROLE];
-const DASHT = { stan: ['Р-2', 'Стан зараз'], motors: ['Р-11', 'Двигуни в роботі'], boxes: ['Р-12', 'Чисті ящики'], tare: ['Р-5', 'Аналіз тари'], batches: ['Р-7', 'Аналіз партій'], out: ['Р-8', 'Виробіток'], scrap: ['Р-10', 'Аналіз браку'], control: ['Р-9', 'Контроль записів МЛП'], my: ['Р-8с', 'Мій виробіток'] };
+const DASHT = { stan: ['Р-2', 'Стан зараз'], shop: ['Р-13', 'Цех наживо'], motors: ['Р-11', 'Двигуни в роботі'], boxes: ['Р-12', 'Чисті ящики'], tare: ['Р-5', 'Аналіз тари'], batches: ['Р-7', 'Аналіз партій'], out: ['Р-8', 'Виробіток'], scrap: ['Р-10', 'Аналіз браку'], control: ['Р-9', 'Контроль записів МЛП'], my: ['Р-8с', 'Мій виробіток'] };
 /** Звіти ролі для меню (Р-0_07). «Мій виробіток» у меню — працівнику (окрема вкладка); тімлідам і зав. відділу якості — 👁 за будь-кого (v58) */
 function navReports() {
   const p = NAV.perms || {}, r = [];
   if (p.dashStan) r.push(['d=stan', 'stan']);
+  if (p.dashStan) r.push(['d=shop', 'shop']);   // v70: Р-13 «Цех наживо»
   if (p.dashStan) r.push(['d=motors', 'motors']);   // v55: Р-11
   if (p.dashBoxes && NAV.role !== 'працівник') r.push(['d=boxes', 'boxes']);   // v57: Р-12 (працівнику — плитка на головній)
   if (p.dashTare) r.push(['d=tare', 'tare']);
@@ -2559,7 +2588,8 @@ function renderDash() {
   $('who').innerHTML = whoHtml(d.me, d.perms);
   ZA = []; ZDRAW = [];
   // v35: усі звіти без вкладок (переходи — у меню); «Мій виробіток» — Р-8с (старий dashMy лишається для відповіді без mode — прибрати на етапі 8)
-  let h = d.d === 'stan' ? r2() : d.d === 'motors' ? r11() : d.d === 'boxes' ? r12() : d.d === 'tare' ? r5() : d.d === 'out' ? r8() : d.d === 'scrap' ? r10() : d.d === 'batches' ? (d.card ? r7card() : r7()) : d.d === 'control' ? r9() : r8c();
+  document.body.classList.toggle('wide', d.d === 'shop');   // v70: Р-13 — на всю ширину екрана
+  let h = d.d === 'stan' ? r2() : d.d === 'shop' ? r13() : d.d === 'motors' ? r11() : d.d === 'boxes' ? r12() : d.d === 'tare' ? r5() : d.d === 'out' ? r8() : d.d === 'scrap' ? r10() : d.d === 'batches' ? (d.card ? r7card() : r7()) : d.d === 'control' ? r9() : r8c();
   h += '<p class="muted" style="text-align:center">Дані на ' + esc(d.now) + (d.me.role === 'адміністратор' ? ' · ' + sec(d.ms) + ' / ' + sec(d.total) + (d.cached ? ' · кеш' : '') + (d.logSrc ? ' · ' + esc(d.logSrc) : '') : '') +
     ' · <a class="lnk" href="javascript:loadDash(1)">оновити</a>' +
     ((d.perms || {}).baMode ? ' · <a class="lnk" href="javascript:baToggle()">🏷 Індекси: ' + (baOn() ? 'вимкнути' : 'увімкнути') + '</a>' : '') +   // v61
@@ -2576,6 +2606,7 @@ function renderDash() {
 const BAIX = {
   'Р-2': { f: { r2_04: 'Р-2_04', r2_05: 'Р-2_05' }, c: {} },   // v68: Р-2_11 — у Р-2_05
   'Р-11': { f: { r11_01: 'Р-11_03', r11_leg: 'Р-11_04' }, c: {} },
+  'Р-13': { f: { r13map: 'Р-13_03', r13rp: 'Р-13_04' }, c: {} },   // v70
   'Р-12': { f: { r12box: 'Р-12_03' }, c: {} },
   'Р-5': { f: { r5_04: 'Р-5_04', r5idle: 'Р-5_05', r5types: 'Р-5_03' }, c: {} },
   'Р-7': { f: { r7idle: 'Р-7_12', r7lead: 'Р-7_04', r7wait: 'Р-7_05', r7tbl: 'Р-7_06', r7recs: 'Р-7_07', r7c: 'Р-7_03', r7path: 'Р-7_07' }, c: { '': 'Р-7_07' } },
@@ -3839,6 +3870,307 @@ function r2() {
       (list.length > 15 ? '<button type="button" class="ic" style="margin-top:8px" onclick="zA(' + zAct(() => { D.more = !D.more; renderDash(); }) + ')">' + (D.more ? 'Згорнути' : 'Показати всі ' + list.length) + '</button>' : '')
       : '<p class="muted">Немає партій за цими фільтрами.</p>'));
   return h;
+}
+
+// =============================================================== v70: Р-13 «ЦЕХ НАЖИВО» — план поверхів Печерська: ящики (кубики Р-2_04) чекають біля столів своїх кроків
+// План — ENEY_MLP_Plan-poverhiv_Pechersk_v1 (24.10.2026; поверх 1 погоджено, 2 — чернетка, 3 — з малюнка тімліда). Ящик стоїть ПЕРЕД столом (бік до центру
+// приміщення), ряди від столу; три ряди заповнені — наступний шар зверху (як у цеху, «хаос» видно). Готові статори / ротори чекають F1 — біля місця F1.
+// Відкриті ящики ГП — біля K2, на складі — у «Гаражі». Вид: поверх 1 / 2 / 3 або «Будівля 3D» (поверхи один над одним, прозорі). Р-13_04 — повтор руху за день / тиждень.
+const PLAN13 = {
+  floors: {
+    1: { name: 'Поверх 1', status: 'погоджено', vb: [0, 0, 1440, 1820], rooms: [[15, 15, 1385, 1275], [680, 1290, 310, 320], [990, 1290, 425, 320]], lines: [[995, 1160, 995, 1290]],
+      stores: [{ id: 'WH1', x: 1005, y: 20, w: 395, h: 930, t: ['Склад №1', '«Гараж»'] }], zones: [], np: [30, 1650, 1380, 160] },
+    2: { name: 'Поверх 2', status: 'чернетка', vb: [0, 0, 1350, 1950], rooms: [[25, 25, 1295, 1710]], lines: [[870, 1190, 1320, 1190]],
+      stores: [{ id: 'WH2', x: 415, y: 1370, w: 525, h: 365, t: ['Склад №2', '«Кабінет»'] }], zones: [[300, 1215, 440, 135]], np: [30, 1780, 1290, 160] },
+    3: { name: 'Поверх 3', status: 'з малюнка тімліда', vb: [0, 0, 1280, 1140], rooms: [[20, 20, 1240, 920]], path: 'M20 630 L250 630 Q320 630 320 700 L320 940',
+      areas: [[60, 790, 'Відділ якості']], stores: [], zones: [[365, 270, 700, 185]], np: [20, 970, 1240, 160] }
+  },
+  // [поверх, id, вид, типорозмір, кроки, x, y, w, h, стан]; стан: '' — працює, p — буде, t — місце уточнити, u — не використовується
+  wp: [
+    [1, '1.01', 'Стіл', '', 'K2', 95, 235, 295, 110], [1, '1.02', 'Стіл', '', 'F3', 95, 345, 185, 105], [1, '1.03', 'Стіл', '', 'F5', 280, 345, 205, 105],
+    [1, '1.04', 'Стіл', '', 'S4', 95, 660, 180, 100], [1, '1.05', 'Стіл', '', 'S4', 275, 660, 180, 100], [1, '1.06', 'Стіл', '', 'S4', 455, 660, 180, 100],
+    [1, '1.07', 'Стіл', '', 'S3', 100, 925, 222, 95], [1, '1.08', 'Стіл', '', 'S3', 322, 925, 223, 95], [1, '1.09', 'Намотувальна машина', '', 'S1', 1115, 1020, 105, 90],
+    [1, '1.10', 'Стіл', '', 'S2', 1010, 1045, 105, 95], [1, '1.11', 'Намотувальна машина', '', 'S1', 1115, 1150, 105, 95], [1, '1.12', 'Стіл', '', 'S2', 1010, 1175, 105, 95],
+    [1, '', 'Стіл', '', '', 95, 80, 130, 95, 'u'], [1, '', 'Стіл', '', '', 360, 85, 125, 80, 'u'], [1, '', 'Стіл', '', '', 200, 1080, 250, 90, 'u'],
+    [1, '', 'Стіл', '', '', 830, 1365, 105, 70, 'u'], [1, '', 'Стіл', '', '', 830, 1435, 105, 70, 'u'],
+    [2, 'OV2', 'Піч', '', 'OV2', 405, 120, 135, 130], [2, 'OV1', 'Піч', '', 'OV1', 540, 120, 175, 130], [2, 'OV3', 'Піч', '', 'OV3', 715, 120, 160, 130],
+    [2, '2.01', 'Стіл', '', 'S10', 830, 280, 150, 82], [2, '2.02', 'Стіл', '', 'S11', 980, 280, 150, 82], [2, '2.03', 'Стіл', '', 'S9.2', 830, 362, 150, 83],
+    [2, '2.04', 'Стіл', '', 'S9.3', 980, 362, 150, 83], [2, '', 'Стіл', '', '', 1130, 280, 190, 82, 'u'], [2, '', 'Стіл', '', '', 1130, 362, 190, 83, 'u'],
+    [2, '2.05', 'Стіл', '', 'S14', 410, 430, 90, 180], [2, '2.06', 'Стіл', '', 'S12', 500, 430, 105, 180], [2, '', 'Стіл', '', '', 410, 610, 90, 175, 'u'],
+    [2, '2.07', 'Стіл', '', 'S13', 500, 610, 105, 175], [2, '2.08', 'Стіл', '', 'S7', 25, 495, 215, 170], [2, '2.09', 'Стіл', '', 'S6 S7', 25, 665, 215, 265],
+    [2, '2.10', 'Стіл', '', 'S5 S6 S7', 25, 930, 215, 190], [2, '2.11', 'Стіл', '', 'S11.1', 870, 695, 230, 125], [2, '2.12', 'Стіл', '', 'S11.2', 1100, 695, 220, 125],
+    [2, 'TL2', 'Стіл тімліда', '', '', 750, 995, 120, 195], [2, '?S8', 'Місце уточнити', '', 'S8', 320, 1265, 195, 65, 't'], [2, '?S9.1', 'Місце уточнити', '', 'S9.1', 525, 1265, 195, 65, 't'],
+    [3, '3.01', 'Баланс-машина', '4320', 'R5 R6', 200, 100, 90, 165], [3, '3.02', 'Баланс-машина', '4320', 'R5 R6', 200, 270, 90, 130], [3, '3.03', 'Штифт', '3115', 'R1', 110, 410, 180, 85],
+    [3, '3.04', 'Гравер', '', 'F4 F4п', 80, 530, 200, 70], [3, '3.05', 'Штифт', '4320', 'R1', 350, 80, 130, 145], [3, '3.06', 'Стіл', '3115', 'R3.1', 485, 90, 145, 115, 'p'],
+    [3, '3.07', 'Стіл', '3115', 'R3.1', 635, 90, 135, 115], [3, '3.08', 'Клейова машина', '3115', 'R4', 775, 85, 155, 105], [3, '3.09', 'Стіл', '', 'R4', 890, 195, 70, 65],
+    [3, '3.10', 'Баланс-машина', '3115', 'R5 R6', 1075, 140, 180, 90], [3, '3.11', 'Баланс-машина', '3115', 'R5 R6', 1135, 245, 90, 130], [3, '3.12', 'Баланс-машина', '3115', 'R5 R6', 1135, 395, 90, 125],
+    [3, '3.13', 'Баланс-машина', '3115', 'R5 R6', 1150, 545, 90, 160], [3, '3.14', 'Гравер', '', 'F4 F4п', 395, 490, 135, 65], [3, '3.15', 'Клейова машина', '3115', 'R4', 800, 470, 130, 85],
+    [3, '3.16', 'Стіл', '', 'R4', 740, 545, 60, 65], [3, 'TL3', 'Стіл тімліда', '', '', 420, 715, 110, 165], [3, '3.17', 'Баланс-машина', '4320', 'R5 R6', 790, 750, 170, 75],
+    [3, '3.18', 'Баланс-машина', '3115', 'R5 R6', 965, 755, 135, 65], [3, '3.19', 'Баланс-машина', '4320', 'R5 R6', 1105, 750, 140, 75],
+    [3, '?F1', 'Місце уточнити', '', 'F1', 385, 315, 205, 55, 't'], [3, '?F2', 'Місце уточнити', '', 'F2', 600, 315, 205, 55, 't'], [3, '?R2', 'Місце уточнити', '', 'R2', 815, 315, 205, 55, 't'],
+    [3, '?R3.2', 'Місце уточнити', '', 'R3.2', 385, 380, 205, 55, 't'], [3, '?OV4', 'Місце уточнити', '', 'OV4', 600, 380, 205, 55, 't'], [3, '?R7', 'Місце уточнити', '', 'R7', 815, 380, 205, 55, 't']
+  ].map(a => ({ f: a[0], id: a[1], kind: a[2], size: a[3], steps: a[4] ? a[4].split(' ') : [], x: a[5], y: a[6], w: a[7], h: a[8], st: a[9] || '' }))
+};
+const Z13 = { fl: '1', flow: [], typ: [], only: 'all', sel: '', rz: -32, rp: { per: 'today', mv: null, busy: false, err: '', i: 0, play: false, sp: 1, fl: '3d' } };
+try { const v = JSON.parse(store('mlp_z13') || 'null'); if (v) { if (v.fl) Z13.fl = v.fl; if (v.rfl) Z13.rp.fl = v.rfl; } } catch (e) { }
+/** назва кроку з маршрутів Р-2 */
+const z13sn = c => { const r = DB.routes || {}; for (const k in r) { const x = r[k].find(y => y[0] === c); if (x) return x[1]; } return ''; };
+const z13save = () => store('mlp_z13', JSON.stringify({ fl: Z13.fl, rfl: Z13.rp.fl }));
+const Z13C = 36;   // клітинка під ящик в одиницях плану (стандартний ящик ≈ 30)
+/** назва місця */
+const z13title = w => w.st === 't' ? 'Місце уточнити (' + w.steps.join(', ') + ')' : w.kind === 'Піч' || w.kind === 'Стіл тімліда' ? w.kind + (w.kind === 'Піч' ? ' ' + w.id : '') : w.kind + ' ' + w.id;
+/** куди ставити ящики кроку: місця з цим кроком (машини свого типорозміру — першими); немає — смуга «без місця на плані» поверху кроку */
+function z13places(step, typ) {
+  const c = PLAN13.wp.filter(w => w.st !== 'u' && w.steps.indexOf(step) >= 0);
+  const own = c.filter(w => !w.size || w.size === typ);
+  return own.length ? own : c;
+}
+/** розставляє одиниці (партія на кроці, ящик ГП) по місцях: перед столом рядами, три ряди — новий шар зверху; склад і «без місця» — сіткою */
+function z13layout(units) {
+  const places = {}, fl = DB.floors && DB.floors['П'] || {};
+  units.forEach(u => {
+    let key, pl;
+    if (u.wh) { key = 'WH1'; pl = { f: 1, store: PLAN13.floors[1].stores[0] }; }
+    else {
+      const ps = z13places(u.step, u.typ);
+      if (ps.length) { const w = ps.length === 1 ? ps[0] : ps.slice().sort((a, b) => ((places[a.id] || {}).n || 0) - ((places[b.id] || {}).n || 0))[0]; key = w.id; pl = { f: w.f, w: w }; }
+      else { const f = Number((fl[u.step] || {})['*'] || (fl[u.step] || {})[u.typ] || 1) || 1; key = 'NP' + f; pl = { f: f, np: PLAN13.floors[f].np }; }
+    }
+    const P = places[key] = places[key] || Object.assign({ key: key, n: 0, us: [] }, pl);
+    P.us.push(u); P.n++;
+  });
+  Object.keys(places).forEach(k => {
+    const P = places[k], F = PLAN13.floors[P.f], C = Z13C;
+    P.us.sort((a, b) => (a.at || 0) - (b.at || 0) || String(a.key).localeCompare(String(b.key)));
+    if (P.w) {
+      const w = P.w, vb = F.vb, dx = (vb[2] / 2 - (w.x + w.w / 2)) / vb[2], dy = (vb[3] * .45 - (w.y + w.h / 2)) / vb[3];
+      const hor = w.h > w.w * 1.15 || (w.h * 1.15 >= w.w && Math.abs(dx) > Math.abs(dy)), side = hor ? (dx > 0 ? 'r' : 'l') : (dy > 0 ? 'd' : 'u');   // перед — уздовж довгого боку, до центру приміщення
+      const L = hor ? w.h : w.w, n = Math.max(2, Math.floor(L / C)), cap = n * 3, off = ((L - n * C) / 2);
+      P.us.forEach((u, i) => {
+        const layer = Math.floor(i / cap), j = i % cap, row = Math.floor(j / n), col = j % n;
+        const a = off + C / 2 + col * C, dpt = 10 + C / 2 + row * C;
+        let x, y;
+        if (side === 'd') { x = w.x + a; y = w.y + w.h + dpt; } else if (side === 'u') { x = w.x + a; y = w.y - dpt; }
+        else if (side === 'r') { x = w.x + w.w + dpt; y = w.y + a; } else { x = w.x - dpt; y = w.y + a; }
+        u.px = x - layer * 6; u.py = y - layer * 9; u.layer = layer; u.f = P.f;
+      });
+      P.side = side;
+    } else {
+      const r = P.store ? [P.store.x + 10, P.store.y + 100, P.store.w - 20, P.store.h - 110] : [P.np[0] + 10, P.np[1] + 34, P.np[2] - 20, P.np[3] - 40];
+      const cols = Math.max(1, Math.floor(r[2] / C)), rows = Math.max(1, Math.floor(r[3] / C)), cap = cols * rows;
+      P.us.forEach((u, i) => { const layer = Math.floor(i / cap), j = i % cap; u.px = r[0] + C / 2 + (j % cols) * C - layer * 6; u.py = r[1] + C / 2 + Math.floor(j / cols) * C - layer * 9; u.layer = layer; u.f = P.f; });
+    }
+  });
+  return places;
+}
+/** розмір кубика на плані: стандартний ящик (норма для типорозміру) — 30, площа ~ шт */
+const z13side = u => Math.max(12, Math.min(58, Math.round(30 * Math.sqrt(Math.max(.02, u.q / (u.per || 160))))));
+function z13boxSvg(u, i) {
+  const s = z13side(u), cs = (u.cols || []).map(zColC), none = !cs.length;
+  const fill = none ? '#FFFFFF' : cs.length > 1 ? 'url(#z13g_' + COLN(u.cols[0]).replace(/\W/g, '') + '_' + COLN(u.cols[1]).replace(/\W/g, '') + ')' : cs[0];
+  return '<g class="z13b' + (u.layer ? ' up' : '') + '" data-i="' + i + '" style="transform:translate(' + u.px.toFixed(1) + 'px,' + u.py.toFixed(1) + 'px)">' +
+    '<rect x="' + (-s / 2) + '" y="' + (-s / 2) + '" width="' + s + '" height="' + s + '" rx="3" fill="' + fill + '"' + (none ? ' stroke="#8A99A3" stroke-dasharray="5 3" stroke-width="2"' : ' stroke="#fff" stroke-width="2"') + '/>' +
+    (u.stk ? '<circle cx="' + (s / 2 - 2) + '" cy="' + (-s / 2 + 2) + '" r="6" fill="#B3261E" stroke="#fff" stroke-width="2"/>' : '') + '</g>';
+}
+/** градієнти для двоколірних ящиків (двигуни з роторами двох кольорів) */
+function z13defs() {
+  const c = Object.keys(ZCOLC); let h = '<defs>';
+  c.forEach(a => c.forEach(b => { if (a !== b) h += '<linearGradient id="z13g_' + a.replace(/\W/g, '') + '_' + b.replace(/\W/g, '') + '" x1="0" y1="0" x2="1" y2="1"><stop offset=".5" stop-color="' + ZCOLC[a] + '"/><stop offset=".5" stop-color="' + ZCOLC[b] + '"/></linearGradient>'; }));
+  return h + '</defs>';
+}
+/** SVG поверху: приміщення, склади, зони, місця з чергою, ящики (units — уже розставлені) */
+function z13floorSvg(f, units, places, opt) {
+  const F = PLAN13.floors[f], npOn = opt.np || !!(places['NP' + f] && places['NP' + f].us.length);
+  const vb = npOn ? F.vb : [0, 0, F.vb[2], F.np[1] - 10];   // смуга «без місця на плані» — тільки коли там щось є
+  let h = '<svg class="z13svg" viewBox="' + vb.join(' ') + '" data-f="' + f + '" role="img" aria-label="' + esc(F.name) + '">' + z13defs();
+  F.rooms.forEach(r => { h += '<rect class="z13room" x="' + r[0] + '" y="' + r[1] + '" width="' + r[2] + '" height="' + r[3] + '" rx="10"/>'; });
+  (F.lines || []).forEach(l => { h += '<line class="z13wall" x1="' + l[0] + '" y1="' + l[1] + '" x2="' + l[2] + '" y2="' + l[3] + '"/>'; });
+  if (F.path) h += '<path class="z13wall" d="' + F.path + '"/>';
+  (F.areas || []).forEach(a => { h += '<text class="z13st" x="' + a[0] + '" y="' + a[1] + '">' + esc(a[2]) + '</text>'; });
+  F.stores.forEach(s => { h += '<rect class="z13store" x="' + s.x + '" y="' + s.y + '" width="' + s.w + '" height="' + s.h + '" rx="8"/>' +
+    s.t.map((t, i) => '<text class="z13st" x="' + (s.x + s.w / 2) + '" y="' + (s.y + 44 + i * 36) + '" text-anchor="middle">' + esc(t) + '</text>').join(''); });
+  F.zones.forEach(z => { h += '<rect class="z13zone" x="' + z[0] + '" y="' + z[1] + '" width="' + z[2] + '" height="' + z[3] + '" rx="12"/>'; });
+  const np = F.np; if (npOn) h += '<rect class="z13np" x="' + np[0] + '" y="' + np[1] + '" width="' + np[2] + '" height="' + np[3] + '" rx="10"/><text class="z13nt" x="' + (np[0] + 14) + '" y="' + (np[1] + 26) + '">Кроки без місця на плані (поверх ' + f + ')</text>';
+  PLAN13.wp.filter(w => w.f === Number(f)).forEach(w => {
+    const P = places[w.id], n = P ? P.us.length : 0, q = P ? P.us.reduce((a, u) => a + u.q, 0) : 0;
+    const cls = 'z13wp ' + (w.st === 'u' ? 'nu' : w.st === 't' ? 't' : w.kind === 'Піч' ? 'ov' : w.kind === 'Стіл тімліда' ? 'tl' : w.size === '3115' ? 's31' : w.size === '4320' ? 's43' : 'g') + (w.st === 'p' ? ' p' : '') + (Z13.sel && Z13.sel === w.id ? ' sel' : '');
+    const cx = w.x + w.w / 2, cy = w.y + w.h / 2, small = w.w < 100 || w.h < 70;
+    h += '<g class="' + cls + '"' + (w.st !== 'u' && w.id && opt.click ? ' data-wp="' + esc(w.id) + '"' : '') + '><rect x="' + w.x + '" y="' + w.y + '" width="' + w.w + '" height="' + w.h + '" rx="6"/>' +
+      (w.st === 'u' ? '' : '<text class="n" x="' + cx + '" y="' + (cy - (small ? 0 : 6)) + '" text-anchor="middle">' + esc(w.st === 't' ? w.steps.join(' ') : w.kind === 'Піч' ? w.id : w.id) + '</text>' +
+        (small || w.st === 't' ? '' : '<text class="s" x="' + cx + '" y="' + (cy + 20) + '" text-anchor="middle">' + esc(w.kind === 'Стіл тімліда' ? 'тімлід' : w.steps.join(' ')) + '</text>')) +
+      (n ? '<g class="z13q"><rect x="' + (w.x + w.w - 74) + '" y="' + (w.y - 18) + '" width="78" height="30" rx="15"/><text x="' + (w.x + w.w - 35) + '" y="' + (w.y + 3) + '" text-anchor="middle">' + n + ' · ' + (q >= 1000 ? (Math.round(q / 100) / 10).toString().replace('.', ',') + 'т' : q) + '</text></g>' : '') + '</g>';
+  });
+  const us = units.map((u, i) => [u, i]).filter(x => x[0].f === Number(f)).sort((a, b) => a[0].layer - b[0].layer || a[0].py - b[0].py);
+  h += '<g class="z13boxes">' + us.map(x => z13boxSvg(x[0], x[1])).join('') + '</g>';
+  return h + '</svg>';
+}
+/** сцена: один поверх або «Будівля 3D» (три поверхи один над одним) */
+function z13scene(id, fl, units, places, opt) {
+  if (fl !== '3d') return '<div class="z13one" id="' + id + '">' + z13floorSvg(fl, units, places, opt) + '</div>';
+  return '<div class="z13b3d" id="' + id + '"><div class="z13rig" style="transform:scale(.66) rotateX(58deg) rotateZ(' + Z13.rz + 'deg)">' +
+    [1, 2, 3].map(f => '<div class="z13lvl" style="transform:translateZ(' + ((f - 1) * 400) + 'px)"><span class="z13lt">' + f + ' поверх</span>' + z13floorSvg(f, units, places, opt) + '</div>').join('') + '</div></div>';
+}
+/** натискання на сцені: ящик — віконце з тарою / партією / ящиком; місце — його черга праворуч */
+function z13wire(id, units, onPlace) {
+  const el = $(id); if (!el) return;
+  el.onclick = e => {
+    const b = e.target.closest('.z13b'); if (b) { const u = units[Number(b.dataset.i)]; if (u) zCubePop(u, e); return; }
+    const w = e.target.closest('[data-wp]'); if (w && onPlace) onPlace(w.dataset.wp);
+  };
+  el.onpointerover = e => { if (e.pointerType !== 'mouse') return; const b = e.target.closest('.z13b'); if (!b) return; const u = units[Number(b.dataset.i)]; if (!u) return;
+    const tip = $('tip'); tip.textContent = (u.box ? u.t : (u.tare || 'без тари')) + (u.no ? ' · ' + u.no : '') + ' · ' + fn(u.q) + ' шт' + (u.stk ? ' · без руху ' + u.idle + ' дн.' : ''); tip.style.display = 'block'; tip._info = b;
+    const r = b.getBoundingClientRect(); tip.style.left = Math.min(r.right + 6, window.innerWidth - tip.offsetWidth - 8) + 'px'; tip.style.top = (r.top - 4) + 'px'; };
+  el.onpointerout = e => { if (e.target.closest('.z13b')) infoHide(); };
+}
+function z13rot(d) { Z13.rz += d; document.querySelectorAll('.z13rig').forEach(r => { r.style.transform = 'scale(.66) rotateX(58deg) rotateZ(' + Z13.rz + 'deg)'; }); }
+/** одиниці «зараз» з даних Р-2: партія на кроці (wait), готові до збирання (чекають F1), відкриті ящики ГП (біля K2), ящики на складі */
+function z13now() {
+  const d = DB, D = Z13, norm = d.boxNorm || {}, per = t => norm[t] || norm['*'] || 160;
+  const pick = b => zHas(D.flow, b.stream) && zHas(D.typ, b.typ) && String(b.loc || 'П').charAt(0) !== 'Ж' && (D.only === 'all' || b.stuck);
+  const cols = b => (b.stream === 'MT' ? (b.colors || []) : [COLN(b.color)]).filter(Boolean);
+  const U = (b, step, q, ready) => ({ key: b.no + '|' + step, step: step, q: q, typ: b.typ, kv: b.kv || '', cols: cols(b), t: b.no, no: b.no, tare: b.tare || '', tare2: b.tare2 || '',
+    href: blHref(b.no), per: per(b.typ), stk: b.stuck, idle: b.idle, at: -b.idle, ready: ready, stream: b.stream });
+  const out = [];
+  d.batches.filter(pick).forEach(b => {
+    if (b.status === 'в роботі' || b.status === 'поза маршрутом') Object.keys(b.wait || {}).forEach(c => { if (b.wait[c] > 0) out.push(U(b, c, b.wait[c])); });
+    else if ((b.stream === 'ST' || b.stream === 'RT') && (b.status === 'готово' || b.status === 'видано частково') && b.rem > 0) out.push(U(b, 'F1', b.rem, true));
+  });
+  if (zHas(D.flow, 'MT') && D.only === 'all') (d.boxes || []).filter(x => x.loc !== 'Ж' && zHas(D.typ, x.typ)).forEach(x => out.push({ box: 1, id: x.id, key: 'bx|' + x.id, step: 'K2', wh: x.st === 'wh',
+    q: x.total, typ: x.typ, kv: x.kv || '', cols: x.colors || [], t: x.name, owner: x.owner || '', st: x.st, per: x.per || per(x.typ), at: 0 }));
+  return out;
+}
+function r13() {
+  const d = DB, D = Z13;
+  document.body.classList.add('wide');
+  const typs = zUniq(d.batches.map(b => b.typ)).filter(Boolean).sort();
+  D.typ = D.typ.filter(x => typs.indexOf(x) >= 0);
+  let h = zFbar('r13', [D.flow.length ? D.flow.map(f => FLOWN[f][0].toLowerCase()).join(', ') : 'усі продукти'].concat(D.typ.length ? [D.typ.join(', ')] : [], D.only === 'stuck' ? ['без руху'] : []).join(' · '), D.typ.length + (D.only === 'stuck' ? 1 : 0),
+    '<div class="zfr"><span class="zfl">Локація</span><div class="chips"><button type="button" class="on" disabled>Печерськ</button><span class="muted" style="align-self:center;font-size:13px">план є тільки для Печерська</span></div></div>' +
+    zFrow('Продукт', [['ST', 'Статори'], ['RT', 'Ротори'], ['MT', 'Двигуни']], D.flow, v => { D.flow = v; renderDash(); }) +
+    zFrow('Типорозмір', typs.map(x => [x, x]), D.typ, v => { D.typ = v; renderDash(); }) +
+    zFrow('Показати', [['all', 'Усі ящики'], ['stuck', 'Тільки без руху']], D.only, v => { D.only = v; renderDash(); }));
+  const units = z13now(), places = z13layout(units);
+  const wait = units.filter(u => !u.box && !u.ready), stk = wait.filter(u => u.stk), wh = units.filter(u => u.wh);
+  const top = Object.keys(places).map(k => places[k]).filter(P => P.w).sort((a, b) => b.us.length - a.us.length)[0];
+  const byF = f => units.filter(u => u.f === f).length;
+  h += '<div class="zkpis">' + zKpi('Чекають біля столів', fn(wait.length), 'ящиків', fn(wait.reduce((a, u) => a + u.q, 0)) + ' шт', 'Партія в тарі, що чекає крок, — один кубик. Партія, розділена між кроками, — кубик біля кожного.') +
+    zKpi('Найбільша черга', top ? fn(top.us.length) : '—', top ? 'ящиків' : '', top ? esc(z13title(top.w)) + ' · ' + esc(top.w.steps.join(', ')) : '', '', '', top ? zAct(() => { D.sel = top.w.id; D.fl = String(top.w.f); z13save(); renderDash(); }) : undefined) +
+    zKpi('Без руху', fn(stk.length), 'ящиків', fn(stk.reduce((a, u) => a + u.q, 0)) + ' шт', IDLE_TIP(d.idleDays), stk.length ? 'kbad' : '') +
+    zKpi('Склад ГП «Гараж»', fn(wh.length), 'ящиків', fn(wh.reduce((a, u) => a + u.q, 0)) + ' двигунів', 'Чисті ящики готової продукції на складі (облік ящиків — з 20.10).') + '</div>';
+  // Р-13_03 план
+  const tabs = [['1', '1 поверх · ' + byF(1)], ['2', '2 поверх · ' + byF(2)], ['3', '3 поверх · ' + byF(3)], ['3d', 'Будівля 3D']];
+  const selP = D.sel && places[D.sel], selW = D.sel && PLAN13.wp.find(w => w.id === D.sel);
+  let side = '';
+  if (selW) {
+    const us = selP ? selP.us : [];
+    side = '<div class="mid" style="font-size:16px">' + esc(z13title(selW)) + '</div><div class="muted">' + esc(PLAN13.floors[selW.f].name) + (selW.size ? ' · ' + selW.size : '') + (selW.st === 'p' ? ' · ще не працює' : '') + '</div>' +
+      '<div style="margin:8px 0">' + selW.steps.map(c => '<div><b>' + esc(c) + '</b> <span class="muted">' + esc(z13sn(c)) + '</span></div>').join('') + '</div>' +
+      (us.length ? '<div class="muted" style="margin-bottom:4px">Чекають: ' + us.length + ' · ' + fn(us.reduce((a, u) => a + u.q, 0)) + ' шт</div><div class="tw" style="max-height:52vh"><table class="t"><tr><th>Тара</th><th>Партія</th><th class="r">шт</th><th class="r">дн.</th></tr>' +
+        us.slice().sort((a, b) => (b.idle || 0) - (a.idle || 0)).map(u => '<tr class="z13row" data-k="' + esc(u.key) + '" style="cursor:pointer"><td><b>' + esc(u.box ? u.t : u.tare || '—') + '</b></td><td>' + esc(u.box ? (u.owner || '') : u.no) + (u.ready ? ' <span class="pill ok" style="margin:0">готово</span>' : '') + '</td><td class="r">' + fn(u.q) + '</td><td class="r">' +
+          (u.stk ? '<span class="pill bad" style="margin:0">' + u.idle + '</span>' : (u.idle || 0)) + '</td></tr>').join('') + '</table></div>' : '<p class="muted">Біля цього місця зараз ящиків немає.</p>') +
+      '<button type="button" class="ic" style="margin-top:8px" onclick="zA(' + zAct(() => { D.sel = ''; renderDash(); }) + ')">✕ Закрити</button>';
+  } else side = '<div class="mid" style="font-size:16px">Як читати</div><div class="zcleg" style="flex-direction:column;align-items:flex-start;gap:6px;margin-top:8px">' +
+    '<span><i class="zcb" style="width:16px;height:16px;background:#1F2326"></i>ящик (партія в тарі) — стандартний</span><span><i class="zcb" style="width:9px;height:9px;background:#1F2326"></i>менше ящика · <i class="zcb" style="width:24px;height:24px;background:#1F2326"></i> більше</span>' +
+    ['синій', 'кольоровий', 'інший'].map(c => '<span><i class="zcb" style="width:16px;height:16px;background:' + zColC(c) + '"></i>' + c + '</span>').join('') +
+    '<span><i class="zcb" style="width:16px;height:16px;background:#fff;border:1.5px dashed #9AA8B0"></i>колір не вказано</span><span><i class="zcb stk" style="width:16px;height:16px;background:#C5D0D7"></i>без руху ≥ ' + d.idleDays + ' роб. дн.</span>' +
+    '<span><b style="background:#2F4858;color:#fff;border-radius:99px;padding:1px 8px;font-size:12px">12 · 1,4т</b> ящиків · штук у черзі</span></div>' +
+    '<p class="muted" style="margin-top:10px">Ящики стоять перед місцем свого наступного кроку, рядами від столу; три ряди заповнені — наступні ставимо зверху (зсунуті). Готові статори й ротори чекають F1 — біля його місця. Натисніть місце — його черга тут; ящик — тара й партія.</p>';
+  const sc = z13scene('z13s', D.fl, units, places, { click: 1 });
+  h += zFold('r13map', 'План · ящики біля місць', units.length + ' на плані', '<div class="zctl">' + zChips(D.fl, tabs, v => { D.fl = v; z13save(); renderDash(); }) +
+    (D.fl === '3d' ? '<span class="zg"><button type="button" class="ic" onclick="z13rot(-15)">⟲</button><button type="button" class="ic" onclick="z13rot(15)">⟳</button></span>' : '') + '</div>' +
+    '<div class="z13wrap"><div class="z13main">' + sc + '</div><aside class="z13side">' + side + '</aside></div>' +
+    '<p class="muted" style="margin:6px 0 0">План: 1 поверх — погоджено, 2 — чернетка, 3 — з малюнка тімліда; місця «уточнити» — пунктиром. Дані — як у Р-2 «Стан зараз».</p>', true);
+  ZDRAW.push(() => { z13wire('z13s', units, id => { D.sel = D.sel === id ? '' : id; renderDash(); });
+    document.querySelectorAll('.z13row').forEach(tr => tr.onclick = e => { const u = units.find(x => x.key === tr.dataset.k); if (u) zCubePop(u, e); }); });
+  // Р-13_04 повтор
+  h += zFold('r13rp', 'Повтор: як рухались ящики', '', z13rpHtml(), true);
+  ZDRAW.push(z13rpDraw);
+  return h;
+}
+// ---- Р-13_04 повтор руху: позиції партій у кожен момент рахуються на сторінці з записів кроків (сервер d=shop&rp)
+const Z13PER = [['today', 'Сьогодні'], ['prev', 'Попередній роб. день'], ['w', 'Останні 7 днів']];
+function z13rpRange(per) { const t = zToday(); return per === 'today' ? [t, t] : per === 'prev' ? [zPrevWork(t), zPrevWork(t)] : [zAdd(t, -6), t]; }
+function z13rpLoad() {
+  const R = Z13.rp, rg = z13rpRange(R.per); R.busy = true; R.err = ''; R.mv = null; R.play = false; renderDash();
+  google.script.run.withSuccessHandler(x => { R.busy = false; R.mv = x.mv; z13rpPrep(); R.i = 0; renderDash(); })
+    .withFailureHandler(e => { R.busy = false; R.err = e.message; renderDash(); }).apiDash({ code: CODE, d: 'shop', rp: 1, from: rg[0], to: rg[1] });
+}
+/** кадри — кожні 10 хв робочого часу (7:00–19:00) робочих днів і днів із записами */
+function z13rpPrep() {
+  const R = Z13.rp, mv = R.mv; if (!mv) return;
+  const has = new Set(); mv.b.forEach(b => b[9].forEach(r => has.add(zYmd(new Date(r[0])))));
+  const ticks = [];
+  for (let d = mv.from; d <= mv.to; d = zAdd(d, 1)) {
+    if (zDow(d) > 4 && !has.has(d)) continue;
+    const base = zPd(d).getTime();
+    for (let m = 7 * 60; m <= 19 * 60; m += 10) { const t = base + m * 60000; if (t > mv.t1 + 600000) break; ticks.push(t); }
+  }
+  R.ticks = ticks; R.i = Math.max(0, Math.min(R.i || 0, ticks.length - 1));
+  const rt = (s, t) => ((DB.routesT || {})[s + '|' + t] || (DB.routes || {})[s] || []).map(x => x[0]);
+  R.bs = mv.b.map(b => ({ no: b[0], stream: b[1], typ: b[2], kv: b[3], cols: b[4], tare: b[5], start: b[6], c: b[7], e: b[8], recs: b[9], route: rt(b[1], b[2]) }));
+}
+/** одиниці в момент t: партія чекає наступний крок після останнього зробленого; маршрут пройдено — ST / RT чекають F1, MT — у ящиках */
+function z13rpUnits(t) {
+  const R = Z13.rp, norm = (DB.boxNorm || {}), per = x => norm[x] || norm['*'] || 160, out = [], D = Z13;
+  R.bs.forEach(b => {
+    if (t < b.c || (b.e && t >= b.e) || !zHas(D.flow, b.stream) || !zHas(D.typ, b.typ)) return;
+    let idx = -1, q = b.start, last = b.c;
+    for (const r of b.recs) { if (r[0] > t) break; const k = b.route.indexOf(r[1]); if (k > idx) idx = k; if (r[2]) q = r[2]; last = r[0]; }
+    if (!b.route.length) return;
+    let step;
+    if (idx >= b.route.length - 1) { if (b.stream === 'MT') return; step = 'F1'; } else step = b.route[idx + 1];
+    out.push({ key: b.no, step: step, q: q || 1, typ: b.typ, kv: b.kv, cols: b.cols, t: b.no, no: b.no, tare: b.tare, href: blHref(b.no), per: per(b.typ), at: last, ready: idx >= b.route.length - 1, stream: b.stream });
+  });
+  if (zHas(D.flow, 'MT')) (R.mv.x || []).forEach(x => { if (t < x[5] || !zHas(D.typ, x[1])) return;
+    out.push({ box: 1, id: x[0], key: 'bx|' + x[0], step: 'K2', wh: !!(x[6] && t >= x[6]), q: x[2], typ: x[1], cols: x[4], t: boxNm(x[0]), per: x[3], at: x[5] }); });
+  return out;
+}
+function z13rpHtml() {
+  const R = Z13.rp;
+  let h = '<div class="zctl">' + zChips(R.per, Z13PER, v => { R.per = v; z13rpLoad(); }) +
+    '<span class="zg">' + zChips(R.fl, [['1', '1 пов.'], ['2', '2 пов.'], ['3', '3 пов.'], ['3d', '3D']], v => { R.fl = v; z13save(); renderDash(); }) + '</span></div>';
+  if (R.busy) return h + '<p class="muted">Збираю рух ящиків…</p>';
+  if (R.err) return h + '<p class="err">' + esc(R.err) + '</p>';
+  if (!R.mv) return h + '<p class="muted">Повтор показує, як ящики переходили від столу до столу й між поверхами. Оберіть період або натисніть ▶.</p><button type="button" class="ic pri" onclick="zA(' + zAct(z13rpLoad) + ')">▶ Завантажити повтор</button>';
+  if (!R.ticks.length) return h + '<p class="muted">За цей період записів немає.</p>';
+  return h + '<div class="z13ctl"><button type="button" class="ic pri" id="z13play" onclick="z13rpPlay()">' + (R.play ? '⏸' : '▶') + '</button>' +
+    '<input type="range" id="z13rng" min="0" max="' + (R.ticks.length - 1) + '" value="' + R.i + '" oninput="z13rpSeek(this.value)">' +
+    '<b id="z13tm" class="z13tm"></b>' + zChips(R.sp, [[1, '×1'], [3, '×3'], [8, '×8']], v => { R.sp = v; renderDash(); }) + '</div>' +
+    '<div id="z13rpc"></div><p class="muted" style="margin:6px 0 0">Кадр — кожні 10 хв робочого часу (7:00–19:00). Ящик з\'являється, коли партію почали, і переходить до наступного місця після запису кроку. Двигуни після K2 — у ящиках ГП: біля K2, потім на складі. <span id="z13cnt"></span></p>';
+}
+/** малює кадр: вперше — сцену, далі лише переставляє ящики (плавно, CSS transition) */
+function z13rpDraw() {
+  const R = Z13.rp, host = $('z13rpc'); if (!host || !R.mv || !R.ticks || !R.ticks.length) return;
+  const t = R.ticks[R.i], units = z13rpUnits(t); z13layout(units);
+  const tm = $('z13tm'); if (tm) tm.textContent = ZDOWN[zDow(zYmd(new Date(t)))] + ' ' + zDm(zYmd(new Date(t))) + ' · ' + String(new Date(t).getHours()).padStart(2, '0') + ':' + String(new Date(t).getMinutes()).padStart(2, '0');
+  const cnt = $('z13cnt'); if (cnt) cnt.textContent = 'Зараз на плані: ' + units.filter(u => !u.wh).length + ' · на складі: ' + units.filter(u => u.wh).length + '.';
+  const rng = $('z13rng'); if (rng && Number(rng.value) !== R.i) rng.value = R.i;
+  if (!host.firstChild || host.dataset.fl !== R.fl || host.dataset.n !== String(R.mv.t0)) {
+    host.dataset.fl = R.fl; host.dataset.n = String(R.mv.t0);
+    host.innerHTML = z13scene('z13r', R.fl, [], {}, { np: 1 });
+    R.el = {};
+  }
+  z13wire('z13r', units, null);
+  const seen = {};
+  units.forEach((u, i) => {
+    const svg = host.querySelector('svg.z13svg[data-f="' + u.f + '"]'); if (!svg) return;
+    let g = R.el[u.key];
+    if (g && g.ownerSVGElement !== svg) { g.remove(); g = null; }
+    const tmp = document.createElementNS('http://www.w3.org/2000/svg', 'g'); tmp.innerHTML = z13boxSvg(u, i); const ng = tmp.firstChild;
+    if (!g) { ng.style.opacity = '0'; svg.querySelector('.z13boxes').appendChild(ng); R.el[u.key] = ng; requestAnimationFrame(() => { ng.style.opacity = '1'; }); }
+    else { g.style.transform = ng.style.transform; g.dataset.i = i; g.innerHTML = ng.innerHTML; g.setAttribute('class', ng.getAttribute('class')); }
+    seen[u.key] = 1;
+  });
+  Object.keys(R.el).forEach(k => { if (!seen[k]) { const g = R.el[k]; delete R.el[k]; g.style.opacity = '0'; setTimeout(() => g.remove(), 450); } });
+}
+function z13rpSeek(v) { const R = Z13.rp; R.i = Number(v) || 0; z13rpDraw(); }
+function z13rpPlay() {
+  const R = Z13.rp; R.play = !R.play; const b = $('z13play'); if (b) b.textContent = R.play ? '⏸' : '▶';
+  if (R.play && R.i >= R.ticks.length - 1) R.i = 0;
+  clearTimeout(R.tm);
+  const step = () => { if (!R.play || DB.d !== 'shop' || !$('z13rpc')) { R.play = false; return; } R.i = Math.min(R.ticks.length - 1, R.i + R.sp); z13rpDraw();
+    if (R.i >= R.ticks.length - 1) { R.play = false; const bb = $('z13play'); if (bb) bb.textContent = '▶'; return; } R.tm = setTimeout(step, 450); };
+  if (R.play) R.tm = setTimeout(step, 150);
 }
 
 // ---- v55: Р-11 «Двигуни в роботі» — партії двигунів і непарні деталі в них (дані Р-2, сервер d=motors)
