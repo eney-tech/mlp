@@ -1,5 +1,9 @@
 <!DOCTYPE html>
-<!-- МЛП · index.html v71 · 24.10.2026 — рішення 24.10: 1) звіти в меню й на вкладці «Звіти» за важливістю: Р-2, Р-8, Р-8с (жирним) · Р-11, Р-12 · Р-5, Р-7, Р-10 · Р-9, Р-13;
+<!-- МЛП · index.html v72 · 26.10.2026 — рішення 26.10: 1) «Нова партія»: перше питання — «Яку партію відкриваємо?» (статорів / роторів / двигунів), для двигунів —
+     підказка, що статори й ротори вказують окремо нижче; 2) внизу картки партії — «ⓘ Кроки цієї партії — розшифровка» (маршрут саме цієї партії, як у довідці);
+     3) реєстрація телефону: сторінка одразу перевіряє реєстрацію, коли її відкрили знову (посиланням з підтвердження форми), і повертає туди, звідки сканували QR.
+     Конвеєр у двигунах (F4п · F1 · F2 · F3 одночасно) — без змін коду: «Налаштування» → STRICT_STREAMS = ST,RT (Code.gs v70 уже це вміє).
+     v71 · 24.10.2026 — рішення 24.10: 1) звіти в меню й на вкладці «Звіти» за важливістю: Р-2, Р-8, Р-8с (жирним) · Р-11, Р-12 · Р-5, Р-7, Р-10 · Р-9, Р-13;
      2) Р-8_04 — один графік «Проведені операції за …»: у кожному періоді стовпчики статорів, роторів і двигунів поруч (розріз — усередині стовпчика),
      лінію % браку прибрано; 3) закладка Р-8_07 — жирна кнопка «Випуск готових статорів, роторів і двигунів», фільтр — усі три види (бухгалтер — і далі двигуни).
      v70 · 24.10.2026 — Р-13 «Цех наживо» (рішення 24.10, Reports.gs v30; право dashStan, пункт меню після Р-2):
@@ -509,7 +513,8 @@
 <div class="net" id="net" role="alert" aria-live="assertive"><div class="nb"><div class="rt" id="netr"></div><div class="nt" id="nett">Зберігаю…</div><div class="ns" id="nets"></div><div class="np"><i id="netp"></i></div><div class="nh" id="neth"></div><div class="zc" id="zc"></div><button class="nx" id="netx" type="button">Не чекати</button></div></div>
 
 <script>
-const PAGE_VERSION = 'index.html v71 · 24.10.2026';   // v71: порядок звітів (важливі — першими, жирним); Р-8_04 — один графік, статори / ротори / двигуни поруч, без лінії % браку; закладка «Випуск готових статорів, роторів і двигунів»
+const PAGE_VERSION = 'index.html v72 · 26.10.2026';   // v72: «Яку партію відкриваємо?»; розшифровка кроків на картці партії; реєстрація — повернення за посиланням з форми
+// v71 (24.10):   // v71: порядок звітів (важливі — першими, жирним); Р-8_04 — один графік, статори / ротори / двигуни поруч, без лінії % браку; закладка «Випуск готових статорів, роторів і двигунів»
 //   // v70: Р-13 «Цех наживо» — план поверхів Печерська з ящиками, «Будівля 3D», повтор руху (Reports.gs v30)
 //   // v69   // v69: Р-2_04 кубики — номер тари в підказці, віконце з посиланнями, тільки заливка, колонки «типорозмір · KV», закріплена шапка
 //   // v68   // v68: звіти — фільтри рядками з мультивибором, згортання всіх візуалок, Р-2 ящики-кубики, Р-9 звірка за днями, Р-10 брак за днями
@@ -1378,6 +1383,17 @@ function stepHelp(x) {
     row('Що робимо', i.w) + row('Результат', i.o) + row('Тара', i.t) + row('Норматив', i.n) +
     row('Що записати в МЛП', (x[2] === 'К' ? 'Успішні й брак. Контроль: до ЗП рахуються всі перевірені — успішні + брак. ' : 'Успішні й брак (з причиною). ') + (i.r || '')) + row('Типовий брак', i.s) + '</div></details>';
 }
+/** v72: розшифровка кроків маршруту партії — внизу картки (ті самі описи, що в довідці «Етапи виробництва») */
+function routeHelp(b) {
+  const T = {}; [HR_ST3115, HR_ST4320, HR_RT, HR_MT].forEach(a => a.forEach(x => { T[x[0]] = x[2]; }));
+  const tp = c => T[c] || T[c.replace(/п$/, '')] || (/^OV/.test(c) ? 'П' : 'В');
+  const rows = (b.route || []).map(s => {
+    const c = s.code, base = c.replace(/п$/, '');
+    if (!STEPINFO[c] && STEPINFO[base] && c !== base) STEPINFO[c] = Object.assign({}, STEPINFO[base], { w: 'Покупні ротори (в1) гравіюють у партії двигунів. ' + STEPINFO[base].w });
+    return stepHelp([c, s.name, tp(c)]);
+  }).join('');
+  return rows ? '<details class="hlp"><summary>ⓘ Кроки цієї партії — розшифровка</summary><div class="hline" style="margin-top:4px;padding-bottom:12px">' + rows + '</div></details>' : '';
+}
 function helpHtml(open) {
   const line = (title, desc, route) => '<div class="hline"><div class="hh">' + title + '</div><div class="muted" style="margin-bottom:6px">' + desc + '</div>' + route.map(stepHelp).join('') + '</div>';
   return '<details class="hlp"' + (open ? ' open' : '') + '><summary>ⓘ Етапи виробництва — довідка</summary>' +
@@ -1410,6 +1426,8 @@ function regDone(pend, d) {
   regStop();
   store('mlp_code', pend); store('mlp_pending', null); CODE = pend; S = d;
   toast('Телефон зареєстровано: ' + d.me.name);
+  const rq = store('mlp_regq'); store('mlp_regq', null);   // v72: повернулись без параметрів — відкрити те, що сканували
+  if (rq && !location.search) { location.replace(location.pathname + rq); return; }
   const go = !d.pending && ((PARAMS.cab && d.perms && d.perms.cabinet) || PARAMS.d || PARAMS.h || PARAMS.s || PARAMS.sklad);
   if (go) load(); else render({});
 }
@@ -1448,10 +1466,12 @@ function renderReg() {
     document.addEventListener('visibilitychange', back);
     window.addEventListener('pageshow', e => { if (e.persisted) back(); });
   }
+  if (location.search) store('mlp_regq', location.search);   // v72: що сканували — відкрити після реєстрації, навіть якщо повернулись посиланням без параметрів
+  if (!isNew && kept) setTimeout(() => { regCheck(false); regWatch(); }, 300);   // v72: сторінку відкрили знову (посилання з підтвердження форми) — перевірити одразу
   const url = (S.reg || '').replace('CODE_PLACEHOLDER', encodeURIComponent(pend));
   $('app').innerHTML = '<div class="card"><div class="mid">Цей телефон ще не зареєстровано</div>' +
     '<p class="muted">Один раз: натисніть кнопку 1, увійдіть у свій Google-акаунт (той, з якого заповнюєте вечірній звіт), впишіть прізвище й ім\'я і надішліть. ' +
-    'Потім поверніться на цю вкладку — сторінка сама побачить реєстрацію.</p>' +
+    'Після надсилання форми натисніть посилання на сторінку МЛП у підтвердженні (кнопкою «Назад» не повертайтесь — вона знову відкриє форму) або перейдіть на цю вкладку. Сторінка сама побачить реєстрацію.</p>' +
     '<p class="warn" style="padding:8px 10px;border-radius:10px;font-size:14px;margin:0 0 12px">Не скануйте QR повторно, доки не з\'явиться «Телефон зареєстровано»: в іншій вкладці чи браузері буде інший код.</p>' +
     (kept ? '' : '<p class="bad" style="padding:8px 10px;border-radius:10px;font-size:14px;margin:0 0 12px">Браузер не зберігає дані сторінки (можливо, приватний режим). Відкрийте сторінку у звичайній вкладці.</p>') +
     '<p class="muted">Код телефону: <b>' + esc(pend) + '</b></p>' +
@@ -1511,8 +1531,8 @@ function renderNew() {
   $('app').innerHTML = '<div class="card"><div class="muted">Тара</div><div class="big">' + esc(t.code) + '</div><span class="pill ok">вільна</span>' +
     '<span class="pill">' + (t.loc === 'Ж' ? 'Жуляни' : 'Печерськ') + '</span></div>' +
     '<div class="card"><div class="mid">Нова партія</div>' +
-    '<label>Що кладете</label><div class="seg">' + ['ST', 'RT', 'MT'].map(s => '<label><input type="radio" name="st" value="' + s + '"' + (s === def ? ' checked' : '') + '><span>' +
-      ({ ST: 'Статори', RT: 'Ротори', MT: 'Двигуни' })[s] + '</span></label>').join('') + '</div>' +
+    '<label>Яку партію відкриваємо?</label><div class="seg">' + ['ST', 'RT', 'MT'].map(s => '<label><input type="radio" name="st" value="' + s + '"' + (s === def ? ' checked' : '') + '><span>' +
+      ({ ST: 'Партія статорів', RT: 'Партія роторів', MT: 'Партія двигунів' })[s] + '</span></label>').join('') + '</div>' +   // v72: не «Що кладете» — для двигунів кладуть і статори, і ротори
     '<div id="nf"></div><div class="err" id="err"></div></div>';
   document.querySelectorAll('input[name=st]').forEach(r => r.onchange = drawNew);
   drawNew();
@@ -1530,7 +1550,8 @@ function drawNew() {
   let h = '<div class="row"><div><label>Типорозмір</label><select id="typ">' + opts(S.dict.typ, '3115') + '</select></div>' +
     (st !== 'RT' ? '<div><label>KV</label><select id="kv">' + opts(S.dict.kv, '', '—') + '</select></div>'
       : '<div><label>KV <span class="muted">(якщо вже відомо)</span></label><select id="kv">' + opts(S.dict.kv, '', '— не вказано —') + '</select></div>') + '</div>';   // v32: KV роторів — необов'язково
-  if (st === 'MT') h += compBlock('S', 'nS', true) + compBlock('R', 'nR', true) +
+  if (st === 'MT') h += '<p class="muted" style="margin:12px 0 0">Збирання двигунів: нижче вкажіть окремо, звідки статори і звідки ротори.</p>' +   // v72
+    compBlock('S', 'nS', true) + compBlock('R', 'nR', true) +
     '<p class="muted">Кількість пар рахується сама — за статорами й роторами, що прийшли.</p>';
   else {
     if (st === 'RT') h += '<label>Походження</label><div class="seg wrap"><label><input type="radio" name="org" value="" checked><span style="font-size:15px">Наші · з R1</span></label>' +
@@ -1887,6 +1908,7 @@ function renderBatch(extra) {
   (b.exits || []).forEach(s => rel.push((s.purpose === S.qc ? 'Взято на відбраковку ' + s.qty + ' шт' : 'Вибуло ' + s.qty + ' шт → ' + esc(s.purpose)) + ': ' + esc(s.product) + (s.comment ? ' (' + esc(s.comment) + ')' : '')));
   if (rel.length) h += '<details><summary>Зв\'язки</summary><div class="list">' + rel.map(r => '<div class="li"><div>' + r + '</div></div>').join('') + '</div></details>';
 
+  h += routeHelp(b);   // v72: розшифровка кроків маршруту цієї партії
   $('app').innerHTML = h + '<div style="height:40px"></div>';
   if ($('stp')) { $('stp').onchange = stepChanged; stepChanged(); $('good').addEventListener('input', () => goodHint(false)); $('go').onclick = submitStep; }
   onbWire();
