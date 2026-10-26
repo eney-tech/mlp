@@ -1,5 +1,7 @@
 <!DOCTYPE html>
-<!-- МЛП · index.html v72 · 26.10.2026 — рішення 26.10: 1) «Нова партія»: перше питання — «Яку партію відкриваємо?» (статорів / роторів / двигунів), для двигунів —
+<!-- МЛП · index.html v73 · 26.10.2026 — Р-11 (рішення 26.10, Reports.gs v31): «Ротори без пари» — разом із покупними роторами, що чекають гравіювання F4п;
+     у клітинці — «з них F4п N»; підказка до плиток пояснює обидва випадки. Картка партії — без змін.
+     v72 · 26.10.2026 — рішення 26.10: 1) «Нова партія»: перше питання — «Яку партію відкриваємо?» (статорів / роторів / двигунів), для двигунів —
      підказка, що статори й ротори вказують окремо нижче; 2) внизу картки партії — «ⓘ Кроки цієї партії — розшифровка» (маршрут саме цієї партії, як у довідці);
      3) реєстрація телефону: сторінка одразу перевіряє реєстрацію, коли її відкрили знову (посиланням з підтвердження форми), і повертає туди, звідки сканували QR.
      Конвеєр у двигунах (F4п · F1 · F2 · F3 одночасно) — без змін коду: «Налаштування» → STRICT_STREAMS = ST,RT (Code.gs v70 уже це вміє).
@@ -513,7 +515,8 @@
 <div class="net" id="net" role="alert" aria-live="assertive"><div class="nb"><div class="rt" id="netr"></div><div class="nt" id="nett">Зберігаю…</div><div class="ns" id="nets"></div><div class="np"><i id="netp"></i></div><div class="nh" id="neth"></div><div class="zc" id="zc"></div><button class="nx" id="netx" type="button">Не чекати</button></div></div>
 
 <script>
-const PAGE_VERSION = 'index.html v72 · 26.10.2026';   // v72: «Яку партію відкриваємо?»; розшифровка кроків на картці партії; реєстрація — повернення за посиланням з форми
+const PAGE_VERSION = 'index.html v73 · 26.10.2026';   // v73: Р-11 — ротори без пари разом із тими, що чекають F4п
+// v72 (26.10):   // v72: «Яку партію відкриваємо?»; розшифровка кроків на картці партії; реєстрація — повернення за посиланням з форми
 // v71 (24.10):   // v71: порядок звітів (важливі — першими, жирним); Р-8_04 — один графік, статори / ротори / двигуни поруч, без лінії % браку; закладка «Випуск готових статорів, роторів і двигунів»
 //   // v70: Р-13 «Цех наживо» — план поверхів Печерська з ящиками, «Будівля 3D», повтор руху (Reports.gs v30)
 //   // v69   // v69: Р-2_04 кубики — номер тари в підказці, віконце з посиланнями, тільки заливка, колонки «типорозмір · KV», закріплена шапка
@@ -4269,7 +4272,7 @@ function r11() {
   if (ZF.r11_01 === undefined) ZF.r11_01 = true;   // v56: таблиця партій — головне в цьому звіті, відкрита за замовчуванням
   const locOf = b => String(b.loc || '').charAt(0);
   const pt = b => { const c = b.cl || { S: 0, R: 0 }; const P = c.P !== undefined ? c.P : Math.min(c.S, c.R);
-    return { P: P, S: c.uS !== undefined ? c.uS : c.S - P, R: c.uR !== undefined ? c.uR : c.R - P }; };
+    return { P: P, S: c.uS !== undefined ? c.uS : c.S - P, R: c.uR !== undefined ? c.uR : c.R - P, w4: c.w4 || 0 }; };   // v73: w4 — ротори, що чекають F4п
   const inWork = b => b.status === 'в роботі' || b.status === 'поза маршрутом';
   const mt = d.batches.filter(b => b.stream === 'MT' && (inWork(b) || (b.cl && (b.cl.S || b.cl.R))));
   const typs = zUniq(mt.map(b => b.typ)).filter(x => x).sort();
@@ -4287,7 +4290,8 @@ function r11() {
   let h = zFbar('r11', sum, [D.typ.length, D.kv.length, D.col.length].filter(x => x).length,
     zFrow('Локація', [['П', 'Печерськ'], ['Ж', 'Жуляни']], D.loc, v => set('loc', v)) + zFrow('Типорозмір', typs.map(x => [x, x]), D.typ, v => set('typ', v)) +
     zFrow('KV', kvs.map(x => [x, lab(x)]), D.kv, v => set('kv', v)) + zFrow('Колір', cols.map(x => [x, lab(x)]), D.col, v => set('col', v)));
-  const UTIP = 'Годна половина двигуна, забракованого на F2 / F3 / F5 («з них брак лише статора / лише ротора»). Лежить у тарі партії, доки їй не доберуть пару.';
+  const UTIP = 'Деталі в тарі партії, яким зараз немає пари до F1: годна половина двигуна, забракованого на F2 / F3 / F5, і статори, яким не вистачає роторів. ' +
+    'Ротори без пари — разом із покупними, що ще чекають гравіювання F4п (вони стануть парою після F4п).';
   const goU = zAct(() => { D.only = 'unp'; zOpen('r11_01'); renderDash(); });
   h += '<div class="zkpis">' +
     zKpi('Партії двигунів у роботі', fn(all.length), 'партій', fn(tot.m) + ' двигунів у них', 'Партії двигунів, що йдуть маршрутом, і партії, де ще лежать деталі.') +
@@ -4301,7 +4305,8 @@ function r11() {
       '<th class="r">Статори без пари</th><th class="r">Ротори без пари</th><th class="r">Пари до F1</th><th>Остання операція</th><th></th></tr>' +
       list.map(b => { const x = pt(b);
         return '<tr><td>' + bl(b.no) + '</td><td>' + esc(b.typ) + (b.kv ? ' · ' + esc(b.kv) : '') + (b.color ? '<br><span class="muted">' + esc(b.color) + '</span>' : '') + '</td><td>' + esc(b.step || '—') +
-          '</td><td>' + tl(b.tare) + '</td><td class="r">' + fn(Math.max(0, b.rem)) + '</td><td class="r">' + red(x.S) + '</td><td class="r">' + red(x.R) + '</td><td class="r">' + (x.P ? fn(x.P) : '<span class="muted">—</span>') +
+          '</td><td>' + tl(b.tare) + '</td><td class="r">' + fn(Math.max(0, b.rem)) + '</td><td class="r">' + red(x.S) + '</td><td class="r">' + red(x.R) +
+          (x.w4 ? '<br><span class="muted" style="font-size:12px">з них F4п ' + fn(x.w4) + '</span>' : '') + '</td><td class="r">' + (x.P ? fn(x.P) : '<span class="muted">—</span>') +
           '</td><td>' + esc(b.last || '—') + '</td><td>' + (b.stuck ? xmark('Без руху ' + b.idle + ' роб. дн. (' + d.idleDays + ' і більше)') : '') + '</td></tr>'; }).join('') +
       '<tr><td colspan="4"><b>Разом</b></td><td class="r"><b>' + fn(list.reduce((a, b) => a + Math.max(0, b.rem), 0)) + '</b></td><td class="r">' + red(list.reduce((a, b) => a + pt(b).S, 0)) +
       '</td><td class="r">' + red(list.reduce((a, b) => a + pt(b).R, 0)) + '</td><td class="r">' + fn(list.reduce((a, b) => a + pt(b).P, 0)) + '</td><td colspan="2"></td></tr></table></div>'
