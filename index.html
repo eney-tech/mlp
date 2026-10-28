@@ -1,5 +1,10 @@
 <!DOCTYPE html>
-<!-- МЛП · index.html v74 · 27.10.2026 — «+ Статори / ротори» і «Нова партія» MT (рішення 27.10, M-00078): «в1 · постачальник» — і з нашої тари:
+<!-- МЛП · index.html v75 · 28.10.2026 — рішення 28.10: 1) «Робота без партії»: якщо для виду роботи в «Довідниках» кілька одиниць («шт / год»),
+     під кількістю — «Одиниця виміру» (новий вид «Збір підшипників для 4320», Code.gs v74); у «Мій виробіток» — одиниця запису, калькулятор
+     рахує шт і год такої роботи окремими рядками. 2) Ретро-історія: стан «внесено в ЖЗР» (Retro.gs v5) — фільтр «Внесені в ЖЗР», картка лише для перегляду.
+     3) Р-13_04 «Повтор»: вид «3D» — тільки адміністратору (доробимо — відкриємо всім). 4) Р-13, Печерськ, 1 поверх: стіл тімліда і стіл контролю якості
+     (без кроків — ящики до них не ставляться).
+     v74 · 27.10.2026 — «+ Статори / ротори» і «Нова партія» MT (рішення 27.10, M-00078): «в1 · постачальник» — і з нашої тари:
      список готових партій в1 (ящики залишків, партії покупних деталей) того самого типорозміру й KV; порожньо — коробка постачальника (номер з етикетки).
      «в2 · наша партія» — лише партії в2. Кількість з тари підставляється сама, крім ящика залишків (там беруть по кілька штук).
      v73 · 26.10.2026 — Р-11 (рішення 26.10, Reports.gs v31): «Ротори без пари» — разом із покупними роторами, що чекають гравіювання F4п;
@@ -204,7 +209,7 @@
   .z13zone{fill:none;stroke:#A06E00;stroke-width:2.5;stroke-dasharray:4 6}.z13np{fill:#FFF8E6;stroke:#E0B54A;stroke-width:2;stroke-dasharray:8 6}.z13nt{fill:#8A5A00;font-size:22px;font-weight:600}
   .z13wp rect{stroke-width:3}.z13wp[data-wp]{cursor:pointer}.z13wp .n{font-size:24px;font-weight:700;fill:#1D2B33}.z13wp .s{font-size:19px;fill:#66767F;font-family:ui-monospace,Menlo,Consolas,monospace}
   .z13wp.g>rect{fill:#E3EFE8;stroke:#1F7A4D}.z13wp.s31>rect{fill:#DCE8F7;stroke:#1A5FB4}.z13wp.s43>rect{fill:#F8E3D3;stroke:#B4581A}.z13wp.ov>rect{fill:#F3E6C8;stroke:#8A6A1F}
-  .z13wp.tl>rect{fill:#E4E8EB;stroke:#2F4858}.z13wp.nu>rect{fill:none;stroke:#C5CED4;stroke-dasharray:8 6}.z13wp.t>rect{fill:#FFF4D6;stroke:#A06E00;stroke-dasharray:10 6}
+  .z13wp.tl>rect{fill:#E4E8EB;stroke:#2F4858}.z13wp.qc>rect{fill:#F1E8F6;stroke:#6B3F8A}.z13wp.nu>rect{fill:none;stroke:#C5CED4;stroke-dasharray:8 6}.z13wp.t>rect{fill:#FFF4D6;stroke:#A06E00;stroke-dasharray:10 6}
   .z13wp.t .n{font-size:20px;fill:#A06E00}.z13wp.p>rect{stroke-dasharray:12 6}.z13wp.sel>rect{stroke:#E0A800;stroke-width:8}
   .z13q rect{fill:#2F4858}.z13q text{fill:#fff;font-size:18px;font-weight:700}
   .z13b{transition:transform .5s ease,opacity .4s;cursor:pointer}.z13b.up rect{filter:drop-shadow(0 3px 2px rgba(0,0,0,.35))}
@@ -518,7 +523,7 @@
 <div class="net" id="net" role="alert" aria-live="assertive"><div class="nb"><div class="rt" id="netr"></div><div class="nt" id="nett">Зберігаю…</div><div class="ns" id="nets"></div><div class="np"><i id="netp"></i></div><div class="nh" id="neth"></div><div class="zc" id="zc"></div><button class="nx" id="netx" type="button">Не чекати</button></div></div>
 
 <script>
-const PAGE_VERSION = 'index.html v74 · 27.10.2026';   // v74: в1 — і з нашої тари (ящик залишків); в2 — лише партії в2
+const PAGE_VERSION = 'index.html v75 · 28.10.2026';   // v74: в1 — і з нашої тари (ящик залишків); в2 — лише партії в2
 // v72 (26.10):   // v72: «Яку партію відкриваємо?»; розшифровка кроків на картці партії; реєстрація — повернення за посиланням з форми
 // v71 (24.10):   // v71: порядок звітів (важливі — першими, жирним); Р-8_04 — один графік, статори / ротори / двигуни поруч, без лінії % браку; закладка «Випуск готових статорів, роторів і двигунів»
 //   // v70: Р-13 «Цех наживо» — план поверхів Печерська з ящиками, «Будівля 3D», повтор руху (Reports.gs v30)
@@ -1522,11 +1527,17 @@ function renderPoster() {
   onbWire();
   $('wk').onchange = () => {
     const w = S.dict.works.find(x => x.name === $('wk').value);
-    $('wkx').innerHTML = !w ? '' : '<label>' + (w.unit === 'год' ? 'Години' : 'Кількість, шт') + '</label>' +
-      (w.unit === 'год' ? '<input type="text" inputmode="decimal" id="val" placeholder="напр. 1,5">' : numInput('val', '')) +
+    const us = w && w.units && w.units.length > 1 ? w.units : null;   // v75: кілька одиниць — «Одиниця виміру»
+    $('wkx').innerHTML = !w ? '' : us
+      ? '<label>Кількість</label><input type="text" inputmode="decimal" id="val">' +
+        '<label>Одиниця виміру</label><div class="seg">' + us.map((u, i) => '<label><input type="radio" name="unit" value="' + esc(u) + '"' + (i ? '' : ' checked') + '><span>' + esc(u) + '</span></label>').join('') + '</div>' +
+        (w.typ ? '<label>Типорозмір</label><select id="typ">' + opts(S.dict.typ, '', '—') + '</select>' : '')
+      : '<label>' + (w.unit === 'год' ? 'Години' : 'Кількість, ' + esc(w.unit || 'шт')) + '</label>' +
+      (w.unit === 'шт' || !w.unit ? numInput('val', '') : '<input type="text" inputmode="decimal" id="val" placeholder="напр. 1,5">') +
       (w.typ ? '<label>Типорозмір</label><select id="typ">' + opts(S.dict.typ, '', '—') + '</select>' : '');
   };
   $('go').onclick = () => act(Object.assign({ action: 'noBatch', work: $('wk').value, value: $('val') ? $('val').value : '', typ: $('typ') ? $('typ').value : '',
+    unit: (document.querySelector('input[name=unit]:checked') || {}).value || '',   // v75
     comment: $('cm').value, site: $('site').value, view: null }, onbVal()), $('go'), () => { $('wk').value = ''; $('wkx').innerHTML = ''; $('cm').value = ''; });
 }
 
@@ -2774,7 +2785,7 @@ function zMoney(d, prices) {
   let m = 0; const g = {};
   d.recs.forEach(r => { const k = r.step + '|' + r.typ; g[k] = (g[k] || 0) + zPayQ(r); });
   Object.keys(g).forEach(k => { m += g[k] * zNum(prices[k]); });
-  d.noBatch.forEach(r => { m += (r.hours || r.qty) * zNum(prices['nb|' + r.work]); });
+  const nbk = zNbKey(d); d.noBatch.forEach(r => { m += (r.hours || r.qty) * zNum(prices[nbk(r)]); });   // v75: ключ ціни — і одиниця, якщо їх кілька
   return m;
 }
 function zKpiMoney(m) { return zKpi('За моїми цінами', m ? fn(m) : '—', m ? '₴' : '', m ? 'неофіційний розрахунок' : 'введіть ціни в калькуляторі нижче', 'Рахується тільки на цьому телефоні з цін, які ви ввели самі. Це не відомість ЗП.'); }
@@ -2863,9 +2874,9 @@ function r8c() {
     c += '<div class="crow"><div><b>' + esc(code) + '</b> ' + esc(nm(code)) + ' <span class="muted">· ' + esc(typ) + '</span>' + (ctl ? ' ' + info(TESTTIP) : '') + '</div>' +
       '<div class="cm"><span class="cq">' + fn(q) + '</span><span class="muted">×</span><input inputmode="decimal" data-k="' + esc(k) + '" data-q="' + q + '" value="' + esc(p) + '" placeholder="ціна" oninput="zCalcInput(this,\'' + esc(uid) + '\')">' +
       '<span class="muted">=</span><span class="cs" id="' + zSid(k) + '">' + (zNum(p) ? fn(q * zNum(p)) : '—') + '</span></div></div>'; });
-  const gnb = {}; d.noBatch.forEach(r => { const k = 'nb|' + r.work; gnb[k] = gnb[k] || { q: 0, h: false }; gnb[k].q += r.hours || r.qty; if (r.hours) gnb[k].h = true; });
+  const nbk = zNbKey(d), gnb = {}; d.noBatch.forEach(r => { const k = nbk(r); gnb[k] = gnb[k] || { q: 0, h: false, u: zNbUnit(r) }; gnb[k].q += r.hours || r.qty; if (r.hours) gnb[k].h = true; });
   Object.keys(gnb).forEach(k => { const x = gnb[k]; const p = prices[k] || '';
-    c += '<div class="crow"><div>' + esc(k.slice(3)) + ' <span class="muted">· без партії</span></div><div class="cm"><span class="cq">' + zF1(x.q) + (x.h ? ' год' : ' шт') + '</span><span class="muted">×</span>' +
+    c += '<div class="crow"><div>' + esc(k.slice(3).split('|')[0]) + ' <span class="muted">· без партії</span></div><div class="cm"><span class="cq">' + zF1(x.q) + ' ' + esc(x.u) + '</span><span class="muted">×</span>' +
       '<input inputmode="decimal" data-k="' + esc(k) + '" data-q="' + x.q + '" value="' + esc(p) + '" placeholder="' + (x.h ? 'за год' : 'ціна') + '" oninput="zCalcInput(this,\'' + esc(uid) + '\')"><span class="muted">=</span><span class="cs" id="' + zSid(k) + '">' + (zNum(p) ? fn(x.q * zNum(p)) : '—') + '</span></div></div>'; });
   c += '<div class="ctot"><span>Разом</span><span id="zcTot">' + (money ? fn(money) + ' ₴' : '—') + '</span></div></div>';
   h += zFold8('calc', 'Калькулятор ₴', money ? fn(money) + ' ₴' : '', '<p class="muted" style="margin-top:0">Ціни зберігаються <b>тільки на цьому телефоні</b> і не потрапляють у базу. Це особистий підрахунок, а не відомість ЗП.' +
@@ -2875,8 +2886,15 @@ function r8c() {
   const hrs = d.noBatch.reduce((a, r) => a + r.hours, 0);
   h += zFold8('nb', 'Робота без партії', d.noBatch.length ? (hrs ? zF1(hrs) + ' год' : d.noBatch.length + '') : '0',
     d.noBatch.length ? d.noBatch.slice().reverse().map(r => '<div class="li"><div>' + esc(r.work) + (r.comment ? '<br><span class="muted">' + esc(r.comment) + '</span>' : '') + '<br><span class="muted">' + ZDOWN[zDow(r.d)] + ' ' + zDm(r.d) + ' ' + esc(r.tm) + '</span></div><b class="r">' +
-      (r.hours ? zF1(r.hours) + ' год' : fn(r.qty) + ' шт') + '</b></div>').join('') : '<p class="muted">За цей період немає. Записати — на Головній.</p>');
+      (r.hours ? zF1(r.hours) + ' год' : zF1(r.qty) + ' ' + esc(zNbUnit(r))) + '</b></div>').join('') : '<p class="muted">За цей період немає. Записати — на Головній.</p>');
   return h;
+}
+/** v75: одиниця запису без партії (сервер v32 шле unit; старий — за годинами) */
+const zNbUnit = r => r.unit || (r.hours ? 'год' : 'шт');
+/** v75: ключ ціни роботи без партії — 'nb|робота'; якщо за період у роботи кілька одиниць — 'nb|робота|одиниця' (старі ціни не губляться) */
+function zNbKey(d) {
+  const us = {}; d.noBatch.forEach(r => { (us[r.work] = us[r.work] || {})[zNbUnit(r)] = 1; });
+  return r => 'nb|' + r.work + (Object.keys(us[r.work] || {}).length > 1 ? '|' + zNbUnit(r) : '');
 }
 /** дані графіка Р-8с_09: кошики — години (день) або дні (тиждень / місяць), серії — розріз, лінія % браку */
 function z8chart(d, prices) {
@@ -4007,6 +4025,7 @@ const PLAN13 = {
     [1, '1.10', 'Стіл', '', 'S2', 1010, 1045, 105, 95], [1, '1.11', 'Намотувальна машина', '', 'S1', 1115, 1150, 105, 95], [1, '1.12', 'Стіл', '', 'S2', 1010, 1175, 105, 95],
     [1, '', 'Стіл', '', '', 95, 80, 130, 95, 'u'], [1, '', 'Стіл', '', '', 360, 85, 125, 80, 'u'], [1, '', 'Стіл', '', '', 200, 1080, 250, 90, 'u'],
     [1, '', 'Стіл', '', '', 830, 1365, 105, 70, 'u'], [1, '', 'Стіл', '', '', 830, 1435, 105, 70, 'u'],
+    [1, 'TL1', 'Стіл тімліда', '', '', 773, 1165, 165, 52], [1, 'QC1', 'Стіл контролю якості', '', '', 874, 440, 127, 440],   // v75: без кроків — для вигляду приміщення
     [2, 'OV2', 'Піч', '', 'OV2', 405, 120, 135, 130], [2, 'OV1', 'Піч', '', 'OV1', 540, 120, 175, 130], [2, 'OV3', 'Піч', '', 'OV3', 715, 120, 160, 130],
     [2, '2.01', 'Стіл', '', 'S10', 830, 280, 150, 82], [2, '2.02', 'Стіл', '', 'S11', 980, 280, 150, 82], [2, '2.03', 'Стіл', '', 'S9.2', 830, 362, 150, 83],
     [2, '2.04', 'Стіл', '', 'S9.3', 980, 362, 150, 83], [2, '', 'Стіл', '', '', 1130, 280, 190, 82, 'u'], [2, '', 'Стіл', '', '', 1130, 362, 190, 83, 'u'],
@@ -4032,7 +4051,7 @@ const z13sn = c => { const r = DB.routes || {}; for (const k in r) { const x = r
 const z13save = () => store('mlp_z13', JSON.stringify({ fl: Z13.fl, rfl: Z13.rp.fl }));
 const Z13C = 36;   // клітинка під ящик в одиницях плану (стандартний ящик ≈ 30)
 /** назва місця */
-const z13title = w => w.st === 't' ? 'Місце уточнити (' + w.steps.join(', ') + ')' : w.kind === 'Піч' || w.kind === 'Стіл тімліда' ? w.kind + (w.kind === 'Піч' ? ' ' + w.id : '') : w.kind + ' ' + w.id;
+const z13title = w => w.st === 't' ? 'Місце уточнити (' + w.steps.join(', ') + ')' : w.kind === 'Піч' || w.kind === 'Стіл тімліда' || w.kind === 'Стіл контролю якості' ? w.kind + (w.kind === 'Піч' ? ' ' + w.id : '') : w.kind + ' ' + w.id;
 /** куди ставити ящики кроку: місця з цим кроком (машини свого типорозміру — першими); немає — смуга «без місця на плані» поверху кроку */
 function z13places(step, typ) {
   const c = PLAN13.wp.filter(w => w.st !== 'u' && w.steps.indexOf(step) >= 0);
@@ -4107,11 +4126,11 @@ function z13floorSvg(f, units, places, opt) {
   const np = F.np; if (npOn) h += '<rect class="z13np" x="' + np[0] + '" y="' + np[1] + '" width="' + np[2] + '" height="' + np[3] + '" rx="10"/><text class="z13nt" x="' + (np[0] + 14) + '" y="' + (np[1] + 26) + '">Кроки без місця на плані (поверх ' + f + ')</text>';
   PLAN13.wp.filter(w => w.f === Number(f)).forEach(w => {
     const P = places[w.id], n = P ? P.us.length : 0, q = P ? P.us.reduce((a, u) => a + u.q, 0) : 0;
-    const cls = 'z13wp ' + (w.st === 'u' ? 'nu' : w.st === 't' ? 't' : w.kind === 'Піч' ? 'ov' : w.kind === 'Стіл тімліда' ? 'tl' : w.size === '3115' ? 's31' : w.size === '4320' ? 's43' : 'g') + (w.st === 'p' ? ' p' : '') + (Z13.sel && Z13.sel === w.id ? ' sel' : '');
+    const cls = 'z13wp ' + (w.st === 'u' ? 'nu' : w.st === 't' ? 't' : w.kind === 'Піч' ? 'ov' : w.kind === 'Стіл тімліда' ? 'tl' : w.kind === 'Стіл контролю якості' ? 'qc' : w.size === '3115' ? 's31' : w.size === '4320' ? 's43' : 'g') + (w.st === 'p' ? ' p' : '') + (Z13.sel && Z13.sel === w.id ? ' sel' : '');
     const cx = w.x + w.w / 2, cy = w.y + w.h / 2, small = w.w < 100 || w.h < 70;
     h += '<g class="' + cls + '"' + (w.st !== 'u' && w.id && opt.click ? ' data-wp="' + esc(w.id) + '"' : '') + '><rect x="' + w.x + '" y="' + w.y + '" width="' + w.w + '" height="' + w.h + '" rx="6"/>' +
-      (w.st === 'u' ? '' : '<text class="n" x="' + cx + '" y="' + (cy - (small ? 0 : 6)) + '" text-anchor="middle">' + esc(w.st === 't' ? w.steps.join(' ') : w.kind === 'Піч' ? w.id : w.id) + '</text>' +
-        (small || w.st === 't' ? '' : '<text class="s" x="' + cx + '" y="' + (cy + 20) + '" text-anchor="middle">' + esc(w.kind === 'Стіл тімліда' ? 'тімлід' : w.steps.join(' ')) + '</text>')) +
+      (w.st === 'u' ? '' : '<text class="n" x="' + cx + '" y="' + (cy - (small ? 0 : 6)) + '" text-anchor="middle">' + esc(w.st === 't' ? w.steps.join(' ') : w.kind === 'Стіл контролю якості' ? 'Контроль' : w.id) + '</text>' +
+        (small || w.st === 't' ? '' : '<text class="s" x="' + cx + '" y="' + (cy + 20) + '" text-anchor="middle">' + esc(w.kind === 'Стіл тімліда' ? 'тімлід' : w.kind === 'Стіл контролю якості' ? 'якості' : w.steps.join(' ')) + '</text>')) +
       (n ? '<g class="z13q"><rect x="' + (w.x + w.w - 74) + '" y="' + (w.y - 18) + '" width="78" height="30" rx="15"/><text x="' + (w.x + w.w - 35) + '" y="' + (w.y + 3) + '" text-anchor="middle">' + n + ' · ' + (q >= 1000 ? (Math.round(q / 100) / 10).toString().replace('.', ',') + 'т' : q) + '</text></g>' : '') + '</g>';
   });
   const us = units.map((u, i) => [u, i]).filter(x => x[0].f === Number(f)).sort((a, b) => a[0].layer - b[0].layer || a[0].py - b[0].py);
@@ -4239,10 +4258,13 @@ function z13rpUnits(t) {
     out.push({ box: 1, id: x[0], key: 'bx|' + x[0], step: 'K2', wh: !!(x[6] && t >= x[6]), q: x[2], typ: x[1], cols: x[4], t: boxNm(x[0]), per: x[3], at: x[5] }); });
   return out;
 }
+/** v75 (рішення 28.10): «3D» у повторі — поки тільки адміністратору */
+const z13rp3d = () => ((DB && DB.me && DB.me.role) || NAV.role) === 'адміністратор';
 function z13rpHtml() {
   const R = Z13.rp;
+  if (R.fl === '3d' && !z13rp3d()) R.fl = '1';
   let h = '<div class="zctl">' + zChips(R.per, Z13PER, v => { R.per = v; z13rpLoad(); }) +
-    '<span class="zg">' + zChips(R.fl, [['1', '1 пов.'], ['2', '2 пов.'], ['3', '3 пов.'], ['3d', '3D']], v => { R.fl = v; z13save(); renderDash(); }) + '</span></div>';
+    '<span class="zg">' + zChips(R.fl, [['1', '1 пов.'], ['2', '2 пов.'], ['3', '3 пов.']].concat(z13rp3d() ? [['3d', '3D']] : []), v => { R.fl = v; z13save(); renderDash(); }) + '</span></div>';
   if (R.busy) return h + '<p class="muted">Збираю рух ящиків…</p>';
   if (R.err) return h + '<p class="err">' + esc(R.err) + '</p>';
   if (!R.mv) return h + '<p class="muted">Повтор показує, як ящики переходили від столу до столу й між поверхами. Оберіть період або натисніть ▶.</p><button type="button" class="ic pri" onclick="zA(' + zAct(z13rpLoad) + ')">▶ Завантажити повтор</button>';
@@ -4255,6 +4277,7 @@ function z13rpHtml() {
 /** малює кадр: вперше — сцену, далі лише переставляє ящики (плавно, CSS transition) */
 function z13rpDraw() {
   const R = Z13.rp, host = $('z13rpc'); if (!host || !R.mv || !R.ticks || !R.ticks.length) return;
+  if (R.fl === '3d' && !z13rp3d()) R.fl = '1';   // v75
   const t = R.ticks[R.i], units = z13rpUnits(t); z13layout(units);
   const tm = $('z13tm'); if (tm) tm.textContent = ZDOWN[zDow(zYmd(new Date(t)))] + ' ' + zDm(zYmd(new Date(t))) + ' · ' + String(new Date(t).getHours()).padStart(2, '0') + ':' + String(new Date(t).getMinutes()).padStart(2, '0');
   const cnt = $('z13cnt'); if (cnt) cnt.textContent = 'Зараз на плані: ' + units.filter(u => !u.wh).length + ' · на складі: ' + units.filter(u => u.wh).length + '.';
@@ -4817,6 +4840,7 @@ function retroErr(e) {
   $('app').innerHTML = '<div class="card err">' + esc(e.message) + '</div><a class="btn btn2" style="display:block;text-align:center;text-decoration:none;margin:12px;width:auto" href="' + esc(link('')) + '">На головну</a>';
 }
 window.addEventListener('beforeunload', e => { if (RDIRTY) { e.preventDefault(); e.returnValue = ''; } });
+const RT_IN = 'внесено в ЖЗР';   // v75: Retro.gs v5
 function loadRetro() {
   document.body.classList.remove('nonav');
   if (PARAMS.rb) return loadRetroCard(PARAMS.rb);
@@ -4839,10 +4863,12 @@ function renderRetroList() {
   const sum = list.reduce((s, x) => { s.ok += x.c.ok; s.q += x.c.q; s.nr += x.c.nr; s.fix += x.c.fix; return s; }, { ok: 0, q: 0, nr: 0, fix: 0 });
   const all = d.list, wait = all.filter(x => x.status === 'очікує').length;
   let h = '<div class="card"><div class="mid">Ретро-історія партій</div><p class="muted" style="margin:6px 0 0">Партії, заведені з кроку X: записи попередніх кроків розпізнано з фото паперових техкарт. ' +
-    'Відкрийте партію, звірте записи з фото, виправте або допишіть і натисніть «Підтвердити історію партії». У ЖЗР ці записи внесемо окремо, коли перевірять усі партії.</p>' +
+    'Відкрийте партію, звірте записи з фото, виправте або допишіть і натисніть «Підтвердити історію партії». Підтверджені партії вносимо в ЖЗР (стан «у ЖЗР») — далі вони тут лише для перегляду. ' +
+    'Нові партії, заведені з кроку X з фото паперового листа, з\'являються тут самі.</p>' +
     '<div class="zctl" style="margin-top:12px"><span>Тімлід</span><span class="chips">' + chip('who', d.me.id, 'Мої', who === d.me.id) +
     Object.keys(d.leads).filter(k => k !== d.me.id).map(k => chip('who', k, d.leads[k], who === k)).join('') + chip('who', '', 'Усі', !who) + '</span></div>' +
-    '<div class="zctl"><span>Стан</span><span class="chips">' + chip('st', 'очікує', 'Чекають перевірки', st === 'очікує') + chip('st', 'підтверджено', 'Підтверджені', st === 'підтверджено') + chip('st', '', 'Усі', !st) + '</span></div></div>';
+    '<div class="zctl"><span>Стан</span><span class="chips">' + chip('st', 'очікує', 'Чекають перевірки', st === 'очікує') + chip('st', 'підтверджено', 'Підтверджені', st === 'підтверджено') +
+    chip('st', RT_IN, 'Внесені в ЖЗР', st === RT_IN) + chip('st', '', 'Усі', !st) + '</span></div></div>';   // v75
   h += '<div class="zkpis"><div class="zkpi"><div class="l">Партій у списку</div><div class="v">' + list.length + '</div><div class="d">усього чекають: ' + wait + ' з ' + all.length + '</div></div>' +
     '<div class="zkpi"><div class="l">Записи ок</div><div class="v" style="color:#17643D">' + sum.ok + '</div></div>' +
     '<div class="zkpi"><div class="l">Питання</div><div class="v" style="color:#8A5A00">' + sum.q + '</div></div>' +
@@ -4854,7 +4880,7 @@ function renderRetroList() {
       '<td>' + esc(x.typ) + (x.kv ? ' · ' + esc(x.kv) : '') + '</td><td>' + esc(x.from) + '</td><td class="r">' + esc(x.qty) + '</td><td>' + esc(x.leadName) + '</td>' +
       '<td class="r">' + (x.c.ok || '') + '</td><td class="r">' + (x.c.q ? '<span class="pill warn" style="margin:0">' + x.c.q + '</span>' : '') + '</td>' +
       '<td class="r">' + (x.c.nr ? '<span class="pill bad" style="margin:0">' + x.c.nr + '</span>' : '') + '</td>' +
-      '<td>' + (x.status === 'підтверджено' ? '<span class="pill ok" style="margin:0">✔ ' + esc(x.by) + '</span>' : '<span class="pill" style="margin:0">чекає</span>') + '</td></tr>').join('')
+      '<td>' + (x.status === RT_IN ? '<span class="pill blu" style="margin:0">у ЖЗР</span>' : x.status === 'підтверджено' ? '<span class="pill ok" style="margin:0">✔ ' + esc(x.by) + '</span>' : '<span class="pill" style="margin:0">чекає</span>') + '</td></tr>').join('')
       : '<tr><td colspan="9" class="muted">Немає партій за цим фільтром</td></tr>') + '</tbody></table></div></div>' +
     '<p class="muted" style="text-align:center">' + esc(PAGE_VERSION) + ' · ' + esc(d.version) + '</p><div style="height:20px"></div>';
   $('app').innerHTML = h;
@@ -4888,7 +4914,7 @@ function retroGo(no) {
   RDIRTY = false; PARAMS.rb = no; setUrl(); loadRetroCard(no);
 }
 function renderRetroCard(fresh) {
-  const c = RC, b = c.batch, done = b.status === 'підтверджено';
+  const c = RC, b = c.batch, inLog = b.status === RT_IN, done = b.status === 'підтверджено' || inLog;   // v75: «внесено в ЖЗР» — лише перегляд
   const prev = retroNav(-1), next = retroNav(1);
   const wname = id => { if (id === RUNK) return RUNK; const p = c.people.find(x => x.id === id); return p ? p.name + ' · ' + p.id : id; };
   const live = RN.filter(s => !s.inLog);
@@ -4904,7 +4930,7 @@ function renderRetroCard(fresh) {
   h += '<div class="rright"><div class="card" style="margin:0 0 12px"><div style="display:flex;justify-content:space-between;gap:10px;align-items:flex-start;flex-wrap:wrap">' +
     '<div><div class="mid">' + esc(b.no) + ' · ' + esc(b.typ) + (b.kv ? ' · KV ' + esc(b.kv) : '') + '</div><div class="muted">заведено з кроку <b>' + esc(b.from) + '</b> · ' + esc(b.qty) + ' шт · тімлід ' + esc(b.leadName) +
     ' · фото ' + (b.src === 'Б' ? 'з поля етикетки' : 'історії') + '</div></div>' +
-    (done ? '<span class="pill ok" style="margin:0">✔ підтверджено · ' + esc(b.by) + ' · ' + esc(b.at) + '</span>' : '<span class="pill" style="margin:0">чекає перевірки</span>') + '</div>' +
+    (inLog ? '<span class="pill blu" style="margin:0">✔ внесено в ЖЗР · підтвердив ' + esc(b.by) + '</span>' : done ? '<span class="pill ok" style="margin:0">✔ підтверджено · ' + esc(b.by) + ' · ' + esc(b.at) + '</span>' : '<span class="pill" style="margin:0">чекає перевірки</span>') + '</div>' +
     (b.note ? '<div class="tail" style="margin-top:10px">' + esc(b.note) + '</div>' : '') +
     '<div class="rleg"><span class="pill ok">ок ' + cnt('ок') + '</span><span class="pill warn">питання ' + cnt('питання') + '</span><span class="pill bad">не розпізнано ' + cnt('не розпізнано') + '</span>' +
     (cnt('виправлено') + cnt('додано') ? '<span class="pill blu">виправлено / додано ' + (cnt('виправлено') + cnt('додано')) + '</span>' : '') +
@@ -4931,7 +4957,10 @@ function renderRetroCard(fresh) {
         '<td>' + (done ? '' : '<button class="ic" data-del title="' + (s.del ? 'Повернути рядок' : 'Видалити рядок — такого запису не було') + '">' + (s.del ? '↩' : '✖') + '</button>') + '</td></tr>';
     }).join('') + '</tbody></table></div>' +
     (done ? '' : '<button class="btn btn2" style="width:auto;padding:9px 14px;font-size:15px;margin-top:8px" onclick="retroAdd()">+ Додати рядок</button>') + '</div>';
-  h += done
+  h += inLog
+    ? '<div class="card" style="margin:0 0 12px"><p style="margin:0">Історію підтвердив ' + esc(b.by) + ', ' + esc(b.at) + '; записи внесено в ЖЗР — вони в історії партії й у виробітку за свої дати. Виправити — ✎ на картці партії.</p>' +
+      '<a class="btn btn2" style="display:block;text-align:center;text-decoration:none" href="' + esc(link('h=' + encodeURIComponent(b.no))) + '">Історія партії ' + esc(b.no) + '</a>' + (next ? '<button class="btn" onclick="retroGo(\'' + esc(next.no) + '\')">Наступна партія ' + esc(next.no) + ' ›</button>' : '') + '</div>'
+    : done
     ? '<div class="card" style="margin:0 0 12px"><p style="margin:0">Історію підтверджено: ' + esc(b.by) + ', ' + esc(b.at) + '. Щоб змінити — поверніть на перевірку.</p>' +
       '<button class="btn btn2" onclick="retroReopen(this)">↩ Повернути на перевірку</button>' + (next ? '<button class="btn" onclick="retroGo(\'' + esc(next.no) + '\')">Наступна партія ' + esc(next.no) + ' ›</button>' : '') + '</div>'
     : '<div class="rbtns"><button class="btn btn2" id="rsave" onclick="retroSave(this)">Зберегти зміни</button>' +
