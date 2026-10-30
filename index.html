@@ -1,5 +1,8 @@
 <!DOCTYPE html>
-<!-- МЛП · index.html v77 · 30.10.2026 — Р-10 (і Р-8, Р-9): звіт на всю ширину екрана (меню лишається; було max-width 880 px), таблиці вищі й з власною прокруткою;
+<!-- МЛП · index.html v78 · 30.10.2026 — Р-14 «Записи працівника» (рішення 30.10; Code.gs v78, Reports.gs v34): список усіх записів працівника за період з фільтрами
+     (тип, деталі, крок, типорозмір, партія, тара, статус, як внесено), CSV; свої записи — будь-хто з «Кабінету» і з «Мій виробіток», тімлід і вище — за будь-якого працівника
+     (вибір людини зверху, 👁-стиль). Скасовані й виправлені (було → стало) — видно. Помічник (Assistant.gs v2) — такі самі запити словами.
+     v77 · 30.10.2026 — Р-10 (і Р-8, Р-9): звіт на всю ширину екрана (меню лишається; було max-width 880 px), таблиці вищі й з власною прокруткою;
      закріплені шапки: матриця Р-10_05 / Р-8_06 — рядок-підпис «що за таблиця» (назва, рядки, колонки, значення) + заголовки колонок, перша колонка; «Брак за днями» Р-10_07 і звірка Р-9_08 — заголовки днів;
      кнопка «⛶ На весь екран» біля матриці Р-10_05 / Р-8_06 і таблиць днів Р-10_07, Р-9_08 (Esc або «✕ Згорнути» — назад). Code.gs без змін.
      v76 · 29.10.2026 — рішення 29.10: «✂ Відокремити» на готовій партії S / R (ящик залишків) — підказка, що номер партії M
@@ -542,7 +545,7 @@
 <div class="net" id="net" role="alert" aria-live="assertive"><div class="nb"><div class="rt" id="netr"></div><div class="nt" id="nett">Зберігаю…</div><div class="ns" id="nets"></div><div class="np"><i id="netp"></i></div><div class="nh" id="neth"></div><div class="zc" id="zc"></div><button class="nx" id="netx" type="button">Не чекати</button></div></div>
 
 <script>
-const PAGE_VERSION = 'index.html v77 · 30.10.2026';   // v74: в1 — і з нашої тари (ящик залишків); в2 — лише партії в2
+const PAGE_VERSION = 'index.html v78 · 30.10.2026';   // v74: в1 — і з нашої тари (ящик залишків); в2 — лише партії в2
 // v72 (26.10):   // v72: «Яку партію відкриваємо?»; розшифровка кроків на картці партії; реєстрація — повернення за посиланням з форми
 // v71 (24.10):   // v71: порядок звітів (важливі — першими, жирним); Р-8_04 — один графік, статори / ротори / двигуни поруч, без лінії % браку; закладка «Випуск готових статорів, роторів і двигунів»
 //   // v70: Р-13 «Цех наживо» — план поверхів Печерська з ящиками, «Будівля 3D», повтор руху (Reports.gs v30)
@@ -1146,7 +1149,7 @@ function whoHtml(me, perms, unknown) {
 // =============================================================== v33: ОБОЛОНКА — меню, шапка, Головна, сканер QR, довідка
 /** Роль і права для меню. Сторінки кабінету, звітів і складу не викликають apiPage, тож меню бере роль з пристрою (останнє відоме) */
 let NAV = (() => { try { return JSON.parse(store('mlp_nav') || '{}') || {}; } catch (e) { return {}; } })();
-const NAV_KEYS = ['step', 'separate', 'noBatch', 'sklad', 'dashStan', 'dashTare', 'dashMy', 'history', 'cabinet', 'dashOut', 'dashScrap', 'dashBatches', 'dashControl', 'retro', 'dashBoxes', 'assist'];   // v65: + assist (помічник)
+const NAV_KEYS = ['step', 'separate', 'noBatch', 'sklad', 'dashStan', 'dashTare', 'dashMy', 'history', 'cabinet', 'dashOut', 'dashScrap', 'dashBatches', 'dashControl', 'retro', 'dashBoxes', 'assist', 'dashRecs'];   // v65: + assist (помічник)
 function navSave(me, perms) {
   const n = { role: me.role, name: me.name, perms: NAV.perms || {} };
   if (perms) { n.perms = {}; NAV_KEYS.forEach(k => n.perms[k] = !!perms[k]); }
@@ -1156,7 +1159,7 @@ function navSave(me, perms) {
 /** v58 (рішення 23.10): «зав. відділу браку» → «зав. відділу якості»; Василь заміщує тімліда — у списках тімлідів */
 const QC_ROLE = 'зав. відділу якості';
 const LEAD_ROLES = ['тімлід', 'зав. виробництва', 'адміністратор', QC_ROLE];
-const DASHT = { stan: ['Р-2', 'Стан зараз'], shop: ['Р-13', 'Цех наживо'], motors: ['Р-11', 'Двигуни в роботі'], boxes: ['Р-12', 'Чисті ящики'], tare: ['Р-5', 'Аналіз тари'], batches: ['Р-7', 'Аналіз партій'], out: ['Р-8', 'Виробіток'], scrap: ['Р-10', 'Аналіз браку'], control: ['Р-9', 'Контроль записів МЛП'], my: ['Р-8с', 'Мій виробіток'] };
+const DASHT = { stan: ['Р-2', 'Стан зараз'], shop: ['Р-13', 'Цех наживо'], motors: ['Р-11', 'Двигуни в роботі'], boxes: ['Р-12', 'Чисті ящики'], tare: ['Р-5', 'Аналіз тари'], batches: ['Р-7', 'Аналіз партій'], out: ['Р-8', 'Виробіток'], scrap: ['Р-10', 'Аналіз браку'], control: ['Р-9', 'Контроль записів МЛП'], my: ['Р-8с', 'Мій виробіток'], recs: ['Р-14', 'Записи працівника'] };
 /** Звіти ролі для меню (Р-0_07). «Мій виробіток» у меню — працівнику (окрема вкладка); тімлідам і зав. відділу якості — 👁 за будь-кого (v58) */
 function navReports() {
   // v71 (рішення 24.10): порядок за важливістю; x[3] — група: 0 — важливі (жирним), далі — тонкий відступ між групами
@@ -1164,6 +1167,7 @@ function navReports() {
   if (p.dashStan) r.push(['d=stan', 'stan', '', 0]);
   if (p.dashOut) r.push(['d=out', 'out', '', 0]);   // v38
   if (p.dashMy && LEAD_ROLES.indexOf(NAV.role) >= 0) r.push(['d=my', 'my', ' 👁', 0]);   // v36: перегляд як працівник (Р-0_08)
+  if (p.dashRecs && LEAD_ROLES.indexOf(NAV.role) >= 0) r.push(['d=recs', 'recs', '', 0]);   // v78: Р-14 — записи будь-якого працівника
   if (p.dashStan) r.push(['d=motors', 'motors', '', 1]);   // v55: Р-11
   if (p.dashBoxes && NAV.role !== 'працівник') r.push(['d=boxes', 'boxes', '', 1]);   // v57: Р-12 (працівнику — плитка на головній)
   if (p.dashTare) r.push(['d=tare', 'tare', '', 2]);
@@ -1201,7 +1205,7 @@ function navRender() {
   const curD = PARAMS.d || '';
   const a = (href, inner, on) => '<a href="' + esc(link(href)) + '" class="' + (on ? 'on' : '') + '">' + inner + '</a>';
   let h = a('', '<span>⌂</span>Головна', VIEW === 'home') + (p.assist ? a('ai=1', '<span>🤖</span>Помічник', VIEW === 'ai') : '') + a('cab=1', '<span>☰</span>Кабінет', VIEW === 'cab');   // v65: + Помічник
-  if (worker && p.dashMy) h += '<div class="sec">Звіти</div>' + a('d=my', '<span class="code">Р-8с</span>Мій виробіток', curD === 'my');
+  if (worker && p.dashMy) h += '<div class="sec">Звіти</div>' + a('d=my', '<span class="code">Р-8с</span>Мій виробіток', curD === 'my') + (p.dashRecs ? a('d=recs', '<span class="code">Р-14</span>Мої записи', curD === 'recs') : '');
   else if (reps.length) h += '<div class="sec">Звіти</div>' + reps.map((x, i) => (repGap(reps, i) ? '<div class="rgap"></div>' : '') + a(x[0], '<span class="code">' + DASHT[x[1]][0] + '</span>' + (x[3] === 0 ? '<b>' + DASHT[x[1]][1] + (x[2] || '') + '</b>' : DASHT[x[1]][1] + (x[2] || '')), curD === x[1])).join('');   // v71
   if (p.retro) h += '<div class="sec">Перевірка</div>' + a('rh=1', '<span>📄</span>Ретро-історія', VIEW === 'retro');   // v53
   side.innerHTML = h;
@@ -2591,7 +2595,8 @@ function wset(email, op, value) {
 function renderCabinet() {
   const d = CAB; document.body.classList.remove('nonav');
   $('who').innerHTML = esc(d.me.name) + '<br>' + esc(d.me.role);
-  const profile = '<div class="card"><div class="mid">Мій профіль</div>' +
+  const recsCard = '<a class="tile" href="' + esc(link('d=recs')) + '"><div class="tn">📋 Мої записи</div><div class="td">усе, що ви вносили, — за період, з фільтрами (крок, партія, тара…)</div></a><div style="height:8px"></div>';   // v78: Р-14
+  const profile = recsCard + '<div class="card"><div class="mid">Мій профіль</div>' +
     '<div class="li"><span>Ім\'я</span><b class="r">' + esc(d.me.name) + '</b></div><div class="li"><span>Роль</span><b class="r">' + esc(d.me.role) + '</b></div>' +
     '<div class="li"><span>E-mail реєстрації</span><b style="word-break:break-all;text-align:right">' + esc(d.me.email) + '</b></div>' +
     '<div class="li"><span>Код телефону</span><b style="font-family:ui-monospace,Menlo,Consolas,monospace;letter-spacing:.06em">' + esc(CODE) + '</b></div>' +
@@ -2627,7 +2632,7 @@ function renderCabinet() {
     '<p class="muted" style="margin-top:0">Успішних операцій сьогодні' + (T.floor ? ' на кроках вашого поверху (за аркушем «Поверхи»)' : '') + '.</p>' +
     (T.people.length ? T.people.map(p => '<div class="li"><div>' + esc(p.name) + '<br><span class="muted">' + esc(p.steps.join(', ')) + (T.floor ? '' : (p.floors.length ? ' · ' + esc(p.floors.join(', ')) : '')) + '</span></div>' +
       '<div class="r"><b>' + fn(p.good) + '</b>' + (p.scrap ? ' <span class="muted">· брак ' + fn(p.scrap) + '</span>' : '') +
-      (/^W/.test(p.id || '') ? ' <a class="ic" style="text-decoration:none;padding:6px 9px" title="Мій виробіток очима працівника" href="' + esc(link('d=my&as=' + encodeURIComponent(p.id))) + '">👁</a>' : '') + '</div></div>').join('') : '<p class="muted">Сьогодні записів ще немає.</p>') + '</div></details>';
+      (/^W/.test(p.id || '') ? ' <a class="ic" style="text-decoration:none;padding:6px 9px" title="Мій виробіток очима працівника" href="' + esc(link('d=my&as=' + encodeURIComponent(p.id))) + '">👁</a> <a class="ic" style="text-decoration:none;padding:6px 9px" title="Записи працівника" href="' + esc(link('d=recs&as=' + encodeURIComponent(p.id))) + '">📋</a>' : '') + '</div></div>').join('') : '<p class="muted">Сьогодні записів ще немає.</p>') + '</div></details>';
   h += '<details><summary>' + (d.big ? 'Усі працівники' : 'Мої люди') + ' (' + act.length + ')</summary><div class="list">' + act.map(p => {
     const on = p.active === 'так';
     let ctl = '<button class="ic" onclick="wset(\'' + esc(p.email) + '\',\'' + (on ? 'off' : 'on') + '\')">' + (on ? 'Вимкнути' : 'Увімкнути') + '</button>';
@@ -2667,7 +2672,7 @@ function loadDash(fresh) {
       if (/не зареєстровано/.test(e.message)) { forgetCode(); return loadPage(); }
       $('app').innerHTML = '<div class="card err">' + esc(e.message) + '</div>' +
         '<a class="btn btn2" style="display:block;text-align:center;text-decoration:none;margin:12px;width:auto" href="' + esc(link('')) + '">На головну</a>';
-    }).apiDash(Object.assign({ code: CODE, d: PARAMS.d, per: PARAMS.per || 'w', fresh: fresh ? 1 : 0 }, PARAMS.d === 'my' ? z8q() : (PARAMS.d === 'batches' && PARAMS.card) ? { card: PARAMS.card } : (PARAMS.d === 'out' || PARAMS.d === 'scrap' || PARAMS.d === 'batches' || PARAMS.d === 'control') ? zOutQ() : {}));   // v35: Р-8с — режим, дата, 👁
+    }).apiDash(Object.assign({ code: CODE, d: PARAMS.d, per: PARAMS.per || 'w', fresh: fresh ? 1 : 0 }, PARAMS.d === 'my' ? z8q() : PARAMS.d === 'recs' ? Object.assign(zOutQ(), { as: PARAMS.as || '' }) : (PARAMS.d === 'batches' && PARAMS.card) ? { card: PARAMS.card } : (PARAMS.d === 'out' || PARAMS.d === 'scrap' || PARAMS.d === 'batches' || PARAMS.d === 'control') ? zOutQ() : {}));   // v35: Р-8с — режим, дата, 👁
 }
 function kpi(l, v, u, d) {
   return '<div class="kpi"><div class="l">' + l + '</div><div class="v">' + v + (u ? '<small>' + u + '</small>' : '') + '</div>' +
@@ -2680,8 +2685,8 @@ function renderDash() {
   ZA = []; ZDRAW = [];
   // v35: усі звіти без вкладок (переходи — у меню); «Мій виробіток» — Р-8с (старий dashMy лишається для відповіді без mode — прибрати на етапі 8)
   document.body.classList.toggle('wide', d.d === 'shop');   // v70: Р-13 — на всю ширину екрана
-  document.body.classList.toggle('rwide', d.d === 'scrap' || d.d === 'out' || d.d === 'control');   // v77: Р-10, Р-8, Р-9 — таблиці на всю ширину, меню лишається
-  let h = d.d === 'stan' ? r2() : d.d === 'shop' ? r13() : d.d === 'motors' ? r11() : d.d === 'boxes' ? r12() : d.d === 'tare' ? r5() : d.d === 'out' ? r8() : d.d === 'scrap' ? r10() : d.d === 'batches' ? (d.card ? r7card() : r7()) : d.d === 'control' ? r9() : r8c();
+  document.body.classList.toggle('rwide', d.d === 'scrap' || d.d === 'out' || d.d === 'control' || d.d === 'recs');   // v77: Р-10, Р-8, Р-9 — таблиці на всю ширину, меню лишається
+  let h = d.d === 'stan' ? r2() : d.d === 'shop' ? r13() : d.d === 'motors' ? r11() : d.d === 'boxes' ? r12() : d.d === 'tare' ? r5() : d.d === 'out' ? r8() : d.d === 'scrap' ? r10() : d.d === 'batches' ? (d.card ? r7card() : r7()) : d.d === 'control' ? r9() : d.d === 'recs' ? r14() : r8c();
   h += '<p class="muted" style="text-align:center">Дані на ' + esc(d.now) + (d.me.role === 'адміністратор' ? ' · ' + sec(d.ms) + ' / ' + sec(d.total) + (d.cached ? ' · кеш' : '') + (d.logSrc ? ' · ' + esc(d.logSrc) : '') : '') +
     ' · <a class="lnk" href="javascript:loadDash(1)">оновити</a>' +
     ((d.perms || {}).baMode ? ' · <a class="lnk" href="javascript:baToggle()">🏷 Індекси: ' + (baOn() ? 'вимкнути' : 'увімкнути') + '</a>' : '') +   // v61
@@ -2835,6 +2840,7 @@ function r8c() {
       '<select onchange="z8go(\'as\',this.value)"><option value="">' + (d.viewAs ? '← мій' : '— працівник —') + '</option>' +
       d.people.map(p => '<option value="' + esc(p.id) + '"' + (d.viewAs && d.viewAs.id === p.id ? ' selected' : '') + '>' + esc(p.name) + '</option>').join('') + '</select></div>';
   }
+  h += '<div style="margin:6px 12px"><a class="lnk" href="' + esc(link('d=recs' + (d.viewAs ? '&as=' + encodeURIComponent(d.viewAs.id) : ''))) + '">📋 Усі записи за період, з фільтрами →</a></div>';   // v78: Р-14
   const lbl = d.mode === 'd' ? (d.anchor === d.today ? 'Сьогодні, ' : '') + ZDOWN[zDow(d.anchor)] + ' ' + zDm(d.anchor) + '.' + d.anchor.slice(0, 4)
     : d.mode === 'w' ? 'Тиждень ' + zDm(d.from) + ' – ' + zDm(d.to) : ZMONN[Number(d.from.slice(5, 7)) - 1] + ' ' + d.from.slice(0, 4);
   h += '<div class="zfbar" style="display:block"><div class="zfrow">' + zChips(d.mode, [['d', 'День'], ['w', 'Тиждень'], ['m', 'Місяць']], v => { PARAMS.m = v; z8go('a', d.anchor); }) +
@@ -3197,7 +3203,7 @@ function zFbar8(rid, fields, extra) {
   const set = k => a => { if (a.length) F.m[k] = a; else delete F.m[k]; renderDash(); };
   let dates = '';
   if (F.per === 'custom') { const rg = zRange(F); dates = '<input type="date" class="zdate" value="' + rg[0] + '" max="' + zToday() + '" onchange="zSetCustom(\'' + rid + '\',\'from\',this.value)"><span class="muted">–</span><input type="date" class="zdate" value="' + rg[1] + '" max="' + zToday() + '" onchange="zSetCustom(\'' + rid + '\',\'to\',this.value)">'; }
-  let h = zFrow('Період', ZPERS, F.per, v => zSetPer(rid, v), dates) + zFrow('Деталізація', [['d', 'Дні'], ['w', 'Тижні'], ['m', 'Місяці']], F.gran, v => zSetGran(rid, v));
+  let h = zFrow('Період', ZPERS, F.per, v => zSetPer(rid, v), dates) + (S.noGran ? '' : zFrow('Деталізація', [['d', 'Дні'], ['w', 'Тижні'], ['m', 'Місяці']], F.gran, v => zSetGran(rid, v)));   // v78: noGran — списки (Р-14) без деталізації
   fields.forEach(k => {
     const v = F.m[k] || [];
     if (lock[k]) { h += '<div class="zfr"><span class="zfl">' + esc(D[k].l) + '</span><div class="chips">' + (v.length ? v.map(x => '<button type="button" class="on" disabled>' + esc(D[k].lab(x)) + ' 🔒</button>').join('') : '<button type="button" disabled>усі 🔒</button>') + '</div></div>'; return; }
@@ -3748,6 +3754,77 @@ function z9form(S) {
       '<td class="r">' + (x.d > 0 ? '+' : '') + fn(x.d) + '</td><td class="r">' + (x.bad ? '<span class="pill bad" style="margin:0">' + (x.a && x.b !== null ? zF1p(x.p) + ' %' : '—') + '</span>' : zF1p(x.p) + ' %') + '</td></tr>').join('') + '</table></div>' : '<p class="muted">Розбіжностей немає.</p>';
   h += '<p class="muted" style="margin:8px 0 0">Звіряємо записи в МЛП з вечірньою формою Антона, поки працівники заповнюють обидві. Різниця = МЛП − форма. Контрольні кроки — перевірені (успішні + брак). Розбіжність понад 2 % — розібрати. Працівника форми знаходимо за e-mail, інакше — за ім\'ям і прізвищем.</p>';
   if ((DB.formUnknown || []).length) h += '<p class="muted" style="margin:8px 0 0">Види робіт з форми, не зіставлені з кроками (додати в «Відповідність форми» в MLP_Підсумки): ' + DB.formUnknown.map(x => esc(x[0]) + ' (' + x[1] + ')').join(', ') + '.</p>';
+  return h;
+}
+
+// =============================================================== v78: Р-14 «ЗАПИСИ ПРАЦІВНИКА» (рішення 30.10)
+// Усі записи ЖЗР працівника за період — свої і внесені за інших (Reports.gs v34, apiDash d=recs). Працівник бачить свої, тімлід і вище — будь-якого (вибір зверху).
+// Фільтри — ті самі компоненти, що в Р-8 / Р-9; без графіків: це список. Скасовані лишаються зі статусом, виправлені — «було → стало». CSV — усе, що пройшло фільтри.
+const ZRT = { 'крок': 'Крок', 'видача': 'Видача деталей', 'робота без партії': 'Робота без партії', 'додавання': 'Додавання', 'відокремлення': 'Відокремлення', 'вибуття': 'Вибуття',
+  'пропуск': 'Пропуск кроку', 'покупні': 'Покупні деталі', 'власні': 'Власні деталі', 'залишок': 'Залишок', 'партія на склад': 'Партія на склад', 'партія зі складу': 'Партія зі складу' };
+const ZRKIND = { S: 'ST', R: 'RT', M: 'MT' };
+const ZRDIMS = {
+  t: { l: 'Тип запису', f: r => r.t, lab: v => ZRT[v] || v },
+  kind: { l: 'Деталі', f: r => ZRKIND[String(r.b).charAt(0)] || '—', lab: v => v === '—' ? v : (ZKINDN[v] || v) },
+  step: { l: 'Крок', f: r => r.st || '—', lab: v => v === '—' ? v : v + ((DB.steps || {})[v] ? ' ' + DB.steps[v] : '') },
+  typ: { l: 'Типорозмір', f: r => r.typ || '—', lab: v => v },
+  batch: { l: 'Партія', f: r => r.b || '—', lab: v => v },
+  tare: { l: 'Тара (з якої)', f: r => r.tr || '—', lab: v => v },
+  status: { l: 'Статус', f: r => r.status || 'діє', lab: v => v },
+  how: { l: 'Як внесено', f: r => r.how, lab: v => v }
+};
+ZPOPDIMS.push('tare');
+ZST.recs = { F: zMkF('week', 'd'), sel: [], noGran: true, more: false, D: ZRDIMS,
+  sortV: (k, vals) => vals.sort((a, b) => k === 't' ? (Object.keys(ZRT).indexOf(a) + 1 || 99) - (Object.keys(ZRT).indexOf(b) + 1 || 99) : k === 'kind' ? ['ST', 'RT', 'MT', '—'].indexOf(a) - ['ST', 'RT', 'MT', '—'].indexOf(b)
+    : k === 'status' ? ['діє', 'виправлено', 'скасовано'].indexOf(a) - ['діє', 'виправлено', 'скасовано'].indexOf(b) : String(a).localeCompare(String(b), 'uk', { numeric: true })) };
+try { const v = JSON.parse(store('mlp_per_recs') || 'null'); if (v && v.per) Object.assign(ZST.recs.F, { per: v.per, from: v.from || '', to: v.to || '' }); } catch (e) { }
+function z14row(r) {
+  const dead = r.status === 'скасовано', was = r.status === 'виправлено';
+  const qty = r.t === 'крок' ? fn(r.g) + ' / ' + fn(r.s) + (was ? ' <span class="muted">(було ' + fn(r.wg) + ' / ' + fn(r.ws) + ')</span>' : '')
+    : r.t === 'робота без партії' ? (r.h ? fn(r.h) + ' год' : fn(r.q) + ' ' + esc(r.x1 || 'шт'))
+    : r.q ? fn(r.q) + ' шт' + (was && r.wq !== undefined ? ' <span class="muted">(було ' + fn(r.wq) + ')</span>' : '') : '—';
+  const bt = r.b ? bl(r.b) + (r.bt ? ' → ' + bl(r.bt) : '') : (r.bt ? bl(r.bt) : '—');
+  const tr = r.tr ? esc(r.tr) + (r.tt ? ' → ' + esc(r.tt) : '') : (r.tt ? esc(r.tt) : '—');
+  const stp = r.t === 'крок' && r.st ? esc(r.st) + ' <span class="muted">' + esc(r.sn) + '</span>' : r.t === 'робота без партії' ? esc(r.wk) : '—';
+  const how = r.how === 'сам' ? '<span class="muted">сам</span>' : '<span class="pill warn" style="margin:0">' + esc(r.how) + '</span>' +
+    (r.how === 'вніс за іншого' ? '<br><span class="muted">за ' + esc(zWN(r.for)) + '</span>' : r.by ? '<br><span class="muted">' + esc(zWN(r.by)) + '</span>' : '');
+  const st = r.status ? '<span class="pill ' + (dead ? 'bad' : 'warn') + '" style="margin:0">' + esc(r.status) + '</span>' + (r.si ? '<br><span class="muted">' + esc(r.si) + '</span>' : '') : '';
+  return '<tr' + (dead ? ' style="opacity:.55"' : '') + '><td style="white-space:nowrap">' + ZDOWN[zDow(r.d)] + ' ' + zDm(r.d) + ' <span class="muted">' + esc(r.tm) + '</span></td><td>' + esc(ZRT[r.t] || r.t) + '</td><td>' + stp + '</td><td style="white-space:nowrap">' + bt + '</td><td style="white-space:nowrap">' + tr +
+    '</td><td class="r"' + (dead ? ' style="text-decoration:line-through"' : '') + '>' + qty + '</td><td>' + how + '</td><td>' + st + '</td><td class="muted">' + esc([r.rs, r.c].filter(Boolean).join(' · ')) + '</td></tr>';
+}
+function z14csv(rs) {
+  const head = ['Дата', 'Час', 'Тип', 'Партія', 'Партія-ціль', 'Тара', 'Тара-ціль', 'Крок', 'Вид роботи', 'Типорозмір', 'KV', 'Успішних', 'Брак', 'Кількість', 'Години', 'Причина браку', 'Коментар', 'Статус', 'Як внесено', 'Працівник'];
+  const out = [head].concat(rs.map(r => [r.d, r.tm, r.t, r.b, r.bt, r.tr, r.tt, r.st, r.wk, r.typ, r.kv, r.g, r.s, r.q, r.h, r.rs, r.c, r.status || 'діє', r.how, zWN(r.for || r.w)]));
+  const csv = '﻿' + out.map(x => x.map(v => '"' + String(v === undefined || v === null ? '' : v).replace(/"/g, '""') + '"').join(';')).join('\r\n');
+  const a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([csv], { type: 'text/csv;charset=utf-8' }));
+  a.download = 'ENEY_MLP_R14_' + DB.who.id + '_' + DB.from + '_' + DB.to + '.csv'; document.body.appendChild(a); a.click(); a.remove(); toast('CSV завантажено');
+}
+function r14() {
+  const S = ZST.recs, F = S.F, d = DB;
+  S.base = d.recs || [];
+  const rs = S.base.filter(e => { for (const k in F.m) { const v = F.m[k]; if (v && v.length && v.indexOf(ZRDIMS[k].f(e)) < 0) return false; } return true; });
+  const live = rs.filter(r => r.status !== 'скасовано');
+  const sum = (a, f) => a.reduce((t, r) => t + (f(r) || 0), 0);
+  const nm = d.viewAs ? d.viewAs.name : d.who.name;
+  let h = '';
+  if (d.people) h += '<div class="zban"><span>📋 ' + (d.viewAs ? 'Записи працівника: <b>' + esc(d.viewAs.name) + '</b> · тільки перегляд' : 'Ваші записи. Подивитись записи працівника:') + '</span>' +
+    '<select onchange="z8go(\'as\',this.value)"><option value="">' + (d.viewAs ? '← мої' : '— працівник —') + '</option>' +
+    d.people.map(p => '<option value="' + esc(p.id) + '"' + (d.viewAs && d.viewAs.id === p.id ? ' selected' : '') + '>' + esc(p.name) + '</option>').join('') + '</select></div>';
+  else h += '<div class="zban"><span>📋 <b>Ваші записи</b>: усе, що ви внесли, і що внесли за вас, — за обраний період. Скасовані й виправлені теж видно.</span></div>';
+  h += zFbar8('recs', ['t', 'kind', 'step', 'typ', 'batch', 'tare', 'status', 'how']);
+  const kr = live.filter(r => r.t === 'крок');
+  h += '<div class="zkpis">' + zKpi('Записів', fn(live.length), '', rs.length - live.length ? 'скасованих: ' + fn(rs.length - live.length) : '') +
+    zKpi('Успішних', fn(sum(kr, r => r.g)), '', 'у записах кроків') + zKpi('Брак', fn(sum(kr, r => r.s)), '', kr.length ? zPc(sum(kr, r => r.s), sum(kr, r => r.g + r.s)) + ' від оброблених' : '') +
+    zKpi('Видано деталей', fn(sum(live.filter(r => r.t === 'видача'), r => r.q)), 'шт', 'з партій / тари у збирання') + zKpi('Виправлено', fn(live.filter(r => r.status === 'виправлено').length)) + '</div>';
+  if (d.periodCut) h += '<p class="muted" style="margin:8px 12px">Період скорочено до ' + zDmy(d.from) + ' – ' + zDmy(d.to) + ' (не довше за 92 дні).</p>';
+  if (d.rowsCut) h += '<p class="muted" style="margin:8px 12px">Показано найновіші ' + fn(d.recs.length) + ' записів із ' + fn(d.total) + ' — зменшіть період.</p>';
+  if (!rs.length) return h + '<div class="card center muted">' + (S.base.length ? 'За цими фільтрами записів немає.' : esc(nm) + ': за ' + esc(zPerLabel(F)) + ' записів немає.') + '</div>';
+  const shown = S.more ? rs : rs.slice(0, 100);
+  h += zFold('r14t', 'Записи', fn(rs.length), '<div class="tw" style="max-height:640px"><table class="t"><tr><th>Коли</th><th>Що</th><th>Крок / робота</th><th>Партія</th><th>Тара</th><th class="r">Кількість<br><span class="muted">успішних / брак</span></th><th>Внесення</th><th>Статус</th><th>Причина, коментар</th></tr>' +
+    shown.map(z14row).join('') + '</table></div>' +
+    '<div class="zctl" style="margin-top:8px">' + (rs.length > 100 ? '<button type="button" class="ic" onclick="zA(' + zAct(() => { S.more = !S.more; renderDash(); }) + ')">' + (S.more ? 'Згорнути' : 'Показати всі ' + fn(rs.length)) + '</button>' : '') +
+    '<button type="button" class="ic" onclick="zA(' + zAct(() => z14csv(rs)) + ')">⬇ CSV</button></div>' +
+    '<p class="muted" style="margin:8px 0 0">Час — коли працівник робив (тімлід міг внести пізніше). «Видача деталей» — з якої партії й тари взято деталі і в яку партію двигунів. «Вніс за іншого» — записи, які цей тімлід зробив за працівників. Партія — картка партії.</p>', true);
   return h;
 }
 
