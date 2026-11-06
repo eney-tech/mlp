@@ -1,5 +1,8 @@
 <!DOCTYPE html>
-<!-- МЛП · index.html v84 · 05.11.2026 — R3.1 і R3.2 злито в один крок R3 «Клей і запресування кільця» (Code.gs v84): довідка кроків, підказка R3,
+<!-- МЛП · index.html v85 · 06.11.2026 — модуль відділу якості, етап 1 (специфікація, аркуш 21, ПР-77): Р-10_08 «Деталі» на кроках двигунів —
+     колонки «Статорів · Роторів · Двигунів»: що саме передано у відділ якості (F1 — брак статорів / роторів; F2 / F3 / F5 — лише статора / лише ротора,
+     решта — двигуни цілі; Reports.gs v37, рядок підсумків [14] / [15]); на кроках статорів / роторів — у заголовку «Брак, статорів» / «Брак, роторів».
+     v84 · 05.11.2026 — R3.1 і R3.2 злито в один крок R3 «Клей і запресування кільця» (Code.gs v84): довідка кроків, підказка R3,
      Р-13 — столи 3.06 / 3.07 = R3 («місце уточнити» R3.2 прибрано); калькулятор «Мій виробіток» — збережена ціна R3 = R3.1 + R3.2 (на пристрої).
      v83 · 05.11.2026 — рішення 05.11 (Code.gs v81, Reports.gs v35): 1) Р-8 / Р-10 — фільтр, розріз і рівень матриці «Лінія»
      (Жуляни: В1 — двигуни й гравіювання покупних роторів, В2 — статори й ротори в2; Печерськ — «—»). 2) Кабінет: «Працівники» — усі, «мій поверх» —
@@ -556,7 +559,7 @@
 <div class="net" id="net" role="alert" aria-live="assertive"><div class="nb"><div class="rt" id="netr"></div><div class="nt" id="nett">Зберігаю…</div><div class="ns" id="nets"></div><div class="np"><i id="netp"></i></div><div class="nh" id="neth"></div><div class="zc" id="zc"></div><button class="nx" id="netx" type="button">Не чекати</button></div></div>
 
 <script>
-const PAGE_VERSION = 'index.html v84 · 05.11.2026';   // v74: в1 — і з нашої тари (ящик залишків); в2 — лише партії в2
+const PAGE_VERSION = 'index.html v85 · 06.11.2026';   // v74: в1 — і з нашої тари (ящик залишків); в2 — лише партії в2
 // v72 (26.10):   // v72: «Яку партію відкриваємо?»; розшифровка кроків на картці партії; реєстрація — повернення за посиланням з форми
 // v71 (24.10):   // v71: порядок звітів (важливі — першими, жирним); Р-8_04 — один графік, статори / ротори / двигуни поруч, без лінії % браку; закладка «Випуск готових статорів, роторів і двигунів»
 //   // v70: Р-13 «Цех наживо» — план поверхів Печерська з ящиками, «Будівля 3D», повтор руху (Reports.gs v30)
@@ -3152,9 +3155,10 @@ function zRecs() {
     const step = x[2], kind = x[3], typ = x[4];
     const base = { d: x[0], w: x[1], step: step, kind: kind, typ: typ, kv: x[5], ver: x[6], fl: x[7] ? x[8] + x[7] : (x[8] || '—'), loc: x[8] || '—', b: x[9], ln: x[13] || '—',
       fin: !!(fin[kind + '|' + typ + '|' + step] || fin[kind + '|*|' + step]), ctl: (d.steps[step] || [])[1] === 'К' };
-    let rest = x[11];
+    let rest = x[11]; const n0 = out.length;
     String(x[12] || '').split(/;\s*/).filter(Boolean).forEach(p => { const m = p.match(/^(.*):\s*(\d+)$/); if (!m) return; const n = Number(m[2]); rest -= n; out.push(Object.assign({}, base, { g: 0, s: n, rs: m[1] })); });
     if (x[10] || rest > 0 || !x[11]) out.push(Object.assign({}, base, { g: x[10], s: Math.max(0, rest), rs: '—' }));
+    if (out.length > n0) { out[n0].x1 = Number(x[14]) || 0; out[n0].x2 = Number(x[15]) || 0; }   // v85: брак статорів / роторів (MT) — лише на першому з рядків, щоб не подвоїти
   });
   ZRECDB = DB; return ZREC = out;
 }
@@ -3526,6 +3530,16 @@ function r10() {
   return h;
 }
 
+/** v85: що саме пішло в брак на кроці: st — статорів, rt — роторів, mt — двигунів цілих. MT: F1 — брак = статори + ротори (Дод. 1 / 2);
+ *  F2 / F3 / F5 — Дод. 1 / 2 = брак лише статора / лише ротора, решта — двигуни цілі; інші кроки MT — двигуни цілі. ST / RT — сама деталь */
+function zPartsOf(step, s, x1, x2) {
+  const k = ((DB.steps || {})[step] || [])[2] || '';
+  if (k === 'ST') return { st: s, rt: 0, mt: 0 };
+  if (k === 'RT') return { st: 0, rt: s, mt: 0 };
+  if (step === 'F1') return { st: x1, rt: x2, mt: Math.max(0, s - x1 - x2) };   // старі записи без розподілу — у «Двигунів» (не повинно бути)
+  if (PART_SCRAP.indexOf(step) >= 0) return { st: x1, rt: x2, mt: Math.max(0, s - x1 - x2) };
+  return { st: 0, rt: 0, mt: s };
+}
 /** v68: Р-10_07 брак за днями — рядки кроки (▸ до партій або працівників), колонки дні періоду, сума браку з кожного кроку;
  *  клітинка — Р-10_08 «Деталі» нижче: які партії, хто, причини, скільки оброблено */
 function z10days(S, rs) {
@@ -3557,10 +3571,17 @@ function z10days(S, rs) {
   if (S.det) {   // Р-10_08 деталі клітинки
     const x = S.det, recs = dr.filter(r => r.step === x.step && r.d === x.d && (!x.dim || String(ZDIMS[x.dim].f(r)) === String(x.val)));
     const g = zGroup(recs, r => r.b + '¦' + r.w), rowsD = [...g.keys()].map(k => { const a = g.get(k), rsn = {}; a.forEach(r => { if (r.s && r.rs && r.rs !== '—') rsn[r.rs] = (rsn[r.rs] || 0) + r.s; });
-      return { b: a[0].b, w: a[0].w, s: a.reduce((q, r) => q + r.s, 0), o: a.reduce((q, r) => q + r.g + r.s, 0), why: Object.keys(rsn).map(z => z + ': ' + rsn[z]).join('; ') }; }).filter(r => r.s > 0).sort((p, q) => q.s - p.s);
+      const s = a.reduce((q, r) => q + r.s, 0), x1 = a.reduce((q, r) => q + (r.x1 || 0), 0), x2 = a.reduce((q, r) => q + (r.x2 || 0), 0);
+      return Object.assign({ b: a[0].b, w: a[0].w, s: s, o: a.reduce((q, r) => q + r.g + r.s, 0), why: Object.keys(rsn).map(z => z + ': ' + rsn[z]).join('; ') }, zPartsOf(x.step, s, x1, x2)); }).filter(r => r.s > 0).sort((p, q) => q.s - p.s);
     const ttl = esc(x.step) + ' ' + esc((DB.steps[x.step] || [''])[0]) + ' · ' + ZDOWN[zDow(x.d)] + ' ' + zDm(x.d) + (x.dim ? ' · ' + esc(x.dim === 'batch' ? x.val : ZDIMS.worker.lab(x.val)) : '');
-    h += zFold('r10det', 'Деталі: ' + ttl, rowsD.length ? fn(rowsD.reduce((q, r) => q + r.s, 0)) + ' шт' : '', (rowsD.length ? '<div class="tw"><table class="t"><tr><th>Партія</th><th>Працівник</th><th>Причина</th><th class="r">Брак</th><th class="r">Оброблено</th><th class="r">% браку</th></tr>' +
-      rowsD.map(r => '<tr><td>' + bl(r.b) + '</td><td>' + esc(ZDIMS.worker.lab(r.w)) + zEye(r.w) + '</td><td>' + esc(r.why || 'без причини') + '</td><td class="r"><b>' + fn(r.s) + '</b></td><td class="r">' + fn(r.o) + '</td><td class="r">' + zPc(r.s, r.o) + '</td></tr>').join('') + '</table></div>'
+    const kd = (DB.steps[x.step] || [])[2] || '', mt = kd === 'MT', sumK = k => rowsD.reduce((q, r) => q + r[k], 0);   // v85: що саме передано у відділ якості
+    const pc = v => v ? fn(v) : '<span class="muted">—</span>';
+    h += zFold('r10det', 'Деталі: ' + ttl, rowsD.length ? fn(rowsD.reduce((q, r) => q + r.s, 0)) + ' шт' : '', (rowsD.length ? '<div class="tw"><table class="t"><tr><th>Партія</th><th>Працівник</th><th>Причина</th><th class="r">' + (kd === 'ST' ? 'Брак, статорів' : kd === 'RT' ? 'Брак, роторів' : 'Брак') + '</th>' +
+      (mt ? '<th class="r">Статорів</th><th class="r">Роторів</th><th class="r">Двигунів</th>' : '') + '<th class="r">Оброблено</th><th class="r">% браку</th></tr>' +
+      rowsD.map(r => '<tr><td>' + bl(r.b) + '</td><td>' + esc(ZDIMS.worker.lab(r.w)) + zEye(r.w) + '</td><td>' + esc(r.why || 'без причини') + '</td><td class="r"><b>' + fn(r.s) + '</b></td>' +
+        (mt ? '<td class="r">' + pc(r.st) + '</td><td class="r">' + pc(r.rt) + '</td><td class="r">' + pc(r.mt) + '</td>' : '') + '<td class="r">' + fn(r.o) + '</td><td class="r">' + zPc(r.s, r.o) + '</td></tr>').join('') +
+      (mt && rowsD.length > 1 ? '<tr class="tot"><td colspan="3">Разом</td><td class="r">' + fn(sumK('s')) + '</td><td class="r">' + pc(sumK('st')) + '</td><td class="r">' + pc(sumK('rt')) + '</td><td class="r">' + pc(sumK('mt')) + '</td><td class="r">' + fn(sumK('o')) + '</td><td></td></tr>' : '') + '</table></div>' +
+      (mt ? '<p class="muted" style="margin:6px 0 0">Що передано у відділ якості: ' + (x.step === 'F1' ? 'на F1 брак — окремо статори й ротори (брак = статорів + роторів), друга деталь лишається в партії.' : PART_SCRAP.indexOf(x.step) >= 0 ? 'статорів / роторів — брак лише цієї деталі (друга лишається в партії), двигунів — брак цілим двигуном.' : 'на цьому кроці в брак іде двигун цілим.') + '</p>' : '')
       : '<p class="muted">Браку немає.</p>') + '<button type="button" class="ic" style="margin-top:8px" onclick="zA(' + zAct(() => { S.det = null; renderDash(); }) + ')">✕ Закрити деталі</button>', true);
   }
   return h;
