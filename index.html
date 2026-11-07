@@ -1,5 +1,9 @@
 <!DOCTYPE html>
-<!-- МЛП · index.html v86 · 06.11.2026 — Р-10_08: брак на F4п (гравіювання покупних роторів у партії двигунів, до F1) — у колонці «Роторів», не «Двигунів».
+<!-- МЛП · index.html v87 · 07.11.2026 — Р-10_08 «Деталі браку» — завжди на екрані (внизу Р-10): записи браку за фільтрами звіту і всіма ◎-виборами
+     з візуалів (графік, причини, кроки, назви в матриці). Натискання клітинки матриці Р-10_05 (будь-який рівень, «Разом») і клітинки Р-10_07 «Брак за днями» —
+     звужує деталі до цієї клітинки (чип «◎ Клітинка …» з ✕) і переходить до них. Кнопка «↓ Деталі браку» внизу екрана, коли щось обрано.
+     Колонки: день і крок (якщо їх кілька), партія, працівник, причина, брак, статорів / роторів / двигунів (кроки двигунів), оброблено, % браку; «Разом».
+     v86 · 06.11.2026 — Р-10_08: брак на F4п (гравіювання покупних роторів у партії двигунів, до F1) — у колонці «Роторів», не «Двигунів».
      v85 · 06.11.2026 — модуль відділу якості, етап 1 (специфікація, аркуш 21, ПР-77): Р-10_08 «Деталі» на кроках двигунів —
      колонки «Статорів · Роторів · Двигунів»: що саме передано у відділ якості (F1 — брак статорів / роторів; F2 / F3 / F5 — лише статора / лише ротора,
      решта — двигуни цілі; Reports.gs v37, рядок підсумків [14] / [15]); на кроках статорів / роторів — у заголовку «Брак, статорів» / «Брак, роторів».
@@ -260,7 +264,9 @@
   table.zbt td.lb{white-space:nowrap;max-width:280px;overflow:hidden;text-overflow:ellipsis}table.zbt td.bc{width:38%;min-width:90px}
   table.zbt .bx{height:14px;background:#F4F7F9;border-radius:4px;overflow:hidden}table.zbt .bar{height:100%;background:#2a78d6;border-radius:0 4px 4px 0}
   table.zdt td,table.zdt th{padding:5px 7px;font-variant-numeric:tabular-nums}table.zdt th{text-align:right}table.zdt td.c{text-align:right;cursor:pointer;min-width:46px}
-  table.zdt td.c:hover{outline:2px solid #2F4858;outline-offset:-2px}table.zdt td.on{outline:2px solid #2F4858;outline-offset:-2px}table.zdt th.c{cursor:pointer}
+  table.zdt td.c:hover{outline:2px solid #2F4858;outline-offset:-2px}table.zdt td.on{outline:2px solid #2F4858;outline-offset:-2px}
+  td.zclk{cursor:pointer}td.zclk:hover{outline:2px solid #2F4858;outline-offset:-2px}td.zclk[data-on]{outline:2px solid #B3261E;outline-offset:-2px}
+  .zjump{position:fixed;right:16px;bottom:16px;z-index:40;border:0;border-radius:20px;padding:9px 14px;background:#B3261E;color:#fff;font-weight:700;box-shadow:0 2px 8px rgba(0,0,0,.25);cursor:pointer}table.zdt th.c{cursor:pointer}
   table.zdt td.nf{box-shadow:inset 0 0 0 1px #E5A100}table.zdt tr.tot td{border-top:2px solid #C5D0D7;font-weight:600}
   .zseg{display:flex;height:100%}.zseg i{display:block;height:100%}
   .zpanel{display:flex;gap:8px;align-items:baseline;margin:14px 0 0;font-size:15px}.zpanel:first-child{margin-top:4px}
@@ -560,7 +566,7 @@
 <div class="net" id="net" role="alert" aria-live="assertive"><div class="nb"><div class="rt" id="netr"></div><div class="nt" id="nett">Зберігаю…</div><div class="ns" id="nets"></div><div class="np"><i id="netp"></i></div><div class="nh" id="neth"></div><div class="zc" id="zc"></div><button class="nx" id="netx" type="button">Не чекати</button></div></div>
 
 <script>
-const PAGE_VERSION = 'index.html v86 · 06.11.2026';   // v74: в1 — і з нашої тари (ящик залишків); в2 — лише партії в2
+const PAGE_VERSION = 'index.html v87 · 07.11.2026';   // v74: в1 — і з нашої тари (ящик залишків); в2 — лише партії в2
 // v72 (26.10):   // v72: «Яку партію відкриваємо?»; розшифровка кроків на картці партії; реєстрація — повернення за посиланням з форми
 // v71 (24.10):   // v71: порядок звітів (важливі — першими, жирним); Р-8_04 — один графік, статори / ротори / двигуни поруч, без лінії % браку; закладка «Випуск готових статорів, роторів і двигунів»
 //   // v70: Р-13 «Цех наживо» — план поверхів Печерська з ящиками, «Будівля 3D», повтор руху (Reports.gs v30)
@@ -3302,11 +3308,16 @@ function zMatrix(rid, recs, M, cfg) {
       const cells = colF ? colKeys.map(c => { const sub = g.filter(r => colF(r) === c); return sub.length ? V.f(zAgg(sub)) : null; }) : [];
       const tot = V.f(zAgg(g));
       (colF ? cells : [tot]).forEach(v => { if (v !== null) maxBy[depth] = Math.max(maxBy[depth] || 0, v); });
-      rows.push({ depth: depth, dim: dim, k: k, p: p, leaf: leaf, open: open, cells: cells, tot: tot });
+      rows.push({ depth: depth, dim: dim, k: k, p: p, pa: path.concat(String(k)), leaf: leaf, open: open, cells: cells, tot: tot });
       if (open) build(g, depth + 1, path.concat(String(k)));
     });
   })(recs, 0, []);
   const heat = (v, d) => v === null || !maxBy[d] || !v ? '' : ' style="background:rgba(42,120,214,' + (v / maxBy[d] * (V.pct ? .38 : .3)).toFixed(3) + ')"';
+  // v87: клітинка → cfg.onCell(умови, ключ): умови — значення рівнів рядка + колонка; обрана підсвічена (cfg.selKey)
+  const colCond = c => M.cols === 'bucket' ? { dim: 'bucket', val: c, gran: cfg.gran } : { dim: M.cols, val: c };
+  const cellA = (pa, c, has) => { if (!cfg.onCell || !has) return '';
+    const conds = (pa || []).map((v, i) => ({ dim: M.rows[i], val: v })).concat(c === undefined ? [] : [colCond(c)]), key = 'mx¦' + (pa ? pa.join('¦') : '*') + '¦' + (c === undefined ? '*' : c);
+    return ' onclick="zA(' + zAct(() => cfg.onCell(conds, key)) + ')"' + (cfg.selKey === key ? ' data-on="1"' : '') + ' title="Деталі цієї клітинки"'; };
   const avail = cfg.dims.filter(x => M.rows.indexOf(x) < 0);
   let h = '<div class="zctl zmx"><span>Рядки:</span>' + M.rows.map((x, i) => '<span class="lvl"><b>' + (i + 1) + '. ' + esc(ZDIMS[x].l) + '</b>' +
       (i > 0 ? '<button type="button" title="Вище" onclick="zA(' + zAct(() => { const r = M.rows; [r[i - 1], r[i]] = [r[i], r[i - 1]]; M.exp = {}; renderDash(); }) + ')">↑</button>' : '') +
@@ -3326,11 +3337,12 @@ function zMatrix(rid, recs, M, cfg) {
     const tg = r.leaf ? '<span class="tg0"></span>' : '<button type="button" class="tg" onclick="zA(' + zAct(() => { if (M.all) { M.all = false; rows.filter(x => x.open).forEach(x => M.exp[x.p] = 1); } if (M.exp[r.p]) delete M.exp[r.p]; else M.exp[r.p] = 1; renderDash(); }) + ')">' + (r.open ? '▾' : '▸') + '</button>';
     const lab = r.dim === 'batch' ? bl(r.k) : '<a class="lnk" href="javascript:void 0" title="Відфільтрувати решту звіту" onclick="zA(' + zAct(() => zSelTog(ZST[rid], 'mx', r.dim, r.k, cfg.gran)) + ')">' + esc(ZDIMS[r.dim].lab(r.k)) + '</a>' + (r.dim === 'worker' ? zEye(r.k) : '');
     h += '<tr class="d' + r.depth + '"><td style="padding-left:' + (4 + r.depth * 18) + 'px;white-space:nowrap">' + tg + lab + '</td>' +
-      r.cells.map(v => '<td class="r zmxm"' + heat(v, r.depth) + '>' + (v === null ? '<span class="muted">·</span>' : esc(V.fmt(v))) + '</td>').join('') + '<td class="r zmxm"' + (colF ? '' : heat(r.tot, r.depth)) + '><b>' + esc(V.fmt(r.tot)) + '</b></td></tr>';
+      r.cells.map((v, i) => '<td class="r zmxm' + (cfg.onCell && v !== null ? ' zclk' : '') + '"' + heat(v, r.depth) + cellA(r.pa, colKeys[i], v !== null) + '>' + (v === null ? '<span class="muted">·</span>' : esc(V.fmt(v))) + '</td>').join('') +
+      '<td class="r zmxm' + (cfg.onCell ? ' zclk' : '') + '"' + (colF ? '' : heat(r.tot, r.depth)) + cellA(r.pa, undefined, true) + '><b>' + esc(V.fmt(r.tot)) + '</b></td></tr>';
   });
-  h += '<tr class="tot"><td><b>Разом</b></td>' + colKeys.map(c => '<td class="r zmxm">' + esc(V.fmt(V.f(zAgg(recs.filter(r => colF(r) === c))))) + '</td>').join('') + '<td class="r zmxm"><b>' + esc(V.fmt(V.f(T))) + '</b></td></tr></table></div>' +
+  h += '<tr class="tot"><td><b>Разом</b></td>' + colKeys.map(c => '<td class="r zmxm' + (cfg.onCell ? ' zclk' : '') + '"' + cellA(null, c, true) + '>' + esc(V.fmt(V.f(zAgg(recs.filter(r => colF(r) === c))))) + '</td>').join('') + '<td class="r zmxm"><b>' + esc(V.fmt(V.f(T))) + '</b></td></tr></table></div>' +
     (rows.length > 1500 ? '<p class="muted">Показано 1500 рядків — звузьте фільтри.</p>' : '') +
-    '<p class="muted" style="margin:6px 0 0">Додайте рівень, змініть порядок ↑, розгорніть ▸. Назва — фільтр для решти звіту.</p>';
+    '<p class="muted" style="margin:6px 0 0">Додайте рівень, змініть порядок ↑, розгорніть ▸. Назва — фільтр для решти звіту.' + (cfg.onCell ? ' Клітинка — ' + esc(cfg.cellHint || 'деталі') + '.' : '') + '</p>';
   return '<div class="zfs' + zFsOn(rid + 'm') + '" id="zfs_' + rid + 'm">' + h + '</div>';   // v77: вся матриця (керування + таблиця) розгортається на весь екран
 }
 /** v77: «⛶ На весь екран» — таблиця займає весь екран (Esc або «✕ Згорнути» — назад); стан пам'ятає перемальовка звіту */
@@ -3527,10 +3539,49 @@ function r10() {
   // Р-10_06 причини, Р-10_05 матриця
   const rr = zSelApply(rs, S, 'reas').filter(r => r.s), gr = zGroup(rr, r => r.rs || '—'), rk = [...gr.keys()].sort((a, b) => zAgg(gr.get(b)).s - zAgg(gr.get(a)).s), sr = zSelOf(S, 'reas');
   h += zFold('r10r', 'Причини браку', rk.length, rk.length ? zBars(rk.map(k => { const a = zAgg(gr.get(k)); return { l: esc(ZDIMS.reason.lab(k)), v: a.s, t: fn(a.s) + ' шт', c: '#B3261E', on: zAct(() => zSelTog(S, 'reas', 'reason', k)), dim: sr && sr.val !== k }; })) : '<p class="muted">Браку немає.</p>');
-  h += zFold('r10m', 'Матриця браку', '', zMatrix('scrap', zSelApply(rs, S, 'mx'), S.mx, { title: 'Р-10_05 Матриця браку', gran: F.gran, vals: ZVALS10, dims: ['step', 'worker', 'batch', 'reason', 'kind', 'typ', 'kv', 'floor', 'line', 'loc'], colDims: ['kind', 'floor', 'line', 'reason'] }));
+  h += zFold('r10m', 'Матриця браку', '', zMatrix('scrap', zSelApply(rs, S, 'mx'), S.mx, { title: 'Р-10_05 Матриця браку', gran: F.gran, vals: ZVALS10, dims: ['step', 'worker', 'batch', 'reason', 'kind', 'typ', 'kv', 'floor', 'line', 'loc'], colDims: ['kind', 'floor', 'line', 'reason'],
+    onCell: (conds, key) => z10detSet(S, conds, key), selKey: S.det && S.det.key, cellHint: 'деталі браку внизу (Р-10_08)' }));
+  h += z10det(S, rs);
   return h;
 }
 
+/** v87: клітинка матриці / «Брак за днями» → Р-10_08 звужено до неї і перехід до деталей; повторне натискання тієї самої клітинки — зняти */
+function z10detSet(S, conds, key) {
+  if (S.det && S.det.key === key) S.det = null; else { S.det = { key: key, conds: conds }; S.detMore = false; zOpen('r10det'); }
+  renderDash();
+}
+const zCondOk = (r, c) => c.dim === 'bucket' ? zBk(r.d, c.gran) === c.val : String(ZDIMS[c.dim].f(r)) === String(c.val);
+const zCondLab = c => c.dim === 'bucket' ? zBkLabel(c.val, c.gran, true) : ZDIMS[c.dim].l + ': ' + ZDIMS[c.dim].lab(c.val);
+/** v87: Р-10_08 «Деталі браку» — завжди на екрані: записи браку за фільтрами і всіма ◎-виборами звіту, звужені клітинкою (S.det) */
+function z10det(S, rs) {
+  const x = S.det && S.det.conds ? S.det : null; if (S.det && !x) S.det = null;
+  const recs = zSelApply(rs, S, 'det').filter(r => !x || x.conds.every(c => zCondOk(r, c)));
+  const g = zGroup(recs, r => r.d + '¦' + r.step + '¦' + r.b + '¦' + r.w);
+  const rowsD = [...g.keys()].map(k => { const a = g.get(k), rsn = {}; a.forEach(r => { if (r.s && r.rs && r.rs !== '—') rsn[r.rs] = (rsn[r.rs] || 0) + r.s; });
+    const s = a.reduce((q, r) => q + r.s, 0), x1 = a.reduce((q, r) => q + (r.x1 || 0), 0), x2 = a.reduce((q, r) => q + (r.x2 || 0), 0);
+    return Object.assign({ d: a[0].d, step: a[0].step, b: a[0].b, w: a[0].w, s: s, o: a.reduce((q, r) => q + r.g + r.s, 0), why: Object.keys(rsn).map(z => z + ': ' + rsn[z]).join('; ') }, zPartsOf(a[0].step, s, x1, x2));
+  }).filter(r => r.s > 0).sort((p, q) => p.d < q.d ? 1 : p.d > q.d ? -1 : q.s - p.s);
+  const kindOf = st => (DB.steps[st] || [])[2] || '', mt = rowsD.some(r => kindOf(r.step) === 'MT'), oneD = new Set(rowsD.map(r => r.d)).size <= 1, oneS = new Set(rowsD.map(r => r.step)).size <= 1;
+  const k1 = oneS && rowsD.length ? kindOf(rowsD[0].step) : '', sumK = k => rowsD.reduce((q, r) => q + r[k], 0), pc = v => v ? fn(v) : '<span class="muted">—</span>';
+  const sel = S.sel.map(z => zSelLabel(z));
+  let h = '<div class="zctl">' + (x ? '<span class="zchip sel">◎ Клітинка: ' + esc(x.conds.map(zCondLab).join(' · ')) + '<button type="button" title="Прибрати клітинку" onclick="zA(' + zAct(() => { S.det = null; renderDash(); }) + ')">✕</button></span>' : '') +
+    (sel.length ? '<span class="muted">з урахуванням: ' + esc(sel.join(' · ')) + '</span>' : '') +
+    (!x && !sel.length ? '<span class="muted">Усі записи браку за фільтрами звіту. Натисніть клітинку матриці або «Брак за днями», крок, причину, стовпчик графіка — тут лишаться лише вони.</span>' : '') + '</div>';
+  if (!rowsD.length) return zFold('r10det', 'Деталі браку', '0 шт', h + '<p class="muted">Браку немає.</p>', true);
+  const lim = S.detMore ? rowsD.length : 100, show = rowsD.slice(0, lim);
+  h += '<div class="tw zmaxh"><table class="t"><tr>' + (oneD ? '' : '<th>День</th>') + (oneS ? '' : '<th>Крок</th>') + '<th>Партія</th><th>Працівник</th><th>Причина</th><th class="r">' +
+    (k1 === 'ST' ? 'Брак, статорів' : k1 === 'RT' ? 'Брак, роторів' : 'Брак') + '</th>' + (mt ? '<th class="r">Статорів</th><th class="r">Роторів</th><th class="r">Двигунів</th>' : '') + '<th class="r">Оброблено</th><th class="r">% браку</th></tr>' +
+    show.map(r => '<tr>' + (oneD ? '' : '<td style="white-space:nowrap">' + ZDOWN[zDow(r.d)] + ' ' + zDm(r.d) + '</td>') + (oneS ? '' : '<td style="white-space:nowrap"><b>' + esc(r.step) + '</b> <span class="muted">' + esc((DB.steps[r.step] || [''])[0]) + '</span></td>') +
+      '<td>' + bl(r.b) + '</td><td>' + esc(ZDIMS.worker.lab(r.w)) + zEye(r.w) + '</td><td>' + esc(r.why || 'без причини') + '</td><td class="r"><b>' + fn(r.s) + '</b></td>' +
+      (mt ? '<td class="r">' + pc(r.st) + '</td><td class="r">' + pc(r.rt) + '</td><td class="r">' + pc(r.mt) + '</td>' : '') + '<td class="r">' + fn(r.o) + '</td><td class="r">' + zPc(r.s, r.o) + '</td></tr>').join('') +
+    (rowsD.length > 1 ? '<tr class="tot"><td colspan="' + (3 + (oneD ? 0 : 1) + (oneS ? 0 : 1)) + '">Разом' + (rowsD.length > lim ? ' (усі ' + fn(rowsD.length) + ' рядків)' : '') + '</td><td class="r">' + fn(sumK('s')) + '</td>' +
+      (mt ? '<td class="r">' + pc(sumK('st')) + '</td><td class="r">' + pc(sumK('rt')) + '</td><td class="r">' + pc(sumK('mt')) + '</td>' : '') + '<td class="r">' + fn(sumK('o')) + '</td><td class="r">' + zPc(sumK('s'), sumK('o')) + '</td></tr>' : '') + '</table></div>' +
+    (rowsD.length > 100 ? '<button type="button" class="ic" style="margin-top:8px" onclick="zA(' + zAct(() => { S.detMore = !S.detMore; renderDash(); }) + ')">' + (S.detMore ? 'Згорнути' : 'Показати всі ' + fn(rowsD.length)) + '</button>' : '') +
+    (mt ? '<p class="muted" style="margin:6px 0 0">Статорів / роторів / двигунів — що передано у відділ якості: F4п — ротори; F1 — статори й ротори окремо (брак = статорів + роторів); F2 / F3 / F5 — брак лише статора / лише ротора (друга деталь лишається в партії) або двигун цілий; K2 — двигуни.</p>' : '');
+  h = zFold('r10det', 'Деталі браку', fn(sumK('s')) + ' шт', h, true);
+  if (x || S.sel.length) h += '<button type="button" class="zjump" onclick="zA(' + zAct(() => { const el = $('zf_r10det'); if (el) { el.open = true; el.scrollIntoView({ block: 'start', behavior: 'smooth' }); } }) + ')">↓ Деталі браку · ' + fn(sumK('s')) + ' шт</button>';
+  return h;
+}
 /** v85: що саме пішло в брак на кроці: st — статорів, rt — роторів, mt — двигунів цілих. MT: F1 — брак = статори + ротори (Дод. 1 / 2);
  *  F2 / F3 / F5 — Дод. 1 / 2 = брак лише статора / лише ротора, решта — двигуни цілі; інші кроки MT — двигуни цілі. ST / RT — сама деталь */
 function zPartsOf(step, s, x1, x2) {
@@ -3549,10 +3600,10 @@ function z10days(S, rs) {
   const gst = zGroup(sr, r => r.step), stK = zSortVals('step', [...gst.keys()]), by = S.dBy;
   const sumD = (a, d) => a.reduce((x, r) => x + (r.d === d ? r.s : 0), 0), sumA = a => a.reduce((x, r) => x + r.s, 0);
   let mx = 1; stK.forEach(k => days.forEach(d => { mx = Math.max(mx, sumD(gst.get(k), d)); }));
-  const isOn = (k, d, dim, v) => S.det && S.det.step === k && S.det.d === d && (S.det.dim || '') === (dim || '') && String(S.det.val || '') === String(v || '');
+  const dKey = (k, d, dim, v) => 'd¦' + k + '¦' + d + '¦' + (dim || '') + '¦' + (v || ''), isOn = (k, d, dim, v) => !!S.det && S.det.key === dKey(k, d, dim, v);
   const cell = (a, k, d, dim, v) => { const q = sumD(a, d);
     return '<td class="c' + (isOn(k, d, dim, v) ? ' on' : '') + '"' + (q ? ' style="background:rgba(179,38,30,' + (0.08 + q / mx * 0.5).toFixed(3) + ')"' : '') +
-      ' onclick="zA(' + zAct(() => { S.det = { step: k, d: d, dim: dim || '', val: v || '' }; zOpen('r10det'); renderDash(); }) + ')">' + (q ? fn(q) : '<span class="muted">·</span>') + '</td>'; };
+      ' onclick="zA(' + zAct(() => z10detSet(S, [{ dim: 'step', val: k }, { dim: 'bucket', val: d, gran: 'd' }].concat(dim ? [{ dim: dim, val: v }] : []), dKey(k, d, dim, v))) + ')">' + (q ? fn(q) : '<span class="muted">·</span>') + '</td>'; };
   let t = '<div class="zfs' + zFsOn('r10d') + '" id="zfs_r10d"><div class="zctl">Розгорнути крок до: ' + zChips(by, [['batch', 'Партій'], ['worker', 'Працівників']], v => { S.dBy = v; renderDash(); }) + zFsBtn('r10d') + '</div>' +
     '<div class="tw zmaxh"><table class="t zdt"><tr><th style="text-align:left">Крок</th>' + days.map(d => '<th>' + ZDOWN[zDow(d)] + '<br>' + zDm(d) + '</th>').join('') + '<th>Разом</th></tr>';
   let lk = '';
@@ -3567,24 +3618,8 @@ function z10days(S, rs) {
     }
   });
   t += '<tr class="tot"><td>Разом</td>' + days.map(d => { const q = sumD(sr, d); return '<td class="r">' + (q ? fn(q) : '<span class="muted">·</span>') + '</td>'; }).join('') + '<td class="r">' + fn(sumA(sr)) + '</td></tr></table></div>' +
-    '<p class="muted" style="margin:6px 0 0">Брак, шт — сума з кожного кроку за день (тільки кроки, де брак був). ▸ — розгорнути до ' + (by === 'batch' ? 'партій' : 'працівників') + '. Натисніть клітинку — деталі нижче.</p></div>';
+    '<p class="muted" style="margin:6px 0 0">Брак, шт — сума з кожного кроку за день (тільки кроки, де брак був). ▸ — розгорнути до ' + (by === 'batch' ? 'партій' : 'працівників') + '. Натисніть клітинку — деталі браку внизу звіту (Р-10_08).</p></div>';
   let h = zFold('r10d', 'Брак за днями', stK.length ? fn(sumA(sr)) + ' шт' : '', stK.length ? t : '<p class="muted">Браку за період немає.</p>', true);
-  if (S.det) {   // Р-10_08 деталі клітинки
-    const x = S.det, recs = dr.filter(r => r.step === x.step && r.d === x.d && (!x.dim || String(ZDIMS[x.dim].f(r)) === String(x.val)));
-    const g = zGroup(recs, r => r.b + '¦' + r.w), rowsD = [...g.keys()].map(k => { const a = g.get(k), rsn = {}; a.forEach(r => { if (r.s && r.rs && r.rs !== '—') rsn[r.rs] = (rsn[r.rs] || 0) + r.s; });
-      const s = a.reduce((q, r) => q + r.s, 0), x1 = a.reduce((q, r) => q + (r.x1 || 0), 0), x2 = a.reduce((q, r) => q + (r.x2 || 0), 0);
-      return Object.assign({ b: a[0].b, w: a[0].w, s: s, o: a.reduce((q, r) => q + r.g + r.s, 0), why: Object.keys(rsn).map(z => z + ': ' + rsn[z]).join('; ') }, zPartsOf(x.step, s, x1, x2)); }).filter(r => r.s > 0).sort((p, q) => q.s - p.s);
-    const ttl = esc(x.step) + ' ' + esc((DB.steps[x.step] || [''])[0]) + ' · ' + ZDOWN[zDow(x.d)] + ' ' + zDm(x.d) + (x.dim ? ' · ' + esc(x.dim === 'batch' ? x.val : ZDIMS.worker.lab(x.val)) : '');
-    const kd = (DB.steps[x.step] || [])[2] || '', mt = kd === 'MT', sumK = k => rowsD.reduce((q, r) => q + r[k], 0);   // v85: що саме передано у відділ якості
-    const pc = v => v ? fn(v) : '<span class="muted">—</span>';
-    h += zFold('r10det', 'Деталі: ' + ttl, rowsD.length ? fn(rowsD.reduce((q, r) => q + r.s, 0)) + ' шт' : '', (rowsD.length ? '<div class="tw"><table class="t"><tr><th>Партія</th><th>Працівник</th><th>Причина</th><th class="r">' + (kd === 'ST' ? 'Брак, статорів' : kd === 'RT' ? 'Брак, роторів' : 'Брак') + '</th>' +
-      (mt ? '<th class="r">Статорів</th><th class="r">Роторів</th><th class="r">Двигунів</th>' : '') + '<th class="r">Оброблено</th><th class="r">% браку</th></tr>' +
-      rowsD.map(r => '<tr><td>' + bl(r.b) + '</td><td>' + esc(ZDIMS.worker.lab(r.w)) + zEye(r.w) + '</td><td>' + esc(r.why || 'без причини') + '</td><td class="r"><b>' + fn(r.s) + '</b></td>' +
-        (mt ? '<td class="r">' + pc(r.st) + '</td><td class="r">' + pc(r.rt) + '</td><td class="r">' + pc(r.mt) + '</td>' : '') + '<td class="r">' + fn(r.o) + '</td><td class="r">' + zPc(r.s, r.o) + '</td></tr>').join('') +
-      (mt && rowsD.length > 1 ? '<tr class="tot"><td colspan="3">Разом</td><td class="r">' + fn(sumK('s')) + '</td><td class="r">' + pc(sumK('st')) + '</td><td class="r">' + pc(sumK('rt')) + '</td><td class="r">' + pc(sumK('mt')) + '</td><td class="r">' + fn(sumK('o')) + '</td><td></td></tr>' : '') + '</table></div>' +
-      (mt ? '<p class="muted" style="margin:6px 0 0">Що передано у відділ якості: ' + (x.step === 'F1' ? 'на F1 брак — окремо статори й ротори (брак = статорів + роторів), друга деталь лишається в партії.' : PART_SCRAP.indexOf(x.step) >= 0 ? 'статорів / роторів — брак лише цієї деталі (друга лишається в партії), двигунів — брак цілим двигуном.' : x.step === 'F4п' ? 'на F4п (до збирання) у брак ідуть ротори.' : 'на цьому кроці в брак іде двигун цілим.') + '</p>' : '')
-      : '<p class="muted">Браку немає.</p>') + '<button type="button" class="ic" style="margin-top:8px" onclick="zA(' + zAct(() => { S.det = null; renderDash(); }) + ')">✕ Закрити деталі</button>', true);
-  }
   return h;
 }
 
