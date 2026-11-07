@@ -1,5 +1,7 @@
 <!DOCTYPE html>
-<!-- МЛП · index.html v87 · 07.11.2026 — Р-10_08 «Деталі браку» — завжди на екрані (внизу Р-10): записи браку за фільтрами звіту і всіма ◎-виборами
+<!-- МЛП · index.html v88 · 07.11.2026 — Р-10_08: «Оброблено» і % браку — за всіма записами групи (день · крок · партія · працівник), а не лише за обраною
+     причиною (з фільтром причини було 100 %).
+     v87 · 07.11.2026 — Р-10_08 «Деталі браку» — завжди на екрані (внизу Р-10): записи браку за фільтрами звіту і всіма ◎-виборами
      з візуалів (графік, причини, кроки, назви в матриці). Натискання клітинки матриці Р-10_05 (будь-який рівень, «Разом») і клітинки Р-10_07 «Брак за днями» —
      звужує деталі до цієї клітинки (чип «◎ Клітинка …» з ✕) і переходить до них. Кнопка «↓ Деталі браку» внизу екрана, коли щось обрано.
      Колонки: день і крок (якщо їх кілька), партія, працівник, причина, брак, статорів / роторів / двигунів (кроки двигунів), оброблено, % браку; «Разом».
@@ -566,7 +568,7 @@
 <div class="net" id="net" role="alert" aria-live="assertive"><div class="nb"><div class="rt" id="netr"></div><div class="nt" id="nett">Зберігаю…</div><div class="ns" id="nets"></div><div class="np"><i id="netp"></i></div><div class="nh" id="neth"></div><div class="zc" id="zc"></div><button class="nx" id="netx" type="button">Не чекати</button></div></div>
 
 <script>
-const PAGE_VERSION = 'index.html v87 · 07.11.2026';   // v74: в1 — і з нашої тари (ящик залишків); в2 — лише партії в2
+const PAGE_VERSION = 'index.html v88 · 07.11.2026';   // v74: в1 — і з нашої тари (ящик залишків); в2 — лише партії в2
 // v72 (26.10):   // v72: «Яку партію відкриваємо?»; розшифровка кроків на картці партії; реєстрація — повернення за посиланням з форми
 // v71 (24.10):   // v71: порядок звітів (важливі — першими, жирним); Р-8_04 — один графік, статори / ротори / двигуни поруч, без лінії % браку; закладка «Випуск готових статорів, роторів і двигунів»
 //   // v70: Р-13 «Цех наживо» — план поверхів Печерська з ящиками, «Будівля 3D», повтор руху (Reports.gs v30)
@@ -3556,10 +3558,11 @@ const zCondLab = c => c.dim === 'bucket' ? zBkLabel(c.val, c.gran, true) : ZDIMS
 function z10det(S, rs) {
   const x = S.det && S.det.conds ? S.det : null; if (S.det && !x) S.det = null;
   const recs = zSelApply(rs, S, 'det').filter(r => !x || x.conds.every(c => zCondOk(r, c)));
-  const g = zGroup(recs, r => r.d + '¦' + r.step + '¦' + r.b + '¦' + r.w);
+  const gk = r => r.d + '¦' + r.step + '¦' + r.b + '¦' + r.w, g = zGroup(recs, gk);
+  const opsAll = new Map(); (S.base || rs).forEach(r => { const k = gk(r); if (g.has(k)) opsAll.set(k, (opsAll.get(k) || 0) + r.g + r.s); });   // v88: оброблено — уся група, без фільтра причини
   const rowsD = [...g.keys()].map(k => { const a = g.get(k), rsn = {}; a.forEach(r => { if (r.s && r.rs && r.rs !== '—') rsn[r.rs] = (rsn[r.rs] || 0) + r.s; });
     const s = a.reduce((q, r) => q + r.s, 0), x1 = a.reduce((q, r) => q + (r.x1 || 0), 0), x2 = a.reduce((q, r) => q + (r.x2 || 0), 0);
-    return Object.assign({ d: a[0].d, step: a[0].step, b: a[0].b, w: a[0].w, s: s, o: a.reduce((q, r) => q + r.g + r.s, 0), why: Object.keys(rsn).map(z => z + ': ' + rsn[z]).join('; ') }, zPartsOf(a[0].step, s, x1, x2));
+    return Object.assign({ d: a[0].d, step: a[0].step, b: a[0].b, w: a[0].w, s: s, o: opsAll.get(k) || a.reduce((q, r) => q + r.g + r.s, 0), why: Object.keys(rsn).map(z => z + ': ' + rsn[z]).join('; ') }, zPartsOf(a[0].step, s, x1, x2));
   }).filter(r => r.s > 0).sort((p, q) => p.d < q.d ? 1 : p.d > q.d ? -1 : q.s - p.s);
   const kindOf = st => (DB.steps[st] || [])[2] || '', mt = rowsD.some(r => kindOf(r.step) === 'MT'), oneD = new Set(rowsD.map(r => r.d)).size <= 1, oneS = new Set(rowsD.map(r => r.step)).size <= 1;
   const k1 = oneS && rowsD.length ? kindOf(rowsD[0].step) : '', sumK = k => rowsD.reduce((q, r) => q + r[k], 0), pc = v => v ? fn(v) : '<span class="muted">—</span>';
