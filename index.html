@@ -1,5 +1,8 @@
 <!DOCTYPE html>
-<!-- МЛП · index.html v97 · 08.11.2026 — Р-9_07: ще один прихований рівень (рішення 08.11) — натиснути рядок «працівник × вид роботи» → дослівно,
+<!-- МЛП · index.html v98 · 08.11.2026 — R5 «Добалансна перевірка» (рішення 08.11): поля по порядку — «Перевірено», «Одразу на F4», «На балансування», «Брак»;
+     перевірено = одразу на F4 + на балансування + брак; «На балансування» рахується саме (можна змінити), запис — лише коли сума сходиться.
+     На сервер — як і раніше: успішних = одразу + на балансування, Дод. 1 / Дод. 2 (Code.gs без змін).
+     v97 · 08.11.2026 — Р-9_07: ще один прихований рівень (рішення 08.11) — натиснути рядок «працівник × вид роботи» → дослівно,
      як людина заповнила форму Антона (позначка часу, дата, ПІБ, типорозмір, вид роботи, кількість — як у таблиці відповідей) і її записи в МЛП
      (як у «Мій виробіток»: час, крок, партія, типорозмір, KV, успішних, брак, хто вніс, коментар). Окремий запит apiDash d=control&raw=1 (Reports.gs v38).
      Обрано працівника — рядок «Поза звіркою»: рядки форми з незіставленим видом роботи чи нерозпізнаною кількістю, кроки МЛП без відповідності, робота без партії.
@@ -605,7 +608,7 @@
 <div class="net" id="net" role="alert" aria-live="assertive"><div class="nb"><div class="rt" id="netr"></div><div class="nt" id="nett">Зберігаю…</div><div class="ns" id="nets"></div><div class="np"><i id="netp"></i></div><div class="nh" id="neth"></div><div class="zc" id="zc"></div><button class="nx" id="netx" type="button">Не чекати</button></div></div>
 
 <script>
-const PAGE_VERSION = 'index.html v97 · 08.11.2026';   // v74: в1 — і з нашої тари (ящик залишків); в2 — лише партії в2
+const PAGE_VERSION = 'index.html v98 · 08.11.2026';   // v74: в1 — і з нашої тари (ящик залишків); в2 — лише партії в2
 // v72 (26.10):   // v72: «Яку партію відкриваємо?»; розшифровка кроків на картці партії; реєстрація — повернення за посиланням з форми
 // v71 (24.10):   // v71: порядок звітів (важливі — першими, жирним); Р-8_04 — один графік, статори / ротори / двигуни поруч, без лінії % браку; закладка «Випуск готових статорів, роторів і двигунів»
 //   // v70: Р-13 «Цех наживо» — план поверхів Печерська з ящиками, «Будівля 3D», повтор руху (Reports.gs v30)
@@ -2117,18 +2120,23 @@ function stepChanged() {
   const f1 = !!(s && s.code === 'F1' && S.batch.comp);
   const pack = !!(s && s.extra === 'pack');   // v92: K2 — браку немає, лише пакування
   $('goodLbl').textContent = f1 ? 'Зібрано двигунів' : pack ? 'Запаковано двигунів' : 'Успішних';
+  const split = !!(s && s.extra === 'split');   // v98: R5 — замість «Успішних» поле «Перевірено» (у xf0), успішних = одразу + на балансування
+  $('goodLbl').style.display = split ? 'none' : ''; $('good').parentNode.style.display = split ? 'none' : '';
   $('rz').style.display = pack ? 'none' : '';
   let x = '';
   $('xf0').innerHTML = f1 ? '<label>Брак статорів</label>' + numInput('x1', 0) + '<label>Брак роторів</label>' + numInput('x2', 0) +
       '<p class="muted">Зібрано — успішно зібрані двигуни. Якщо бракований лише статор або лише ротор — пишіть брак тільки цієї деталі: друга лишиться в залишку.</p>' : '';
+  if (split) {   // v98: «одразу на» — перший крок після балансування (R6 / OV4) за маршрутом
+    const R = S.batch.route; let k = R.indexOf(s) + 1; while (R[k] && ['R6', 'OV4'].indexOf(R[k].code) >= 0) k++;
+    $('xf0').innerHTML = '<label>Перевірено</label>' + numInput('chkd', s.avail) + '<label>Одразу на ' + esc(R[k] ? R[k].code : 'наступний крок') + '</label>' + numInput('x2', 0) +
+      '<label>На балансування</label>' + numInput('x1', s.avail) + '<div class="muted" id="spHint" style="margin-top:6px"></div>' +
+      '<p class="muted" style="margin:6px 0 0">Перевірено = одразу на ' + esc(R[k] ? R[k].code : 'наступний крок') + ' + на балансування + брак. «На балансування» рахується саме.</p>';
+    $('good').value = s.avail;
+  }
   // v52: брак — рядки «кількість + причини»; на F1 брак = статори + ротори, рядки лише ділять його за причинами
   // v92: кожен блок браку — свої поля (статор / ротор на F2 / F3 / F5, одразу виправлено при «термоусадці», коментар)
   rzInit('rz', { step: s ? s.code : '', total: f1 ? () => (Number($('x1').value) || 0) + (Number($('x2').value) || 0) : null, onTotal: scrapChanged,
     ext: true, part: !!(s && S.batch.comp && PART_SCRAP.indexOf(s.code) >= 0), fix: !!s && !f1 && !pack });
-  if (s && s.extra === 'split') {   // v24: «одразу на» — перший крок після балансування (R6 / OV4) за маршрутом
-    const R = S.batch.route; let k = R.indexOf(s) + 1; while (R[k] && ['R6', 'OV4'].indexOf(R[k].code) >= 0) k++;
-    x = '<div class="row"><div><label>На балансування</label>' + numInput('x1', s.avail) + '</div></div><label>Одразу на ' + esc(R[k] ? R[k].code : 'наступний крок') + '</label>' + numInput('x2', 0);
-  }
   if (s && s.extra === 'kv') x = '<label>KV — під який гравіюють</label><select id="kvs">' + opts(S.dict.kv, S.batch.info['KV'], '— оберіть —') + '</select>';
   if (pack) x = '<div class="zpack"><div class="zch">📦 Що зробити</div>' +   // v94: підказка — таблиця ящиків; вибір лише для залишку
     '<input type="hidden" id="k2to" value="new"><input type="hidden" id="k2rest" value="new"><div id="k2plan"></div><div id="k2restBox"></div>' +
@@ -2144,8 +2152,8 @@ function stepChanged() {
   $('xfc').innerHTML = xc ? '<div class="zcomp"><div class="zch">🧩 Компоненти</div>' + xc + '</div>' : '';
   LOTF_reset(); if (lotOn) wireLot('slot', { batch: S.batch.info['Номер'], step: s.code });
   if (f1) { const upd = () => rzSync('rz', true); $('x1').oninput = upd; $('x2').oninput = upd; }
-  if (s && s.extra === 'split') $('good').oninput = () => { $('x1').value = Math.max(0, (Number($('good').value) || 0) - (Number($('x2').value) || 0)); };
-  else $('good').oninput = null;
+  $('good').oninput = null;
+  if (split) { $('chkd').oninput = splitCalc; $('x2').oninput = splitCalc; $('x1').oninput = splitSync; splitCalc(); }
   if (s && s.extra === 'pack') {   // v94: таблиця «що зробити» — повні ящики за нормою; залишок — новий неповний або докласти в неповний
     const recalc = () => {
       const g = Number($('good').value) || 0, nb = Number($('x1').value) || 0, P = k2Plan(g, $('k2rest').value, nb);
@@ -2169,12 +2177,37 @@ function stepChanged() {
     };
   }
 }
+/** v98: R5 — на балансування = перевірено − одразу далі − брак; успішних (good, приховане) = одразу + на балансування */
+function splitCalc() {
+  if (!$('chkd')) return;
+  const n = id => Number($(id).value) || 0;
+  $('x1').value = Math.max(0, n('chkd') - n('x2') - rzTotal('rz'));
+  splitSync();
+}
+function splitSync() {
+  if (!$('chkd')) return;
+  const n = id => Number($(id).value) || 0, s = S.batch.route.find(x => x.code === $('stp').value), t = rzTotal('rz'), c = n('chkd');
+  $('good').value = n('x1') + n('x2');
+  const sum = n('x1') + n('x2') + t;
+  $('spHint').innerHTML = s && c > s.avail ? '<span style="color:#9B231A;font-weight:600">Перевірено ' + c + ' — більше, ніж доступно (' + s.avail + ')</span>'
+    : sum !== c ? '<span style="color:#9B231A;font-weight:600">Одразу + на балансування + брак = ' + sum + ', а перевірено ' + c + '</span>' : '';
+}
+/** v98: R5 — помилка перед записом, якщо сума не сходиться або перевірено більше за доступне; '' — усе гаразд */
+function splitErr() {
+  if (!$('chkd')) return '';
+  const n = id => Number($(id).value) || 0, s = S.batch.route.find(x => x.code === $('stp').value), t = rzTotal('rz'), c = n('chkd');
+  if (!(c > 0)) return 'Вкажіть, скільки перевірено';
+  if (s && c > s.avail) return 'Перевірено ' + c + ' — більше, ніж доступно (' + s.avail + ')';
+  if (n('x1') + n('x2') + t !== c) return 'Перевірено ' + c + ' має дорівнювати: одразу ' + n('x2') + ' + на балансування ' + n('x1') + ' + брак ' + t + ' = ' + (n('x1') + n('x2') + t);
+  return '';
+}
 /** v52: калькулятор кроку — брак зріс так, що успішних + брак більше «доступно»: успішних зменшується саме. Навпаки — ні:
  *  менше успішних не означає браку (решту могли ще не зробити) */
 function scrapChanged(t) {
   const s = S.batch && S.batch.route.find(x => x.code === ($('stp') || {}).value); if (!s || !$('good')) return;
   const f1 = s.code === 'F1' && S.batch.comp;
   $('scrap').value = f1 ? 0 : t;
+  if (s.extra === 'split') { if ($('psw')) $('psw').style.display = t > 0 ? 'block' : 'none'; splitCalc(); $('goodHint').innerHTML = ''; return; }   // v98: брак зменшує «на балансування»
   if ($('psw')) $('psw').style.display = t > 0 ? 'block' : 'none';
   const g = $('good'), gv = Number(g.value) || 0;
   const max = f1 ? Math.min(S.batch.comp.S.left - (Number($('x1').value) || 0), S.batch.comp.R.left - (Number($('x2').value) || 0)) : s.avail - t;
@@ -2183,7 +2216,7 @@ function scrapChanged(t) {
 }
 function goodHint(cut) {
   const s = S.batch && S.batch.route.find(x => x.code === ($('stp') || {}).value), h = $('goodHint'); if (!s || !h) return;
-  if (s.code === 'F1' && S.batch.comp) { h.innerHTML = ''; return; }
+  if ((s.code === 'F1' && S.batch.comp) || s.extra === 'split') { h.innerHTML = ''; return; }   // v98: R5 — підказка під полями (spHint)
   const g = Number($('good').value) || 0, t = rzTotal('rz');
   if (s.extra === 'pack') { h.innerHTML = g > s.avail ? '<span style="color:#9B231A;font-weight:600">Запаковано ' + g + ' — більше, ніж доступно (' + s.avail + ')</span>' : ''; return; }   // v93
   h.innerHTML = g + t > s.avail ? '<span style="color:#9B231A;font-weight:600">Успішних + брак = ' + (g + t) + ' — більше, ніж доступно (' + s.avail + ')</span>'
@@ -2285,6 +2318,7 @@ function submitStep() {
     btn.disabled = false;
     const l = lotVal('slot');
     const rz = rzVal('rz'); if (rz.err) { $('err').textContent = rz.err; return; }   // v52
+    const se = splitErr(); if (se) { $('err').textContent = se; return; }   // v98: R5
     const pz = RZ.rz && RZ.rz.part && rz.x1 !== undefined;   // v92: брак лише статора / ротора — сума блоків браку
     act(Object.assign({ action: 'step', batch: S.batch.info['Номер'], step: $('stp').value, good: v('good'), scrap: v('scrap'), reason: rz.v,
       x1: pz ? rz.x1 : v('x1'), x2: pz ? rz.x2 : v('x2'), kv: v('kvs'), check: $('chk') ? $('chk').checked : false,
