@@ -1,5 +1,6 @@
 <!DOCTYPE html>
-<!-- МЛП · index.html v94 · 08.11.2026 — K2 як підказка «що зробити» (рішення 08.11): головне — велика таблиця ящиків: повні за нормою — нові ящики (повний → на склад сам),
+<!-- МЛП · index.html v95 · 08.11.2026 — K2, таблиця «Що зробити»: колонка «Що робимо» — коротко: «повний», «неповний (норма N)», «було → стане» (без «заклеїти, етикетка; на склад — сам»).
+     v94 · 08.11.2026 — K2 як підказка «що зробити» (рішення 08.11): головне — велика таблиця ящиків: повні за нормою — нові ящики (повний → на склад сам),
      вибір — лише для залишку: «🆕 новий неповний ящик» або «➕ докласти в неповний ящик №…» (до норми; що не влізло — новий неповний; Code.gs v87, Labels.gs v13, a.rest).
      Інша кількість ящиків (не за нормою) — згорнуто «Інакше». Старий вибір «усе в існуючий ящик» прибрано.
      v93 · 08.11.2026 — K2: підказка під кількістю — «Запаковано N — більше, ніж доступно» (без «успішних + брак»).
@@ -598,7 +599,7 @@
 <div class="net" id="net" role="alert" aria-live="assertive"><div class="nb"><div class="rt" id="netr"></div><div class="nt" id="nett">Зберігаю…</div><div class="ns" id="nets"></div><div class="np"><i id="netp"></i></div><div class="nh" id="neth"></div><div class="zc" id="zc"></div><button class="nx" id="netx" type="button">Не чекати</button></div></div>
 
 <script>
-const PAGE_VERSION = 'index.html v94 · 08.11.2026';   // v74: в1 — і з нашої тари (ящик залишків); в2 — лише партії в2
+const PAGE_VERSION = 'index.html v95 · 08.11.2026';   // v74: в1 — і з нашої тари (ящик залишків); в2 — лише партії в2
 // v72 (26.10):   // v72: «Яку партію відкриваємо?»; розшифровка кроків на картці партії; реєстрація — повернення за посиланням з форми
 // v71 (24.10):   // v71: порядок звітів (важливі — першими, жирним); Р-8_04 — один графік, статори / ротори / двигуни поруч, без лінії % браку; закладка «Випуск готових статорів, роторів і двигунів»
 //   // v70: Р-13 «Цех наживо» — план поверхів Печерська з ящиками, «Будівля 3D», повтор руху (Reports.gs v30)
@@ -2206,9 +2207,9 @@ function k2Plan(g, rest, nb) {
 function k2PlanHtml(P) {
   if (!P.rows.length) return '<p class="muted" style="margin:8px 0 0">Вкажіть, скільки двигунів пакуєте — тут з\'явиться, які ящики заклеїти.</p>';
   const nf = P.rows.filter(r => (r.was || 0) + r.q >= P.per).length;
-  const what = r => r.kind === 'full' ? '<b>повний</b> — заклеїти, етикетка; на склад — сам'
-    : r.kind === 'top' ? 'було ' + r.was + ' → стане <b>' + (r.was + r.q) + '</b>' + (r.was + r.q >= P.per ? ' · <b>повний</b> — на склад сам' : ' · до норми ще ' + (P.per - r.was - r.q)) + '; нову етикетку — замість старої'
-    : '<b style="color:#9B231A">неповний</b> (норма ' + P.per + ') — лишається на виробництві, докладуть наступні партії';
+  const what = r => r.kind === 'full' ? '<b>повний</b>'   // v95: коротко, без пояснень процесу
+    : r.kind === 'top' ? 'було ' + r.was + ' → стане <b>' + (r.was + r.q) + '</b>' + (r.was + r.q >= P.per ? ' · <b>повний</b>' : '') + ' · нова етикетка'
+    : '<b style="color:#9B231A">неповний</b> (норма ' + P.per + ')';
   return '<table class="k2t"><tr><th>Ящик</th><th class="r">Шт</th><th>Що робимо</th></tr>' +
     P.rows.map(r => '<tr' + (r.rest ? ' class="rest"' : '') + '><td style="white-space:nowrap">' + (r.kind === 'full' ? '📦' : r.kind === 'top' ? '➕' : '🆕') + ' <b>' + esc(r.name) + '</b></td>' +
       '<td class="r">' + (r.kind === 'top' ? '+' : '') + r.q + '</td><td class="what">' + what(r) + '</td></tr>').join('') +
@@ -2220,7 +2221,7 @@ function k2RestHtml(P) {
   const cur = $('k2rest').value, r = P.rest, no = S.batch.info['Номер'];
   const newNo = P.rows.filter(x => x.kind === 'full').length + ((S.k2 || {}).next || 1);
   return '<div class="k2rest"><div class="zch">Залишок ' + r + ' шт — куди?</div>' +
-    '<button type="button" class="k2o' + (cur === 'new' ? ' on' : '') + '" data-v="new"><b>🆕 Новий неповний ящик ' + esc(no) + ' №' + newNo + '</b><span class="muted">' + r + ' шт; лишається на виробництві</span></button>' +
+    '<button type="button" class="k2o' + (cur === 'new' ? ' on' : '') + '" data-v="new"><b>🆕 Новий неповний ящик ' + esc(no) + ' №' + newNo + '</b><span class="muted">' + r + ' шт</span></button>' +
     P.cands.map(o => { const sp = P.per - o.total, fit = r <= sp;
       return '<button type="button" class="k2o' + (cur === o.id ? ' on' : '') + '" data-v="' + esc(o.id) + '"><b>➕ Докласти в ' + esc(o.name) + '</b><span class="muted">зараз ' + o.total + ' шт, вільно ' + sp +
         (fit ? ' → стане ' + (o.total + r) + (o.total + r >= P.per ? ' (повний)' : '') : ' → влізе ' + sp + ' (стане повним), решта ' + (r - sp) + ' — новий неповний') + '</span></button>'; }).join('') +
