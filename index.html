@@ -1,5 +1,11 @@
 <!DOCTYPE html>
-<!-- МЛП · index.html v91 · 08.11.2026 — аналітика (Р-8, Р-10 та ін. на zRecs): комбіновані причини браку зводяться до одного порядку частин
+<!-- МЛП · index.html v92 · 08.11.2026 — форма запису кроку (рішення 08.11): 1) кожен блок браку — свій набір полів після вибору причини: на F2 / F3 / F5 —
+     «з них брак лише статора (ротор без пари залишиться в партії)» / «… лише ротора (статор без пари …)», коментар до цього браку; причина рівно «термоусадка»
+     (FIX_REASONS з сервера) — «З них одразу виправлено й повернуто в партію» і «Хто виправив» (обов'язково, без значення за замовчуванням; Code.gs v86, ДП-27).
+     Другий блок «Брак з іншою причиною» — свій набір. На запис: брак лише статора / ротора — сума блоків, коментарі блоків — до коментаря запису.
+     2) K2: браку немає — поле не показується; «Запаковано двигунів»; «Куди пакуємо» — картки (нові чисті ящики / докласти в неповний ящик) у зоні «📦 Пакування».
+     3) Компоненти (ложементи, партія постачальника компонента) — окрема кольорова зона «🧩 Компоненти» на всіх кроках.
+     v91 · 08.11.2026 — аналітика (Р-8, Р-10 та ін. на zRecs): комбіновані причини браку зводяться до одного порядку частин
      («термоусадка + брак скрутки» і «брак скрутки + термоусадка» → «брак скрутки + термоусадка»), повтори частин прибрано; записи в ЖЗР не змінюються (С-52).
      v90 · 08.11.2026 — Р-8_06: «Причина браку» — і рівнем рядків, і колонками матриці (у Р-10_05 вже було). Успішні без браку —
      у значенні «без браку / без причини».
@@ -412,6 +418,13 @@
   .zban .cbx>input.cbxi,.fl .cbx>input.cbxi{font-size:15px;padding:7px 32px 7px 9px;background-position:right 9px center}
   /* v52: брак за причинами */
   .rzr{border-top:1px dashed #C5D0D7;margin-top:14px}.rzr:first-child{border-top:0;margin-top:0}
+  .rzr+.rzr{border:1px solid #E3C9C6;border-radius:12px;padding:2px 12px 12px;background:#FFF8F7}
+  .rze{border-left:3px solid #E3C9C6;padding-left:10px;margin-top:8px}.rzfix{border-left:3px solid #2E7D32;padding-left:10px;margin-top:10px}
+  .zcomp{background:#F5F2FB;border:1px solid #D9CFEC;border-radius:12px;padding:2px 12px 12px;margin-top:16px}
+  .zpack{background:#EEF5F9;border:1px solid #C8DCE6;border-radius:12px;padding:2px 12px 12px;margin-top:16px}
+  .zch{font-weight:700;margin-top:10px;color:#2F4858}.zcomp .zch{color:#4A3B6B}
+  .k2o{display:block;width:100%;text-align:left;border:1px solid #C5D0D7;border-radius:12px;padding:12px;margin-top:8px;background:#fff;font:inherit;font-size:16px;cursor:pointer}
+  .k2o.on{border:2px solid #2F4858;background:#E3EEF4}.k2o span{display:block;margin-top:2px;font-size:14px}
   .rzh{display:flex;justify-content:space-between;align-items:baseline;gap:8px}.rzh label{margin-bottom:6px}
   .rzh button{border:0;background:transparent;color:#9B231A;font-size:14px;font-weight:600;padding:4px 0;font-family:inherit}
   .rzb{display:flex;flex-wrap:wrap;gap:6px;align-items:center;width:100%;min-height:50px;text-align:left;font-size:17px;padding:8px 12px;border:1px solid #C5D0D7;border-radius:10px;background:#fff;color:#66767F;font-family:inherit;cursor:pointer}
@@ -576,7 +589,7 @@
 <div class="net" id="net" role="alert" aria-live="assertive"><div class="nb"><div class="rt" id="netr"></div><div class="nt" id="nett">Зберігаю…</div><div class="ns" id="nets"></div><div class="np"><i id="netp"></i></div><div class="nh" id="neth"></div><div class="zc" id="zc"></div><button class="nx" id="netx" type="button">Не чекати</button></div></div>
 
 <script>
-const PAGE_VERSION = 'index.html v91 · 08.11.2026';   // v74: в1 — і з нашої тари (ящик залишків); в2 — лише партії в2
+const PAGE_VERSION = 'index.html v92 · 08.11.2026';   // v74: в1 — і з нашої тари (ящик залишків); в2 — лише партії в2
 // v72 (26.10):   // v72: «Яку партію відкриваємо?»; розшифровка кроків на картці партії; реєстрація — повернення за посиланням з форми
 // v71 (24.10):   // v71: порядок звітів (важливі — першими, жирним); Р-8_04 — один графік, статори / ротори / двигуни поруч, без лінії % браку; закладка «Випуск готових статорів, роторів і двигунів»
 //   // v70: Р-13 «Цех наживо» — план поверхів Печерська з ящиками, «Будівля 3D», повтор руху (Reports.gs v30)
@@ -1030,7 +1043,7 @@ function rzLists(step) {
 }
 /** box — id контейнера; o: { step, init (рядок ЖЗР), scrap (брак для init), total: () => число | null, onTotal } */
 function rzInit(box, o) {
-  RZ[box] = { box: box, step: o.step, total: o.total || null, onTotal: o.onTotal || null, rows: rzParse(o.init, o.scrap) };
+  RZ[box] = { box: box, step: o.step, total: o.total || null, onTotal: o.onTotal || null, rows: rzParse(o.init, o.scrap), ext: !!o.ext, part: !!o.part, fix: !!o.fix };   // v92: ext — поля блоку
   if (RZ[box].total && RZ[box].rows.length === 1) RZ[box].rows[0].q = 0;
   rzDraw(box);
 }
@@ -1046,17 +1059,40 @@ function rzDraw(box) {
         numInput(box + 'q' + k, x.q) : '') +
       '<div id="' + box + 'p' + k + '"><label>Причина браку <span class="muted">— можна кілька</span></label>' +
       '<button type="button" class="rzb" id="' + box + 'b' + k + '" onclick="rzOpen(\'' + box + '\',' + k + ')">' +
-      (x.r.length ? x.r.map(r => '<span>' + esc(r) + '</span>').join('') : '— оберіть —') + '</button></div></div>';
+      (x.r.length ? x.r.map(r => '<span>' + esc(r) + '</span>').join('') : '— оберіть —') + '</button></div>' +
+      (z.ext ? '<div id="' + box + 'e' + k + '">' + rzExtHtml(box, z, x, k) + '</div>' : '') + '</div>';
   }).join('') + '<button type="button" class="rzadd" id="' + box + 'add" onclick="rzAdd(\'' + box + '\')">+ Додати брак з іншою причиною</button>' +
     '<div class="muted rzsum" id="' + box + 'sum"></div>';
   z.rows.forEach((x, k) => { const q = $(box + 'q' + k); if (q) q.oninput = () => { x.q = Math.max(0, Math.round(Number(q.value) || 0)); rzSync(box, true); }; });
+  if (z.ext) z.rows.forEach((x, k) => {   // v92: поля блоку — у стан рядка
+    const n = (id, f) => { const e = $(box + id + k); if (e) e.oninput = () => { x[f] = Math.max(0, Math.round(Number(e.value) || 0)); if (f === 'fq') { const w = $(box + 'fw' + k); if (w) w.style.display = x.fq > 0 ? 'block' : 'none'; } }; };
+    n('s', 's1'); n('r', 's2'); n('f', 'fq');
+    const w = $(box + 'w' + k); if (w) w.onchange = () => { x.fby = w.value; w.classList.remove('bad'); };
+    const c = $(box + 'c' + k); if (c) c.oninput = () => { x.cm = c.value; };
+  });
   rzSync(box, false);
+}
+/** v92: причина, брак з якою можна одразу виправити (лише сама, без комбінацій; сервер — FIX_REASONS) */
+const rzFixable = r => r.length === 1 && ((S.fixReasons && S.fixReasons.length ? S.fixReasons : ['термоусадка']).indexOf(r[0]) >= 0);
+/** v92: поля блоку браку після вибору причини — статор / ротор (F2 / F3 / F5), одразу виправлено (термоусадка), коментар до цього браку */
+function rzExtHtml(box, z, x, k) {
+  if (!x.r.length) return '';
+  let h = '<div class="rze">';
+  if (z.part) h += '<label>з них брак лише статора (ротор без пари залишиться в партії)</label>' + numInput(box + 's' + k, x.s1 || 0) +
+    '<label>з них брак лише ротора (статор без пари залишиться в партії)</label>' + numInput(box + 'r' + k, x.s2 || 0) +
+    '<p class="muted" style="margin:6px 0 0">Решта цього браку — увесь двигун. Деталь без пари лишається в партії: доберіть до неї пару («+ Статори / ротори») і зберіть знову на F1.</p>';
+  if (z.fix && rzFixable(x.r)) h += '<div class="rzfix"><label>З них одразу виправлено й повернуто в партію</label>' + numInput(box + 'f' + k, x.fq || 0) +
+    '<div id="' + box + 'fw' + k + '" style="display:' + (x.fq > 0 ? 'block' : 'none') + '"><label>Хто виправив <span class="muted">— обов\'язково</span></label><select id="' + box + 'w' + k + '"><option value="">— оберіть —</option>' +
+    (S.people || []).map(p => '<option value="' + esc(p.id) + '"' + (p.id === x.fby ? ' selected' : '') + '>' + esc(p.name) + '</option>').join('') + '</select></div>' +
+    '<p class="muted" style="margin:6px 0 0">Брак рахується повністю; виправлені одразу доступні наступному кроку, партія не стає змішаною.</p></div>';
+  return h + '<label>Коментар до цього браку <span class="muted">(необов\'язково)</span></label><input type="text" id="' + box + 'c' + k + '" value="' + esc(x.cm || '') + '"></div>';
 }
 /** Видимість причин і «+ Додати», підсумок; changed — кількість змінилась (калькулятор кроку) */
 function rzSync(box, changed) {
   const z = RZ[box]; if (!z || !$(box)) return;
   const fx = !!z.total, tot = rzTotal(box), many = z.rows.length > 1;
-  z.rows.forEach((x, k) => { const p = $(box + 'p' + k); if (p) p.style.display = (fx && !many ? tot > 0 : x.q > 0 || k > 0) ? 'block' : 'none'; });
+  z.rows.forEach((x, k) => { const p = $(box + 'p' + k), on = (fx && !many ? tot > 0 : x.q > 0 || k > 0); if (p) p.style.display = on ? 'block' : 'none';
+    const e = $(box + 'e' + k); if (e) e.style.display = on ? 'block' : 'none'; });   // v92: поля блоку — разом із причиною
   $(box + 'add').style.display = tot > 0 && z.rows[z.rows.length - 1].r.length ? 'block' : 'none';
   const s = $(box + 'sum');
   if (many) { const sum = rzSum(box);
@@ -1078,10 +1114,26 @@ function rzVal(box) {
   const many = z.rows.length > 1, rows = z.rows.filter(x => !many || x.q > 0 || x.r.length);
   const bad = rows.findIndex(x => !x.r.length);
   if (bad >= 0) { const b = $(box + 'b' + z.rows.indexOf(rows[bad])); if (b) b.classList.add('bad'); return { err: 'Вкажіть причину браку' + (many ? ' в кожному рядку' : '') }; }
-  if (rows.length === 1) return { v: rows[0].r.join(' + ') };
-  if (rows.some(x => !(x.q > 0))) return { err: 'Брак з іншою причиною: вкажіть кількість або приберіть рядок' };
-  if (z.total && rzSum(box) !== tot) return { err: 'За причинами розписано ' + rzSum(box) + ' шт, а браку ' + tot + ' шт' };
-  return { v: rows.map(x => x.r.join(' + ') + ': ' + x.q).join('; ') };
+  let v;
+  if (rows.length === 1) v = rows[0].r.join(' + ');
+  else {
+    if (rows.some(x => !(x.q > 0))) return { err: 'Брак з іншою причиною: вкажіть кількість або приберіть рядок' };
+    if (z.total && rzSum(box) !== tot) return { err: 'За причинами розписано ' + rzSum(box) + ' шт, а браку ' + tot + ' шт' };
+    v = rows.map(x => x.r.join(' + ') + ': ' + x.q).join('; ');
+  }
+  if (!z.ext) return { v: v };
+  // v92: поля блоків — статор / ротор (сума), одразу виправлено (+ хто), коментарі
+  const out = { v: v, x1: 0, x2: 0, fixes: [], cm: [] };
+  for (const x of rows) {
+    const q = rows.length === 1 ? tot : x.q, nm = '«' + x.r.join(' + ') + '»', s1 = z.part ? x.s1 || 0 : 0, s2 = z.part ? x.s2 || 0 : 0, fq = z.fix && rzFixable(x.r) ? x.fq || 0 : 0;
+    if (s1 + s2 > q) return { err: 'Брак ' + nm + ': лише статора (' + s1 + ') + лише ротора (' + s2 + ') більше, ніж ' + q + ' шт' };
+    if (fq > q - s1 - s2) return { err: 'Брак ' + nm + ': одразу виправлено ' + fq + ' — більше, ніж браку двигуном цілим (' + (q - s1 - s2) + ')' };
+    if (fq > 0 && !x.fby) { const w = $(box + 'w' + z.rows.indexOf(x)); if (w) w.classList.add('bad'); return { err: 'Брак ' + nm + ': вкажіть, хто виправив' }; }
+    out.x1 += s1; out.x2 += s2; if (fq > 0) out.fixes.push({ q: fq, by: x.fby });
+    if (String(x.cm || '').trim()) out.cm.push((rows.length > 1 ? nm + ': ' : 'брак: ') + String(x.cm).trim());
+  }
+  out.cm = out.cm.join('; ');
+  return out;
 }
 let RZP = null;   // відкритий вибір причин: { box, k, sel }
 function rzOpen(box, k) {
@@ -1908,8 +1960,8 @@ function renderBatch(extra) {
         esc(s.code + ' · ' + s.name) + (altSkipped(b, s) ? ' — не потрібен, обрано ' + esc(altSkipped(b, s)) : s.altWith && s.altWith.length ? ' (або ' + esc(s.altWith.join(', ')) + ')' : '') + (s.avail ? (s.blockedBy ? ' — ' + s.avail + ' шт, спершу закрити ' + s.blockedBy : ' — доступно ' + s.avail) : '') + '</option>').join('') + '</select>' +
       '<label id="goodLbl">Успішних</label>' + numInput('good', '') + '<div class="muted" id="goodHint" style="margin-top:6px"></div>' +
       '<input type="hidden" id="scrap" value="0"><div id="xf0"></div><div id="rz" style="margin-top:14px"></div>' +   // v52: брак за причинами
-      '<div id="xf"></div>' +
-      '<label>Коментар (необов\'язково)</label><input type="text" id="cm">' +
+      '<div id="xf"></div><div id="xfc"></div>' +   // v92: xfc — зона «🧩 Компоненти»
+      '<label>Коментар до запису <span class="muted">(необов\'язково)</span></label><input type="text" id="cm">' +
       '<button class="btn" id="go">Записати</button><div class="err" id="err"></div></div>';
   } else if (b.status === 'готово' || b.status === 'видано частково') {
     h += '<div class="card"><div class="mid">✓ Усі кроки пройдено</div><div class="muted">' +
@@ -2046,30 +2098,32 @@ function stepChanged() {
   const s = S.batch.route.find(x => x.code === $('stp').value);
   $('good').value = s ? s.avail : ''; $('scrap').value = 0; $('goodHint').innerHTML = '';
   const f1 = !!(s && s.code === 'F1' && S.batch.comp);
-  $('goodLbl').textContent = f1 ? 'Зібрано двигунів' : 'Успішних';
+  const pack = !!(s && s.extra === 'pack');   // v92: K2 — браку немає, лише пакування
+  $('goodLbl').textContent = f1 ? 'Зібрано двигунів' : pack ? 'Запаковано двигунів' : 'Успішних';
+  $('rz').style.display = pack ? 'none' : '';
   let x = '';
   $('xf0').innerHTML = f1 ? '<label>Брак статорів</label>' + numInput('x1', 0) + '<label>Брак роторів</label>' + numInput('x2', 0) +
       '<p class="muted">Зібрано — успішно зібрані двигуни. Якщо бракований лише статор або лише ротор — пишіть брак тільки цієї деталі: друга лишиться в залишку.</p>' : '';
   // v52: брак — рядки «кількість + причини»; на F1 брак = статори + ротори, рядки лише ділять його за причинами
-  rzInit('rz', { step: s ? s.code : '', total: f1 ? () => (Number($('x1').value) || 0) + (Number($('x2').value) || 0) : null, onTotal: scrapChanged });
-  if (s && S.batch.comp && PART_SCRAP.indexOf(s.code) >= 0)   // v47: брак лише статора / лише ротора — годна деталь лишається в партії
-    x = '<div id="psw" style="display:none"><label>з них брак лише статора (ротор годний)</label>' + numInput('x1', 0) + '<label>з них брак лише ротора (статор годний)</label>' + numInput('x2', 0) +
-      '<p class="muted">Решта браку — увесь двигун. Годна деталь лишається в партії: доберіть до неї пару («+ Статори / ротори») і зберіть знову на F1.</p></div>';
+  // v92: кожен блок браку — свої поля (статор / ротор на F2 / F3 / F5, одразу виправлено при «термоусадці», коментар)
+  rzInit('rz', { step: s ? s.code : '', total: f1 ? () => (Number($('x1').value) || 0) + (Number($('x2').value) || 0) : null, onTotal: scrapChanged,
+    ext: true, part: !!(s && S.batch.comp && PART_SCRAP.indexOf(s.code) >= 0), fix: !!s && !f1 && !pack });
   if (s && s.extra === 'split') {   // v24: «одразу на» — перший крок після балансування (R6 / OV4) за маршрутом
     const R = S.batch.route; let k = R.indexOf(s) + 1; while (R[k] && ['R6', 'OV4'].indexOf(R[k].code) >= 0) k++;
     x = '<div class="row"><div><label>На балансування</label>' + numInput('x1', s.avail) + '</div></div><label>Одразу на ' + esc(R[k] ? R[k].code : 'наступний крок') + '</label>' + numInput('x2', 0);
   }
   if (s && s.extra === 'kv') x = '<label>KV — під який гравіюють</label><select id="kvs">' + opts(S.dict.kv, S.batch.info['KV'], '— оберіть —') + '</select>';
-  if (s && s.extra === 'pack') x = '<label>Куди пакуємо</label><select id="k2to" data-nocbx>' + k2ToOpts() + '</select>' +   // v57: новий чистий ящик або існуючий неповний
+  if (pack) x = '<div class="zpack"><div class="zch">📦 Пакування</div><label>Куди пакуємо</label><input type="hidden" id="k2to" value="new"><div id="k2opts">' + k2Cards() + '</div>' +   // v92: картки замість списку
     '<div id="k2new"><label>Ящиків <span class="muted">(порожньо — за нормою ' + boxPer() + ' шт у ящику)</span></label><input type="number" inputmode="numeric" id="x1"></div>' +
-    '<label>Ложементів</label><input type="number" inputmode="numeric" id="x2">' +
-    '<div id="k2plan" class="muted" style="margin-top:10px"></div>' +
-    '<button type="button" class="btn btn2" id="k2pre" style="margin-top:10px">🖨 Етикетки зараз (до запису кроку)</button><div id="k2sent" class="muted" style="margin-top:6px"></div>';   // v45
+    '<div id="k2plan" style="margin-top:10px"></div>' +
+    '<button type="button" class="btn btn2" id="k2pre" style="margin-top:10px">🖨 Етикетки зараз (до запису кроку)</button><div id="k2sent" class="muted" style="margin-top:6px"></div></div>';   // v45
   if (s && s.extra === 'color') x = colorField('clr', S.batch.info['Потік'], S.batch.info['Колір']);   // v21: колір статорів на «Базі статора»
   if (s && s.extra.indexOf('check:') === 0) x = '<label style="display:flex;gap:10px;align-items:center;font-size:18px;color:#1D2B33"><input type="checkbox" id="chk" checked style="width:26px;height:26px"> ' + esc(s.extra.slice(6)) + '</label>';
   const lotOn = !!(s && (S.lotSteps || []).indexOf(s.code) >= 0);   // v17: партія постачальника компонента на цьому кроці
-  if (lotOn) x += lotField('slot', 'Партія постачальника компонента');
+  let xc = pack ? '<label>Ложементів</label><input type="number" inputmode="numeric" id="x2">' : '';   // v92: компоненти — окрема зона
+  if (lotOn) xc += lotField('slot', 'Партія постачальника компонента');
   $('xf').innerHTML = x;
+  $('xfc').innerHTML = xc ? '<div class="zcomp"><div class="zch">🧩 Компоненти</div>' + xc + '</div>' : '';
   LOTF_reset(); if (lotOn) wireLot('slot', { batch: S.batch.info['Номер'], step: s.code });
   if (f1) { const upd = () => rzSync('rz', true); $('x1').oninput = upd; $('x2').oninput = upd; }
   if (s && s.extra === 'split') $('good').oninput = () => { $('x1').value = Math.max(0, (Number($('good').value) || 0) - (Number($('x2').value) || 0)); };
@@ -2079,14 +2133,16 @@ function stepChanged() {
       const g = Number($('good').value) || 0, to = $('k2to').value;
       $('k2new').style.display = to === 'new' ? 'block' : 'none';
       const pl = k2PlanTxt(g, to, Number($('x1').value) || 0);
-      $('k2plan').innerHTML = pl.length ? (to === 'new' ? 'Ящики й етикетки:<br>' : 'Етикетка всього ящика:<br>') + pl.join('<br>') + '<br>PDF прийде на ' + esc(k2To()) +
-        '. Друк: термопринтер, 100 × 100 мм, масштаб 100 %.' + (to === 'new' ? '' : ' Нову етикетку клеїть замість старої.') : '';
+      $('k2plan').innerHTML = pl.length ? '<b>' + (to === 'new' ? 'Буде ящиків і етикеток:' : 'Буде в ящику (етикетка всього ящика):') + '</b><br>' + pl.join('<br>') + '<div class="muted" style="margin-top:4px">PDF прийде на ' + esc(k2To()) +
+        '. Друк: термопринтер, 100 × 100 мм, масштаб 100 %.' + (to === 'new' ? '' : ' Нову етикетку клеїть замість старої.') + '</div>' : '<span class="muted">Вкажіть, скільки двигунів пакуєте.</span>';
       const same = K2SENT && K2SENT.batch === S.batch.info['Номер'] && K2SENT.good === g && K2SENT.box === to && K2SENT.boxes === (to === 'new' ? Number($('x1').value) || 0 : 0);
       $('k2sent').innerHTML = K2SENT && K2SENT.batch === S.batch.info['Номер'] ? (same ? '✓ Етикетки вже надіслано — після «Записати крок» вдруге не прийдуть.'
         : '<span style="color:#9B231A">Кількість або ящики змінились після друку — при записі прийдуть нові етикетки.</span>') : '';
     };
     // v16 (T-48): зміна кількості завжди перераховує ящики; ручне число ящиків діє до наступної зміни кількості
-    $('good').oninput = recalc; $('x1').oninput = recalc; $('k2to').onchange = recalc;
+    $('good').oninput = recalc; $('x1').oninput = recalc;
+    [...$('k2opts').querySelectorAll('.k2o')].forEach(b => b.onclick = () => {   // v92: вибір картки
+      $('k2to').value = b.dataset.v; [...$('k2opts').querySelectorAll('.k2o')].forEach(o => o.classList.toggle('on', o === b)); recalc(); });
     recalc();
     $('k2pre').onclick = () => {   // v45: етикетки до запису кроку; v57: + куди (ящик) і скільки нових ящиків
       const g = Number($('good').value) || 0, to = $('k2to').value, bx = to === 'new' ? Number($('x1').value) || 0 : 0;
@@ -2119,6 +2175,14 @@ function goodHint(cut) {
 /** v47: кроки двигунів, де брак може бути лише статора або лише ротора (Code.gs v53, PART_SCRAP_STEPS) */
 const PART_SCRAP = ['F2', 'F3', 'F5'];
 /** v50: те саме правило, що k2Plan_ у Labels.gs: повні ящики по BOX_QTY, остача — ще один ящик; склад — свої першими, далі чужі */
+/** v92: «Куди пакуємо» — картки: нові чисті ящики (за замовчуванням) і неповні ящики тієї самої специфікації на виробництві (сервер: res.k2.open) */
+function k2Cards() {
+  const op = (S.k2 && S.k2.open) || [], per = boxPer();
+  return '<button type="button" class="k2o on" data-v="new"><b>📦 У нові чисті ящики</b><span class="muted">за нормою ' + per + ' шт у ящику; номери ящиків — далі по партії</span></button>' +
+    op.map(o => { const n = Number(o.per) || per, d = n - o.total;
+      return '<button type="button" class="k2o" data-v="' + esc(o.id) + '"><b>➕ Докласти в неповний ящик ' + esc(o.name) + '</b><span class="muted">зараз ' + o.total + ' шт' + (d > 0 ? ' · до норми ще ' + d : ' · уже норма') + '</span></button>'; }).join('') +
+    (op.length ? '' : '<p class="muted" style="margin:6px 0 0">Неповних ящиків цієї специфікації на виробництві немає.</p>');
+}
 /** v57: «Куди пакуємо» — «У новий чистий ящик» і неповні ящики тієї самої специфікації на виробництві (сервер: res.k2.open) */
 function k2ToOpts() {
   const op = (S.k2 && S.k2.open) || [];
@@ -2163,8 +2227,10 @@ function submitStep() {
     btn.disabled = false;
     const l = lotVal('slot');
     const rz = rzVal('rz'); if (rz.err) { $('err').textContent = rz.err; return; }   // v52
+    const pz = RZ.rz && RZ.rz.part && rz.x1 !== undefined;   // v92: брак лише статора / ротора — сума блоків браку
     act(Object.assign({ action: 'step', batch: S.batch.info['Номер'], step: $('stp').value, good: v('good'), scrap: v('scrap'), reason: rz.v,
-      x1: v('x1'), x2: v('x2'), kv: v('kvs'), check: $('chk') ? $('chk').checked : false, comment: v('cm'), lot: l.lot, photo: l.photo, color: v('clr'),
+      x1: pz ? rz.x1 : v('x1'), x2: pz ? rz.x2 : v('x2'), kv: v('kvs'), check: $('chk') ? $('chk').checked : false,
+      comment: [v('cm').trim(), rz.cm || ''].filter(Boolean).join(' · '), fixes: rz.fixes && rz.fixes.length ? JSON.stringify(rz.fixes) : '', lot: l.lot, photo: l.photo, color: v('clr'),
       box: v('k2to'),   // v57: куди пакуємо (new — новий чистий ящик)
       labelsSent: !!(K2SENT && $('k2pre') && K2SENT.batch === S.batch.info['Номер'] && K2SENT.good === (Number(v('good')) || 0) && K2SENT.box === v('k2to') &&
         K2SENT.boxes === (v('k2to') === 'new' ? Number(v('x1')) || 0 : 0)) }, onbVal()), btn,
@@ -2569,8 +2635,8 @@ function openCorrect(id) {
     '<label>' + (x.step === 'F1' && S.batch.comp ? 'Зібрано двигунів' : 'Успішних') + '</label>' + numInput('cg', x.good) +
     (x.step === 'F1' && S.batch.comp ? '<label>Брак статорів</label>' + numInput('cx1', x.x1) + '<label>Брак роторів</label>' + numInput('cx2', x.x2) : '<input type="hidden" id="cs" value="' + esc(x.scrap) + '">') +
     '<div id="crz" style="margin-top:14px"></div>' +   // v52: брак за причинами
-    (PART_SCRAP.indexOf(x.step) >= 0 && S.batch.comp ? '<label>з них брак лише статора (ротор годний)</label>' + numInput('cx1', x.x1 || 0) +
-      '<label>з них брак лише ротора (статор годний)</label>' + numInput('cx2', x.x2 || 0) : '') +   // v47
+    (PART_SCRAP.indexOf(x.step) >= 0 && S.batch.comp ? '<label>з них брак лише статора (ротор без пари залишиться в партії)</label>' + numInput('cx1', x.x1 || 0) +
+      '<label>з них брак лише ротора (статор без пари залишиться в партії)</label>' + numInput('cx2', x.x2 || 0) : '') +   // v47; v92 — підписи
     '<label>Причина виправлення (обов\'язково)</label><input type="text" id="mcm">' +
     '<div class="err" id="merr"></div><div class="grid" style="margin-top:6px"><button class="btn btn2 btnr" id="cdel">Скасувати запис</button><button class="btn" id="mgo">Зберегти</button></div>' +
     '<button class="btn btn2" onclick="closeModal()">Закрити</button></div>');
