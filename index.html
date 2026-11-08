@@ -1,5 +1,7 @@
 <!DOCTYPE html>
-<!-- МЛП · index.html v95 · 08.11.2026 — K2, таблиця «Що зробити»: колонка «Що робимо» — коротко: «повний», «неповний (норма N)», «було → стане» (без «заклеїти, етикетка; на склад — сам»).
+<!-- МЛП · index.html v96 · 08.11.2026 — сторінка партії: рядки «Статори / Ротори» (прийшло · у двигунах · брак) — у блок «Маршрут і кількості» (згорнутий, нагорі блоку);
+     «Історія» → «Історія записів»; «Додати крок» → «Записати крок».
+     v95 · 08.11.2026 — K2, таблиця «Що зробити»: колонка «Що робимо» — коротко: «повний», «неповний (норма N)», «було → стане» (без «заклеїти, етикетка; на склад — сам»).
      v94 · 08.11.2026 — K2 як підказка «що зробити» (рішення 08.11): головне — велика таблиця ящиків: повні за нормою — нові ящики (повний → на склад сам),
      вибір — лише для залишку: «🆕 новий неповний ящик» або «➕ докласти в неповний ящик №…» (до норми; що не влізло — новий неповний; Code.gs v87, Labels.gs v13, a.rest).
      Інша кількість ящиків (не за нормою) — згорнуто «Інакше». Старий вибір «усе в існуючий ящик» прибрано.
@@ -599,7 +601,7 @@
 <div class="net" id="net" role="alert" aria-live="assertive"><div class="nb"><div class="rt" id="netr"></div><div class="nt" id="nett">Зберігаю…</div><div class="ns" id="nets"></div><div class="np"><i id="netp"></i></div><div class="nh" id="neth"></div><div class="zc" id="zc"></div><button class="nx" id="netx" type="button">Не чекати</button></div></div>
 
 <script>
-const PAGE_VERSION = 'index.html v95 · 08.11.2026';   // v74: в1 — і з нашої тари (ящик залишків); в2 — лише партії в2
+const PAGE_VERSION = 'index.html v96 · 08.11.2026';   // v74: в1 — і з нашої тари (ящик залишків); в2 — лише партії в2
 // v72 (26.10):   // v72: «Яку партію відкриваємо?»; розшифровка кроків на картці партії; реєстрація — повернення за посиланням з форми
 // v71 (24.10):   // v71: порядок звітів (важливі — першими, жирним); Р-8_04 — один графік, статори / ротори / двигуни поруч, без лінії % браку; закладка «Випуск готових статорів, роторів і двигунів»
 //   // v70: Р-13 «Цех наживо» — план поверхів Печерська з ящиками, «Будівля 3D», повтор руху (Reports.gs v30)
@@ -1939,6 +1941,7 @@ function renderBatch(extra) {
       return '<div class="tail">На <b>' + esc(t.code) + '</b> лишилось <b>' + t.avail + ' шт</b>. Поки їх не записано (успішні або брак) або не відокремлено, ' + esc(nx.join(', ')) + ' не відкриється.</div>'; }).join('') +
     '</div>';
   if (b.boxes) h += boxesCard(b);   // v48: ящики ГП партії
+  let compH = '';   // v96: рядки «Статори / Ротори» — у блок «Маршрут і кількості»
   if (b.comp) {
     const vv = c => [c.v2 ? 'в2 ' + c.v2 : '', c.v1 ? 'в1 ' + c.v1 : ''].filter(x => x).join(' · ');   // v13: версії деталей
     // v55: у двигунах — скільки деталей зараз у двигунах партії; без пари — годна половина двигуна, забракованого на F2 / F3 / F5; брак — разом із двигунами
@@ -1951,7 +1954,7 @@ function renderBatch(extra) {
         c.unp ? '<b style="color:#9B231A">без пари ' + c.unp + '</b>' : '', P ? 'чекають збирання ' + P : '', 'брак ' + c.lost, c.ret ? 'пішло ' + c.ret : '',
         c.waitF4 ? 'чекають F4п ' + c.waitF4 : ''].filter(x => x).join(' · ') + '</span></div>' +
         '<div class="r">' + (c.unp ? '<span class="pill warn">без пари ' + c.unp + '</span>' : P ? '<span class="pill">до F1: ' + P + '</span>' : '') + '</div></div>';
-    h += '<div class="card" style="padding-top:8px"><div class="list" style="padding:0">' + row('Статори', b.comp.S) + row('Ротори', b.comp.R) + '</div></div>';
+    compH = row('Статори', b.comp.S) + row('Ротори', b.comp.R);
   }
 
   if (b.status === 'анульовано' || b.status === 'закрито') {
@@ -1965,7 +1968,7 @@ function renderBatch(extra) {
     h += '<div class="card"><div class="mid">Ящик залишків</div><div class="muted">Тут лежать ' + (stream === 'ST' ? 'статори' : 'ротори') + ' ' + esc(i['Варіант'] || '') +
       ', що лишились без пари. Взяти на збирання — «+ Статори / ротори» на картці партії двигунів (вкажіть цю тару або ' + esc(i['Номер']) + '). Покласти сюди — «✂» на картці партії двигунів. 1 ящик = 1 версія.</div></div>';
   } else if (p.step && avail.length) {
-    h += '<div class="card"><div class="mid">Додати крок</div>' + onbHtml() +
+    h += '<div class="card"><div class="mid">Записати крок</div>' + onbHtml() +
       '<label>Крок</label><select id="stp">' + b.route.map(s => '<option value="' + esc(s.code) + '"' + (s.avail && !s.blockedBy ? '' : ' disabled') + (s.code === pre ? ' selected' : '') + '>' +
         esc(s.code + ' · ' + s.name) + (altSkipped(b, s) ? ' — не потрібен, обрано ' + esc(altSkipped(b, s)) : s.altWith && s.altWith.length ? ' (або ' + esc(s.altWith.join(', ')) + ')' : '') + (s.avail ? (s.blockedBy ? ' — ' + s.avail + ' шт, спершу закрити ' + s.blockedBy : ' — доступно ' + s.avail) : '') + '</option>').join('') + '</select>' +
       '<label id="goodLbl">Успішних</label>' + numInput('good', '') + '<div class="muted" id="goodHint" style="margin-top:6px"></div>' +
@@ -2003,12 +2006,12 @@ function renderBatch(extra) {
   if (acts.length) h += '<div class="card"><div class="grid">' + acts.map(a => '<button class="btn btn2 ' + a[2] + '" onclick="openAct(\'' + a[0] + '\')">' + a[1] + '</button>').join('') + '</div></div>';
 
   // маршрут
-  h += '<details><summary>Маршрут і кількості</summary><div class="list">' + b.route.map(s =>
+  h += '<details><summary>Маршрут і кількості</summary><div class="list">' + (compH ? compH + '<div class="li"><div class="muted" style="font-size:13px;font-weight:600">Кроки: успішних / брак</div></div>' : '') + b.route.map(s =>
     '<div class="li"><div>' + esc(s.code + ' · ' + s.name) + '</div><div class="r">' + (s.good || s.scrap ? s.good + ' / <span style="color:#9B231A">' + s.scrap + '</span>' : '<span class="muted">' + (altSkipped(b, s) ? 'пропущено (обрано ' + esc(altSkipped(b, s)) + ')' : '—') + '</span>') +
     (s.avail ? '<br><span class="muted">доступно ' + s.avail + '</span>' : '') + '</div></div>').join('') + '</div></details>';
 
   // історія
-  h += '<details' + (extra && extra.openHist ? ' open' : '') + '><summary>Історія (' + b.history.length + ')</summary><div class="list">' + b.history.map(x => {
+  h += '<details' + (extra && extra.openHist ? ' open' : '') + '><summary>Історія записів (' + b.history.length + ')</summary><div class="list">' + b.history.map(x => {
     let what = esc(x.type);
     if (x.type === 'крок') what = '<b>' + esc(x.step) + '</b> · ' + x.good + ' / ' + x.scrap + (x.reason ? ' · ' + esc(x.reason) : '') +
       (x.step === 'K2' && x.boxes ? ' · ' + boxesLinks(x.boxes) : x.step === 'K2' && x.x1 ? ' · ящиків ' + x.x1 : '') + (x.d1 && (b.route.find(r => r.code === x.step) || {}).extra === 'color' ? ' · 🎨 ' + esc(x.d1) : '') +
