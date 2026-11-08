@@ -1,5 +1,8 @@
 <!DOCTYPE html>
-<!-- МЛП · index.html v98 · 08.11.2026 — R5 «Добалансна перевірка» (рішення 08.11): поля по порядку — «Перевірено», «Одразу на F4», «На балансування», «Брак»;
+<!-- МЛП · index.html v99 · 08.11.2026 — рішення 08.11: 1) контрольні кроки (тип К) — «Пройшли перевірку успішно» замість «Успішних» (брак — окремо, як було);
+     2) R5 в «Історії записів» і в записах картки Р-7 — «на балансування N · одразу на F4 N»; 3) «Що в тарі зараз» — рядок, розкладений на частини
+     (parts, Code.gs v88): після R5 — «Ротор добалансований» і «Ротор без добалансування (дисбаланс у нормі)», кожен окремим рядком.
+     v98 · 08.11.2026 — R5 «Добалансна перевірка» (рішення 08.11): поля по порядку — «Перевірено», «Одразу на F4», «На балансування», «Брак»;
      перевірено = одразу на F4 + на балансування + брак; «На балансування» рахується саме (можна змінити), запис — лише коли сума сходиться.
      На сервер — як і раніше: успішних = одразу + на балансування, Дод. 1 / Дод. 2 (Code.gs без змін).
      v97 · 08.11.2026 — Р-9_07: ще один прихований рівень (рішення 08.11) — натиснути рядок «працівник × вид роботи» → дослівно,
@@ -608,7 +611,7 @@
 <div class="net" id="net" role="alert" aria-live="assertive"><div class="nb"><div class="rt" id="netr"></div><div class="nt" id="nett">Зберігаю…</div><div class="ns" id="nets"></div><div class="np"><i id="netp"></i></div><div class="nh" id="neth"></div><div class="zc" id="zc"></div><button class="nx" id="netx" type="button">Не чекати</button></div></div>
 
 <script>
-const PAGE_VERSION = 'index.html v98 · 08.11.2026';   // v74: в1 — і з нашої тари (ящик залишків); в2 — лише партії в2
+const PAGE_VERSION = 'index.html v99 · 08.11.2026';   // v74: в1 — і з нашої тари (ящик залишків); в2 — лише партії в2
 // v72 (26.10):   // v72: «Яку партію відкриваємо?»; розшифровка кроків на картці партії; реєстрація — повернення за посиланням з форми
 // v71 (24.10):   // v71: порядок звітів (важливі — першими, жирним); Р-8_04 — один графік, статори / ротори / двигуни поруч, без лінії % браку; закладка «Випуск готових статорів, роторів і двигунів»
 //   // v70: Р-13 «Цех наживо» — план поверхів Печерська з ящиками, «Будівля 3D», повтор руху (Reports.gs v30)
@@ -2022,7 +2025,8 @@ function renderBatch(extra) {
     let what = esc(x.type);
     if (x.type === 'крок') what = '<b>' + esc(x.step) + '</b> · ' + x.good + ' / ' + x.scrap + (x.reason ? ' · ' + esc(x.reason) : '') +
       (x.step === 'K2' && x.boxes ? ' · ' + boxesLinks(x.boxes) : x.step === 'K2' && x.x1 ? ' · ящиків ' + x.x1 : '') + (x.d1 && (b.route.find(r => r.code === x.step) || {}).extra === 'color' ? ' · 🎨 ' + esc(x.d1) : '') +
-      (PART_SCRAP.indexOf(x.step) >= 0 && b.comp && (x.x1 || x.x2) ? ' · з них лише статора ' + (x.x1 || 0) + ', лише ротора ' + (x.x2 || 0) : '');   // v47
+      (PART_SCRAP.indexOf(x.step) >= 0 && b.comp && (x.x1 || x.x2) ? ' · з них лише статора ' + (x.x1 || 0) + ', лише ротора ' + (x.x2 || 0) : '') +   // v47
+      ((b.route.find(r => r.code === x.step) || {}).extra === 'split' ? ' · на балансування <b>' + (x.x1 || 0) + '</b> · одразу на ' + esc(splitTo(b, x.step)) + ' <b>' + (x.x2 || 0) + '</b>' : '');   // v99
     if (x.type === 'нова партія') what = 'нова партія · ' + x.qty + ' шт' + (x.d1 && !b.comp ? ' · 🎨 ' + esc(x.d1) : '') + (x.d2 && !b.comp ? ' · старт з <b>' + esc(x.d2) + '</b>' : '');   // v27
     if (x.type === 'пропуск') what = '⏭ пропущено <b>' + esc(x.step) + '</b> · ' + x.qty + ' шт';   // v27
     if (x.type === 'колір') what = '🎨 колір: ' + esc(x.d2 || 'не вказано') + ' → <b>' + esc(x.d1 || 'не вказано') + '</b>';   // v21
@@ -2096,6 +2100,8 @@ function boxesCard(b) {
     (via.length ? ' · запаковано іншими партіями: ' + via.reduce((a, x) => a + x.q, 0) + ' шт' : '') +
     (k2.avail ? ' · <b style="color:#9B231A">чекає K2: ' + k2.avail + ' шт</b>' : '') + (before ? ' · ще не дійшли до K2: ' + before + ' шт' : '') + '</div></div>';
 }
+/** v99: крок, куди йдуть ротори з R5 «одразу» — перший після балансування (R6 / OV4) за маршрутом */
+function splitTo(b, code) { const R = b.route || [], c = r => r.code || r[0]; let k = R.findIndex(r => c(r) === code) + 1; while (R[k] && ['R6', 'OV4'].indexOf(c(R[k])) >= 0) k++; return R[k] ? c(R[k]) : 'F4'; }   // route — об'єкти (сторінка партії) або масиви (Р-7)
 function nowHtml(b) {
   const st = b.stages || [];
   // v55: партія двигунів — крім двигунів, у тарі лежать деталі: пари до F1, статори / ротори без пари, покупні ротори до F4п
@@ -2105,8 +2111,8 @@ function nowHtml(b) {
   if (c && c.R.unp) ex.push({ q: c.R.unp, n: 'Ротори без пари', r: 'потрібен статор → F1', w: 1 });
   if (c && c.R.waitF4) ex.push({ q: c.R.waitF4, n: 'Покупні ротори', r: 'чекає F4п' });
   if (!st.length && !ex.length) return '';
-  return '<div class="now"><div class="muted">Що в тарі зараз</div><div class="list" style="padding:0">' + st.map(x =>
-    '<div class="li"><div><b>' + x.qty + ' шт</b> · ' + esc(x.name) + '</div><div class="r muted">' + (x.done ? 'усі кроки пройдено' : 'чекає ' + esc(x.wait)) + '</div></div>').join('') +
+  return '<div class="now"><div class="muted">Що в тарі зараз</div><div class="list" style="padding:0">' + st.map(x => (x.parts || [x]).map(y =>   // v99: рядок, розкладений на частини (після R5)
+    '<div class="li"><div><b>' + y.qty + ' шт</b> · ' + esc(y.name) + '</div><div class="r muted">' + (x.done ? 'усі кроки пройдено' : 'чекає ' + esc(x.wait)) + '</div></div>').join('')).join('') +
     ex.map(x => '<div class="li"><div><b' + (x.w ? ' style="color:#9B231A"' : '') + '>' + x.q + ' шт</b> · ' + esc(x.n) + '</div><div class="r muted">' + esc(x.r) + '</div></div>').join('') + '</div></div>';
 }
 function bl(no) {   // v39 (Р-0_02): у звітах — картка партії Р-7, якщо роль її бачить; інакше — сторінка партії
@@ -2119,7 +2125,7 @@ function stepChanged() {
   $('good').value = s ? s.avail : ''; $('scrap').value = 0; $('goodHint').innerHTML = '';
   const f1 = !!(s && s.code === 'F1' && S.batch.comp);
   const pack = !!(s && s.extra === 'pack');   // v92: K2 — браку немає, лише пакування
-  $('goodLbl').textContent = f1 ? 'Зібрано двигунів' : pack ? 'Запаковано двигунів' : 'Успішних';
+  $('goodLbl').textContent = f1 ? 'Зібрано двигунів' : pack ? 'Запаковано двигунів' : s && s.type === 'К' ? 'Пройшли перевірку успішно' : 'Успішних';   // v99
   const split = !!(s && s.extra === 'split');   // v98: R5 — замість «Успішних» поле «Перевірено» (у xf0), успішних = одразу + на балансування
   $('goodLbl').style.display = split ? 'none' : ''; $('good').parentNode.style.display = split ? 'none' : '';
   $('rz').style.display = pack ? 'none' : '';
@@ -2219,8 +2225,8 @@ function goodHint(cut) {
   if ((s.code === 'F1' && S.batch.comp) || s.extra === 'split') { h.innerHTML = ''; return; }   // v98: R5 — підказка під полями (spHint)
   const g = Number($('good').value) || 0, t = rzTotal('rz');
   if (s.extra === 'pack') { h.innerHTML = g > s.avail ? '<span style="color:#9B231A;font-weight:600">Запаковано ' + g + ' — більше, ніж доступно (' + s.avail + ')</span>' : ''; return; }   // v93
-  h.innerHTML = g + t > s.avail ? '<span style="color:#9B231A;font-weight:600">Успішних + брак = ' + (g + t) + ' — більше, ніж доступно (' + s.avail + ')</span>'
-    : cut && t ? 'Успішних — ' + g + ': доступно ' + s.avail + ', брак ' + t : '';
+  h.innerHTML = g + t > s.avail ? '<span style="color:#9B231A;font-weight:600">' + (s.type === 'К' ? 'Пройшли успішно' : 'Успішних') + ' + брак = ' + (g + t) + ' — більше, ніж доступно (' + s.avail + ')</span>'
+    : cut && t ? (s.type === 'К' ? 'Пройшли успішно' : 'Успішних') + ' — ' + g + ': доступно ' + s.avail + ', брак ' + t : '';
 }
 /** v47: кроки двигунів, де брак може бути лише статора або лише ротора (Code.gs v53, PART_SCRAP_STEPS) */
 const PART_SCRAP = ['F2', 'F3', 'F5'];
@@ -3903,7 +3909,8 @@ function r7card() {
   h += zFold('r7path', 'Шлях партії за кроками', '', '<p class="muted" style="margin-top:0">Успішних на кожному кроці, червоне — брак. «!» — простій перед кроком ' + idl + ' і більше роб. дн. (у «наступний» — якщо стільки чекає зараз). Жовті смуги — контроль.</p>' + zBars(rows), true);
   h += zFold('r7recs', 'Записи', b.recs.length, '<div class="tw"><table class="t"><tr><th>Час</th><th>Крок</th><th>Хто</th><th>Дільниця</th><th class="r">Успішних</th><th class="r">Брак</th><th>Причина</th></tr>' +
     b.recs.slice().reverse().map(r => '<tr><td>' + zDm(r.d) + ' <span class="muted">' + esc(r.tm) + '</span></td><td><b>' + esc(r.step) + '</b> <span class="muted">' + esc(zSN(r.step) || (b.route.find(x => x[0] === r.step) || ['', ''])[1]) + '</span></td><td>' + esc(r.who) +
-      (LEAD_ROLES.indexOf(DB.me.role) >= 0 && /^W/.test(r.w) ? ' <a class="lnk" href="' + esc(link('d=my&as=' + encodeURIComponent(r.w))) + '">👁</a>' : '') + '</td><td>' + esc(r.loc) + '</td><td class="r">' + fn(r.g) + '</td><td class="r">' + (r.s || '—') + '</td><td>' + esc(r.rs) + '</td></tr>').join('') + '</table></div>');
+      (LEAD_ROLES.indexOf(DB.me.role) >= 0 && /^W/.test(r.w) ? ' <a class="lnk" href="' + esc(link('d=my&as=' + encodeURIComponent(r.w))) + '">👁</a>' : '') + '</td><td>' + esc(r.loc) + '</td><td class="r">' + fn(r.g) + '</td><td class="r">' + (r.s || '—') + '</td><td>' + esc(r.rs) +
+      (r.x1 || r.x2 ? (r.rs ? '<br>' : '') + '<span class="muted">на балансування ' + fn(r.x1) + ' · одразу на ' + esc(splitTo(b, r.step)) + ' ' + fn(r.x2) + '</span>' : '') + '</td></tr>').join('') + '</table></div>');   // v99
   return h;
 }
 
