@@ -1,5 +1,9 @@
 <!DOCTYPE html>
-<!-- МЛП · index.html v96 · 08.11.2026 — сторінка партії: рядки «Статори / Ротори» (прийшло · у двигунах · брак) — у блок «Маршрут і кількості» (згорнутий, нагорі блоку);
+<!-- МЛП · index.html v97 · 08.11.2026 — Р-9_07: ще один прихований рівень (рішення 08.11) — натиснути рядок «працівник × вид роботи» → дослівно,
+     як людина заповнила форму Антона (позначка часу, дата, ПІБ, типорозмір, вид роботи, кількість — як у таблиці відповідей) і її записи в МЛП
+     (як у «Мій виробіток»: час, крок, партія, типорозмір, KV, успішних, брак, хто вніс, коментар). Окремий запит apiDash d=control&raw=1 (Reports.gs v38).
+     Обрано працівника — рядок «Поза звіркою»: рядки форми з незіставленим видом роботи чи нерозпізнаною кількістю, кроки МЛП без відповідності, робота без партії.
+     v96 · 08.11.2026 — сторінка партії: рядки «Статори / Ротори» (прийшло · у двигунах · брак) — у блок «Маршрут і кількості» (згорнутий, нагорі блоку);
      «Історія» → «Історія записів»; «Додати крок» → «Записати крок».
      v95 · 08.11.2026 — K2, таблиця «Що зробити»: колонка «Що робимо» — коротко: «повний», «неповний (норма N)», «було → стане» (без «заклеїти, етикетка; на склад — сам»).
      v94 · 08.11.2026 — K2 як підказка «що зробити» (рішення 08.11): головне — велика таблиця ящиків: повні за нормою — нові ящики (повний → на склад сам),
@@ -601,7 +605,7 @@
 <div class="net" id="net" role="alert" aria-live="assertive"><div class="nb"><div class="rt" id="netr"></div><div class="nt" id="nett">Зберігаю…</div><div class="ns" id="nets"></div><div class="np"><i id="netp"></i></div><div class="nh" id="neth"></div><div class="zc" id="zc"></div><button class="nx" id="netx" type="button">Не чекати</button></div></div>
 
 <script>
-const PAGE_VERSION = 'index.html v96 · 08.11.2026';   // v74: в1 — і з нашої тари (ящик залишків); в2 — лише партії в2
+const PAGE_VERSION = 'index.html v97 · 08.11.2026';   // v74: в1 — і з нашої тари (ящик залишків); в2 — лише партії в2
 // v72 (26.10):   // v72: «Яку партію відкриваємо?»; розшифровка кроків на картці партії; реєстрація — повернення за посиланням з форми
 // v71 (24.10):   // v71: порядок звітів (важливі — першими, жирним); Р-8_04 — один графік, статори / ротори / двигуни поруч, без лінії % браку; закладка «Випуск готових статорів, роторів і двигунів»
 //   // v70: Р-13 «Цех наживо» — план поверхів Печерська з ящиками, «Будівля 3D», повтор руху (Reports.gs v30)
@@ -3879,7 +3883,7 @@ const ZCDIMS = {
   by: { l: 'Хто виправив / вніс', f: e => e.by, lab: v => zWN(v) },
   worker: { l: 'Працівник', f: e => e.w, lab: v => zWN(v) }
 };
-ZST.control = { F: zMkF('month', 'w'), sel: [], more: false, rw: '', rday: '', rv: 'abs', only2: false, D: ZCDIMS,
+ZST.control = { F: zMkF('month', 'w'), sel: [], more: false, rw: '', rday: '', rv: 'abs', only2: false, open: {}, raw: {}, rawDB: null, D: ZCDIMS,
   sortV: (k, vals) => vals.sort((a, b) => k === 't' ? ZEVT.indexOf(a) - ZEVT.indexOf(b) : String(ZCDIMS[k].lab(a)).localeCompare(String(ZCDIMS[k].lab(b)), 'uk')) };
 try { const v = JSON.parse(store('mlp_per_control') || 'null'); if (v && v.per) Object.assign(ZST.control.F, { per: v.per, from: v.from || '', to: v.to || '', gran: v.gran || 'w' }); } catch (e) { }
 function r9() {
@@ -3980,12 +3984,55 @@ function z9form(S) {
     '<label class="zck"><input type="checkbox"' + (S.only2 ? ' checked' : '') + ' onchange="zA(' + zAct(v => { S.only2 = v; renderDash(); }) + ',this.checked)"> тільки розбіжності</label></div>' +
     '<div class="zkpis" style="margin:10px 0">' + zKpi('Рядків', fn(rows.length), '') + zKpi('Збігаються (≤ 2 %)', fn(rows.length - nBad), '', zPc(rows.length - nBad, rows.length), '', 'kgood') + zKpi('Розбіжність > 2 %', fn(nBad - nMissF - nMissZ), '', '', '', nBad - nMissF - nMissZ ? 'kbad' : '') +
     zKpi('Немає у формі', fn(nMissF), '', 'записано тільки в МЛП') + zKpi('Немає в МЛП', fn(nMissZ), '', 'тільки у формі Антона') + '</div>';
-  h += vis.length ? '<div class="tw" style="max-height:520px"><table class="t"><tr><th>Працівник</th><th>Вид роботи у формі → кроки МЛП</th><th class="r">МЛП</th><th class="r">Форма Антона</th><th class="r">Різниця</th><th class="r">%</th></tr>' +
-    vis.map(x => '<tr><td>' + esc(zWN(x.w)) + (x.w.indexOf('e:') === 0 ? ' <span class="pill warn" style="margin:0">немає в МЛП</span>' : zEye(x.w)) + '</td><td>' + esc(x.g) + '</td><td class="r">' + (x.a ? fn(x.a) : '<span class="pill warn" style="margin:0">немає</span>') + '</td><td class="r">' + (x.b === null ? '<span class="pill warn" style="margin:0">немає</span>' : fn(x.b)) + '</td>' +
-      '<td class="r">' + (x.d > 0 ? '+' : '') + fn(x.d) + '</td><td class="r">' + (x.bad ? '<span class="pill bad" style="margin:0">' + (x.a && x.b !== null ? zF1p(x.p) + ' %' : '—') + '</span>' : zF1p(x.p) + ' %') + '</td></tr>').join('') + '</table></div>' : '<p class="muted">Розбіжностей немає.</p>';
+  if (S.rawDB !== DB) { S.rawDB = DB; S.raw = {}; }   // v97: нові дані звіту — дослівні рядки завантажимо заново
+  const tog = (w, g) => zAct(() => { const k = w + '¦' + g; if (S.open[k]) delete S.open[k]; else { S.open[k] = 1; z9raw(S, w); } renderDash(); });
+  const out = S.rw ? [{ w: S.rw, g: '', out: 1 }] : [];   // v97: поза звіркою — тільки для обраного працівника
+  h += vis.length || out.length ? '<div class="tw" style="max-height:720px"><table class="t"><tr><th>Працівник</th><th>Вид роботи у формі → кроки МЛП</th><th class="r">МЛП</th><th class="r">Форма Антона</th><th class="r">Різниця</th><th class="r">%</th></tr>' +
+    vis.map(x => { const on = S.open[x.w + '¦' + x.g];
+      return '<tr style="cursor:pointer" onclick="zA(' + tog(x.w, x.g) + ')"><td>' + (on ? '▾ ' : '▸ ') + esc(zWN(x.w)) + (x.w.indexOf('e:') === 0 ? ' <span class="pill warn" style="margin:0">немає в МЛП</span>' : zEye(x.w)) + '</td><td>' + esc(x.g) + '</td><td class="r">' + (x.a ? fn(x.a) : '<span class="pill warn" style="margin:0">немає</span>') + '</td><td class="r">' + (x.b === null ? '<span class="pill warn" style="margin:0">немає</span>' : fn(x.b)) + '</td>' +
+      '<td class="r">' + (x.d > 0 ? '+' : '') + fn(x.d) + '</td><td class="r">' + (x.bad ? '<span class="pill bad" style="margin:0">' + (x.a && x.b !== null ? zF1p(x.p) + ' %' : '—') + '</span>' : zF1p(x.p) + ' %') + '</td></tr>' +
+      (on ? '<tr><td colspan="6" style="background:var(--bg2,rgba(127,127,127,.06));padding:8px 10px">' + z9rawBox(S, x.w, x.g, x) + '</td></tr>' : ''); }).join('') +
+    out.map(x => { const on = S.open[x.w + '¦'];
+      return '<tr style="cursor:pointer" onclick="zA(' + tog(x.w, '') + ')"><td>' + (on ? '▾ ' : '▸ ') + esc(zWN(x.w)) + '</td><td colspan="5"><i>Поза звіркою</i> <span class="muted">— рядки форми з незіставленим видом роботи або нерозпізнаною кількістю, кроки МЛП без відповідності у формі, робота без партії</span></td></tr>' +
+      (on ? '<tr><td colspan="6" style="background:var(--bg2,rgba(127,127,127,.06));padding:8px 10px">' + z9rawBox(S, x.w, '', null) + '</td></tr>' : ''); }).join('') + '</table></div>' +
+    '<p class="muted" style="margin:6px 0 0">▸ Натисніть рядок — дослівно, як людина заповнила форму Антона, і її записи в МЛП (як у «Мій виробіток»).</p>' : '<p class="muted">Розбіжностей немає.</p>';
   h += '<p class="muted" style="margin:8px 0 0">Звіряємо записи в МЛП з вечірньою формою Антона, поки працівники заповнюють обидві. Різниця = МЛП − форма. Контрольні кроки — перевірені (успішні + брак). Розбіжність понад 2 % — розібрати. Працівника форми знаходимо за e-mail, інакше — за ім\'ям і прізвищем.</p>';
   if ((DB.formUnknown || []).length) h += '<p class="muted" style="margin:8px 0 0">Види робіт з форми, не зіставлені з кроками (додати в «Відповідність форми» в MLP_Підсумки): ' + DB.formUnknown.map(x => esc(x[0]) + ' (' + x[1] + ')').join(', ') + '.</p>';
   return h;
+}
+
+/** v97: дослівні рядки працівника w за обраний день (або весь пілот) — окремий запит apiDash d=control&raw=1 (Reports.gs v38), кеш до наступного завантаження звіту */
+function z9raw(S, w) {
+  const k = w + '¦' + (S.rday || ''); if (S.raw[k]) return;
+  S.raw[k] = { loading: 1 };
+  google.script.run.withSuccessHandler(d => { S.raw[k] = (d && d.raw) || { err: 'Порожня відповідь' }; renderDash(); })
+    .withFailureHandler(e => { S.raw[k] = { err: e.message }; renderDash(); })
+    .apiDash({ code: CODE, d: 'control', raw: 1, rw: w, rday: S.rday || '' });
+}
+/** v97: вміст прихованого рівня для рядка (w, g); g = '' — поза звіркою. x — рядок звірки (МЛП a, форма b) для перевірки сум */
+function z9rawBox(S, w, g, x) {
+  const R = S.raw[w + '¦' + (S.rday || '')];
+  if (!R || R.loading) { if (!R) z9raw(S, w); return '<span class="muted">Завантаження записів…</span>'; }
+  if (R.err) return '<span class="err">' + esc(R.err) + '</span> <button type="button" class="ic" onclick="event.stopPropagation();zA(' + zAct(() => { delete S.raw[w + '¦' + (S.rday || '')]; renderDash(); }) + ')">Ще раз</button>';
+  const many = !S.rday, mx = (R.mx || []).indexOf(g) >= 0;
+  const F = (R.form || []).filter(r => g ? r.g === g && !r.why : !!r.why), Z = (R.mlp || []).filter(r => g ? r.grp === g : !r.grp);
+  const fh = R.fh || [], xh = fh.slice(7), xOn = xh.map((hh, i) => F.some(r => String((r.x || [])[i] || '').trim()));
+  const sF = F.reduce((a, r) => a + (r.q || 0), 0), sZ = Z.reduce((a, r) => a + (r.val || 0), 0);
+  const th = (i, d) => '<th>' + esc(fh[i] || d) + '</th>';
+  let h = '<div style="font-weight:600;margin:0 0 4px">Форма Антона — як заповнено <span class="muted" style="font-weight:400">· ' + F.length + ' ряд.' + (g ? ' · враховано ' + fn(sF) + (x && x.b !== null && x.b !== sF ? ' (у звірці ' + fn(x.b) + ')' : '') : '') + '</span></div>';
+  h += R.formOff ? '<p class="muted">Звірку з формою вимкнено.</p>' : F.length ? '<div class="tw"><table class="t" style="font-size:13px"><tr>' + th(0, 'Позначка часу') + th(2, 'Дата') + th(3, 'ПІБ') + th(4, 'Типорозмір') + th(5, 'Вид роботи') + th(6, 'Кількість') +
+    xh.map((hh, i) => xOn[i] ? '<th>' + esc(hh || 'Колонка ' + (8 + i)) + '</th>' : '').join('') + '<th class="r">' + (g ? 'Враховано' : 'Чому поза звіркою') + '</th><th class="r">Рядок</th></tr>' +
+    F.map(r => '<tr><td style="white-space:nowrap">' + esc(r.ts) + '</td><td style="white-space:nowrap">' + esc(r.dd) + '</td><td>' + esc(r.n) + '</td><td>' + esc(r.typ) + '</td><td>' + esc(r.txt) + '</td><td><b>' + esc(r.qt) + '</b></td>' +
+      xh.map((hh, i) => xOn[i] ? '<td>' + esc((r.x || [])[i] || '') + '</td>' : '').join('') + '<td class="r">' + (g ? fn(r.q) : '<span class="pill warn" style="margin:0">' + esc(r.why) + '</span>') + '</td><td class="r muted">' + r.row + '</td></tr>').join('') + '</table></div>'
+    : '<p class="muted" style="margin:0 0 6px">' + (g ? 'У формі за ' + (many ? 'пілот' : 'цей день') + ' такого виду роботи немає.' : 'Немає.') + '</p>';
+  h += '<div style="font-weight:600;margin:10px 0 4px">МЛП — записи (як у «Мій виробіток») <span class="muted" style="font-weight:400">· ' + Z.length + ' зап.' + (g ? ' · враховано ' + fn(sZ) + (mx ? ' — у звірці найбільше з кроків за день' : '') + (x && !mx && x.a !== sZ ? ' (у звірці ' + fn(x.a) + ')' : '') : '') + '</span></div>';
+  h += Z.length ? '<div class="tw"><table class="t" style="font-size:13px"><tr>' + (many ? '<th>Дата</th>' : '') + '<th>Час</th><th>Крок</th><th>Партія</th><th>Типорозмір</th><th>KV</th><th class="r">Успішних</th><th class="r">Брак</th>' + (g ? '<th class="r">Враховано</th>' : '') + '<th>Хто вніс</th><th>Коментар</th></tr>' +
+    Z.map(r => '<tr><td style="white-space:nowrap">' + (many ? zDm(r.d) + '</td><td>' : '') + esc(r.tm) + '</td><td>' + (r.step ? '<b>' + esc(r.step) + '</b> <span class="muted">' + esc(zSN(r.step)) + '</span>' : '<span class="muted">без партії:</span> ' + esc(r.nb || '')) +
+      (r.fix ? ' <span class="pill warn" style="margin:0" title="Запис виправлено — показано нове значення">✎</span>' : '') + (r.st ? ' <span class="pill bad" style="margin:0">сторно</span>' : '') + '</td><td>' + (r.b ? bl(r.b) : '—') + '</td><td>' + esc(r.typ) + '</td><td>' + esc(r.kv) + '</td>' +
+      '<td class="r">' + fn(r.g) + (r.u ? ' <span class="muted">' + esc(r.u) + '</span>' : '') + '</td><td class="r">' + (r.s ? fn(r.s) : '—') + '</td>' + (g ? '<td class="r">' + fn(r.val) + (r.ctl ? ' <span class="muted" title="Контрольний крок: успішні + брак">к</span>' : '') + '</td>' : '') +
+      '<td>' + (r.by ? esc(r.by) + ' <span class="muted">' + esc(r.ins) + '</span>' : '<span class="muted">сам</span>') + '</td><td class="muted">' + esc(r.c) + '</td></tr>').join('') + '</table></div>'
+    : '<p class="muted" style="margin:0">' + (g ? 'У МЛП за ' + (many ? 'пілот' : 'цей день') + ' таких записів немає.' : 'Немає.') + '</p>';
+  return '<div onclick="event.stopPropagation()" style="cursor:auto">' + h + '</div>';
 }
 
 // =============================================================== v78: Р-14 «ЗАПИСИ ПРАЦІВНИКА» (рішення 30.10)
