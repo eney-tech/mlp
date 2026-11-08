@@ -1,5 +1,7 @@
 <!DOCTYPE html>
-<!-- МЛП · index.html v90 · 08.11.2026 — Р-8_06: «Причина браку» — і рівнем рядків, і колонками матриці (у Р-10_05 вже було). Успішні без браку —
+<!-- МЛП · index.html v91 · 08.11.2026 — аналітика (Р-8, Р-10 та ін. на zRecs): комбіновані причини браку зводяться до одного порядку частин
+     («термоусадка + брак скрутки» і «брак скрутки + термоусадка» → «брак скрутки + термоусадка»), повтори частин прибрано; записи в ЖЗР не змінюються (С-52).
+     v90 · 08.11.2026 — Р-8_06: «Причина браку» — і рівнем рядків, і колонками матриці (у Р-10_05 вже було). Успішні без браку —
      у значенні «без браку / без причини».
      v89 · 08.11.2026 — матриці Р-8_06 / Р-10_05: кілька значень одночасно — «Значення» (перше) + «+ значення» (наприклад, успішних, брак, % браку);
      з колонками — під кожною колонкою підколонки значень, теплова заливка — окремо для кожного значення; CSV — так само.
@@ -574,7 +576,7 @@
 <div class="net" id="net" role="alert" aria-live="assertive"><div class="nb"><div class="rt" id="netr"></div><div class="nt" id="nett">Зберігаю…</div><div class="ns" id="nets"></div><div class="np"><i id="netp"></i></div><div class="nh" id="neth"></div><div class="zc" id="zc"></div><button class="nx" id="netx" type="button">Не чекати</button></div></div>
 
 <script>
-const PAGE_VERSION = 'index.html v90 · 08.11.2026';   // v74: в1 — і з нашої тари (ящик залишків); в2 — лише партії в2
+const PAGE_VERSION = 'index.html v91 · 08.11.2026';   // v74: в1 — і з нашої тари (ящик залишків); в2 — лише партії в2
 // v72 (26.10):   // v72: «Яку партію відкриваємо?»; розшифровка кроків на картці партії; реєстрація — повернення за посиланням з форми
 // v71 (24.10):   // v71: порядок звітів (важливі — першими, жирним); Р-8_04 — один графік, статори / ротори / двигуни поруч, без лінії % браку; закладка «Випуск готових статорів, роторів і двигунів»
 //   // v70: Р-13 «Цех наживо» — план поверхів Печерська з ящиками, «Будівля 3D», повтор руху (Reports.gs v30)
@@ -3171,7 +3173,7 @@ function zRecs() {
     const base = { d: x[0], w: x[1], step: step, kind: kind, typ: typ, kv: x[5], ver: x[6], fl: x[7] ? x[8] + x[7] : (x[8] || '—'), loc: x[8] || '—', b: x[9], ln: x[13] || '—',
       fin: !!(fin[kind + '|' + typ + '|' + step] || fin[kind + '|*|' + step]), ctl: (d.steps[step] || [])[1] === 'К' };
     let rest = x[11]; const n0 = out.length;
-    String(x[12] || '').split(/;\s*/).filter(Boolean).forEach(p => { const m = p.match(/^(.*):\s*(\d+)$/); if (!m) return; const n = Number(m[2]); rest -= n; out.push(Object.assign({}, base, { g: 0, s: n, rs: m[1] })); });
+    String(x[12] || '').split(/;\s*/).filter(Boolean).forEach(p => { const m = p.match(/^(.*):\s*(\d+)$/); if (!m) return; const n = Number(m[2]); rest -= n; out.push(Object.assign({}, base, { g: 0, s: n, rs: zRsNorm(m[1]) })); });
     if (x[10] || rest > 0 || !x[11]) out.push(Object.assign({}, base, { g: x[10], s: Math.max(0, rest), rs: '—' }));
     if (out.length > n0) { out[n0].x1 = Number(x[14]) || 0; out[n0].x2 = Number(x[15]) || 0; }   // v85: брак статорів / роторів (MT) — лише на першому з рядків, щоб не подвоїти
   });
@@ -3569,6 +3571,8 @@ function r10() {
   return h;
 }
 
+/** v91 (С-52): комбінована причина — частини в одному порядку (за абеткою), без повторів: пари в різному порядку зливаються в аналітиці */
+const zRsNorm = t => { t = String(t || '').trim(); if (t.indexOf('+') < 0) return t; return [...new Set(t.split('+').map(x => x.trim()).filter(Boolean))].sort((a, b) => a.localeCompare(b, 'uk')).join(' + '); };
 /** v87: клітинка матриці / «Брак за днями» → Р-10_08 звужено до неї і перехід до деталей; повторне натискання тієї самої клітинки — зняти */
 function z10detSet(S, conds, key) {
   if (S.det && S.det.key === key) S.det = null; else { S.det = { key: key, conds: conds }; S.detMore = false; zOpen('r10det'); }
