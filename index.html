@@ -1,5 +1,7 @@
 <!DOCTYPE html>
-<!-- МЛП · index.html v101 · 09.11.2026 — «✂ Відокремити», «Куди» (рішення 09.11): «За маршрутом — тара або партія» → «В іншу партію / тару»,
+<!-- МЛП · index.html v102 · 09.11.2026 — історія і зв'язки партії, форма «+ Додати»: «взято на відбраковку» → «→ відділ якості N шт»,
+     «повернуто з відбраковки» → «↩ з відділу якості N шт» (рішення 09.11).
+     v101 · 09.11.2026 — «✂ Відокремити», «Куди» (рішення 09.11): «За маршрутом — тара або партія» → «В іншу партію / тару»,
      «Взяли на відбраковку» → «Відділ якості».
      v100 · 09.11.2026 — одна кнопка «+ Додати» (рішення 09.11) замість «+ Статори / ротори / двигуни», «+ Додати» і «↩ Повернути з відбраковки»:
      спочатку ЩО (у партії двигунів — статори / ротори / двигуни; у S / R — деталі цієї партії), потім ЗВІДКИ: відділ якості (етап, кількість, партія походження
@@ -618,7 +620,7 @@
 <div class="net" id="net" role="alert" aria-live="assertive"><div class="nb"><div class="rt" id="netr"></div><div class="nt" id="nett">Зберігаю…</div><div class="ns" id="nets"></div><div class="np"><i id="netp"></i></div><div class="nh" id="neth"></div><div class="zc" id="zc"></div><button class="nx" id="netx" type="button">Не чекати</button></div></div>
 
 <script>
-const PAGE_VERSION = 'index.html v101 · 09.11.2026';   // v74: в1 — і з нашої тари (ящик залишків); в2 — лише партії в2
+const PAGE_VERSION = 'index.html v102 · 09.11.2026';   // v74: в1 — і з нашої тари (ящик залишків); в2 — лише партії в2
 // v72 (26.10):   // v72: «Яку партію відкриваємо?»; розшифровка кроків на картці партії; реєстрація — повернення за посиланням з форми
 // v71 (24.10):   // v71: порядок звітів (важливі — першими, жирним); Р-8_04 — один графік, статори / ротори / двигуни поруч, без лінії % браку; закладка «Випуск готових статорів, роторів і двигунів»
 //   // v70: Р-13 «Цех наживо» — план поверхів Печерська з ящиками, «Будівля 3D», повтор руху (Reports.gs v30)
@@ -2041,8 +2043,8 @@ function renderBatch(extra) {
     if (x.type === 'крок' && x.step === 'F1' && b.comp) what = '<b>F1</b> · зібрано ' + x.good + (x.x1 ? ' · брак статорів ' + x.x1 : '') + (x.x2 ? ' · брак роторів ' + x.x2 : '') + (x.reason ? ' · ' + esc(x.reason) : '');
     if (x.type === 'відокремлення') what = (x.batch === i['Номер'] ? 'відокремлено ' + x.qty + ' → ' + bl(x.target) : 'додано ' + x.qty + ' з ' + bl(x.batch)) + (x.product ? ' · ' + esc(x.product) : '') +
       (x.left && x.d1 ? ' · ' + esc(x.d1) : '');
-    if (x.type === 'вибуття') what = (x.purpose === S.qc ? 'взято на відбраковку ' + x.qty + ' шт' : 'вибуло ' + x.qty + ' шт → <b>' + esc(x.purpose) + '</b>') + ' · ' + esc(x.product);
-    if (x.type === 'додавання') what = x.purpose === S.qc ? '↩ повернуто з відбраковки ' + x.qty + ' шт · ' + esc(x.product) + (x.origin ? ' · з ' + bl(x.origin) : '') + (x.rby ? ' · переробив ' + esc(x.rby) : '')   // v19; v100
+    if (x.type === 'вибуття') what = (x.purpose === S.qc ? '→ <b>відділ якості</b> ' + x.qty + ' шт' : 'вибуло ' + x.qty + ' шт → <b>' + esc(x.purpose) + '</b>') + ' · ' + esc(x.product);
+    if (x.type === 'додавання') what = x.purpose === S.qc ? '↩ з відділу якості ' + x.qty + ' шт · ' + esc(x.product) + (x.origin ? ' · з ' + bl(x.origin) : '') + (x.rby ? ' · переробив ' + esc(x.rby) : '')   // v19; v100
       : '+ додано ' + x.qty + ' шт · ' + esc(x.product) + ' · звідки: <b>' + esc(x.purpose) + '</b>';   // v17
     if (x.type === 'партія на склад') what = '📦 на склад <b>' + esc(x.d2) + '</b>' + (x.d1 && x.d1 !== 'виробництво' ? ' (зі складу ' + esc(x.d1) + ')' : '') + ' · ' + x.qty + ' шт';   // v62
     if (x.type === 'партія зі складу') what = '↩ зі складу ' + esc(x.d2) + ' на виробництво';
@@ -2075,7 +2077,7 @@ function renderBatch(extra) {
     : (s.kind === 'видача' ? 'Взято ' : s.kind === 'залишок' || s.left ? 'Залишок ' : 'Додано ') + s.qty + ' шт з ' + bl(s.batch) + (s.ver ? ' (' + esc(s.ver) + ')' : '')));
   b.issues.forEach(s => rel.push(s.kind === 'залишок' ? 'Повернуто ' + s.qty + ' ' + esc(s.comp) + ' → ' + (s.batch === 'склад' ? 'склад' : bl(s.batch)) : 'Видано ' + s.qty + ' шт у ' + bl(s.batch)));
   b.children.forEach(s => rel.push((s.left ? 'Залишок ' + (s.left === 'S' ? 'статорів ' : 'роторів ') : 'Відокремлено ') + s.qty + ' шт → ' + bl(s.batch)));
-  (b.exits || []).forEach(s => rel.push((s.purpose === S.qc ? 'Взято на відбраковку ' + s.qty + ' шт' : 'Вибуло ' + s.qty + ' шт → ' + esc(s.purpose)) + ': ' + esc(s.product) + (s.comment ? ' (' + esc(s.comment) + ')' : '')));
+  (b.exits || []).forEach(s => rel.push((s.purpose === S.qc ? '→ Відділ якості ' + s.qty + ' шт' : 'Вибуло ' + s.qty + ' шт → ' + esc(s.purpose)) + ': ' + esc(s.product) + (s.comment ? ' (' + esc(s.comment) + ')' : '')));
   if (rel.length) h += '<details><summary>Зв\'язки</summary><div class="list">' + rel.map(r => '<div class="li"><div>' + r + '</div></div>').join('') + '</div></details>';
 
   h += routeHelp(b);   // v72: розшифровка кроків маршруту цієї партії
@@ -2653,7 +2655,7 @@ function addForm(no) {
     }
     const qc = src === 'qc', o = orgList();
     const took = live.filter(x => x.type === 'вибуття').reduce((t, x) => t + (Number(x.qty) || 0), 0), back = live.filter(x => x.type === 'додавання').reduce((t, x) => t + (Number(x.qty) || 0), 0);
-    box.innerHTML = (qc && (took || back) ? '<p class="muted" style="margin:10px 0 0">З цієї партії взято на відбраковку ' + took + ' шт, повернуто ' + back + ' шт.</p>' : '') +
+    box.innerHTML = (qc && (took || back) ? '<p class="muted" style="margin:10px 0 0">З цієї партії у відділ якості передано ' + took + ' шт, повернуто ' + back + ' шт.</p>' : '') +
       (comp ? '' : stSel(qc ? defSt : '')) +
       (qc ? '' : '<label>Звідки саме</label><select id="adFrom">' + opts((S.dict.purposes || []).filter(x => x !== S.qc), '', '— оберіть —') + '</select>') +
       '<label>Кількість, шт</label>' + numInput('acq', '') +
