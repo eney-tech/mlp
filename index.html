@@ -1,5 +1,10 @@
 <!DOCTYPE html>
-<!-- МЛП · index.html v99 · 08.11.2026 — рішення 08.11: 1) контрольні кроки (тип К) — «Пройшли перевірку успішно» замість «Успішних» (брак — окремо, як було);
+<!-- МЛП · index.html v100 · 09.11.2026 — одна кнопка «+ Додати» (рішення 09.11) замість «+ Статори / ротори / двигуни», «+ Додати» і «↩ Повернути з відбраковки»:
+     спочатку ЩО (у партії двигунів — статори / ротори / двигуни; у S / R — деталі цієї партії), потім ЗВІДКИ: відділ якості (етап, кількість, партія походження
+     зі списку партій з браком, хто переробив — обидва необов'язково), інше (R&D, Антон П., інше — коментар обов'язковий), для статорів / роторів у M — наша партія в2
+     і постачальник / наша тара в1 (як було), для двигунів — резерв після F3; «інша партія» — лише попередження: «✂ Відокремити» на картці тієї партії.
+     Кнопку бачать усі (Code.gs v89: PERM.add = ALL). Історія — партія походження і хто переробив.
+     index.html v99 · 08.11.2026 — рішення 08.11: 1) контрольні кроки (тип К) — «Пройшли перевірку успішно» замість «Успішних» (брак — окремо, як було);
      2) R5 в «Історії записів» і в записах картки Р-7 — «на балансування N · одразу на F4 N»; 3) «Що в тарі зараз» — рядок, розкладений на частини
      (parts, Code.gs v88): після R5 — «Ротор добалансований» і «Ротор без добалансування (дисбаланс у нормі)», кожен окремим рядком.
      v98 · 08.11.2026 — R5 «Добалансна перевірка» (рішення 08.11): поля по порядку — «Перевірено», «Одразу на F4», «На балансування», «Брак»;
@@ -58,13 +63,13 @@
      закріплені шапки: матриця Р-10_05 / Р-8_06 — рядок-підпис «що за таблиця» (назва, рядки, колонки, значення) + заголовки колонок, перша колонка; «Брак за днями» Р-10_07 і звірка Р-9_08 — заголовки днів;
      кнопка «⛶ На весь екран» біля матриці Р-10_05 / Р-8_06 і таблиць днів Р-10_07, Р-9_08 (Esc або «✕ Згорнути» — назад). Code.gs без змін.
      v76 · 29.10.2026 — рішення 29.10: «✂ Відокремити» на готовій партії S / R (ящик залишків) — підказка, що номер партії M
-     відправляє деталі у збирання (Code.gs v76: запис «видача», як «+ Статори / ротори» з картки M; лише тімлід і вище).
+     відправляє деталі у збирання (Code.gs v76: запис «видача», як «+ Додати» → статори / ротори з картки M; лише тімлід і вище).
      v75 · 28.10.2026 — рішення 28.10: 1) «Робота без партії»: якщо для виду роботи в «Довідниках» кілька одиниць («шт / год»),
      під кількістю — «Одиниця виміру» (новий вид «Збір підшипників для 4320», Code.gs v74); у «Мій виробіток» — одиниця запису, калькулятор
      рахує шт і год такої роботи окремими рядками. 2) Ретро-історія: стан «внесено в ЖЗР» (Retro.gs v5) — фільтр «Внесені в ЖЗР», картка лише для перегляду.
      3) Р-13_04 «Повтор»: вид «3D» — тільки адміністратору (доробимо — відкриємо всім). 4) Р-13, Печерськ, 1 поверх: стіл тімліда і стіл контролю якості
      (без кроків — ящики до них не ставляться).
-     v74 · 27.10.2026 — «+ Статори / ротори» і «Нова партія» MT (рішення 27.10, M-00078): «в1 · постачальник» — і з нашої тари:
+     v74 · 27.10.2026 — «+ Додати» → статори / ротори і «Нова партія» MT (рішення 27.10, M-00078): «в1 · постачальник» — і з нашої тари:
      список готових партій в1 (ящики залишків, партії покупних деталей) того самого типорозміру й KV; порожньо — коробка постачальника (номер з етикетки).
      «в2 · наша партія» — лише партії в2. Кількість з тари підставляється сама, крім ящика залишків (там беруть по кілька штук).
      v73 · 26.10.2026 — Р-11 (рішення 26.10, Reports.gs v31): «Ротори без пари» — разом із покупними роторами, що чекають гравіювання F4п;
@@ -172,7 +177,7 @@
      v45 · 20.10.2026 — K2: кнопка «🖨 Етикетки зараз» — PDF етикеток до запису кроку (запит k2Labels, Code.gs v51); запис K2 з тією самою
      кількістю й ящиками етикетки вдруге не надсилає (labelsSent). Етикетки — термопринтер 100 × 100 мм (Labels.gs v5): у «✉ Етикетки ще раз» немає позиції на аркуші.
      Сканер читає й штрихкоди (Code 128 / GS1-128 з етикетки ящика → картка партії): BarcodeDetector, де вміє; інакше ZXing (@zxing/library).
-     v44 · 20.10.2026 — «+ Статори / ротори» у партії двигунів: третій варіант «Двигуни» — скручені двигуни з резерву, що пройшли F3
+     v44 · 20.10.2026 — «+ Додати» → статори / ротори у партії двигунів: третій варіант «Двигуни» — скручені двигуни з резерву, що пройшли F3
      (запит addComp, comp = двигун, Code.gs v49): кількість, коментар необов'язковий, підказка про типорозмір і KV партії.
      v43 · 20.10.2026 — склад: зав. складу виправляє (✎) і скасовує (✖) будь-який запис зі списку «Усі записи» з причиною (запит skladEdit, Sklad.gs v6);
      пошук у списку (ім'я, позиція, ID, партія); у записах видно «виправлено → ВД-…», хто й чому змінив.
@@ -611,7 +616,7 @@
 <div class="net" id="net" role="alert" aria-live="assertive"><div class="nb"><div class="rt" id="netr"></div><div class="nt" id="nett">Зберігаю…</div><div class="ns" id="nets"></div><div class="np"><i id="netp"></i></div><div class="nh" id="neth"></div><div class="zc" id="zc"></div><button class="nx" id="netx" type="button">Не чекати</button></div></div>
 
 <script>
-const PAGE_VERSION = 'index.html v99 · 08.11.2026';   // v74: в1 — і з нашої тари (ящик залишків); в2 — лише партії в2
+const PAGE_VERSION = 'index.html v100 · 09.11.2026';   // v74: в1 — і з нашої тари (ящик залишків); в2 — лише партії в2
 // v72 (26.10):   // v72: «Яку партію відкриваємо?»; розшифровка кроків на картці партії; реєстрація — повернення за посиланням з форми
 // v71 (24.10):   // v71: порядок звітів (важливі — першими, жирним); Р-8_04 — один графік, статори / ротори / двигуни поруч, без лінії % браку; закладка «Випуск готових статорів, роторів і двигунів»
 //   // v70: Р-13 «Цех наживо» — план поверхів Печерська з ящиками, «Будівля 3D», повтор руху (Reports.gs v30)
@@ -1102,7 +1107,7 @@ function rzExtHtml(box, z, x, k) {
   let h = '<div class="rze">';
   if (z.part) h += '<label>з них брак лише статора (ротор без пари залишиться в партії)</label>' + numInput(box + 's' + k, x.s1 || 0) +
     '<label>з них брак лише ротора (статор без пари залишиться в партії)</label>' + numInput(box + 'r' + k, x.s2 || 0) +
-    '<p class="muted" style="margin:6px 0 0">Решта цього браку — увесь двигун. Деталь без пари лишається в партії: доберіть до неї пару («+ Статори / ротори») і зберіть знову на F1.</p>';
+    '<p class="muted" style="margin:6px 0 0">Решта цього браку — увесь двигун. Деталь без пари лишається в партії: доберіть до неї пару («+ Додати» → статори / ротори) і зберіть знову на F1.</p>';
   if (z.fix && rzFixable(x.r)) h += '<div class="rzfix"><label>З них одразу виправлено й повернуто в партію</label>' + numInput(box + 'f' + k, x.fq || 0) +
     '<div id="' + box + 'fw' + k + '" style="display:' + (x.fq > 0 ? 'block' : 'none') + '"><label>Хто виправив <span class="muted">— обов\'язково</span></label><select id="' + box + 'w' + k + '"><option value="">— оберіть —</option>' +
     (S.people || []).map(p => '<option value="' + esc(p.id) + '"' + (p.id === x.fby ? ' selected' : '') + '>' + esc(p.name) + '</option>').join('') + '</select></div>' +
@@ -1507,7 +1512,7 @@ const STEPINFO = {
   R5: { w: 'Перевіряють дисбаланс і розподіляють партію: частина — на балансування, частина — одразу на гравіювання.', o: 'Ротор, допущений до балансування', t: 'КР · ящик', r: 'Вказати, скільки на балансування і скільки одразу на F4.', s: 'дисбаланс поза межами' },
   R6: { w: 'Динамічне балансування: коригують дисбаланс клеєм до норми.', o: 'Збалансований ротор', t: 'КР · ящик', n: 'дисбаланс ≤ 10 мг', s: 'не вдалося збалансувати' },
   F4: { w: 'Лазером гравіюють бренд, розмір і KV. Тут ротор стає прив\'язаним до KV. Останній крок ротора.', o: 'Ротор із гравіюванням — готовий до збирання', t: 'КР · ящик', r: 'KV обов\'язково. Покупні ротори (в1) мають свої партії, що починаються одразу з F4.', s: 'брак гравіювання' },
-  F1: { w: 'Збирають двигун: статор + ротор + ущільнювальне кільце й латунна прокладка. Статори й ротори беруть у партію двигунів кнопкою «+ Статори / ротори»: наша партія (в2), покупні (в1) — з коробки постачальника або з нашої тари (ящик залишків).', o: 'Двигун у зборі, ще не скручений', t: 'КР · ящик або ТЧ · тачка', r: 'Брак статорів і брак роторів — окремо. Половинки пар після браку — у коробку залишків.', s: 'брак статора або ротора, виявлений на збиранні' },
+  F1: { w: 'Збирають двигун: статор + ротор + ущільнювальне кільце й латунна прокладка. Статори й ротори беруть у партію двигунів кнопкою «+ Додати» → статори / ротори: наша партія (в2), покупні (в1) — з коробки постачальника або з нашої тари (ящик залишків).', o: 'Двигун у зборі, ще не скручений', t: 'КР · ящик або ТЧ · тачка', r: 'Брак статорів і брак роторів — окремо. Половинки пар після браку — у коробку залишків.', s: 'брак статора або ротора, виявлений на збиранні' },
   F2: { w: 'Скручують: гвинт M3×6 з фіксатором різьби, момент 2 кгс·см.', o: 'Скручений двигун', t: 'КР · ящик або ТЧ · тачка', s: 'зірвана різьба, не той кріпіж' },
   F3: { w: 'Тест на холостому ходу на комплексному тестері.', o: 'Протестований двигун', t: 'КР · ящик або ТЧ · тачка', n: '3115: 20 В; струм ≤ 2,5 А; 17 575…19 425 об/хв; обертання CW; 14 полюсів', s: 'тест не пройдено, шум, заїдання ротора' },
   F5: { w: 'Вихідний контроль: зовнішній вигляд, довжина й рівність виводів.', o: 'Двигун — готова продукція', t: 'КР · ящик або ТЧ · тачка', n: 'виводи 300 ± 5 мм, різниця ≤ 3 мм', s: 'подряпини, нерівні виводи' },
@@ -1756,7 +1761,7 @@ function drawNew() {
   };
 }
 
-// ---- v17: звідки статори / ротори (форма «Нова партія» MT і «+ Статори / ротори» на картці MT): в1 · в2 · пізніше
+// ---- v17: звідки статори / ротори (форма «Нова партія» MT і «+ Додати» → статори / ротори на картці MT): в1 · в2 · пізніше
 // в1 — покупні: з нашої тари (готова партія в1, напр. ящик залишків — v74) або з коробки постачальника: номер партії (необов'язково, + 📷 етикетки); порожньо — «в1 без номера».
 // в2 — наша партія ST / RT зі списку готових (лише в2, v74; номер і тара); «без номера» — старий запас без партії.
 const SRC_OPTS = [['v1', 'в1 · постачальник'], ['v2', 'в2 · наша партія'], ['later', 'Пізніше']];
@@ -1811,7 +1816,7 @@ function compRedraw(k, p) {
       '<div id="' + p + 'info" class="muted" style="margin-top:6px;min-height:18px">' + (list.length ? 'Лише готові партії ' + esc(st + ' ' + (c.typ || '')) + (c.kv ? ' KV ' + esc(c.kv) : '') + ' в2.'
         : 'Готових партій ' + esc(st + ' ' + (c.typ || '')) + (c.kv ? ' KV ' + esc(c.kv) : '') + ' в2 немає — «без номера» або «Пізніше».') + '</div>';
   }
-  if (src === 'later') h = '<p class="muted" style="margin:8px 0 0">Додасте потім: «+ Статори / ротори» на картці цієї партії двигунів.</p>';
+  if (src === 'later') h = '<p class="muted" style="margin:8px 0 0">Додасте потім: «+ Додати» → статори / ротори на картці цієї партії двигунів.</p>';
   if (src && src !== 'later') h += '<label>Скільки, шт</label>' + numInput(p + 'q', src === 'v2' ? '' : (CMP[p].defQty || ''));
   box.innerHTML = h;
   if (src === 'v1') {
@@ -1973,10 +1978,10 @@ function renderBatch(extra) {
     h += '<div class="card muted">Партія поза маршрутом (' + esc(i['Призначення']) + '): кроки не записуються.</div>';
   } else if (i['Склад']) {   // v62: партія на складі — кроки не записуються
     h += '<div class="card"><div class="mid">📦 Партія на складі ' + esc(i['Склад']) + '</div><div class="muted">Кроки не записуються. Щоб продовжити роботу — «↩ Повернути зі складу».' +
-      (stream !== 'MT' && (b.status === 'готово' || b.status === 'видано частково') ? ' Брати деталі на збирання можна й зі складу: «+ Статори / ротори» на картці партії двигунів.' : '') + '</div></div>';
+      (stream !== 'MT' && (b.status === 'готово' || b.status === 'видано частково') ? ' Брати деталі на збирання можна й зі складу: «+ Додати» → статори / ротори на картці партії двигунів.' : '') + '</div></div>';
   } else if (i['Залишки'] === 'так' && (b.status === 'готово' || b.status === 'видано частково')) {   // v62
     h += '<div class="card"><div class="mid">Ящик залишків</div><div class="muted">Тут лежать ' + (stream === 'ST' ? 'статори' : 'ротори') + ' ' + esc(i['Варіант'] || '') +
-      ', що лишились без пари. Взяти на збирання — «+ Статори / ротори» на картці партії двигунів (вкажіть цю тару або ' + esc(i['Номер']) + '). Покласти сюди — «✂» на картці партії двигунів. 1 ящик = 1 версія.</div></div>';
+      ', що лишились без пари. Взяти на збирання — «+ Додати» → статори / ротори на картці партії двигунів (вкажіть цю тару або ' + esc(i['Номер']) + '). Покласти сюди — «✂» на картці партії двигунів. 1 ящик = 1 версія.</div></div>';
   } else if (p.step && avail.length) {
     h += '<div class="card"><div class="mid">Записати крок</div>' + onbHtml() +
       '<label>Крок</label><select id="stp">' + b.route.map(s => '<option value="' + esc(s.code) + '"' + (s.avail && !s.blockedBy ? '' : ' disabled') + (s.code === pre ? ' selected' : '') + '>' +
@@ -1988,13 +1993,12 @@ function renderBatch(extra) {
       '<button class="btn" id="go">Записати</button><div class="err" id="err"></div></div>';
   } else if (b.status === 'готово' || b.status === 'видано частково') {
     h += '<div class="card"><div class="mid">✓ Усі кроки пройдено</div><div class="muted">' +
-      (stream === 'MT' ? 'Партію двигунів завершено.' : 'Готово до збирання. Тут більше нічого записувати не треба: на збиранні цю партію оберуть з картки партії двигунів («+ Статори / ротори»).') + '</div></div>';
+      (stream === 'MT' ? 'Партію двигунів завершено.' : 'Готово до збирання. Тут більше нічого записувати не треба: на збиранні цю партію оберуть з картки партії двигунів («+ Додати» → статори / ротори).') + '</div></div>';
   }
 
   // дії
   const acts = [];
   if (p.move && b.status !== 'закрито' && b.status !== 'анульовано') acts.push(['move', S.tare ? '⇄ Перекласти' : '⇄ Прив\'язати до тари', '']);
-  if (b.comp && p.addComp && b.status === 'в роботі') acts.push(['addComp', '+ Статори / ротори / двигуни', '']);   // v13; v44: + двигуни з резерву
   if (p.skip && !i['Призначення'] && skippable(b).length) acts.push(['skip', '⏭ Пропустити крок', '']);   // v27
   const hasLeft = (b.leftovers || []).length > 0;
   const isQC = S.me && S.me.role === QC_ROLE;
@@ -2002,10 +2006,7 @@ function renderBatch(extra) {
   if (mtSep && ((b.stages || []).length || hasLeft) && ['анульовано', 'закрито'].indexOf(b.status) < 0) acts.push(['separate', '✂ Відокремити', '']);
   else if (p.separateAll && ((b.stages || []).length || hasLeft) && b.status !== 'анульовано') acts.push(['separate', '✂ Відокремити', '']);
   else if (p.separate && hasLeft && b.status === 'в роботі') acts.push(['separate', '✂ Залишок', '']);   // v13: працівник — тільки залишок деталей
-  if (p.add && !i['Призначення'] && ['в роботі', 'готово', 'видано частково'].indexOf(b.status) >= 0) {
-    acts.push(['add', '+ Додати', '']);   // v17: протилежність вибуттю
-    if (isQC) acts.push(['addQC', '↩ Повернути з відбраковки', '']);   // v19; v58: у зав. відділу якості — і «+ Додати», як у тімліда
-  }
+  if (p.add && !i['Призначення'] && ['в роботі', 'готово', 'видано частково'].indexOf(b.status) >= 0) acts.push(['add', '+ Додати', '']);   // v100: одна кнопка — ЩО, потім ЗВІДКИ
   if (p.setColor && (stream === 'ST' || stream === 'RT') && b.status !== 'анульовано') acts.push(['color', '🎨 Колір', '']);   // v21
   if (p.batchToWh && (b.tares || []).length && ['закрито', 'анульовано'].indexOf(b.status) < 0) acts.push(['toWh', i['Склад'] ? '📦 На інший склад' : '📦 На склад', '']);   // v62
   if (p.batchFromWh && i['Склад'] && ['закрито', 'анульовано'].indexOf(b.status) < 0) acts.push(['fromWh', '↩ Повернути зі складу', '']);
@@ -2039,7 +2040,7 @@ function renderBatch(extra) {
     if (x.type === 'відокремлення') what = (x.batch === i['Номер'] ? 'відокремлено ' + x.qty + ' → ' + bl(x.target) : 'додано ' + x.qty + ' з ' + bl(x.batch)) + (x.product ? ' · ' + esc(x.product) : '') +
       (x.left && x.d1 ? ' · ' + esc(x.d1) : '');
     if (x.type === 'вибуття') what = (x.purpose === S.qc ? 'взято на відбраковку ' + x.qty + ' шт' : 'вибуло ' + x.qty + ' шт → <b>' + esc(x.purpose) + '</b>') + ' · ' + esc(x.product);
-    if (x.type === 'додавання') what = x.purpose === S.qc ? '↩ повернуто з відбраковки ' + x.qty + ' шт · ' + esc(x.product)   // v19
+    if (x.type === 'додавання') what = x.purpose === S.qc ? '↩ повернуто з відбраковки ' + x.qty + ' шт · ' + esc(x.product) + (x.origin ? ' · з ' + bl(x.origin) : '') + (x.rby ? ' · переробив ' + esc(x.rby) : '')   // v19; v100
       : '+ додано ' + x.qty + ' шт · ' + esc(x.product) + ' · звідки: <b>' + esc(x.purpose) + '</b>';   // v17
     if (x.type === 'партія на склад') what = '📦 на склад <b>' + esc(x.d2) + '</b>' + (x.d1 && x.d1 !== 'виробництво' ? ' (зі складу ' + esc(x.d1) + ')' : '') + ' · ' + x.qty + ' шт';   // v62
     if (x.type === 'партія зі складу') what = '↩ зі складу ' + esc(x.d2) + ' на виробництво';
@@ -2533,7 +2534,7 @@ function openAct(a) {
       $('sepTareTxt').textContent = left ? 'Тара або номер партії: інша партія двигунів (MT) у роботі, ящик залишків або готова партія ' + (o.left === 'S' ? 'статорів (S)' : 'роторів (R)') +
           ' — той самий типорозмір, KV і версія; готова партія стане «змішаною». Вільна тара — нова партія залишків (створює тімлід).'
         : o && o.done && ['ST', 'RT'].indexOf(S.batch.info['Потік']) >= 0   // v76: готові статори / ротори → у збирання (Code.gs v76)
-          ? 'Номер партії двигунів (M-…) або її тара → ' + (S.batch.info['Потік'] === 'ST' ? 'статори' : 'ротори') + ' підуть у збирання (як «+ Статори / ротори» з картки M): ' +
+          ? 'Номер партії двигунів (M-…) або її тара → ' + (S.batch.info['Потік'] === 'ST' ? 'статори' : 'ротори') + ' підуть у збирання (як «+ Додати» → статори / ротори з картки M): ' +
             'той самий типорозмір і KV, партія M — у роботі. Вільна тара → нова партія, зайнята тара або партія ' + (S.batch.info['Потік'] === 'ST' ? 'S' : 'R') + ' → стане «змішаною».'
           : 'Вільна тара → нова партія з новим номером. Зайнята тара або номер партії → деталі додадуться до неї (стане «змішаною»).';
       const tt = $('tgt'); if (tt) tt.innerHTML = opts(left ? ['КР', 'ТЧ', 'СК', 'партія M', 'партія ' + o.left] : ['КР', 'СК', 'ПД', 'ТЧ', 'партія M', 'партія S', 'партія R']);
@@ -2585,73 +2586,105 @@ function openAct(a) {
       opts(['партію фізично переклали без запису', 'тара пошкоджена', 'інше']) + '</select><label>Коментар</label><input type="text" id="mcm">' + foot);
     $('mgo').onclick = () => act({ action: 'free', tare: S.tare.code, reason: $('mr').value, comment: $('mcm').value }, $('mgo'));
   }
-  if (a === 'addComp') {   // v13: «+ Статори / ротори» — наша партія ST / RT, постачальник, в1 / в2 без номера
-    openModal(head('+ Статори / ротори / двигуни') +
-      '<label>Що</label><div class="seg"><label><input type="radio" name="cmp" value="S" checked><span>Статори</span></label>' +
-      '<label><input type="radio" name="cmp" value="R"><span>Ротори</span></label>' +
-      '<label><input type="radio" name="cmp" value="M"><span>Двигуни</span></label></div><div id="acBox"></div>' +   // v44: двигуни з резерву
-      '<p class="muted" id="acHint">Брак однієї деталі на F1 — доберіть сюди пару і зберіть ще двигун.</p>' + foot);
-    const sel = () => (document.querySelector('input[name=cmp]:checked') || {}).value || 'S';
-    const k = () => sel() === 'R' ? 'R' : 'S';
-    const draw = () => {
-      LOTF_reset();
-      if (sel() === 'M') {   // v44: скручені двигуни, що пройшли F3, з резерву
-        const i = S.batch.info;
-        $('acBox').innerHTML = '<p class="muted" style="margin:10px 0 0">Скручені двигуни, що вже пройшли <b>F3</b> і лежать у резерві. Стануть у партію після F3 — далі F5 і K2.</p>' +
-          '<p style="margin:8px 0 0">Тільки <b>' + esc(i['Типорозмір'] || '—') + (i['KV'] ? ' · ' + esc(i['KV']) + ' KV' : '') + '</b> — як у цій партії.</p>' +
-          '<label>Кількість, шт</label>' + numInput('acM', '') +
-          '<label>Коментар <span class="muted">(необов\'язково)</span></label><input type="text" id="acMc" placeholder="напр. з якої коробки резерву">';
-        $('acHint').style.display = 'none';
-        return;
-      }
-      $('acHint').style.display = '';
-      $('acBox').innerHTML = compBlock(k(), 'ac', false); wireComp(k(), 'ac', () => ({ batch: no }), '');
-    };
-    document.querySelectorAll('input[name=cmp]').forEach(r => r.onchange = draw); draw();
-    $('mgo').onclick = () => {
-      if (sel() === 'M') {
-        if (!(Number($('acM').value) > 0)) { $('merr').textContent = 'Вкажіть кількість двигунів'; return; }
-        return act({ action: 'addComp', batch: no, comp: 'двигун', qty: $('acM').value, comment: $('acMc').value }, $('mgo'));
-      }
-      if (!compSrc('ac')) { $('merr').textContent = 'Оберіть, звідки деталі'; return; }
-      $('mgo').disabled = true;
-      lotWait().then(() => {   // v17: фото етикетки в1 — дочекатися посилання
-        $('mgo').disabled = false;
-        const c = compVal(k(), 'ac');
-        act({ action: 'addComp', batch: no, comp: k() === 'R' ? 'ротор' : 'статор', src: c.src, ref: c.ref, lot: c.lot, photo: c.photo, qty: c.qty }, $('mgo'));
-      });
-    };
-  }
-  if (a === 'add' || a === 'addQC') {   // v17: «+ Додати» — деталі ззовні циклу (з відділу якості, R&D …) на обраний етап; коментар обов'язковий
-    const R = S.batch.route; const i1 = S.batch.comp ? R.findIndex(x => x.code === 'F1') : -1;
-    const stages = (S.batch.comp ? [] : [['', 'до першого кроку · ' + ({ ST: 'ядро статора', RT: 'ротортоп і вал' }[S.batch.info['Потік']] || '')]])
-      .concat(R.filter((x, k) => k >= i1).map(x => [x.code, 'після ' + x.code + ' · ' + (x.product || x.name)]));
-    if (a === 'addQC') {   // v19: повернення з відбраковки — етап як востаннє брали з цієї партії (v58: окрема кнопка зав. відділу якості)
-      const live = S.batch.history.filter(x => !x.cancelled && x.purpose === S.qc);
-      const took = live.filter(x => x.type === 'вибуття').reduce((t, x) => t + (Number(x.qty) || 0), 0);
-      const back = live.filter(x => x.type === 'додавання').reduce((t, x) => t + (Number(x.qty) || 0), 0);
-      const last = live.find(x => x.type === 'вибуття' && !x.left);
-      const def = last && stages.some(x => x[0] === String(last.step || '')) ? String(last.step || '') : '';
-      openModal(head('↩ Повернути з відбраковки') +
-        (took || back ? '<p class="muted">З цієї партії взято на відбраковку ' + took + ' шт, повернуто ' + back + ' шт.</p>' : '') +
-        '<label>Що повертаєте (на якому етапі)</label><select id="adSt">' + stages.map(x => '<option value="' + esc(x[0]) + '"' + (x[0] === def ? ' selected' : '') + '>' + esc(x[1]) + '</option>').join('') + '</select>' +
-        '<label>Кількість, шт</label>' + numInput('mq', '') +
-        '<label>Коментар (необов\'язково)</label><input type="text" id="mcm">' + foot);
-      $('mgo').onclick = () => act({ action: 'add', batch: no, stage: $('adSt').value, qty: $('mq').value, comment: $('mcm').value }, $('mgo'));
-      return;
-    }
-    openModal(head('+ Додати') +
-      '<p class="muted">Деталі, що повертаються ззовні — з відділу якості, R&D, знайдені. Із іншої партії — «✂ Відокремити» на її картці' + (S.batch.comp ? '; статори й ротори — «+ Статори / ротори»' : '') + '.</p>' +
-      '<label>Що додаєте (на якому етапі)</label><select id="adSt">' + stages.map(x => '<option value="' + esc(x[0]) + '">' + esc(x[1]) + '</option>').join('') + '</select>' +
-      '<label>Звідки</label><select id="adFrom">' + opts(S.dict.purposes, '', '— оберіть —') + '</select>' +
-      '<label>Кількість, шт</label>' + numInput('mq', '') +
-      '<label>Коментар (обов\'язково)</label><input type="text" id="mcm" placeholder="що це і чому повертається">' + foot);
-    $('mgo').onclick = () => act({ action: 'add', batch: no, stage: $('adSt').value, purpose: $('adFrom').value, qty: $('mq').value, comment: $('mcm').value }, $('mgo'));
-  }
+  if (a === 'add') { addForm(no); return; }   // v100: одна форма «+ Додати» (ЩО → ЗВІДКИ)
   if (a === 'annul') {
     openModal(head('Анулювати партію') + '<p class="muted">Тільки якщо партію створено помилково і кроків ще немає.</p><label>Причина</label><input type="text" id="mcm">' + foot);
     $('mgo').onclick = () => act({ action: 'annul', batch: no, comment: $('mcm').value }, $('mgo'));
   }
+}
+/** v100 (рішення 09.11): одна форма «+ Додати» — спочатку ЩО, потім ЗВІДКИ.
+ *  M: статори / ротори (наша партія в2 · постачальник або наша тара в1 · відділ якості · інше) → addComp;
+ *     двигуни (резерв після F3 → addComp «двигун»; відділ якості · інше → add з етапом після F1; інша партія — попередження).
+ *  S / R: відділ якості · інше → add з етапом; інша партія — попередження. Відділ якості: партія походження і хто переробив — необов'язково. */
+function addForm(no) {
+  const b = S.batch, mt = !!b.comp, i = b.info, isQC = S.me && S.me.role === QC_ROLE;
+  const head = '<div class="card"><div class="mid">+ Додати</div><div class="muted">' + esc(no) + ' · є ' + b.remaining + ' шт</div>';
+  const foot = '<div class="err" id="merr"></div><div class="grid" style="margin-top:6px"><button class="btn btn2" onclick="closeModal()">Скасувати</button><button class="btn" id="mgo">Підтвердити</button></div></div>';
+  const seg = (name, list, sel) => '<div class="seg wrap">' + list.map(o => '<label><input type="radio" name="' + name + '" value="' + o[0] + '"' + (o[0] === sel ? ' checked' : '') + '><span style="font-size:15px">' + o[1] + '</span></label>').join('') + '</div>';
+  const val = n => (document.querySelector('input[name=' + n + ']:checked') || {}).value || '';
+  const own = { ST: 'Статори', RT: 'Ротори' }[i['Потік']] || 'Деталі';
+  openModal(head + (mt ? '<label>Що додаєте</label>' + seg('adWhat', [['S', 'Статори'], ['R', 'Ротори'], ['M', 'Двигуни']], 'S')
+    : '<p style="margin:10px 0 0">Що: <b>' + esc(own.toLowerCase()) + '</b> — у цю партію</p>') +
+    '<label>Звідки</label><div id="adSrcBox"></div><div id="acx"></div>' + foot);
+  const R = b.route, i1 = mt ? R.findIndex(x => x.code === 'F1') : -1;
+  const stages = (mt ? [] : [['', 'до першого кроку · ' + ({ ST: 'ядро статора', RT: 'ротортоп і вал' }[i['Потік']] || '')]])
+    .concat(R.filter((x, k) => k >= i1).map(x => [x.code, 'після ' + x.code + ' · ' + (x.product || x.name)]));
+  const live = b.history.filter(x => !x.cancelled && x.purpose === S.qc);
+  const lastTook = live.find(x => x.type === 'вибуття' && !x.left);
+  const defSt = lastTook && stages.some(x => x[0] === String(lastTook.step || '')) ? String(lastTook.step || '') : '';
+  const what = () => mt ? val('adWhat') : 'own';
+  const srcList = () => what() === 'S' || what() === 'R' ? [['v2', 'в2 · наша партія'], ['v1', 'в1 · постачальник / наша тара'], ['qc', '↩ Відділ якості'], ['other', 'Інше']]
+    : what() === 'M' ? [['qc', '↩ Відділ якості'], ['res', 'Резерв (скручені, після ' + esc(S.reserveStep || 'F3') + ')'], ['batch', 'Інша партія двигунів'], ['other', 'Інше']]
+    : [['qc', '↩ Відділ якості'], ['batch', 'Інша партія'], ['other', 'Інше']];
+  const typ = String(i['Типорозмір'] || '');
+  const orgList = () => (b.origins || []).filter(o => !typ || !o.typ || o.typ === typ).filter(o => what() === 'M' ? /^M/i.test(o.no) : what() === 'S' ? /^[SM]/i.test(o.no) : what() === 'R' ? /^[RM]/i.test(o.no) : o.no.charAt(0) === no.charAt(0));
+  const stSel = (def) => '<label>Що повертаєте (на якому етапі)</label><select id="adSt">' + stages.map(x => '<option value="' + esc(x[0]) + '"' + (x[0] === def ? ' selected' : '') + '>' + esc(x[1]) + '</option>').join('') + '</select>';
+  const draw = () => {
+    const w = what(), list = srcList(), cur = val('acsrc');
+    const sel = list.some(x => x[0] === cur) ? cur : isQC ? 'qc' : (w === 'S' || w === 'R') ? 'v2' : '';
+    $('adSrcBox').innerHTML = seg('acsrc', list, sel);
+    document.querySelectorAll('input[name=acsrc]').forEach(r => r.onchange = drawSrc);
+    drawSrc();
+  };
+  const drawSrc = () => {
+    LOTF_reset();
+    const w = what(), src = val('acsrc'), comp = w === 'S' || w === 'R', box = $('acx');
+    $('mgo').style.display = '';
+    if (!src) { box.innerHTML = ''; return; }
+    if (comp && (src === 'v1' || src === 'v2')) {   // як було в «+ Додати» → статори / ротори
+      CMP.ac = { k: w, ctx: () => ({ batch: no }), defQty: '' };
+      compRedraw(w, 'ac');
+      box.insertAdjacentHTML('beforeend', '<p class="muted" style="margin:6px 0 0">Брак однієї деталі на F1 — доберіть сюди пару і зберіть ще двигун.</p>');
+      return;
+    }
+    if (src === 'batch') {
+      box.innerHTML = '<div class="hint" style="margin-top:10px;padding:10px 12px;border-radius:10px;background:#FFF4E5;color:#7A4B00">З іншої партії так не додають. Відкрийте картку <b>тієї</b> партії, звідки берете ' +
+        (w === 'M' ? 'двигуни' : 'деталі') + ', — «✂ Відокремити» → у цю партію (' + esc(no) + ' або її тару). Так обидві партії залишаться правильними.</div>';
+      $('mgo').style.display = 'none';
+      return;
+    }
+    if (src === 'res') {
+      box.innerHTML = '<p class="muted" style="margin:10px 0 0">Скручені двигуни, що вже пройшли <b>' + esc(S.reserveStep || 'F3') + '</b> і лежать у резерві. Стануть у партію після ' + esc(S.reserveStep || 'F3') + '.</p>' +
+        '<p style="margin:8px 0 0">Тільки <b>' + esc(typ || '—') + (i['KV'] ? ' · ' + esc(i['KV']) + ' KV' : '') + '</b> — як у цій партії.</p>' +
+        '<label>Кількість, шт</label>' + numInput('acq', '') + '<label>Коментар <span class="muted">(необов\'язково)</span></label><input type="text" id="acc" placeholder="напр. з якої коробки резерву">';
+      return;
+    }
+    const qc = src === 'qc', o = orgList();
+    const took = live.filter(x => x.type === 'вибуття').reduce((t, x) => t + (Number(x.qty) || 0), 0), back = live.filter(x => x.type === 'додавання').reduce((t, x) => t + (Number(x.qty) || 0), 0);
+    box.innerHTML = (qc && (took || back) ? '<p class="muted" style="margin:10px 0 0">З цієї партії взято на відбраковку ' + took + ' шт, повернуто ' + back + ' шт.</p>' : '') +
+      (comp ? '' : stSel(qc ? defSt : '')) +
+      (qc ? '' : '<label>Звідки саме</label><select id="adFrom">' + opts((S.dict.purposes || []).filter(x => x !== S.qc), '', '— оберіть —') + '</select>') +
+      '<label>Кількість, шт</label>' + numInput('acq', '') +
+      (qc ? '<label>Партія походження <span class="muted">(необов\'язково — номер з наліпки на деталі)</span></label><input type="text" id="acOrg" list="acOrgL" autocomplete="off" placeholder="напр. ' + esc((o[0] || {}).no || 'S-00123') + '">' +
+        '<datalist id="acOrgL">' + o.map(x => '<option value="' + esc(x.no) + '">' + esc(x.no + (x.kv ? ' · KV ' + x.kv : '')) + '</option>').join('') + '</datalist>' +
+        '<label>Хто переробив <span class="muted">(необов\'язково)</span></label><select id="acBy"><option value="">— не вказано —</option>' +
+        (S.people || []).map(p => '<option value="' + esc(p.id) + '">' + esc(p.name) + '</option>').join('') + '</select>' +
+        (comp ? '<p class="muted" style="margin:6px 0 0">Версія — як у партії походження S- / R-; не вказано — в1. Гравіювання (F4п) для них не додається.</p>' : '') : '') +
+      '<label>Коментар ' + (qc ? '<span class="muted">(необов\'язково)</span>' : '(обов\'язково)') + '</label><input type="text" id="acc"' + (qc ? '' : ' placeholder="що це і звідки"') + '>';
+  };
+  if (mt) document.querySelectorAll('input[name=adWhat]').forEach(r => r.onchange = draw);
+  draw();
+  $('mgo').onclick = () => {
+    const w = what(), src = val('acsrc'), comp = w === 'S' || w === 'R';
+    if (!src) { $('merr').textContent = 'Оберіть, звідки'; return; }
+    if (comp && (src === 'v1' || src === 'v2')) {
+      $('mgo').disabled = true;
+      return lotWait().then(() => {
+        $('mgo').disabled = false;
+        const c = compVal(w, 'ac');
+        act({ action: 'addComp', batch: no, comp: w === 'R' ? 'ротор' : 'статор', src: c.src, ref: c.ref, lot: c.lot, photo: c.photo, qty: c.qty }, $('mgo'));
+      });
+    }
+    const q = $('acq') ? $('acq').value : '';
+    if (!(Number(q) > 0)) { $('merr').textContent = 'Вкажіть кількість'; return; }
+    if (src === 'res') return act({ action: 'addComp', batch: no, comp: 'двигун', qty: q, comment: $('acc').value }, $('mgo'));
+    const qc = src === 'qc', purpose = qc ? S.qc : ($('adFrom') ? $('adFrom').value : '');
+    if (!qc && !purpose) { $('merr').textContent = 'Оберіть, звідки саме'; return; }
+    if (!qc && !$('acc').value.trim()) { $('merr').textContent = 'Коментар обов\'язковий: що це і звідки'; return; }
+    const extra = qc ? { origin: $('acOrg').value.trim(), by: $('acBy').value } : {};
+    if (comp) return act(Object.assign({ action: 'addComp', batch: no, comp: w === 'R' ? 'ротор' : 'статор', src: qc ? 'qc' : 'other', purpose: purpose, qty: q, comment: $('acc').value }, extra), $('mgo'));
+    act(Object.assign({ action: 'add', batch: no, stage: $('adSt').value, purpose: purpose, qty: q, comment: $('acc').value }, extra), $('mgo'));
+  };
 }
 /** v13: «✉ Етикетки ще раз» для запису K2 — з потрібної позиції на аркуші наліпок (v30: 1–6, A4 2 × 3) */
 function openLabels(id) {
@@ -2688,7 +2721,7 @@ function boxesTxt(v) { const p = String(v || '').split(' | ');
   return p[0].split(/\s*;\s*/).filter(Boolean).map(x => { const m = x.match(/^(.+)#(\d+)(?::(\d+))?$/); return m ? m[1] + ' №' + m[2] + (m[3] ? ' — ' + m[3] : '') : x; }).join(', ') +
     (p[1] ? ' · змішаний: ' + p[1] : ''); }
 function partsWhat(x, n) { n = n === undefined ? x.qty : n; return n + (partsKey(x) === 'S' ? ' статор' : ' ротор') + plural(n, '', 'и', 'ів'); }
-function partsVer(x) { return x.type === 'власні' ? 'в2 без номера' : x.comment ? 'в1 · партія постачальника ' + x.comment : 'в1 без номера'; }
+function partsVer(x) { return / · /.test(String(x.d2 || '')) ? x.d2 + (x.origin ? ' · з ' + x.origin : '') + (x.rby ? ' · переробив ' + x.rby : '') : x.type === 'власні' ? 'в2 без номера' : x.comment ? 'в1 · партія постачальника ' + x.comment : 'в1 без номера'; }   // v100: повернення з ВЯ / «інше»
 /** v14 (T-46): ✎ тімліда — нова кількість (більше або менше) або «Скасувати запис», з причиною */
 function openCorrectParts(id) {
   const x = S.batch.history.find(h => h.id === id);
@@ -4796,7 +4829,7 @@ function r11() {
       '<tr><td colspan="4"><b>Разом</b></td><td class="r"><b>' + fn(list.reduce((a, b) => a + Math.max(0, b.rem), 0)) + '</b></td><td class="r">' + red(list.reduce((a, b) => a + pt(b).S, 0)) +
       '</td><td class="r">' + red(list.reduce((a, b) => a + pt(b).R, 0)) + '</td><td class="r">' + fn(list.reduce((a, b) => a + pt(b).P, 0)) + '</td><td colspan="2"></td></tr></table></div>'
       : '<p class="muted">' + (D.only === 'unp' ? 'Непарних деталей немає.' : 'Немає партій двигунів за цими фільтрами.') + '</p>') +
-    '<p class="muted" style="margin-top:10px">Що робити з непарною деталлю: на картці партії «+ Статори / ротори» — доберіть пару і зберіть двигун знову на F1; ' +
+    '<p class="muted" style="margin-top:10px">Що робити з непарною деталлю: на картці партії «+ Додати» → статори / ротори — доберіть пару і зберіть двигун знову на F1; ' +
     'якщо пари немає — «✂ Відокремити» залишок. Якщо двигун пішов у брак цілим (не розбирали), виправте запис кроку ✎: «з них брак лише статора / ротора» = 0.</p>');
   // v68: Р-11_04 розшифровка кроків маршруту двигунів (F1, F2 … K2)
   const mr = (d.routes || {}).MT || [];
