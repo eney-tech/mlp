@@ -1,5 +1,9 @@
 <!DOCTYPE html>
-<!-- МЛП · index.html v102 · 09.11.2026 — історія і зв'язки партії, форма «+ Додати»: «взято на відбраковку» → «→ відділ якості N шт»,
+<!-- МЛП · index.html v103 · 11.11.2026 — Р-9_08 звірка МЛП ↔ форма Антона (рішення 11.11): режим «За типом» (за замовчуванням) — світло-червона клітинка:
+     є МЛП, немає форми; світло-оранжева: немає МЛП, є форма; оранжева рамка: є обидва, кількість відрізняється; розбіжність — будь-яка різниця (було > 2 %, і в Р-9_07).
+     Р-9_07 для обраної клітинки «працівник × день» — коментар і позначка «Перевірено, все ок» (запит reconAck, Code.gs v91, Reports.gs v41, аркуш «Звірка_Перевірки»);
+     ✔ — зелена клітинка, навіть якщо цифри різні; дані змінилися після позначки — зелений пунктир, перевірити знову. KPI і «тільки з неперевіреними розбіжностями».
+     v102 · 09.11.2026 — історія і зв'язки партії, форма «+ Додати»: «взято на відбраковку» → «→ відділ якості N шт»,
      «повернуто з відбраковки» → «↩ з відділу якості N шт» (рішення 09.11).
      v101 · 09.11.2026 — «✂ Відокремити», «Куди» (рішення 09.11): «За маршрутом — тара або партія» → «В іншу партію / тару»,
      «Взяли на відбраковку» → «Відділ якості».
@@ -309,7 +313,13 @@
   table.zdt td.c:hover{outline:2px solid #2F4858;outline-offset:-2px}table.zdt td.on{outline:2px solid #2F4858;outline-offset:-2px}
   td.zclk{cursor:pointer}td.zclk:hover{outline:2px solid #2F4858;outline-offset:-2px}td.zclk[data-on]{outline:2px solid #B3261E;outline-offset:-2px}
   .zjump{position:fixed;right:16px;bottom:16px;z-index:40;border:0;border-radius:20px;padding:9px 14px;background:#B3261E;color:#fff;font-weight:700;box-shadow:0 2px 8px rgba(0,0,0,.25);cursor:pointer}table.zdt th.c{cursor:pointer}
-  table.zdt td.nf{box-shadow:inset 0 0 0 1px #E5A100}table.zdt tr.tot td{border-top:2px solid #C5D0D7;font-weight:600}
+  table.zdt td.nf{box-shadow:inset 0 0 0 1px #E5A100}
+  table.zdt td.tM,.zlg.tM{background:#F8D7D4}table.zdt td.tF,.zlg.tF{background:#FFE2BF}table.zdt td.tG{background:rgba(23,100,61,.10)}
+  table.zdt td.tQ,.zlg.tQ{box-shadow:inset 0 0 0 3px #E8710A}table.zdt td.tQ{font-weight:700}
+  table.zdt td.tok,.zlg.tok{background:#9FD8B5;color:#17643D;font-weight:700}table.zdt td.tS:not(.on),.zlg.tS{outline:2px dashed #1F7A4D;outline-offset:-5px}
+  table.zdt td sup{font-size:9px;margin-left:1px}.zlg{display:inline-block;width:14px;height:12px;border-radius:2px;vertical-align:-1px;margin-right:4px;border:1px solid #C5D0D7}
+  .zack{border:1px solid #C5D0D7;border-radius:10px;padding:10px 12px;margin:10px 0}.zack.ok{border-color:#1F7A4D;background:#EEF8F2}.zack.st{border-color:#E8710A;background:#FFF5EA}
+  .zack textarea{width:100%;min-height:54px;box-sizing:border-box;border:1px solid #C5D0D7;border-radius:8px;padding:6px 8px;font:inherit;margin:6px 0}table.zdt tr.tot td{border-top:2px solid #C5D0D7;font-weight:600}
   .zseg{display:flex;height:100%}.zseg i{display:block;height:100%}
   .zpanel{display:flex;gap:8px;align-items:baseline;margin:14px 0 0;font-size:15px}.zpanel:first-child{margin-top:4px}
   .zleg2{display:grid;grid-template-columns:max-content 1fr;gap:4px 12px;font-size:14px}.zleg2 b{font-variant-numeric:tabular-nums}
@@ -660,7 +670,7 @@ function post(api, q) {
  *  (плашка, якщо довше за 0,7 с), '' — без плашки (перевірка партії у формі, фото, списки у формі) */
 function netKind(api, q) {
   q = q || {};
-  if (api === 'act' || api === 'skladSave' || api === 'skladCancel' || api === 'skladEdit' || api === 'skladBox') return 'w';
+  if (api === 'act' || api === 'skladSave' || api === 'skladCancel' || api === 'skladEdit' || api === 'skladBox' || api === 'reconAck') return 'w';
   if (api === 'approve') return q.confirm ? 'w' : 'r';
   if (api === 'retro') return /^(save|confirm|reopen)$/.test(q.op || '') ? 'w' : (q.op === 'photo' ? '' : 'r');
   if (api === 'page' || api === 'cabinet' || api === 'dash' || api === 'hist' || api === 'skladPage') return 'r';
@@ -3961,7 +3971,7 @@ const ZCDIMS = {
   by: { l: 'Хто виправив / вніс', f: e => e.by, lab: v => zWN(v) },
   worker: { l: 'Працівник', f: e => e.w, lab: v => zWN(v) }
 };
-ZST.control = { F: zMkF('month', 'w'), sel: [], more: false, rw: '', rday: '', rv: 'abs', only2: false, open: {}, raw: {}, rawDB: null, D: ZCDIMS,
+ZST.control = { F: zMkF('month', 'w'), sel: [], more: false, rw: '', rday: '', rv: 'type', unk: false, only2: false, open: {}, raw: {}, rawDB: null, D: ZCDIMS,
   sortV: (k, vals) => vals.sort((a, b) => k === 't' ? ZEVT.indexOf(a) - ZEVT.indexOf(b) : String(ZCDIMS[k].lab(a)).localeCompare(String(ZCDIMS[k].lab(b)), 'uk')) };
 try { const v = JSON.parse(store('mlp_per_control') || 'null'); if (v && v.per) Object.assign(ZST.control.F, { per: v.per, from: v.from || '', to: v.to || '', gran: v.gran || 'w' }); } catch (e) { }
 function r9() {
@@ -4016,7 +4026,15 @@ function z9agg(S) {
     o.a += Number(x[4]) || 0; if (x[5] !== null && x[5] !== undefined) o.b = (o.b || 0) + Number(x[5]); });
   return Object.keys(R).map(k => R[k]);
 }
-/** Р-9_08: працівники × дні від початку пілоту; клітинка — розбіжність (Σ |МЛП − форма| за видами робіт); натиснути — деталі в Р-9_07 */
+/** v103: знімок клітинки для позначки «Перевірено»: види робіт з сумами МЛП / форма — позначка діє, поки знімок той самий */
+function z9sig(parts) { return parts.slice().sort().join(';'); }
+/** v103: тип розбіжності клітинки за видами робіт: oM — є МЛП, немає форми; oF — немає МЛП, є форма; qd — є обидва, кількість відрізняється */
+function z9kind(c) { return { oM: c.oM > 0, oF: c.oF > 0, qd: c.qd > 0, any: c.oM + c.oF + c.qd > 0 }; }
+/** v103: остання позначка клітинки і чи вона ще дійсна (дані не змінилися після позначки) */
+function z9ack(w, d, sig) { const a = (DB.acks || {})[w + '¦' + d]; if (!a) return null; return Object.assign({ fresh: a.sig === sig }, a); }
+/** Р-9_08: працівники × дні від початку пілоту; клітинка — розбіжність (Σ |МЛП − форма| за видами робіт); натиснути — деталі в Р-9_07.
+ *  v103 (рішення 11.11): режим «За типом» — світло-червона: є МЛП, немає форми; світло-оранжева: немає МЛП, є форма; оранжева рамка: є обидва, кількість відрізняється
+ *  (будь-яка різниця). Зелена ✔ — тімлід / Антон / Василь / адміністратор перевірили клітинку («Перевірено, все ок» у деталях); дані змінилися після позначки — зелений пунктир. */
 function z9days(S) {
   if (DB.formErr) return '<p class="err">' + esc(DB.formErr) + '</p>';
   if (!DB.form) return '<p class="muted">Звірку вимкнено (немає FORM_SS_ID у «Налаштування»).</p>';
@@ -4024,26 +4042,48 @@ function z9days(S) {
   if (!rows.length) return '<p class="muted">У формі Антона й у МЛП немає записів, які можна зіставити.</p>';
   const days = []; const has = new Set(rows.map(r => r.d));
   for (let x = DB.recFrom; x && x <= (DB.recTo || DB.today); x = zAdd(x, 1)) if (zDow(x) < 5 || has.has(x)) days.push(x);
-  const C = {}, W = {};
-  rows.forEach(r => { const k = r.w + '¦' + r.d, c = C[k] = C[k] || { a: 0, b: 0, nb: 0, n: 0, abs: 0 }; c.a += r.a; c.b += r.b || 0; c.n++; if (r.b === null) c.nb++; c.abs += Math.abs(r.a - (r.b || 0));
-    const w = W[r.w] = W[r.w] || { abs: 0, a: 0, b: 0 }; w.abs += Math.abs(r.a - (r.b || 0)); w.a += r.a; w.b += r.b || 0; });
+  const C = {}, W = {}, typ = S.rv === 'type';
+  rows.forEach(r => { const k = r.w + '¦' + r.d, c = C[k] = C[k] || { a: 0, b: 0, nb: 0, n: 0, abs: 0, oM: 0, oF: 0, qd: 0, sp: [] }; c.a += r.a; c.b += r.b || 0; c.n++; if (r.b === null) c.nb++; c.abs += Math.abs(r.a - (r.b || 0));
+    if (r.a && r.b === null) c.oM++; else if (!r.a && r.b) c.oF++; else if (r.a && r.b !== null && r.a !== r.b) c.qd++;
+    c.sp.push(r.g + '=' + r.a + '/' + (r.b === null ? '-' : r.b));
+    const w = W[r.w] = W[r.w] || { abs: 0, a: 0, b: 0, open: 0 }; w.abs += Math.abs(r.a - (r.b || 0)); w.a += r.a; w.b += r.b || 0; });
+  const N = { oM: 0, oF: 0, qd: 0, ok: 0, stale: 0, open: 0 };
+  Object.keys(C).forEach(k => { const c = C[k], i = k.indexOf('¦'), t = z9kind(c); c.sig = z9sig(c.sp); c.ack = z9ack(k.slice(0, i), k.slice(i + 1), c.sig);
+    if (!t.any) return; if (t.oM) N.oM++; if (t.oF) N.oF++; if (t.qd) N.qd++;
+    if (c.ack && c.ack.ok && c.ack.fresh) N.ok++; else { N.open++; W[k.slice(0, i)].open++; if (c.ack && c.ack.ok) N.stale++; } });
   const pc = c => c.abs / Math.max(1, c.a, c.b) * 100, val = c => S.rv === 'pct' ? pc(c) : c.abs, fmtV = v => S.rv === 'pct' ? zF1p(v) + ' %' : fn(v);
-  const ws = Object.keys(W).sort((x, y) => W[y].abs - W[x].abs || zWN(x).localeCompare(zWN(y), 'uk'));
+  const ws = Object.keys(W).filter(w => !S.unk || W[w].open).sort((x, y) => W[y].abs - W[x].abs || zWN(x).localeCompare(zWN(y), 'uk'));
   let mx = 1; Object.keys(C).forEach(k => { mx = Math.max(mx, val(C[k])); });
   const pick = (w, d) => zAct(() => { S.rw = w; S.rday = d; zOpen('r9form'); renderDash(); });
-  let t = '<div class="zfs' + zFsOn('r9day') + '" id="zfs_r9day"><div class="zctl"><span>Показати:</span>' + zChips(S.rv, [['abs', 'Розбіжність, шт'], ['pct', 'Розбіжність, %']], v => { S.rv = v; renderDash(); }) + zFsBtn('r9day') + '</div>' +
+  let t = '<div class="zfs' + zFsOn('r9day') + '" id="zfs_r9day"><div class="zctl"><span>Показати:</span>' + zChips(S.rv, [['type', 'За типом'], ['abs', 'Розбіжність, шт'], ['pct', 'Розбіжність, %']], v => { S.rv = v; renderDash(); }) +
+    '<label class="zck"><input type="checkbox"' + (S.unk ? ' checked' : '') + ' onchange="zA(' + zAct(v => { S.unk = v; renderDash(); }) + ',this.checked)"> тільки з неперевіреними розбіжностями</label>' + zFsBtn('r9day') + '</div>' +
+    '<div class="zkpis" style="margin:8px 0">' + zKpi('Не перевірено', fn(N.open), '', N.stale ? 'з них ' + fn(N.stale) + ' — дані змінилися після позначки' : 'клітинок з розбіжністю', '', N.open ? 'kbad' : 'kgood') +
+    zKpi('Перевірено, все ок', fn(N.ok), '', '', '', 'kgood') + zKpi('Кількість відрізняється', fn(N.qd), '', 'є і МЛП, і форма') +
+    zKpi('Є МЛП, немає форми', fn(N.oM), '') + zKpi('Немає МЛП, є форма', fn(N.oF), '') + '</div>' +
     '<div class="tw zmaxh"><table class="t zdt"><tr><th style="text-align:left">Працівник</th>' +
     days.map(d => '<th class="c" onclick="zA(' + pick('', d) + ')" title="Усі працівники за цей день">' + ZDOWN[zDow(d)] + '<br>' + zDm(d) + '</th>').join('') + '<th>Разом</th></tr>';
   ws.forEach(w => {
     t += '<tr><td style="white-space:nowrap"><a class="lnk" href="javascript:void 0" onclick="zA(' + pick(w, '') + ')">' + esc(zWN(w)) + '</a>' + (w.indexOf('e:') === 0 ? ' <span class="pill warn" style="margin:0">немає в МЛП</span>' : zEye(w)) + '</td>' +
-      days.map(d => { const c = C[w + '¦' + d]; if (!c) return '<td class="c muted" onclick="zA(' + pick(w, d) + ')">·</td>';
-        const v = val(c), tip = 'МЛП ' + fn(c.a) + ' · форма ' + (c.nb === c.n ? 'немає' : fn(c.b)) + ' · різниця ' + (c.a - c.b > 0 ? '+' : '') + fn(c.a - c.b);
-        return '<td class="c' + (S.rw === w && S.rday === d ? ' on' : '') + (c.nb === c.n ? ' nf' : '') + '" data-ztip="1" data-tip="' + esc(tip) + '"' + (v ? ' style="background:rgba(179,38,30,' + (0.06 + v / mx * 0.5).toFixed(3) + ')"' : ' style="background:rgba(23,100,61,.10)"') +
-          ' onclick="zA(' + pick(w, d) + ')">' + (v ? fmtV(v) : '✓') + '</td>'; }).join('') +
+      days.map(d => { const c = C[w + '¦' + d], sel = S.rw === w && S.rday === d ? ' on' : ''; if (!c) return '<td class="c muted' + sel + '" onclick="zA(' + pick(w, d) + ')">·</td>';
+        const v = val(c), k = z9kind(c), a = c.ack, okA = a && a.ok && a.fresh, staleA = a && a.ok && !a.fresh;
+        const tip = 'МЛП ' + fn(c.a) + ' · форма ' + (c.nb === c.n ? 'немає' : fn(c.b)) + ' · різниця ' + (c.a - c.b > 0 ? '+' : '') + fn(c.a - c.b) +
+          (k.qd ? ' · кількість відрізняється' : '') + (k.oM ? ' · є МЛП, немає форми' : '') + (k.oF ? ' · немає МЛП, є форма' : '') +
+          (a ? ' · ' + (a.ok ? (a.fresh ? '✔ перевірено' : '✔ перевірено, але дані змінилися') : '💬') + ' — ' + a.by + ', ' + a.at + (a.c ? ': ' + a.c : '') : '');
+        let cls = 'c' + sel, st = '';
+        if (okA) { cls += ' tok'; }
+        else if (typ) { if (k.oM) cls += ' tM'; else if (k.oF) cls += ' tF'; else if (!k.any) cls += ' tG'; if (k.qd) cls += ' tQ'; }
+        else { if (c.nb === c.n) cls += ' nf'; st = v ? ' style="background:rgba(179,38,30,' + (0.06 + v / mx * 0.5).toFixed(3) + ')"' : ' style="background:rgba(23,100,61,.10)"'; }
+        if (staleA) cls += ' tS';
+        const txt = okA ? '✔' : (k.any || v ? fmtV(typ ? c.abs : v) : '✓') + (a && !a.ok && a.c ? '<sup>💬</sup>' : '') + (staleA ? '<sup>✔?</sup>' : '');
+        return '<td class="' + cls + '" data-ztip="1" data-tip="' + esc(tip) + '"' + st + ' onclick="zA(' + pick(w, d) + ')">' + txt + '</td>'; }).join('') +
       '<td class="r"><b>' + fmtV(S.rv === 'pct' ? W[w].abs / Math.max(1, W[w].a, W[w].b) * 100 : W[w].abs) + '</b></td></tr>';
   });
-  t += '</table></div><p class="muted" style="margin:6px 0 0">З початку пілоту (' + zDmy(DB.recFrom) + '), період звіту тут не діє. Клітинка — розбіжність за день: сума |МЛП − форма| за всіма видами робіт' +
-    (S.rv === 'pct' ? ' ÷ більше з двох' : '') + '; ✓ — збігається; жовта рамка — у формі Антона цього дня нічого. Натисніть клітинку — деталі нижче (за видами робіт), ім\'я — усі дні людини, дату — усі люди за день.</p></div>';
+  if (!ws.length) t += '<tr><td colspan="' + (days.length + 2) + '" class="muted">Усі розбіжності перевірено.</td></tr>';
+  t += '</table></div>' + (typ ? '<div class="zcleg" style="margin-top:6px"><span><i class="zlg tQ"></i>є і МЛП, і форма — кількість відрізняється</span><span><i class="zlg tM"></i>є МЛП, немає форми</span>' +
+    '<span><i class="zlg tF"></i>немає МЛП, є форма</span><span><i class="zlg tok"></i>✔ перевірено, все ок</span><span><i class="zlg tS"></i>перевірено, але дані змінилися — перевірити знову</span></div>' : '') +
+    '<p class="muted" style="margin:6px 0 0">З початку пілоту (' + zDmy(DB.recFrom) + '), період звіту тут не діє. Клітинка — розбіжність за день: сума |МЛП − форма| за всіма видами робіт' +
+    (S.rv === 'pct' ? ' ÷ більше з двох' : ', шт') + '; розбіжність — будь-яка різниця; ✓ — збігається' + (typ ? '' : '; жовта рамка — у формі Антона цього дня нічого') +
+    '. Натисніть клітинку — деталі нижче (за видами робіт): там коментар і позначка «Перевірено, все ок». Ім\'я — усі дні людини, дату — усі люди за день.</p></div>';
   return t;
 }
 /** Р-9_07: деталі звірки — обраний у Р-9_08 день і / або працівник (інакше — увесь пілот), за видами робіт; «Форма» — форма Антона, «МЛП» — записи в МЛП */
@@ -4054,14 +4094,15 @@ function z9form(S) {
   z9agg(S).filter(r => (!S.rw || r.w === S.rw) && (!S.rday || r.d === S.rday)).forEach(r => {
     const k = r.w + '¦' + r.g, o = R[k] = R[k] || { w: r.w, g: r.g, a: 0, b: null }; o.a += r.a; if (r.b !== null) o.b = (o.b || 0) + r.b; });
   const rows = Object.keys(R).map(k => { const x = R[k], dd = (x.b || 0) - x.a, p = x.a ? Math.abs(dd) / x.a * 100 : 100;
-    return { w: x.w, g: x.g, a: x.a, b: x.b, d: x.a - (x.b || 0), p: p, bad: x.b === null || !x.a || p > 2 }; }).sort((x, y) => y.p - x.p || y.a - x.a);
+    return { w: x.w, g: x.g, a: x.a, b: x.b, d: x.a - (x.b || 0), p: p, bad: x.b === null || !x.a || x.a !== x.b }; }).sort((x, y) => y.p - x.p || y.a - x.a);   // v103: розбіжність — будь-яка різниця (рішення 11.11; було > 2 %)
   const vis = S.only2 ? rows.filter(x => x.bad) : rows;
   const nMissF = rows.filter(x => x.b === null).length, nMissZ = rows.filter(x => !x.a).length, nBad = rows.filter(x => x.bad).length;
   const selT = (S.rw ? zWN(S.rw) : 'усі працівники') + ' · ' + (S.rday ? ZDOWN[zDow(S.rday)] + ' ' + zDmy(S.rday) : 'увесь пілот з ' + zDmy(DB.recFrom || DB.from));
   let h = '<div class="zctl"><span class="zchip sel">◎ ' + esc(selT) + (S.rw || S.rday ? '<button type="button" onclick="zA(' + zAct(() => { S.rw = ''; S.rday = ''; renderDash(); }) + ')">✕</button>' : '') + '</span>' +
     '<label class="zck"><input type="checkbox"' + (S.only2 ? ' checked' : '') + ' onchange="zA(' + zAct(v => { S.only2 = v; renderDash(); }) + ',this.checked)"> тільки розбіжності</label></div>' +
-    '<div class="zkpis" style="margin:10px 0">' + zKpi('Рядків', fn(rows.length), '') + zKpi('Збігаються (≤ 2 %)', fn(rows.length - nBad), '', zPc(rows.length - nBad, rows.length), '', 'kgood') + zKpi('Розбіжність > 2 %', fn(nBad - nMissF - nMissZ), '', '', '', nBad - nMissF - nMissZ ? 'kbad' : '') +
+    '<div class="zkpis" style="margin:10px 0">' + zKpi('Рядків', fn(rows.length), '') + zKpi('Збігаються', fn(rows.length - nBad), '', zPc(rows.length - nBad, rows.length), '', 'kgood') + zKpi('Кількість відрізняється', fn(nBad - nMissF - nMissZ), '', 'є і МЛП, і форма', '', nBad - nMissF - nMissZ ? 'kbad' : '') +
     zKpi('Немає у формі', fn(nMissF), '', 'записано тільки в МЛП') + zKpi('Немає в МЛП', fn(nMissZ), '', 'тільки у формі Антона') + '</div>';
+  if (S.rw && S.rday) h += z9ackBox(S);   // v103: коментар і «Перевірено, все ок» — для однієї клітинки «працівник × день»
   if (S.rawDB !== DB) { S.rawDB = DB; S.raw = {}; }   // v97: нові дані звіту — дослівні рядки завантажимо заново
   const tog = (w, g) => zAct(() => { const k = w + '¦' + g; if (S.open[k]) delete S.open[k]; else { S.open[k] = 1; z9raw(S, w); } renderDash(); });
   const out = S.rw ? [{ w: S.rw, g: '', out: 1 }] : [];   // v97: поза звіркою — тільки для обраного працівника
@@ -4074,11 +4115,38 @@ function z9form(S) {
       return '<tr style="cursor:pointer" onclick="zA(' + tog(x.w, '') + ')"><td>' + (on ? '▾ ' : '▸ ') + esc(zWN(x.w)) + '</td><td colspan="5"><i>Поза звіркою</i> <span class="muted">— рядки форми з незіставленим видом роботи або нерозпізнаною кількістю, кроки МЛП без відповідності у формі, робота без партії</span></td></tr>' +
       (on ? '<tr><td colspan="6" style="background:var(--bg2,rgba(127,127,127,.06));padding:8px 10px">' + z9rawBox(S, x.w, '', null) + '</td></tr>' : ''); }).join('') + '</table></div>' +
     '<p class="muted" style="margin:6px 0 0">▸ Натисніть рядок — дослівно, як людина заповнила форму Антона, і її записи в МЛП (як у «Мій виробіток»).</p>' : '<p class="muted">Розбіжностей немає.</p>';
-  h += '<p class="muted" style="margin:8px 0 0">Звіряємо записи в МЛП з вечірньою формою Антона, поки працівники заповнюють обидві. Різниця = МЛП − форма. Контрольні кроки — перевірені (успішні + брак). Розбіжність понад 2 % — розібрати. Працівника форми знаходимо за e-mail, інакше — за ім\'ям і прізвищем.</p>';
+  h += '<p class="muted" style="margin:8px 0 0">Звіряємо записи в МЛП з вечірньою формою Антона, поки працівники заповнюють обидві. Різниця = МЛП − форма. Контрольні кроки — перевірені (успішні + брак). Розбіжність — будь-яка різниця: розібрати, а якщо все гаразд — позначка «Перевірено, все ок» (оберіть клітинку «працівник × день» у таблиці вище). Працівника форми знаходимо за e-mail, інакше — за ім\'ям і прізвищем.</p>';
   if ((DB.formUnknown || []).length) h += '<p class="muted" style="margin:8px 0 0">Види робіт з форми, не зіставлені з кроками (додати в «Відповідність форми» в MLP_Підсумки): ' + DB.formUnknown.map(x => esc(x[0]) + ' (' + x[1] + ')').join(', ') + '.</p>';
   return h;
 }
 
+/** v103: блок «Перевірено, все ок» і коментар для клітинки S.rw × S.rday (Р-9_08). Позначка — у «Звірка_Перевірки» (запит reconAck, Reports.gs v41);
+ *  разом з нею зберігаємо знімок сум за видами робіт — якщо потім записи МЛП чи форма зміняться, клітинка покаже «дані змінилися». */
+function z9ackBox(S) {
+  const rs = z9agg(S).filter(r => r.w === S.rw && r.d === S.rday); if (!rs.length) return '';
+  const k = S.rw + '¦' + S.rday, sig = z9sig(rs.map(r => r.g + '=' + r.a + '/' + (r.b === null ? '-' : r.b))), a = z9ack(S.rw, S.rday, sig);
+  const sa = rs.reduce((x, r) => x + r.a, 0), sb = rs.some(r => r.b !== null) ? rs.reduce((x, r) => x + (r.b || 0), 0) : null;
+  const diff = rs.some(r => r.b === null || !r.a || r.a !== r.b);
+  S.ackDraft = S.ackDraft || {}; const dr = S.ackDraft[k] || { c: a ? a.c : '', ok: !!(a && a.ok && a.fresh) };
+  const can = !!(DB.perms && DB.perms.dashControl);
+  let st = '';
+  if (a && a.ok && a.fresh) st = '<b style="color:#17643D">✔ Перевірено, все ок</b> — ' + esc(a.by) + ', ' + esc(a.at);
+  else if (a && a.ok) st = '<b style="color:#B85C00">⚠ Перевірено ' + esc(a.at) + ' (' + esc(a.by) + '), але потім дані змінилися</b> — було МЛП ' + fn(a.a) + ' · форма ' + (a.b === null ? 'немає' : fn(a.b)) + ', зараз МЛП ' + fn(sa) + ' · форма ' + (sb === null ? 'немає' : fn(sb)) + '. Перевірте знову.';
+  else if (a) st = '💬 Коментар — ' + esc(a.by) + ', ' + esc(a.at) + ' · ще не позначено «перевірено»';
+  else st = diff ? '<b>Не перевірено</b>' : 'Розбіжностей немає';
+  const set = (f, v) => { const d = S.ackDraft[k] = S.ackDraft[k] || { c: dr.c, ok: dr.ok }; d[f] = v; };
+  const save = zAct(() => {
+    const d = S.ackDraft[k] || dr, btn = document.getElementById('zackSave'); if (btn) { btn.disabled = true; btn.textContent = 'Зберігаю…'; }
+    post('reconAck', { code: CODE, w: S.rw, day: S.rday, ok: !!d.ok, c: d.c || '', a: sa, b: sb, sig: sig })
+      .then(r => { DB.acks = DB.acks || {}; DB.acks[k] = r.ack; delete S.ackDraft[k]; toast(r.msg); renderDash(); })
+      .catch(e => { if (btn) { btn.disabled = false; btn.textContent = 'Зберегти'; } toast(e.message, true); });
+  });
+  return '<div class="zack' + (a && a.ok ? (a.fresh ? ' ok' : ' st') : '') + '"><div>' + st + '</div>' + (a && a.c && !can ? '<div style="margin-top:4px">«' + esc(a.c) + '»</div>' : '') +
+    (can ? '<textarea placeholder="Коментар: що з\'ясували (необов\'язково, якщо ставите позначку)" oninput="zA(' + zAct(v => set('c', v)) + ',this.value)">' + esc(dr.c) + '</textarea>' +
+      '<div class="zctl" style="margin:0"><label class="zck"><input type="checkbox"' + (dr.ok ? ' checked' : '') + ' onchange="zA(' + zAct(v => set('ok', v)) + ',this.checked)"> <b>Перевірено, все ок</b></label>' +
+      '<button type="button" class="ic" style="background:#1F7A4D;color:#fff;font-weight:700;padding:8px 16px;margin:0" id="zackSave" onclick="zA(' + save + ')">Зберегти</button></div>' +
+      '<p class="muted" style="margin:6px 0 0">Записи МЛП і форма Антона не змінюються. Зелена ✔ означає: розбіжність розібрано, проблеми немає, — навіть якщо цифри різні.</p>' : '') + '</div>';
+}
 /** v97: дослівні рядки працівника w за обраний день (або весь пілот) — окремий запит apiDash d=control&raw=1 (Reports.gs v38), кеш до наступного завантаження звіту */
 function z9raw(S, w) {
   const k = w + '¦' + (S.rday || ''); if (S.raw[k]) return;
