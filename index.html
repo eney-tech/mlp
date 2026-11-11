@@ -1,5 +1,7 @@
 <!DOCTYPE html>
-<!-- МЛП · index.html v103 · 11.11.2026 — Р-9_08 звірка МЛП ↔ форма Антона (рішення 11.11): режим «За типом» (за замовчуванням) — світло-червона клітинка:
+<!-- МЛП · index.html v104 · 11.11.2026 — «Історія тари» (рішення 11.11): ?th=КР-0012 — усі записи з тарою (хто, коли, що), згруповані за партіями,
+     фільтр «Усе / Кроки / Рух партій і тари»; назва тари (шапка, картка партії, вільна тара) — посилання на неї. Запит tareHist (Reports.gs v42, Code.gs v92).
+     v103 · 11.11.2026 — Р-9_08 звірка МЛП ↔ форма Антона (рішення 11.11): режим «За типом» (за замовчуванням) — світло-червона клітинка:
      є МЛП, немає форми; світло-оранжева: немає МЛП, є форма; оранжева рамка: є обидва, кількість відрізняється; розбіжність — будь-яка різниця (було > 2 %, і в Р-9_07).
      Р-9_07 для обраної клітинки «працівник × день» — коментар і позначка «Перевірено, все ок» (запит reconAck, Code.gs v91, Reports.gs v41, аркуш «Звірка_Перевірки»);
      ✔ — зелена клітинка, навіть якщо цифри різні; дані змінилися після позначки — зелений пунктир, перевірити знову. KPI і «тільки з неперевіреними розбіжностями».
@@ -630,7 +632,9 @@
 <div class="net" id="net" role="alert" aria-live="assertive"><div class="nb"><div class="rt" id="netr"></div><div class="nt" id="nett">Зберігаю…</div><div class="ns" id="nets"></div><div class="np"><i id="netp"></i></div><div class="nh" id="neth"></div><div class="zc" id="zc"></div><button class="nx" id="netx" type="button">Не чекати</button></div></div>
 
 <script>
-const PAGE_VERSION = 'index.html v102 · 09.11.2026';   // v74: в1 — і з нашої тари (ящик залишків); в2 — лише партії в2
+const PAGE_VERSION = 'index.html v104 · 11.11.2026';   // v104: «Історія тари» (?th=) — назва тари на сторінці тари / партії веде на неї (Reports.gs v42)
+// v103 (11.11): Р-9_08 «За типом», «Перевірено, все ок»
+// v102 (09.11):   // v74: в1 — і з нашої тари (ящик залишків); в2 — лише партії в2
 // v72 (26.10):   // v72: «Яку партію відкриваємо?»; розшифровка кроків на картці партії; реєстрація — повернення за посиланням з форми
 // v71 (24.10):   // v71: порядок звітів (важливі — першими, жирним); Р-8_04 — один графік, статори / ротори / двигуни поруч, без лінії % браку; закладка «Випуск готових статорів, роторів і двигунів»
 //   // v70: Р-13 «Цех наживо» — план поверхів Печерська з ящиками, «Будівля 3D», повтор руху (Reports.gs v30)
@@ -653,7 +657,7 @@ var google = { script: { get run() {
     .then(r => r.json()).then(j => { netEnd(tk, j); netDeliver(() => j.ok ? ok(j.data) : fail({ message: j.error })); },
       e => { netEnd(tk, null); netDeliver(() => fail({ message: 'Немає зв\'язку з сервером. Перевірте інтернет і спробуйте ще раз.', net: true })); }); };
   const o = { withSuccessHandler(f) { ok = f; return o; }, withFailureHandler(f) { fail = f; return o; },
-    apiPage(q) { call('page', q); }, apiAct(q) { call('act', q); }, apiApprove(q) { call('approve', q); }, apiCabinet(q) { call('cabinet', q); }, apiDash(q) { call('dash', q); }, apiHistory(q) { call('hist', q); },
+    apiPage(q) { call('page', q); }, apiAct(q) { call('act', q); }, apiApprove(q) { call('approve', q); }, apiCabinet(q) { call('cabinet', q); }, apiDash(q) { call('dash', q); }, apiHistory(q) { call('hist', q); }, apiTareHist(q) { call('tareHist', q); },
     apiSkladPage(q) { call('skladPage', q); }, apiSkladCancel(q) { call('skladCancel', q); }, apiPeek(q) { call('peek', q); } };
   return o;
 } } };
@@ -673,7 +677,7 @@ function netKind(api, q) {
   if (api === 'act' || api === 'skladSave' || api === 'skladCancel' || api === 'skladEdit' || api === 'skladBox' || api === 'reconAck') return 'w';
   if (api === 'approve') return q.confirm ? 'w' : 'r';
   if (api === 'retro') return /^(save|confirm|reopen)$/.test(q.op || '') ? 'w' : (q.op === 'photo' ? '' : 'r');
-  if (api === 'page' || api === 'cabinet' || api === 'dash' || api === 'hist' || api === 'skladPage') return 'r';
+  if (api === 'page' || api === 'cabinet' || api === 'dash' || api === 'hist' || api === 'tareHist' || api === 'skladPage') return 'r';
   return '';
 }
 const NET = { list: [], timer: null, chk: null };
@@ -900,6 +904,7 @@ function load(extra) {
   if (PARAMS.cab && CODE) return loadCabinet();   // без коду телефону — звичайний шлях: екран реєстрації
   if (PARAMS.d && CODE) return loadDash();
   if (PARAMS.h && CODE) return loadHistory();
+  if (PARAMS.th && CODE) return loadTareHist();   // v104
   if ((PARAMS.s || PARAMS.sklad) && CODE) return loadSklad();
   if (PARAMS.rh && CODE) return loadRetro();   // v53
   if (PARAMS.ai && CODE) return loadAssist();   // v65: помічник МЛП
@@ -1306,7 +1311,8 @@ const repGap = (r, i) => i > 0 && r[i][3] !== r[i - 1][3];
 let VIEW = '';
 /** Назва в шапці (код звіту — дрібно над назвою) і активний пункт меню */
 function setView(code, title, view) {
-  $('hdrCode').textContent = code || ''; $('hdrTitle').textContent = title || 'МЛП';
+  $('hdrCode').innerHTML = /^[А-ЯІЇЄҐ]{2}-\d+$/.test(code || '') ? '<a href="' + esc(link('th=' + encodeURIComponent(code))) + '" style="color:inherit;text-decoration:underline dotted" title="Історія тари">' + esc(code) + ' 🕘</a>' : esc(code || '');   // v104: тара — посилання на історію
+  $('hdrTitle').textContent = title || 'МЛП';
   document.title = (title ? title + ' · ' : '') + 'МЛП';
   VIEW = view; navRender();
 }
@@ -1585,7 +1591,7 @@ function regDone(pend, d) {
   toast('Телефон зареєстровано: ' + d.me.name);
   const rq = store('mlp_regq'); store('mlp_regq', null);   // v72: повернулись без параметрів — відкрити те, що сканували
   if (rq && !location.search) { location.replace(location.pathname + rq); return; }
-  const go = !d.pending && ((PARAMS.cab && d.perms && d.perms.cabinet) || PARAMS.d || PARAMS.h || PARAMS.s || PARAMS.sklad);
+  const go = !d.pending && ((PARAMS.cab && d.perms && d.perms.cabinet) || PARAMS.d || PARAMS.h || PARAMS.th || PARAMS.s || PARAMS.sklad);
   if (go) load(); else render({});
 }
 /** Тиха перевірка (без повідомлень); manual — натиснуто «2. Я зареєструвався» */
@@ -1689,9 +1695,9 @@ function renderPoster() {
 
 function renderNew() {
   const p = S.perms; const t = S.tare;
-  if (!p.newBatch) { $('app').innerHTML = '<div class="card"><div class="big">' + esc(t.code) + '</div><div class="pill ok">вільна</div></div>'; return; }
+  if (!p.newBatch) { $('app').innerHTML = '<div class="card"><div class="big">' + thl(t.code) + '</div><div class="pill ok">вільна</div></div>'; return; }
   const def = t.type === 'ТЧ' ? 'MT' : '';
-  $('app').innerHTML = '<div class="card"><div class="muted">Тара</div><div class="big">' + esc(t.code) + '</div><span class="pill ok">вільна</span>' +
+  $('app').innerHTML = '<div class="card"><div class="muted">Тара</div><div class="big">' + thl(t.code, t.code + ' 🕘') + '</div><span class="pill ok">вільна</span>' +
     '<span class="pill">' + (t.loc === 'Ж' ? 'Жуляни' : 'Печерськ') + '</span></div>' +
     '<div class="card"><div class="mid">Нова партія</div>' +
     '<label>Яку партію відкриваємо?</label><div class="seg">' + ['ST', 'RT', 'MT'].map(s => '<label><input type="radio" name="st" value="' + s + '"' + (s === def ? ' checked' : '') + '><span>' +
@@ -1954,8 +1960,8 @@ function renderBatch(extra) {
   const pre = (sug && sug.code) || (avail[0] && avail[0].code) || '';
   // ПВ-22: крок, на якому лишились незакриті штуки і який тримає наступні
   const tails = b.route.filter(s => b.route.some(x => x.blockedBy === s.code));
-  const tt = (b.tares || []).length > 1 ? b.tares.map(x => x.code + (x.qty ? ' (' + x.qty + ')' : '')).join(' + ') : (S.tare ? S.tare.code : '');   // v17: пара піддонів
-  let h = '<div class="card"><div class="muted">' + ({ ST: 'Статори', RT: 'Ротори', MT: 'Двигуни' })[stream] + (tt ? ' · тара ' + esc(tt) : ' · ⚠ без тари') + '</div>' +
+  const tt = (b.tares || []).length > 1 ? b.tares.map(x => thl(x.code) + (x.qty ? ' (' + x.qty + ')' : '')).join(' + ') : (S.tare ? thl(S.tare.code) : '');   // v17: пара піддонів; v104: назва тари — посилання на історію тари
+  let h = '<div class="card"><div class="muted">' + ({ ST: 'Статори', RT: 'Ротори', MT: 'Двигуни' })[stream] + (tt ? ' · тара ' + tt : ' · ⚠ без тари') + '</div>' +
     '<div class="big">' + esc(i['Номер']) + '</div>' +
     '<span class="pill">' + esc(i['Типорозмір']) + '</span>' + (i['KV'] ? '<span class="pill">KV ' + esc(i['KV']) + '</span>' : '') +
     (i['Варіант'] ? '<span class="pill">' + esc(i['Варіант']) + '</span>' : '') + (i['Колір'] ? '<span class="pill">🎨 ' + esc(i['Колір']) + '</span>' : '') + (b.comp && b.comp.mixed ? '<span class="pill warn">змішане походження</span>' : '') + statusPill(b.status) +
@@ -5074,6 +5080,90 @@ function renderHistory() {
         esc(s.stepName) + '</span></td><td>' + esc(s.who) + '</td><td class="r">' + fn(s.good) + '</td><td class="r">' + (s.scrap || '—') + '</td></tr>').join('') + '</table></div>'
       : '<p class="muted">Кроків ще немає.</p>');
   h += '<p class="muted" style="text-align:center">Дані на ' + esc(d.now) + (d.me.role === 'адміністратор' ? ' · ' + sec(d.ms) : '') + ' · <a class="lnk" href="javascript:loadHistory()">оновити</a></p><div style="height:30px"></div>';
+  $('app').innerHTML = h;
+}
+
+// =============================================================== ІСТОРІЯ ТАРИ (v104, рішення 11.11)
+// ?th=КР-0012 — усі записи з цією тарою: хто, коли і що робив. Відкривається з назви тари на сторінці тари / партії.
+let TH = null; let THF = 'all'; let THN = 150;
+/** v104: назва тари — посилання на її історію */
+function thl(code, txt) { return code ? '<a class="lnk" title="Історія тари" href="' + esc(link('th=' + encodeURIComponent(code))) + '">' + esc(txt || code) + '</a>' : ''; }
+function loadTareHist() {
+  setView('Історія тари', PARAMS.th, 'home');
+  if (!TH) $('app').innerHTML = '<div class="center muted">Збираю історію тари…</div>';
+  google.script.run.withSuccessHandler(d => { TH = d; renderTareHist(); })
+    .withFailureHandler(e => {
+      if (/не зареєстровано/.test(e.message)) { forgetCode(); return loadPage(); }
+      $('app').innerHTML = '<div class="card err">' + esc(e.message) + '</div>' +
+        '<a class="btn btn2" style="display:block;text-align:center;text-decoration:none;margin:12px;width:auto" href="' + esc(link('')) + '">На головну</a>';
+    }).apiTareHist({ code: CODE, t: PARAMS.th });
+}
+const TH_MOVE = ['нова партія', 'перекладання', 'звільнення тари', 'відокремлення', 'видача', 'залишок', 'партія на склад', 'партія зі складу', 'анулювання'];
+function thWhat(x) {
+  const me = TH.tare.code;
+  const tc = c => !c ? '—' : c === me ? '<b>' + esc(c) + '</b>' : thl(c);
+  const g = x.corrected ? x.corrected.good : x.good, s = x.corrected ? x.corrected.scrap : x.scrap;
+  const q = x.corrected && x.corrected.qty !== null && x.corrected.qty !== undefined ? x.corrected.qty : x.qty;
+  switch (x.type) {
+    case 'крок': return '<b>' + esc(x.step) + '</b> ' + esc(x.stepName) + ' · ' + g + ' / ' + s + (x.reason ? ' · ' + esc(x.reason) : '') +
+      (x.step === 'K2' && x.boxes ? ' · ' + boxesLinks(x.boxes) : '');
+    case 'нова партія': return '▣ нова партія ' + bl(x.batch) + ' · ' + q + ' шт' + (x.x2 && !/^M/.test(x.batch) ? ' · старт з <b>' + esc(x.x2) + '</b>' : '');
+    case 'пропуск': return '⏭ пропущено <b>' + esc(x.step) + '</b> ' + esc(x.stepName) + ' · ' + q + ' шт';
+    case 'перекладання': return '⇄ перекладання ' + tc(x.tare) + ' → ' + tc(x.tareTo) + (x.x1 === 'назад' ? ' (назад)' : '') +
+      (x.x1 === 'пара' ? ' · піддон пари' + (q ? ' · ' + q + ' шт' : '') + (x.x2 ? ' (друга: ' + tc(x.x2) + ')' : '') : x.x1 === 'обʼєднання' ? ' · пару ' + tc(x.tare) + ' + ' + tc(x.x2) + ' обʼєднано' : '');
+    case 'звільнення тари': return '🔓 тару ' + tc(x.tare) + ' звільнено';
+    case 'відокремлення': return x.tareTo === me && x.tare !== me ? '+ додано ' + q + ' з ' + bl(x.batch) + ' у ' + bl(x.target) + (x.x2 ? ' · ' + esc(x.x2) : '')
+      : '✂ відокремлено ' + q + ' з ' + bl(x.batch) + ' → ' + bl(x.target) + (x.tareTo && x.tareTo !== me ? ' (' + tc(x.tareTo) + ')' : '') + (x.x2 ? ' · ' + esc(x.x2) : '');
+    case 'видача': return 'видано ' + q + ' з ' + bl(x.batch) + ' (' + tc(x.tare) + ') → ' + bl(x.target) + (x.tareTo ? ' (' + tc(x.tareTo) + ')' : '');
+    case 'залишок': return 'залишок ' + q + ' ' + esc(x.x1) + ' з ' + bl(x.batch) + ' → ' + (x.target ? bl(x.target) : 'склад');
+    case 'вибуття': return (x.x1 === TH.qc ? '→ <b>відділ якості</b> ' : 'вибуло → <b>' + esc(x.x1) + '</b> ') + q + ' шт' + (x.x2 ? ' · ' + esc(x.x2) : '');
+    case 'додавання': return x.x1 === TH.qc ? '↩ з відділу якості ' + q + ' шт' + (x.x2 ? ' · ' + esc(x.x2) : '') : '+ додано ' + q + ' шт' + (x.x2 ? ' · ' + esc(x.x2) : '') + ' · звідки: <b>' + esc(x.x1) + '</b>';
+    case 'покупні': case 'власні': return '+ ' + esc(partsWhat({ type: x.type, comp: x.x1, qty: q })) + ' ' + esc(partsVer({ type: x.type, d2: x.x2, comment: x.comment }));
+    case 'колір': return '🎨 колір: ' + esc(x.x2 || 'не вказано') + ' → <b>' + esc(x.x1 || 'не вказано') + '</b>';
+    case 'анулювання': return '✖ партію ' + bl(x.batch) + ' анульовано';
+    case 'партія на склад': return '📦 на склад <b>' + esc(x.x2) + '</b>' + (q ? ' · ' + q + ' шт' : '');
+    case 'партія зі складу': return '↩ зі складу ' + esc(x.x2) + ' на виробництво';
+  }
+  return esc(x.type) + (q ? ' · ' + q + ' шт' : '');
+}
+function thFilt(x) { return THF === 'all' || (THF === 'steps' ? x.type === 'крок' || x.type === 'пропуск' : TH_MOVE.indexOf(x.type) >= 0); }
+function renderTareHist() {
+  const d = TH, t = d.tare;
+  $('who').innerHTML = whoHtml(d.me, d.perms);
+  setView('Історія тари', t.code, 'home');
+  const busy = t.state === 'зайнята';
+  let h = '<div class="card"><div class="muted">Історія тари' + (t.typeName ? ' · ' + esc(t.typeName) : '') + ' · ' + esc(LOCN[t.loc] || t.loc || '') + '</div>' +
+    '<div class="big">' + esc(t.code) + '</div>' +
+    '<span class="pill ' + (busy ? '' : 'ok') + '">' + esc(t.state || '—') + '</span>' + (busy && t.batch ? '<span class="pill">партія ' + bl(t.batch) + '</span>' : '') +
+    (t.pair ? '<span class="pill">пара з ' + thl(t.pair) + '</span>' : '') + (t.qty ? '<span class="pill">' + esc(t.qty) + ' шт</span>' : '') +
+    (t.since ? '<div class="muted" style="margin-top:8px">' + (busy ? 'Зайнята з ' : 'Вільна з ') + esc(t.since) + '</div>' : '') +
+    (t.note ? '<div class="muted">' + esc(t.note) + '</div>' : '') +
+    '<a class="btn btn2" style="display:block;text-align:center;text-decoration:none" href="' + esc(link('t=' + encodeURIComponent(t.code))) + '">Відкрити тару</a></div>';
+  const all = d.rows.filter(thFilt);
+  const rows = all.slice(0, THN);
+  // групи: підряд записи однієї партії (найновіші — зверху)
+  const groups = [];
+  rows.forEach(x => { const k = x.batch || '—'; const g = groups[groups.length - 1]; if (g && g.k === k) g.rows.push(x); else groups.push({ k: k, rows: [x] }); });
+  const ST = { ST: 'статори', RT: 'ротори', MT: 'двигуни' };
+  const item = x => '<div class="li"><div class="' + (x.cancelled ? 'x' : '') + '">' + thWhat(x) + (x.retro ? ' <span class="pill" style="margin:0">ретро</span>' : '') +
+    (x.corrected ? ' <span class="pill warn" style="margin:0">виправлено · було ' + (x.corrected.qty !== null && x.corrected.qty !== undefined ? x.qty : x.good + ' / ' + x.scrap) + '</span>' : '') +
+    '<br><span class="muted">' + esc(x.who) + (x.comment && x.type !== 'покупні' ? ' · ' + esc(x.comment) : '') +
+    (x.corrected ? '<br>✎ ' + esc(x.corrected.who) + ' ' + esc(x.corrected.time) + (x.corrected.comment ? ' · ' + esc(x.corrected.comment) : '') : '') +
+    (x.cancelled ? '<br>скасував ' + esc(x.cancelled.who) + ' ' + esc(x.cancelled.time) + (x.cancelled.comment ? ' · ' + esc(x.cancelled.comment) : '') : '') +
+    '</span></div><div class="r muted">' + esc(x.time.slice(0, 10)) + '<br>' + esc(x.time.slice(11)) + '</div></div>';
+  const body = '<div class="chips" style="margin-bottom:8px">' + [['all', 'Усе'], ['steps', 'Кроки'], ['move', 'Рух партій і тари']].map(x =>
+      '<button type="button" class="' + (THF === x[0] ? 'on' : '') + '" onclick="THF=\'' + x[0] + '\';THN=150;renderTareHist()">' + x[1] + '</button>').join('') + '</div>' +
+    (groups.length ? groups.map(g => {
+      const b = d.batches[g.k] || {}, last = g.rows[0], first = g.rows[g.rows.length - 1];
+      return '<div style="margin-top:10px;padding:6px 0;border-bottom:2px solid #E3EAEF"><b>' + (g.k === '—' ? 'без партії' : bl(g.k)) + '</b> <span class="muted">' +
+        [ST[b.stream], b.typ, b.kv ? 'KV ' + b.kv : '', b.status, first.time.slice(0, 10) + (first.time.slice(0, 10) !== last.time.slice(0, 10) ? ' – ' + last.time.slice(0, 10) : '')]
+          .filter(Boolean).map(esc).join(' · ') + '</span></div>' +
+        '<div class="list" style="padding:0">' + g.rows.map(item).join('') + '</div>';
+    }).join('') : '<p class="muted">Записів із цією тарою ще немає.</p>') +
+    (all.length > rows.length ? '<button class="btn btn2" onclick="THN+=300;renderTareHist()">Показати ще (' + (all.length - rows.length) + ')</button>' : '') +
+    (d.total > d.rows.length ? '<p class="muted">Показано найновіші ' + d.rows.length + ' із ' + d.total + ' записів.</p>' : '');
+  h += dcard('Хто, коли і що робив (' + all.length + ')', 'Найновіші — зверху; записи згруповано за партіями, що були в цій тарі', body);
+  h += '<p class="muted" style="text-align:center">Дані на ' + esc(d.now) + (d.me.role === 'адміністратор' ? ' · ' + sec(d.ms) : '') + ' · <a class="lnk" href="javascript:loadTareHist()">оновити</a></p><div style="height:30px"></div>';
   $('app').innerHTML = h;
 }
 
