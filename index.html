@@ -1,5 +1,9 @@
 <!DOCTYPE html>
-<!-- МЛП · index.html v104 · 11.11.2026 — «Історія тари» (рішення 11.11): ?th=КР-0012 — усі записи з тарою (хто, коли, що), згруповані за партіями,
+<!-- МЛП · index.html v106 · 11.11.2026 — «Робота зі складом»: вибір позиції за групами номенклатури (Sklad.gs v10, каталог v24): заголовки груп у списку,
+     група «Інше» — остання; типорозмір підставляється з позиції. Те саме у вікні виправлення.
+     v105 · 11.11.2026 — «Робота зі складом»: кнопки дії «Взяв» → «Беремо зі складу», «Поклав» → «Приймаємо на склад»
+     (форма запису і вікно виправлення, підпис плитки). Значення в журналі не змінились (взяв / поклав) — сервер і звіти без змін.
+     v104 · 11.11.2026 — «Історія тари» (рішення 11.11): ?th=КР-0012 — усі записи з тарою (хто, коли, що), згруповані за партіями,
      фільтр «Усе / Кроки / Рух партій і тари»; назва тари (шапка, картка партії, вільна тара) — посилання на неї. Запит tareHist (Reports.gs v42, Code.gs v92).
      v103 · 11.11.2026 — Р-9_08 звірка МЛП ↔ форма Антона (рішення 11.11): режим «За типом» (за замовчуванням) — світло-червона клітинка:
      є МЛП, немає форми; світло-оранжева: немає МЛП, є форма; оранжева рамка: є обидва, кількість відрізняється; розбіжність — будь-яка різниця (було > 2 %, і в Р-9_07).
@@ -632,7 +636,7 @@
 <div class="net" id="net" role="alert" aria-live="assertive"><div class="nb"><div class="rt" id="netr"></div><div class="nt" id="nett">Зберігаю…</div><div class="ns" id="nets"></div><div class="np"><i id="netp"></i></div><div class="nh" id="neth"></div><div class="zc" id="zc"></div><button class="nx" id="netx" type="button">Не чекати</button></div></div>
 
 <script>
-const PAGE_VERSION = 'index.html v104 · 11.11.2026';   // v104: «Історія тари» (?th=) — назва тари на сторінці тари / партії веде на неї (Reports.gs v42)
+const PAGE_VERSION = 'index.html v106 · 11.11.2026';   // v106: позиції складу за групами; v105: кнопки складу «Беремо зі складу» / «Приймаємо на склад»; v104: «Історія тари» (?th=) — назва тари на сторінці тари / партії веде на неї (Reports.gs v42)
 // v103 (11.11): Р-9_08 «За типом», «Перевірено, все ок»
 // v102 (09.11):   // v74: в1 — і з нашої тари (ящик залишків); в2 — лише партії в2
 // v72 (26.10):   // v72: «Яку партію відкриваємо?»; розшифровка кроків на картці партії; реєстрація — повернення за посиланням з форми
@@ -993,6 +997,16 @@ function numInput(id, val) {
     '<button type="button" onclick="bump(\'' + id + '\',1)">+</button></div>';
 }
 function bump(id, d) { const i = $(id); i.value = Math.max(0, (Number(i.value) || 0) + d); i.dispatchEvent(new Event('input')); }
+/** v106: позиції складу за групами (d.groups з Sklad.gs v10): заголовок групи — неактивний рядок, «Інше» — остання група. extra — назва старого запису, якої вже немає в списку */
+function skPosOpts(d, sel, ph, extra) {
+  const groups = (d.groups || []).slice(), by = {};
+  const put = (g, n) => { if (groups.indexOf(g) < 0) groups.splice(Math.max(0, groups.length - 1), 0, g); (by[g] = by[g] || []).push(n); };
+  d.positions.forEach(p => put(p.group || d.other, p.name));
+  if (extra) put('Попередня назва', extra);
+  put(d.other, d.other);
+  return (ph ? '<option value="">' + esc(ph) + '</option>' : '') + groups.filter(g => by[g]).map(g => '<option value="" disabled>▸ ' + esc(String(g).toUpperCase()) + '</option>' +
+    by[g].map(n => '<option' + (String(n) === String(sel) ? ' selected' : '') + '>' + esc(n) + '</option>').join('')).join('');
+}
 function opts(list, sel, ph) { return (ph ? '<option value="">' + esc(ph) + '</option>' : '') + list.map(x => '<option' + (String(x) === String(sel) ? ' selected' : '') + '>' + esc(x) + '</option>').join(''); }
 // =============================================================== v52: ПОШУК У ВИПАДНИХ СПИСКАХ
 /** Кожен <select> від CBX_MIN варіантів отримує поле пошуку: вводять частину назви — під полем лишаються тільки збіги.
@@ -1379,7 +1393,7 @@ function renderHome() {
     '<input type="number" inputmode="numeric" id="hn" placeholder="номер" style="font-size:17px"></div><button class="btn btn2" id="hgo" style="margin-top:8px">Відкрити</button></div>');
   if (p.noBatch) tiles.push('<a class="tile" href="' + esc(link('nb=1')) + '"><div class="tn">⏱ Записати роботу без партії</div><div class="td">' +
     (p.cabinet ? 'за себе або за працівника, сьогодні або минулою датою' : 'підготовка місця, перебирання залишків, навчання — у годинах або штуках') + '</div></a>');
-  if (p.sklad) tiles.push('<a class="tile" href="' + esc(link('sklad=1')) + '"><div class="tn">⌂ Робота зі складом</div><div class="td">взяв / поклав / надходження</div></a>');
+  if (p.sklad) tiles.push('<a class="tile" href="' + esc(link('sklad=1')) + '"><div class="tn">⌂ Робота зі складом</div><div class="td">беремо зі складу / приймаємо на склад</div></a>');
   if (p.dashBoxes && (prod || p.sklad)) tiles.push('<a class="tile" href="' + esc(link('d=boxes')) + '"><div class="tn">📦 Чисті ящики</div><div class="td">неповні ящики на виробництві, ящики на складі</div></a>');   // v57: Р-12
   if (p.retro) tiles.push('<a class="tile" href="' + esc(link('rh=1')) + '"><div class="tn">📄 Ретро-історія партій</div><div class="td">звірити записи, розпізнані з паперових техкарт, і підтвердити</div></a>');   // v53
   if (tiles.length) h += '<div class="tiles">' + tiles.join('') + '</div>';
@@ -5195,10 +5209,9 @@ function renderSklad() {
   const locHtml = d.loc
     ? '<div class="muted">Локація: <b>' + esc(d.loc.code) + (d.loc.name && d.loc.name !== d.loc.code ? ' · ' + esc(d.loc.name) : '') + '</b></div>'
     : '<label>Локація складу</label><select id="skLoc">' + opts(d.locs.map(l => l.code + (l.name !== l.code ? ' · ' + l.name : '')), '', '— оберіть —') + '</select>';
-  const posList = d.positions.map(p => p.name).concat([d.other]);
   let h = '<div class="card"><div class="mid">Робота зі складом</div>' + locHtml +
-    '<label>Дія</label><div class="seg"><label><input type="radio" name="skAct" value="взяв" checked><span>Взяв</span></label>' +
-    '<label><input type="radio" name="skAct" value="поклав"><span>Поклав</span></label></div>' +
+    '<label>Дія</label><div class="seg"><label><input type="radio" name="skAct" value="взяв" checked><span>Беремо<br>зі складу</span></label>' +
+    '<label><input type="radio" name="skAct" value="поклав"><span>Приймаємо<br>на склад</span></label></div>' +
     // v17: «поклав» — і повернення з виробництва, і прихід від постачальника (наповнення складу)
     '<div id="skFromBox" style="display:none"><label>Звідки</label><div class="seg wrap"><label><input type="radio" name="skFrom" value="з виробництва"><span>З виробництва</span></label>' +
     '<label><input type="radio" name="skFrom" value="від постачальника"><span>Від постачальника</span></label>' +
@@ -5213,7 +5226,7 @@ function renderSklad() {
       '<input type="file" accept="image/*" capture="environment" id="skFile" style="display:none">' +
       '<button type="button" class="btn btn2" id="skCam" style="margin-top:0">📷 Сфотографувати етикетку</button>' +
       '<div id="skPh" class="muted" style="margin-top:8px"></div>' : '') +
-    '<label id="skPosL">Що взяли</label><select id="skPos">' + opts(posList, '', '— оберіть —') + '</select>' +
+    '<label id="skPosL">Що взяли</label><select id="skPos">' + skPosOpts(d, '', '— оберіть —') + '</select>' +
     '<div id="skOtherBox" style="display:none"><label>Що саме</label><input type="text" id="skOther" placeholder="назва"></div>' +
     '<label>Типорозмір <span class="muted">(якщо є)</span></label><select id="skTyp">' + opts(d.typ, '', '—') + '</select>' +
     '<label>Деталі <span class="muted">(марка, розмір, артикул)</span></label><input type="text" id="skDet" placeholder="напр. 0,425 мм">' +
@@ -5233,6 +5246,7 @@ function renderSklad() {
     const v = $('skPos').value;
     $('skOtherBox').style.display = v === d.other ? 'block' : 'none';
     const p = d.positions.find(x => x.name === v); if (p && !SKF.unitTouched) $('skUnit').value = p.unit;
+    if (p && p.typ && $('skTyp')) $('skTyp').value = p.typ;   // v106: типорозмір — з позиції каталогу
   };
   $('skUnit').onchange = () => SKF.unitTouched = true;
   const skMode = () => {   // v58: «ГП з виробництва» — вибір ящика замість позиції й кількості
@@ -5410,8 +5424,7 @@ function skCancel(id) {
 function skFixOpen(id) {
   const x = (SKD.my || []).find(r => r.id === id); if (!x) return;
   const d = SKD;
-  const posList = d.positions.map(p => p.name); if (x.posBase !== d.other && posList.indexOf(x.posBase) < 0) posList.push(x.posBase);
-  posList.push(d.other);
+  const oldPos = x.posBase !== d.other && !d.positions.some(p => p.name === x.posBase) ? x.posBase : '';   // v106: стара назва (до каталогу v24)
   const locs = d.locs.map(l => l.code); if (locs.indexOf(x.loc) < 0) locs.push(x.loc);
   const units = d.units.slice(); if (x.unit && units.indexOf(x.unit) < 0) units.push(x.unit);
   const put = x.act === 'поклав' || x.act === 'повернув';
@@ -5419,10 +5432,10 @@ function skFixOpen(id) {
   openModal('<div class="card"><div class="mid">Виправити ' + esc(id) + '</div>' +
     '<div class="muted">' + esc(x.who || '') + ' · ' + esc(x.time) + ' — час і працівник не змінюються</div>' +
     '<label>Локація</label><select id="fxLoc">' + opts(locs, x.loc) + '</select>' +
-    '<label>Дія</label><div class="seg">' + radio('fxAct', 'взяв', 'Взяв', !put) + radio('fxAct', 'поклав', 'Поклав', put) + '</div>' +
+    '<label>Дія</label><div class="seg">' + radio('fxAct', 'взяв', 'Беремо зі складу', !put) + radio('fxAct', 'поклав', 'Приймаємо на склад', put) + '</div>' +
     '<div id="fxFromBox" style="display:' + (put ? 'block' : 'none') + '"><label>Звідки</label><div class="seg">' +
       radio('fxFrom', 'з виробництва', 'З виробництва', x.from === 'з виробництва') + radio('fxFrom', 'від постачальника', 'Від постачальника', x.from === 'від постачальника') + '</div></div>' +
-    '<label>Позиція</label><select id="fxPos">' + opts(posList, x.posBase) + '</select>' +
+    '<label>Позиція</label><select id="fxPos">' + skPosOpts(d, x.posBase, '', oldPos) + '</select>' +
     '<div id="fxOtherBox" style="display:' + (x.posBase === d.other ? 'block' : 'none') + '"><label>Що саме</label><input type="text" id="fxOther" value="' + esc(x.posOther) + '"></div>' +
     '<label>Типорозмір</label><select id="fxTyp">' + opts(d.typ, x.typ, '—') + '</select>' +
     '<label>Деталі</label><input type="text" id="fxDet" value="' + esc(x.det) + '">' +
@@ -5437,7 +5450,8 @@ function skFixOpen(id) {
   document.querySelectorAll('input[name=fxAct]').forEach(r => r.onchange = () => {
     $('fxFromBox').style.display = (document.querySelector('input[name=fxAct]:checked') || {}).value === 'поклав' ? 'block' : 'none';
   });
-  $('fxPos').onchange = () => $('fxOtherBox').style.display = $('fxPos').value === d.other ? 'block' : 'none';
+  $('fxPos').onchange = () => { const v = $('fxPos').value; $('fxOtherBox').style.display = v === d.other ? 'block' : 'none';
+    const p = d.positions.find(z => z.name === v); if (p && p.typ) $('fxTyp').value = p.typ; };   // v106
   $('fxGo').onclick = () => {
     const act = (document.querySelector('input[name=fxAct]:checked') || {}).value;
     const from = act === 'поклав' ? (document.querySelector('input[name=fxFrom]:checked') || {}).value || '' : '';
