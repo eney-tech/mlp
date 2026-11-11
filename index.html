@@ -1,5 +1,8 @@
 <!DOCTYPE html>
-<!-- МЛП · index.html v107 · 11.11.2026 — передачі склад → цех і ящики ГП у 2 кроки (Sklad.gs v11): «Робота зі складом» — «Вам передали» (тімлід цеху приймає,
+<!-- МЛП · index.html v108 · 11.11.2026 — приймання від постачальника (Sklad.gs v12): «Приймаємо на склад» → «Від постачальника» відкриває форму приходу
+     (склад, постачальник, документ «є / прийде пізніше / без документа» з фото чи PDF, позиції: усього, коробок, у коробці, «за етикеткою постачальника»,
+     партія постачальника); після запису — PDF наліпок 100 × 100 мм; «Чекають документ» і «Приходи» на «Роботі зі складом»; картка приходу з QR наліпки (?pp= / ?pr=).
+     v107 · 11.11.2026 — передачі склад → цех і ящики ГП у 2 кроки (Sklad.gs v11): «Робота зі складом» — «Вам передали» (тімлід цеху приймає,
      можна вписати фактичну кількість), «Ящики ГП чекають прийняття» (зав. складу: прийняти / «немає»), кнопка «Передати в цех» (кілька позицій),
      «Мої передачі» (скасувати, поки в дорозі); тімлід без доступу «Склад» бачить лише приймання; на головній — плашка «чекає прийняття» (skladInbox).
      v106 · 11.11.2026 — «Робота зі складом»: вибір позиції за групами номенклатури (Sklad.gs v10, каталог v24): заголовки груп у списку,
@@ -639,7 +642,7 @@
 <div class="net" id="net" role="alert" aria-live="assertive"><div class="nb"><div class="rt" id="netr"></div><div class="nt" id="nett">Зберігаю…</div><div class="ns" id="nets"></div><div class="np"><i id="netp"></i></div><div class="nh" id="neth"></div><div class="zc" id="zc"></div><button class="nx" id="netx" type="button">Не чекати</button></div></div>
 
 <script>
-const PAGE_VERSION = 'index.html v107 · 11.11.2026';   // v107: передачі склад → цех, ящики ГП приймає склад; v106: позиції складу за групами; v105: кнопки складу «Беремо зі складу» / «Приймаємо на склад»; v104: «Історія тари» (?th=) — назва тари на сторінці тари / партії веде на неї (Reports.gs v42)
+const PAGE_VERSION = 'index.html v108 · 11.11.2026';   // v108: приймання від постачальника, наліпки; v107: передачі склад → цех, ящики ГП приймає склад; v106: позиції складу за групами; v105: кнопки складу «Беремо зі складу» / «Приймаємо на склад»; v104: «Історія тари» (?th=) — назва тари на сторінці тари / партії веде на неї (Reports.gs v42)
 // v103 (11.11): Р-9_08 «За типом», «Перевірено, все ок»
 // v102 (09.11):   // v74: в1 — і з нашої тари (ящик залишків); в2 — лише партії в2
 // v72 (26.10):   // v72: «Яку партію відкриваємо?»; розшифровка кроків на картці партії; реєстрація — повернення за посиланням з форми
@@ -681,10 +684,10 @@ function post(api, q) {
  *  (плашка, якщо довше за 0,7 с), '' — без плашки (перевірка партії у формі, фото, списки у формі) */
 function netKind(api, q) {
   q = q || {};
-  if (api === 'act' || api === 'skladSave' || api === 'skladCancel' || api === 'skladEdit' || api === 'skladBox' || api === 'reconAck' || api === 'skladTransfer' || api === 'skladAccept' || api === 'skladTrCancel' || api === 'skladBoxAccept') return 'w';   // v107
+  if (api === 'act' || api === 'skladSave' || api === 'skladCancel' || api === 'skladEdit' || api === 'skladBox' || api === 'reconAck' || api === 'skladTransfer' || api === 'skladAccept' || api === 'skladTrCancel' || api === 'skladBoxAccept' || api === 'skladReceive' || api === 'skladDocAttach' || api === 'skladLabels') return 'w';   // v107
   if (api === 'approve') return q.confirm ? 'w' : 'r';
   if (api === 'retro') return /^(save|confirm|reopen)$/.test(q.op || '') ? 'w' : (q.op === 'photo' ? '' : 'r');
-  if (api === 'page' || api === 'cabinet' || api === 'dash' || api === 'hist' || api === 'tareHist' || api === 'skladPage') return 'r';
+  if (api === 'page' || api === 'cabinet' || api === 'dash' || api === 'hist' || api === 'tareHist' || api === 'skladPage' || api === 'skladPp') return 'r';
   return '';
 }
 const NET = { list: [], timer: null, chk: null };
@@ -912,7 +915,7 @@ function load(extra) {
   if (PARAMS.d && CODE) return loadDash();
   if (PARAMS.h && CODE) return loadHistory();
   if (PARAMS.th && CODE) return loadTareHist();   // v104
-  if ((PARAMS.s || PARAMS.sklad) && CODE) return loadSklad();
+  if ((PARAMS.s || PARAMS.sklad || PARAMS.pp || PARAMS.pr) && CODE) return loadSklad();   // v108: + QR наліпки приходу
   if (PARAMS.rh && CODE) return loadRetro();   // v53
   if (PARAMS.ai && CODE) return loadAssist();   // v65: помічник МЛП
   loadPage(extra);
@@ -1396,7 +1399,7 @@ function renderHome() {
     '<input type="number" inputmode="numeric" id="hn" placeholder="номер" style="font-size:17px"></div><button class="btn btn2" id="hgo" style="margin-top:8px">Відкрити</button></div>');
   if (p.noBatch) tiles.push('<a class="tile" href="' + esc(link('nb=1')) + '"><div class="tn">⏱ Записати роботу без партії</div><div class="td">' +
     (p.cabinet ? 'за себе або за працівника, сьогодні або минулою датою' : 'підготовка місця, перебирання залишків, навчання — у годинах або штуках') + '</div></a>');
-  const skRecv = !p.sklad && S.me && ['тімлід', 'зав. виробництва', 'адміністратор'].indexOf(S.me.role) >= 0;   // v107: тімлід без доступу «Склад» — приймає передачі
+  const skRecv = !p.sklad && S.me && ['тімлід', 'зав. виробництва', 'адміністратор', 'бухгалтер'].indexOf(S.me.role) >= 0;   // v107: тімлід без доступу «Склад» — приймає передачі
   if (p.sklad || skRecv) tiles.push('<a class="tile" href="' + esc(link('sklad=1')) + '"><div class="tn">⌂ Робота зі складом</div><div class="td">' + (p.sklad ? 'беремо зі складу / приймаємо на склад / передаємо в цех' : 'приймаємо передачі зі складу') + '</div></a>');
   if (p.dashBoxes && (prod || p.sklad)) tiles.push('<a class="tile" href="' + esc(link('d=boxes')) + '"><div class="tn">📦 Чисті ящики</div><div class="td">неповні ящики на виробництві, ящики на складі</div></a>');   // v57: Р-12
   if (p.retro) tiles.push('<a class="tile" href="' + esc(link('rh=1')) + '"><div class="tn">📄 Ретро-історія партій</div><div class="td">звірити записи, розпізнані з паперових техкарт, і підтвердити</div></a>');   // v53
@@ -1407,7 +1410,7 @@ function renderHome() {
   if ($('skInb') && CODE) post('skladInbox', { code: CODE }).then(r => {   // v107
     const b = $('skInb'); if (!b || !r || !r.n) return;
     b.innerHTML = '<a class="tile" href="' + esc(link('sklad=1')) + '" style="margin:12px;background:#FFF4D6"><div class="tn">📥 Чекає прийняття: ' + r.n + '</div><div class="td">' +
-      [r.inbox ? 'вам передали зі складу: ' + r.inbox : '', r.boxes ? 'ящики ГП на склад: ' + r.boxes : ''].filter(Boolean).join(' · ') + '</div></a>';
+      [r.inbox ? 'вам передали зі складу: ' + r.inbox : '', r.boxes ? 'ящики ГП на склад: ' + r.boxes : '', r.docs ? 'приходи без документа: ' + r.docs : ''].filter(Boolean).join(' · ') + '</div></a>';
   }).catch(() => { });
   if (prod) {
     const go = () => homeOpen($('hk').value, $('hn').value);
@@ -1615,7 +1618,7 @@ function regDone(pend, d) {
   toast('Телефон зареєстровано: ' + d.me.name);
   const rq = store('mlp_regq'); store('mlp_regq', null);   // v72: повернулись без параметрів — відкрити те, що сканували
   if (rq && !location.search) { location.replace(location.pathname + rq); return; }
-  const go = !d.pending && ((PARAMS.cab && d.perms && d.perms.cabinet) || PARAMS.d || PARAMS.h || PARAMS.th || PARAMS.s || PARAMS.sklad);
+  const go = !d.pending && ((PARAMS.cab && d.perms && d.perms.cabinet) || PARAMS.d || PARAMS.h || PARAMS.th || PARAMS.s || PARAMS.sklad || PARAMS.pp || PARAMS.pr);
   if (go) load(); else render({});
 }
 /** Тиха перевірка (без повідомлень); manual — натиснуто «2. Я зареєструвався» */
@@ -5223,7 +5226,7 @@ function renderSklad() {
   if (d.canWrite === false) {   // v107: тімлід без доступу «Склад» — лише приймає
     $('app').innerHTML = h + '<div class="card muted">Брати зі складу й передавати в цех можуть працівники з доступом «Склад». Тут — лише приймання передач у ваш цех.</div>' +
       '<p class="muted" style="text-align:center">' + esc(PAGE_VERSION) + ' · ' + esc(d.version) + '</p>';
-    return renderSkIn();
+    renderSkIn(); return skPpParam();
   }
   h += '<div class="card"><div class="mid">Робота зі складом</div>' + locHtml +
     '<label>Дія</label><div class="seg"><label><input type="radio" name="skAct" value="взяв" checked><span>Беремо<br>зі складу</span></label>' +
@@ -5237,6 +5240,8 @@ function renderSklad() {
     '<button type="button" class="ic" id="skBoxScan" style="flex:0 0 58px;font-size:22px;padding:10px 0;margin:0">📷</button></div>' +
     '<div id="skBoxes" class="list" style="padding:0;margin-top:8px"><p class="muted">Завантажую ящики на виробництві…</p></div>' +
     '<p class="muted">Повні ящики МЛП кладе на склад сам після пакування. Тут — неповні або ті, що лишились на столі пакування. Той самий запис — «Перемістити на склад» на картці ящика.</p></div>' +
+    '<div id="skRcvBox" style="display:none"><button type="button" class="btn" onclick="skRcvOpen()">📦 Прийняти від постачальника</button>' +
+      '<p class="muted">Документ (фото, PDF або «прийде пізніше»), кількість по коробках і наліпки 100 × 100 мм на кожну коробку.</p></div>' +   // v108
     '<div id="skReg">' +
     (d.photo ? '<label>Фото етикетки <span class="muted">(необов\'язково — заповнить поля саме)</span></label>' +
       '<input type="file" accept="image/*" capture="environment" id="skFile" style="display:none">' +
@@ -5257,7 +5262,7 @@ function renderSklad() {
     '<button class="btn" id="skGo">Записати</button><div class="err" id="err"></div></div>';
   h += '<div id="skMy"></div><p class="muted" style="text-align:center">' + esc(PAGE_VERSION) + ' · ' + esc(d.version) + '</p><div style="height:20px"></div>';
   $('app').innerHTML = h;
-  renderSkMy(); renderSkIn();
+  renderSkMy(); renderSkIn(); skPpParam();
   $('skPos').onchange = () => {
     const v = $('skPos').value;
     $('skOtherBox').style.display = v === d.other ? 'block' : 'none';
@@ -5269,7 +5274,9 @@ function renderSklad() {
     const put = (document.querySelector('input[name=skAct]:checked') || {}).value === 'поклав';
     const gp = put && (document.querySelector('input[name=skFrom]:checked') || {}).value === 'ГП з виробництва';
     $('skFromBox').style.display = put ? 'block' : 'none'; $('skPosL').textContent = put ? 'Що поклали' : 'Що взяли';
-    $('skReg').style.display = gp ? 'none' : 'block'; $('skGp').style.display = gp ? 'block' : 'none';
+    const sup = put && (document.querySelector('input[name=skFrom]:checked') || {}).value === 'від постачальника';   // v108: прихід — окрема форма
+    $('skReg').style.display = gp || sup ? 'none' : 'block'; $('skGp').style.display = gp ? 'block' : 'none';
+    $('skRcvBox').style.display = sup ? 'block' : 'none'; $('skGo').style.display = sup ? 'none' : ''; $('skCm').style.display = sup ? 'none' : ''; $('skCm').previousElementSibling.style.display = sup ? 'none' : '';
     if (gp && !SKB.list) skBoxesLoad();
   };
   document.querySelectorAll('input[name=skAct], input[name=skFrom]').forEach(r => r.onchange = skMode);
@@ -5412,7 +5419,8 @@ function renderSkMy() {
     (my.length ? my.map(x => '<div class="li"><div><div class="' + (x.cancelled || x.fixed ? 'x' : '') + '">' +
       (x.act === 'повернув' || x.act === 'поклав' ? '<span class="pill warn" style="margin:0 6px 0 0">поклав' + (x.from ? ' · ' + esc(x.from) : '') + '</span>' : '') +
       (x.zr ? '<span class="pill" style="margin:0 6px 0 0">📦 ящик' + (x.act === 'поклав' ? (x.accBy.indexOf('немає') === 0 ? ' · склад: немає' : x.acc ? ' · прийнято' : ' · чекає складу') : '') + '</span>' : '') +   // v58: рух ящика ГП (є і в ЖЗР); v107: прийняв склад?
-      (x.tr ? '<span class="pill blu" style="margin:0 6px 0 0">→ цех · ' + esc(x.tr) + '</span>' : '') +   // v107: рядок передачі
+      (x.tr ? '<span class="pill blu" style="margin:0 6px 0 0">→ цех · ' + esc(x.tr) + '</span>' : '') +
+      (x.pp ? '<span class="pill blu" style="margin:0 6px 0 0;cursor:pointer" onclick="skPpOpen({pp:\'' + esc(x.pp) + '\'})">' + esc(x.pp) + '</span>' : '') +   // v108   // v107: рядок передачі
       '<b>' + esc(x.pos) + (x.typ ? ' ' + esc(x.typ) : '') + '</b> — ' + esc(skNum(x.qty)) + ' ' + esc(x.unit) +
       '<br><span class="muted">' + (x.who ? esc(x.who) + ' · ' : '') + esc(x.loc) + (x.det ? ' · ' + esc(x.det) : '') + (x.lot ? ' · партія ' + esc(x.lot) : '') + (x.mlp ? ' · ' + esc(x.mlp) : '') +
       (x.photo ? ' · 📷' : '') + '</span></div><span class="muted" style="font-size:13px">' + esc(x.id) + st(x) + '</span>' + was(x) + '</div>' +
@@ -5462,14 +5470,24 @@ function renderSkIn() {
         '<br><span class="muted">' + esc(b.loc) + ' · ' + esc(b.time) + ' · ' + esc(b.auto ? 'авто після пакування · ' + b.who : b.who) + '</span></label>').join('') +
       '<div class="grid" style="margin-top:10px"><button class="btn btn2" onclick="skBoxNone()">Немає на складі</button><button class="btn" onclick="skBoxAcc(this)">Прийняти вибрані</button></div></div>';
   }
+  if ((x.docs || []).length) h += '<div class="card" style="border:2px solid #E0A400"><div class="mid">📄 Чекають документ: ' + x.docs.length + '</div>' +   // v108
+    x.docs.map(p => '<div class="li" style="padding:8px 0"><div><b>' + esc(p.pr) + '</b> · ' + esc(p.time.slice(0, 5)) + ' · ' + esc(p.supplier) + (p.docNo ? ' · ' + esc(p.docNo) : '') +
+      '<br><span class="muted">' + esc(p.who) + ' · ' + esc(p.lines.map(l => l.pos + ' ' + skNfmt(l.qty) + ' ' + l.unit).join('; ')) + '</span></div>' +
+      '<div class="r"><button class="ic" onclick="skDocOpen(\'' + esc(p.pr) + '\')">📄</button></div></div>').join('') + '</div>';
   if (d.canWrite !== false && (d.shops || []).length) h += '<button class="btn btn2" style="margin:12px;width:calc(100% - 24px)" onclick="skTrOpen()">→ Передати в цех</button>';
   if (x.sent.length) h += '<details style="margin:0 12px"><summary>Передачі в цех (' + x.sent.length + (x.sent.some(t => t.status === 'в дорозі') ? ', в дорозі: ' + x.sent.filter(t => t.status === 'в дорозі').length : '') + ')</summary>' +
     '<div class="list">' + x.sent.map(t => '<div class="li"><div><b>' + esc(t.id) + '</b> → ' + esc(t.toName) + ' · <span class="pill' + (t.status === 'в дорозі' ? ' warn' : t.status === 'прийнято' ? ' ok' : '') + '" style="margin:0">' + esc(t.status) + '</span>' +
       '<br><span class="muted">' + esc(t.who) + ' · ' + esc(t.time) + (t.by ? ' · прийняв(ла) ' + esc(t.by) + ' ' + esc(t.at) : '') + '</span>' +
       t.lines.map(l => '<div class="muted">' + esc(l.pos) + ' — ' + esc(skNum(l.qty)) + ' ' + esc(l.unit) + (l.got !== null && l.got !== l.qty ? ' · <b style="color:#9B231A">прийнято ' + esc(skNum(l.got)) + '</b>' : '') + (l.note ? ' · ' + esc(l.note) : '') + '</div>').join('') + '</div>' +
       (t.canCancel ? '<div class="r"><button class="ic" onclick="skTrCancel(\'' + esc(t.id) + '\')">✖</button></div>' : '') + '</div>').join('') + '</div></details>';
+  if ((x.rcv || []).length) h += '<details style="margin:0 12px"><summary>Приходи від постачальників (' + x.rcv.length + ')</summary><div class="list">' +   // v108
+    x.rcv.map(p => '<div class="li" onclick="skPpShow(SKD.inbox.rcv.find(z => z.pr === \'' + esc(p.pr) + '\'))" style="cursor:pointer"><div><b>' + esc(p.pr) + '</b> · ' + esc(p.supplier) +
+      ' · <span class="pill' + (p.doc === 'очікується' ? ' warn' : '') + '" style="margin:0">док.: ' + esc(p.doc) + '</span><br><span class="muted">' + esc(p.time) + ' · ' + esc(p.who) + ' · ' +
+      esc(p.lines.map(l => l.pp + ' ' + l.pos + ' ' + skNfmt(l.qty) + ' ' + l.unit).join('; ')) + '</span></div></div>').join('') + '</div></details>';
   box.innerHTML = h;
 }
+/** v108: відкрито з QR наліпки — картка приходу */
+function skPpParam() { if (PARAMS.pp || PARAMS.pr) { const q = { pp: PARAMS.pp || '', pr: PARAMS.pr || '' }; delete PARAMS.pp; delete PARAMS.pr; setUrl(); skPpOpen(q); } }
 function skIn(r) { if (r && r.inbox) SKD.inbox = r.inbox; if (r && r.my) SKD.my = r.my; renderSkIn(); renderSkMy(); }
 function skErr(e, btn) { if (btn) { btn.disabled = false; btn.textContent = btn._t || btn.textContent; } const m = String(e.message || e).replace(/^Error:\s*/, ''); if ($('merr')) $('merr').textContent = m; toast(m, true); }
 function skAccept(id, btn) {
@@ -5557,6 +5575,179 @@ function skTrSave() {
   b.disabled = true; b._t = b.textContent; b.textContent = 'Передаю…';
   post('skladTransfer', { code: CODE, from: $('trFrom').value, to: $('trTo').value, comment: $('trCm').value, lines: lines })
     .then(r => { closeModal(); toast(r.msg); skIn(r); }).catch(e => skErr(e, b));
+}
+// =============================================================== v108: ПРИЙМАННЯ ВІД ПОСТАЧАЛЬНИКА (Sklad.gs v12): прихід ПР-…, партії ПП-…, документ, наліпки 100 × 100
+let RCV = { files: [], up: 0, n: 0 };
+function skNfmt(v) { const x = Math.round((Number(v) || 0) * 1000) / 1000; const s = String(Math.trunc(Math.abs(x))).replace(/\B(?=(\d{3})+(?!\d))/g, ' '); const f = String(x).split('.')[1]; return (x < 0 ? '-' : '') + s + (f ? ',' + f : ''); }
+function skRcvOpen() {
+  const d = SKD; RCV = { files: [], up: 0, n: 0 };
+  const wh = d.whLocs || [], site = String((d.me && d.me.site) || '').charAt(0);
+  const cur = d.loc && wh.some(l => l.code === d.loc.code) ? d.loc.code : ((wh.find(l => site && l.code.charAt(0) === site) || {}).code || '');   // склад своєї будівлі
+  const lab = l => l.code + (l.name && l.name !== l.code ? ' · ' + l.name : '');
+  const seg = (name, list, on) => '<div class="seg wrap">' + list.map(x => '<label><input type="radio" name="' + name + '" value="' + esc(x[0]) + '"' + (x[0] === on ? ' checked' : '') + '><span>' + x[1] + '</span></label>').join('') + '</div>';
+  openModal('<div class="card"><div class="mid">Приймання від постачальника</div>' +
+    '<div class="muted">Один прихід = одна машина / накладна. Кожна позиція отримає номер партії приймання ПП-…, кожна коробка — наліпку.</div>' +
+    '<label>На склад</label><select id="rvLoc" data-nocbx>' + (cur ? '' : '<option value="">— оберіть —</option>') + wh.map(l => '<option value="' + esc(l.code) + '"' + (l.code === cur ? ' selected' : '') + '>' + esc(lab(l)) + '</option>').join('') + '</select>' +
+    '<label>Постачальник</label><input type="text" id="rvSup" list="rvSupL" placeholder="назва з накладної"><datalist id="rvSupL">' + (d.suppliers || []).map(x => '<option value="' + esc(x) + '">').join('') + '</datalist>' +
+    '<label>Документ</label>' + seg('rvDoc', [['є', 'Є<br><small>фото / PDF</small>'], ['очікується', 'Прийде<br>пізніше'], ['без документа', 'Без<br>документа']], '') +
+    '<div id="rvDocYes" style="display:none"><div class="grid" style="margin-top:8px"><button type="button" class="btn btn2" style="margin:0" onclick="$(\'rvCam\').click()">📷 Фото</button>' +
+      '<button type="button" class="btn btn2" style="margin:0" onclick="$(\'rvPdf\').click()">📎 Файл / PDF</button></div>' +
+      '<input type="file" accept="image/*" capture="environment" id="rvCam" style="display:none"><input type="file" accept="application/pdf,image/*" multiple id="rvPdf" style="display:none">' +
+      '<div id="rvFiles" class="muted" style="margin-top:6px"></div></div>' +
+    '<div id="rvDocNo" style="display:none"><input type="text" id="rvNo" placeholder="№ документа (якщо відомий): накладна, інвойс, МД"></div>' +
+    '<div id="rvDocWhy" style="display:none"><input type="text" id="rvWhy" placeholder="чому без документа"></div>' +
+    '<div id="rvLines"></div><button type="button" class="btn btn2" id="rvAdd" style="margin-top:8px">+ Ще позиція</button>' +
+    '<label class="opt" style="margin-top:12px"><input type="checkbox" id="rvPal" checked>Ще наліпка на палету (весь прихід)</label>' +
+    '<label>Коментар</label><input type="text" id="rvCm">' +
+    '<div class="err" id="merr"></div>' +
+    '<div class="grid" style="margin-top:16px"><button class="btn btn2" onclick="closeModal()">Закрити</button><button class="btn" id="rvGo">Прийняти й надрукувати</button></div></div>');
+  document.querySelectorAll('input[name=rvDoc]').forEach(r => r.onchange = () => {
+    const v = (document.querySelector('input[name=rvDoc]:checked') || {}).value;
+    $('rvDocYes').style.display = v === 'є' ? 'block' : 'none'; $('rvDocNo').style.display = v === 'є' || v === 'очікується' ? 'block' : 'none'; $('rvDocWhy').style.display = v === 'без документа' ? 'block' : 'none';
+  });
+  $('rvCam').onchange = e => { [...(e.target.files || [])].forEach(skUpFile); e.target.value = ''; };
+  $('rvPdf').onchange = e => { [...(e.target.files || [])].forEach(skUpFile); e.target.value = ''; };
+  $('rvAdd').onclick = skRcvLine; skRcvLine();
+  $('rvGo').onclick = skRcvSave;
+}
+/** Файл документа → сервер (фото стискаємо; PDF — як є). Список — RCV.files */
+function skUpFile(f, target) {
+  const list = target || RCV, box = target ? $('dcFiles') : $('rvFiles');
+  const it = { name: f.name || 'фото', id: '', st: 'надсилаю…' }; list.files.push(it); list.up++; skUpDraw(list, box);
+  const pdf = /pdf$/i.test(f.type) || /\.pdf$/i.test(f.name || '');
+  const rd = pdf ? new Promise((ok, no) => { const r = new FileReader(); r.onload = () => ok(r.result); r.onerror = () => no(new Error('Не вдалося прочитати файл')); r.readAsDataURL(f); }) : skShrink(f);
+  rd.then(data => post('skladDocUpload', { code: CODE, name: it.name, mime: pdf ? 'application/pdf' : 'image/jpeg', data: String(data).split(',')[1] }))
+    .then(r => { it.id = r.id; it.st = '✓'; }).catch(e => { it.st = '✖ ' + String(e.message || e).replace(/^Error:\s*/, ''); it.bad = 1; })
+    .then(() => { list.up--; skUpDraw(list, box); });
+}
+function skUpDraw(list, box) {
+  if (!box) return;
+  box.innerHTML = list.files.map((x, i) => '<div>' + esc(x.st) + ' ' + esc(x.name) + (x.bad || x.id ? ' <a href="#" onclick="return skUpDel(' + i + ',' + (list === RCV ? 0 : 1) + ')">прибрати</a>' : '') + '</div>').join('');
+}
+function skUpDel(i, doc) { const l = doc ? DOCU : RCV; l.files.splice(i, 1); skUpDraw(l, doc ? $('dcFiles') : $('rvFiles')); return false; }
+function skRcvLine() {
+  const d = SKD, n = ++RCV.n;
+  const div = document.createElement('div'); div.className = 'rvl'; div.dataset.n = n;
+  div.style.cssText = 'border-top:1px solid #E7EDF1;margin-top:12px;padding-top:4px';
+  div.innerHTML = '<label>Позиція ' + n + '</label><select id="rvP' + n + '">' + skPosOpts(d, '', '— оберіть —') + '</select>' +
+    '<div id="rvO' + n + '" style="display:none"><input type="text" id="rvOt' + n + '" placeholder="що саме"></div>' +
+    '<div class="row" style="align-items:flex-end;margin-top:6px"><div style="flex:1;min-width:0"><span class="muted">Усього</span><input type="text" inputmode="decimal" id="rvQ' + n + '" placeholder="напр. 100000" style="font-size:20px;font-weight:600;margin:0"></div>' +
+    '<select id="rvU' + n + '" data-nocbx style="flex:0 0 26%">' + opts(d.units, 'шт') + '</select></div>' +
+    '<div class="row" style="margin-top:6px"><div style="flex:1;min-width:0"><span class="muted">Коробок / місць</span><input type="text" inputmode="numeric" id="rvB' + n + '" value="1" style="margin:0"></div>' +
+    '<div style="flex:1;min-width:0"><span class="muted">У коробці</span><input type="text" inputmode="decimal" id="rvPer' + n + '" style="margin:0"></div></div>' +
+    '<div id="rvH' + n + '" class="muted" style="margin-top:4px;min-height:18px"></div>' +
+    '<label class="opt" style="margin:6px 0 0;font-size:14px"><input type="checkbox" id="rvC' + n + '">Не перераховували — за етикеткою постачальника</label>' +
+    '<input type="text" id="rvL' + n + '" placeholder="партія постачальника (lot, batch, P/N)" style="margin-top:6px">' +
+    '<input type="text" id="rvD' + n + '" placeholder="деталі (необов\'язково)" style="margin-top:6px">';
+  $('rvLines').appendChild(div);
+  $('rvP' + n).onchange = () => { const v = $('rvP' + n).value; $('rvO' + n).style.display = v === d.other ? 'block' : 'none';
+    const p = d.positions.find(x => x.name === v); if (p) $('rvU' + n).value = p.unit; skRcvHint(n); };
+  ['rvQ', 'rvB', 'rvPer', 'rvU'].forEach(k => $(k + n)[k === 'rvU' ? 'onchange' : 'oninput'] = () => skRcvHint(n));
+}
+/** Підказка під рядком: як розкладено по коробках (так буде на наліпках) */
+function skRcvHint(n) {
+  const h = $('rvH' + n); if (!h) return;
+  const tot = skCalc($('rvQ' + n).value), b = Math.round(Number($('rvB' + n).value) || 0), u = $('rvU' + n).value, ps = $('rvPer' + n).value.trim();
+  $('rvPer' + n).placeholder = '';
+  if (!$('rvQ' + n).value.trim()) { h.innerHTML = ''; return; }
+  if (isNaN(tot) || !(tot > 0)) { h.innerHTML = '<span style="color:#9B231A">усього — лише числа і «+»</span>'; return; }
+  if (!(b >= 1)) { h.innerHTML = '<span style="color:#9B231A">коробок — ціле число від 1</span>'; return; }
+  let per = ps ? skCalc(ps) : NaN;
+  const even = tot / b;
+  if (!ps && Math.abs(even * 1000 - Math.round(even * 1000)) < 1e-6) { per = Math.round(even * 1000) / 1000; $('rvPer' + n).placeholder = skNfmt(per); }
+  if (isNaN(per)) { h.innerHTML = ps ? '<span style="color:#9B231A">у коробці — число</span>' : 'Порівну не ділиться — впишіть «у коробці» (остання коробка — решта) або на наліпці буде лише загальна кількість'; return; }
+  if (!(per * (b - 1) < tot - 1e-9 && tot <= per * b + 1e-9)) { h.innerHTML = '<span style="color:#9B231A">' + b + ' кор. по ' + skNfmt(per) + ' — це від ' + skNfmt(per * (b - 1)) + ' до ' + skNfmt(per * b) + '</span>'; return; }
+  const last = Math.round((tot - per * (b - 1)) * 1000) / 1000;
+  h.innerHTML = 'Наліпки: ' + (b === 1 ? '1 кор. · ' + skNfmt(tot) + ' ' + esc(u) : last === per ? b + ' кор. по ' + skNfmt(per) + ' ' + esc(u) : (b - 1) + ' кор. по ' + skNfmt(per) + ' + 1 кор. ' + skNfmt(last) + ' ' + esc(u));
+}
+function skRcvSave() {
+  const b = $('rvGo'); if (b.disabled) return; $('merr').textContent = '';
+  const d = SKD, err = t => { $('merr').textContent = t; };
+  const loc = $('rvLoc').value, sup = $('rvSup').value.trim(), st = (document.querySelector('input[name=rvDoc]:checked') || {}).value;
+  if (!loc) return err('Оберіть склад');
+  if (!sup) return err('Вкажіть постачальника');
+  if (!st) return err('Документ: оберіть «Є», «Прийде пізніше» або «Без документа»');
+  if (RCV.up) return err('Зачекайте — файли ще надсилаються');
+  const files = RCV.files.filter(x => x.id).map(x => x.id);
+  if (st === 'є' && !files.length && !$('rvNo').value.trim()) return err('Документ «Є» — додайте фото чи файл (або впишіть номер)');
+  if (st === 'без документа' && !$('rvWhy').value.trim()) return err('Напишіть, чому без документа');
+  const lines = [];
+  for (const el of document.querySelectorAll('.rvl')) {
+    const n = el.dataset.n, pos = $('rvP' + n).value, q = $('rvQ' + n).value.trim();
+    if (!pos && !q) continue;
+    if (!pos) return err('Позиція ' + n + ': оберіть, що приймаєте');
+    const v = skCalc(q); if (!q || isNaN(v) || !(v > 0)) return err('Позиція ' + n + ': вкажіть, скільки всього');
+    const p = d.positions.find(x => x.name === pos) || {};
+    lines.push({ pos: pos, posOther: $('rvOt' + n).value, typ: p.typ || '', qty: q, unit: $('rvU' + n).value, boxes: $('rvB' + n).value, per: $('rvPer' + n).value,
+      counted: !$('rvC' + n).checked, lot: $('rvL' + n).value, det: $('rvD' + n).value });
+  }
+  if (!lines.length) return err('Додайте хоча б одну позицію');
+  b.disabled = true; b._t = b.textContent; b.textContent = 'Приймаю…';
+  post('skladReceive', { code: CODE, loc: loc, supplier: sup, doc: { st: st, no: st === 'без документа' ? '' : $('rvNo').value, why: $('rvWhy').value, files: files },
+    comment: $('rvCm').value, pallet: $('rvPal').checked, lines: lines }).then(r => {
+    skIn(r); if (r.card && d.suppliers && d.suppliers.indexOf(sup) < 0) d.suppliers.unshift(sup);
+    skPpShow(r.card, { msg: r.msg, pdf: r.pdf, file: r.file });
+  }).catch(e => skErr(e, b));
+}
+/** PDF наліпок з base64 — відкрити / зберегти */
+function skPdfUrl(b64) { const bin = atob(b64), a = new Uint8Array(bin.length); for (let i = 0; i < bin.length; i++) a[i] = bin.charCodeAt(i); return URL.createObjectURL(new Blob([a], { type: 'application/pdf' })); }
+/** Картка приходу: з QR наліпки (?pp=12-3, ?pr=5) або після приймання */
+function skPpOpen(q) {
+  post('skladPp', Object.assign({ code: CODE }, q)).then(r => skPpShow(r.card, { box: r.box, pp: r.pp })).catch(e => toast(String(e.message || e).replace(/^Error:\s*/, ''), true));
+}
+function skPpShow(c, o) {
+  o = o || {}; SKD.card = c;
+  const docTxt = c.doc === 'є' ? '✓ є' : c.doc === 'очікується' ? '<b style="color:#8A5A00">очікується</b>' : 'без документа';
+  openModal('<div class="card"><div class="mid">Прихід ' + esc(c.pr) + (c.cancelled ? ' · скасовано' : '') + '</div>' +
+    (o.msg ? '<div class="pill ok" style="display:block;margin:6px 0 8px">' + esc(o.msg) + '</div>' : '') +
+    (o.pdf ? '<a class="btn" style="display:block;text-align:center;text-decoration:none" href="' + skPdfUrl(o.pdf) + '" download="' + esc(o.file || 'naliepky.pdf') + '" target="_blank">⬇ PDF наліпок (100 × 100 мм)</a>' : '') +
+    '<div class="muted" style="margin-top:8px">' + esc(c.time) + ' · ' + esc(c.locName) + ' · ' + esc(c.who) + '</div>' +
+    '<div style="margin-top:4px"><b>' + esc(c.supplier) + '</b></div>' +
+    '<div style="margin-top:4px">Документ: ' + docTxt + (c.docNo ? ' · ' + esc(c.docNo) : '') + (c.docBy ? ' <span class="muted">(' + esc(c.docBy) + ' ' + esc(c.docAt) + ')</span>' : '') + '</div>' +
+    (c.files.length ? '<div>' + c.files.map((u, i) => '<a href="' + esc(u) + '" target="_blank">файл ' + (i + 1) + '</a>').join(' · ') + '</div>' : '') +
+    (c.doc === 'очікується' && !c.cancelled ? '<button class="btn btn2" onclick="skDocOpen(\'' + esc(c.pr) + '\')">📄 Додати документ</button>' : '') +
+    (c.comment ? '<div class="muted">' + esc(c.comment) + '</div>' : '') +
+    '<div class="list" style="padding:0;margin-top:8px">' + c.lines.map(l => {
+      const here = o.pp === l.pp && o.box;
+      const last = l.per === null ? null : Math.round((l.qty - l.per * (l.boxes - 1)) * 1000) / 1000;
+      const inBox = here && l.per !== null ? (o.box < l.boxes ? l.per : last) : null;
+      return '<div class="li"' + (here ? ' style="background:#FFF4D6"' : '') + '><div' + (l.st ? ' class="x"' : '') + '><b>' + esc(l.pp) + '</b> · ' + esc(l.pos) +
+        '<br><b>' + skNfmt(l.qty) + ' ' + esc(l.unit) + '</b> · ' + l.boxes + ' кор.' + (l.per !== null && l.boxes > 1 ? ' по ' + skNfmt(l.per) + (last !== l.per ? ' (остання ' + skNfmt(last) + ')' : '') : '') +
+        (l.counted ? '' : ' · за етикеткою постачальника') +
+        '<br><span class="muted">' + esc([l.code, l.lot ? 'партія ' + l.lot : '', l.det, l.vd, l.st].filter(Boolean).join(' · ')) + '</span>' +
+        (here ? '<br><b>Ця коробка: ' + o.box + ' з ' + l.boxes + (inBox !== null ? ' · ' + skNfmt(inBox) + ' ' + esc(l.unit) : '') + '</b> <span class="muted">(при прийманні)</span>' : '') + '</div>' +
+        (l.st ? '' : '<div class="r"><button class="ic" title="Наліпки ще раз" onclick="skLblAgain(\'' + esc(l.pp) + '\',' + l.boxes + ')">🖨</button></div>') + '</div>';
+    }).join('') + '</div>' +
+    '<div class="grid" style="margin-top:16px"><button class="btn btn2" onclick="skLblAgain(\'\',0,\'' + esc(c.pr) + '\')">🖨 Наліпка палети</button><button class="btn" onclick="closeModal()">Готово</button></div></div>');
+}
+function skLblAgain(pp, boxes, pr) {
+  const go = q => post('skladLabels', Object.assign({ code: CODE }, q)).then(r => {
+    toast(r.msg); if (r.pdf) { const a = document.createElement('a'); a.href = skPdfUrl(r.pdf); a.download = r.file || 'naliepky.pdf'; a.target = '_blank'; document.body.appendChild(a); a.click(); a.remove(); }
+  }).catch(e => toast(String(e.message || e).replace(/^Error:\s*/, ''), true));
+  if (pr) return go({ pr: pr, pallet: true, only: 'pallet' });
+  const v = prompt('Наліпки ' + pp + ' — які коробки? Напр. «3» або «1-5, 8». Порожньо — усі ' + boxes, '');
+  if (v === null) return;
+  go({ pp: pp, boxes: v.trim() });
+}
+/** Додати документ до приходу, що його чекає */
+let DOCU = { files: [], up: 0 };
+function skDocOpen(pr) {
+  DOCU = { files: [], up: 0 };
+  openModal('<div class="card"><div class="mid">Документ до ' + esc(pr) + '</div>' +
+    '<div class="grid" style="margin-top:8px"><button type="button" class="btn btn2" style="margin:0" onclick="$(\'dcCam\').click()">📷 Фото</button><button type="button" class="btn btn2" style="margin:0" onclick="$(\'dcPdf\').click()">📎 Файл / PDF</button></div>' +
+    '<input type="file" accept="image/*" capture="environment" id="dcCam" style="display:none"><input type="file" accept="application/pdf,image/*" multiple id="dcPdf" style="display:none">' +
+    '<div id="dcFiles" class="muted" style="margin-top:6px"></div>' +
+    '<label>№ документа</label><input type="text" id="dcNo" placeholder="накладна, інвойс, МД"><div class="err" id="merr"></div>' +
+    '<div class="grid" style="margin-top:16px"><button class="btn btn2" onclick="closeModal()">Закрити</button><button class="btn" id="dcGo">Зберегти</button></div></div>');
+  $('dcCam').onchange = e => { [...(e.target.files || [])].forEach(f => skUpFile(f, DOCU)); e.target.value = ''; };
+  $('dcPdf').onchange = e => { [...(e.target.files || [])].forEach(f => skUpFile(f, DOCU)); e.target.value = ''; };
+  $('dcGo').onclick = () => {
+    const b = $('dcGo'); if (DOCU.up) { $('merr').textContent = 'Зачекайте — файли ще надсилаються'; return; }
+    const files = DOCU.files.filter(x => x.id).map(x => x.id);
+    if (!files.length && !$('dcNo').value.trim()) { $('merr').textContent = 'Додайте фото чи файл або впишіть номер'; return; }
+    b.disabled = true; b._t = b.textContent; b.textContent = 'Зберігаю…';
+    post('skladDocAttach', { code: CODE, pr: pr, no: $('dcNo').value, files: files }).then(r => { toast(r.msg); skIn(r); skPpShow(r.card); }).catch(e => skErr(e, b));
+  };
 }
 function skFixOpen(id) {
   const x = (SKD.my || []).find(r => r.id === id); if (!x) return;
