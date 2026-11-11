@@ -1,5 +1,8 @@
 <!DOCTYPE html>
-<!-- МЛП · index.html v108 · 11.11.2026 — приймання від постачальника (Sklad.gs v12): «Приймаємо на склад» → «Від постачальника» відкриває форму приходу
+<!-- МЛП · index.html v109 · 11.11.2026 — кілька фото всюди (рішення 11.11): етикетка на «Роботі зі складом» (📷 Ще фото), етикетка постачальника на кроці / в1,
+     паперовий лист попередніх кроків — до 10, документ приходу — сторінками; «Фото» запису — кілька 📷. Приймання: «коробка» → «тара», у тарі — одна кількість
+     або кожна через «;»; картка приходу — тара зараз, «✎ Нова наліпка» (почали / розділили, Sklad.gs v13 skladRelabel); великий PDF — посиланням на Диск.
+     v108 · 11.11.2026 — приймання від постачальника (Sklad.gs v12): «Приймаємо на склад» → «Від постачальника» відкриває форму приходу
      (склад, постачальник, документ «є / прийде пізніше / без документа» з фото чи PDF, позиції: усього, коробок, у коробці, «за етикеткою постачальника»,
      партія постачальника); після запису — PDF наліпок 100 × 100 мм; «Чекають документ» і «Приходи» на «Роботі зі складом»; картка приходу з QR наліпки (?pp= / ?pr=).
      v107 · 11.11.2026 — передачі склад → цех і ящики ГП у 2 кроки (Sklad.gs v11): «Робота зі складом» — «Вам передали» (тімлід цеху приймає,
@@ -642,7 +645,7 @@
 <div class="net" id="net" role="alert" aria-live="assertive"><div class="nb"><div class="rt" id="netr"></div><div class="nt" id="nett">Зберігаю…</div><div class="ns" id="nets"></div><div class="np"><i id="netp"></i></div><div class="nh" id="neth"></div><div class="zc" id="zc"></div><button class="nx" id="netx" type="button">Не чекати</button></div></div>
 
 <script>
-const PAGE_VERSION = 'index.html v108 · 11.11.2026';   // v108: приймання від постачальника, наліпки; v107: передачі склад → цех, ящики ГП приймає склад; v106: позиції складу за групами; v105: кнопки складу «Беремо зі складу» / «Приймаємо на склад»; v104: «Історія тари» (?th=) — назва тари на сторінці тари / партії веде на неї (Reports.gs v42)
+const PAGE_VERSION = 'index.html v109 · 11.11.2026';   // v109: кілька фото, тара, перемаркування; v108: приймання від постачальника, наліпки; v107: передачі склад → цех, ящики ГП приймає склад; v106: позиції складу за групами; v105: кнопки складу «Беремо зі складу» / «Приймаємо на склад»; v104: «Історія тари» (?th=) — назва тари на сторінці тари / партії веде на неї (Reports.gs v42)
 // v103 (11.11): Р-9_08 «За типом», «Перевірено, все ок»
 // v102 (09.11):   // v74: в1 — і з нашої тари (ящик залишків); в2 — лише партії в2
 // v72 (26.10):   // v72: «Яку партію відкриваємо?»; розшифровка кроків на картці партії; реєстрація — повернення за посиланням з форми
@@ -684,7 +687,7 @@ function post(api, q) {
  *  (плашка, якщо довше за 0,7 с), '' — без плашки (перевірка партії у формі, фото, списки у формі) */
 function netKind(api, q) {
   q = q || {};
-  if (api === 'act' || api === 'skladSave' || api === 'skladCancel' || api === 'skladEdit' || api === 'skladBox' || api === 'reconAck' || api === 'skladTransfer' || api === 'skladAccept' || api === 'skladTrCancel' || api === 'skladBoxAccept' || api === 'skladReceive' || api === 'skladDocAttach' || api === 'skladLabels') return 'w';   // v107
+  if (api === 'act' || api === 'skladSave' || api === 'skladCancel' || api === 'skladEdit' || api === 'skladBox' || api === 'reconAck' || api === 'skladTransfer' || api === 'skladAccept' || api === 'skladTrCancel' || api === 'skladBoxAccept' || api === 'skladReceive' || api === 'skladDocAttach' || api === 'skladLabels' || api === 'skladRelabel') return 'w';   // v107
   if (api === 'approve') return q.confirm ? 'w' : 'r';
   if (api === 'retro') return /^(save|confirm|reopen)$/.test(q.op || '') ? 'w' : (q.op === 'photo' ? '' : 'r');
   if (api === 'page' || api === 'cabinet' || api === 'dash' || api === 'hist' || api === 'tareHist' || api === 'skladPage' || api === 'skladPp') return 'r';
@@ -1894,37 +1897,43 @@ function lotField(id, label) {
     '<input type="file" accept="image/*" capture="environment" id="' + id + 'File" style="display:none"><div id="' + id + 'Ph" class="muted" style="margin-top:6px"></div>';
 }
 function wireLot(id, extra) {
-  LOTF[id] = { photo: '', busy: null };
+  LOTF[id] = { photos: [], busy: [] };
   if (!$(id + 'Cam')) return;
   $(id + 'Cam').onclick = () => $(id + 'File').click();
-  $(id + 'File').onchange = e => { const f = e.target.files && e.target.files[0]; if (f) lotPhoto(id, f, extra); e.target.value = ''; };
+  $(id + 'File').onchange = e => { [...(e.target.files || [])].forEach(f => lotPhoto(id, f, extra)); e.target.value = ''; };
 }
+/** v109: кілька фото етикеток — кожне надсилається й розпізнається; номер партії — з першого, де прочитано */
 function lotPhoto(id, file, extra) {
-  const ph = $(id + 'Ph'); const st = LOTF[id] = { photo: '', busy: null };
-  ph.innerHTML = 'Надсилаю фото…';
-  st.busy = skShrink(file).then(data => {
-    const img = '<img src="' + data + '" style="height:56px;border-radius:8px;vertical-align:middle;margin-right:8px">';
-    ph.innerHTML = img + 'Розпізнаю номер партії…';
+  const st = LOTF[id] = LOTF[id] || { photos: [], busy: [] };
+  const x = { id: '', img: '', txt: 'Надсилаю фото…' }; st.photos.push(x); lotDraw(id);
+  const b = skShrink(file).then(data => {
+    x.img = data; x.txt = 'Розпізнаю номер партії…'; lotDraw(id);
     return post('lotPhoto', Object.assign({ code: CODE, img: data.split(',')[1] }, extra || {})).then(r => {
-      st.photo = r.photo;
+      x.id = r.photo;
       const lot = (r.fields && r.fields.lot) || '';
       if (lot && $(id) && !$(id).value) $(id).value = lot;
-      if ($(id + 'Ph')) $(id + 'Ph').innerHTML = img + (lot ? '✓ Номер з етикетки: <b>' + esc(lot) + '</b> — перевірте' : 'Фото збережено, номер не розпізнано — впишіть вручну');
+      x.txt = lot ? '✓ <b>' + esc(lot) + '</b>' : '✓ збережено';
     });
-  }).catch(e => { if ($(id + 'Ph')) $(id + 'Ph').innerHTML = '<span style="color:#9B231A">' + esc(e.message) + '</span> — можна записати без фото'; })
-    .then(() => { st.busy = null; });
+  }).catch(e => { x.txt = '<span style="color:#9B231A">' + esc(e.message) + '</span>'; x.bad = 1; })
+    .then(() => { st.busy = st.busy.filter(z => z !== b); lotDraw(id); });
+  st.busy.push(b);
 }
-function lotVal(id) { return { lot: $(id) ? $(id).value.trim() : '', photo: (LOTF[id] || {}).photo || '' }; }
+function lotDraw(id) {
+  const ph = $(id + 'Ph'), st = LOTF[id]; if (!ph || !st) return;
+  ph.innerHTML = st.photos.map(x => '<span style="display:inline-flex;align-items:center;gap:6px;margin:4px 10px 0 0">' + (x.img ? '<img src="' + x.img + '" style="height:44px;border-radius:6px">' : '') + x.txt + '</span>').join('') +
+    (st.photos.length ? '<div class="muted" style="font-size:13px">Ще фото — 📷 ще раз. Номер перевірте.</div>' : '');
+}
+function lotVal(id) { return { lot: $(id) ? $(id).value.trim() : '', photo: ((LOTF[id] || {}).photos || []).filter(x => x.id).map(x => x.id) }; }   // v109: масив id
 /** Дочекатися фото, що ще надсилається (щоб запис отримав посилання на нього) */
-function lotWait() { return Promise.all(Object.keys(LOTF).map(k => LOTF[k].busy).filter(Boolean)).catch(() => { }); }
+function lotWait() { return Promise.all([].concat(...Object.keys(LOTF).map(k => LOTF[k].busy || []))).catch(() => { }); }
 
 // ---- v42: оцифрування партії, що вже на кроці X: фото паперового листа попередніх кроків (без розпізнавання, 1–3 фото).
 // Кожне фото надсилається одразу (histPhoto → id файлу), «Створити партію» чекає, поки всі дійдуть, і передає id.
-const HP_MAX = 3;
+const HP_MAX = 10;   // v109: було 3
 let HP = [];
 function HP_reset() { HP = []; }
 function histField() {
-  return '<label>Фото паперового листа попередніх кроків <span class="muted">(необов\'язково)</span></label>' +
+  return '<label>Фото паперового листа попередніх кроків <span class="muted">(необов\'язково, кожна сторінка — окремим фото)</span></label>' +
     '<button type="button" class="btn btn2" id="hpCam" style="margin-top:0">📷 Додати фото</button>' +
     '<input type="file" accept="image/*" capture="environment" id="hpFile" style="display:none">' +
     '<div id="hpList" class="muted" style="margin-top:6px"></div>' +
@@ -2095,7 +2104,7 @@ function renderBatch(extra) {
     if (x.type === 'ящик зі складу') what = '📦 ' + bxl(x.boxes) + ' взято зі складу · ' + x.qty + ' шт';
     if (x.type === 'взято з ящика') what = '📦 взято з ящика ' + bxl(x.boxes) + ' · ' + x.qty + ' шт';
     if (x.type === 'повернуто в ящик') what = '📦 повернуто в ящик ' + bxl(x.boxes) + ' · ' + x.qty + ' шт';
-    if (x.lot || x.photo) what += ' · партія постач. ' + esc(x.lot || '—') + (x.photo ? ' <a class="lnk" target="_blank" href="' + esc(x.photo) + '">📷</a>' : '');   // v17
+    if (x.lot || x.photo) what += ' · партія постач. ' + esc(x.lot || '—') + String(x.photo || '').split(/\s+/).filter(Boolean).map(u => ' <a class="lnk" target="_blank" href="' + esc(u) + '">📷</a>').join('');   // v17; v109: кілька фото
     const btns = (x.canCancel ? '<button class="ic" onclick="cancelRec(\'' + x.id + '\')">✖</button>' : '') +
       (x.canBack && p.move ? '<button class="ic" onclick="moveBack(\'' + x.id + '\')">↩ назад</button>' : '') +
       (x.canUndo ? '<button class="ic" onclick="undoSep(\'' + x.id + '\')">✖</button>' : '') +
@@ -5197,7 +5206,7 @@ function renderTareHist() {
 // =============================================================== СКЛАД (v9)
 // QR на дверях складу: …?s=П1. Видача / повернення, фото етикетки (розпізнає сервер), «Мої видачі».
 let SKD = null;                 // дані від сервера
-let SKF = { photo: '', raw: '', busy: null };   // фото поточного запису; busy — запит фото, що ще йде
+let SKF = { photos: [], raw: '', busy: null };   // v109: кілька фото   // фото поточного запису; busy — запит фото, що ще йде
 function loadSklad() {
   setView('', 'Робота зі складом', 'home');
   $('app').innerHTML = '<div class="center muted">Завантаження…</div>';
@@ -5311,23 +5320,26 @@ function skShrink(file) {
     img.src = url;
   });
 }
-function skPhoto(file) {
-  const ph = $('skPh');
-  SKF.photo = ''; SKF.raw = ''; SKF.hint = '';
-  ph.innerHTML = 'Надсилаю фото…';
-  $('skCam').textContent = '📷 Перезняти етикетку';
-  SKF.busy = skShrink(file).then(data => {
-    ph.innerHTML = '<img src="' + data + '" style="height:64px;border-radius:8px;vertical-align:middle;margin-right:8px">Розпізнаю етикетку…';
-    const loc = SKD.loc ? SKD.loc.code : ($('skLoc') ? $('skLoc').value.split(' ')[0] : '');
+function skPhoto(file) {   // v109: кожне фото — додається (етикетки, сторінки накладної); поля — з перших розпізнаних
+  const x = { id: '', img: '', txt: 'Надсилаю фото…' }; SKF.photos.push(x); skPhDraw();
+  $('skCam').textContent = '📷 Ще фото';
+  const loc = SKD.loc ? SKD.loc.code : ($('skLoc') ? $('skLoc').value.split(' ')[0] : '');
+  const b = skShrink(file).then(data => {
+    x.img = data; x.txt = 'Розпізнаю…'; skPhDraw();
     return post('skladPhoto', { code: CODE, loc: loc, img: data.split(',')[1] }).then(r => {
-      SKF.photo = r.photo; SKF.raw = r.raw || '';
-      const img = '<img src="' + data + '" style="height:64px;border-radius:8px;vertical-align:middle;margin-right:8px">';
-      if (r.fields) { skFill(r.fields); ph.innerHTML = img + '✓ Розпізнано — перевірте поля й впишіть, скільки взяли'; }
-      else ph.innerHTML = img + 'Фото збережено, але розпізнати не вдалось — заповніть поля вручну' +
-        (SKD.me.role === 'адміністратор' ? '<br><span style="color:#9B231A">' + esc(r.recError || '') + '</span>' : '');
+      x.id = r.photo; if (r.raw) SKF.raw = (SKF.raw ? SKF.raw + '\n' : '') + r.raw;
+      if (r.fields) { skFill(r.fields); x.txt = '✓ розпізнано'; }
+      else x.txt = 'збережено, не розпізнано' + (SKD.me.role === 'адміністратор' && r.recError ? ' <span style="color:#9B231A">' + esc(r.recError) + '</span>' : '');
     });
-  }).catch(e => { ph.innerHTML = '<span style="color:#9B231A">' + esc(e.message) + '</span> — можна записати без фото'; })
-    .then(() => { SKF.busy = null; });
+  }).catch(e => { x.txt = '<span style="color:#9B231A">' + esc(e.message) + '</span>'; x.bad = 1; })
+    .then(() => { if (SKF.busy === b) SKF.busy = null; skPhDraw(); });
+  SKF.busy = Promise.all([SKF.busy, b].filter(Boolean)).then(() => { }, () => { });
+}
+function skPhDraw() {
+  const ph = $('skPh'); if (!ph) return;
+  ph.innerHTML = SKF.photos.map((x, i) => '<span style="display:inline-flex;align-items:center;gap:6px;margin:4px 10px 0 0">' + (x.img ? '<img src="' + x.img + '" style="height:52px;border-radius:6px">' : '') +
+    x.txt + (x.id || x.bad ? ' <a href="#" onclick="SKF.photos.splice(' + i + ',1);skPhDraw();return false">✖</a>' : '') + '</span>').join('') +
+    (SKF.photos.length ? '<div class="muted" style="font-size:13px">Перевірте поля й впишіть, скільки.</div>' : '');
 }
 /** Заповнити з етикетки лише порожні поля — що людина вже вписала, не чіпаємо */
 function skFill(f) {
@@ -5387,11 +5399,11 @@ function skSave() {
     const loc = SKD.loc ? SKD.loc.code : ($('skLoc').value || '').split(' ')[0];
     return post('skladSave', { code: CODE, loc: loc, act: act, pos: $('skPos').value, posOther: $('skOther').value, typ: $('skTyp').value,
       det: $('skDet').value, qty: $('skQty').value, unit: $('skUnit').value, lot: $('skLot').value, mlp: $('skMlp').value, from: from,
-      comment: $('skCm').value, photo: SKF.photo, raw: SKF.raw }).then(r => {
+      comment: $('skCm').value, photos: SKF.photos.filter(x => x.id).map(x => x.id), raw: SKF.raw }).then(r => {
       btn.disabled = false; btn.textContent = btn._t;
       toast(r.msg || 'Записано');
       SKD.my = r.my || SKD.my;
-      SKF = { photo: '', raw: '', busy: null };
+      SKF = { photos: [], raw: '', busy: null };
       ['skPos', 'skOther', 'skTyp', 'skDet', 'skQty', 'skLot', 'skMlp', 'skCm'].forEach(id => { if ($(id)) $(id).value = ''; });
       $('skOtherBox').style.display = 'none'; $('skSum').innerHTML = '';
       if ($('skPh')) { $('skPh').innerHTML = ''; $('skCam').textContent = '📷 Сфотографувати етикетку'; }
@@ -5423,7 +5435,7 @@ function renderSkMy() {
       (x.pp ? '<span class="pill blu" style="margin:0 6px 0 0;cursor:pointer" onclick="skPpOpen({pp:\'' + esc(x.pp) + '\'})">' + esc(x.pp) + '</span>' : '') +   // v108   // v107: рядок передачі
       '<b>' + esc(x.pos) + (x.typ ? ' ' + esc(x.typ) : '') + '</b> — ' + esc(skNum(x.qty)) + ' ' + esc(x.unit) +
       '<br><span class="muted">' + (x.who ? esc(x.who) + ' · ' : '') + esc(x.loc) + (x.det ? ' · ' + esc(x.det) : '') + (x.lot ? ' · партія ' + esc(x.lot) : '') + (x.mlp ? ' · ' + esc(x.mlp) : '') +
-      (x.photo ? ' · 📷' : '') + '</span></div><span class="muted" style="font-size:13px">' + esc(x.id) + st(x) + '</span>' + was(x) + '</div>' +
+      (x.photo ? ' · 📷' + (x.photo > 1 ? '×' + x.photo : '') : '') + '</span></div><span class="muted" style="font-size:13px">' + esc(x.id) + st(x) + '</span>' + was(x) + '</div>' +
       '<div class="r muted">' + esc(x.time.slice(0, 5)) + '<br>' + esc(x.time.slice(6)) +
       (x.canFix || x.canCancel ? '<br>' : '') +
       (x.canFix ? '<button class="ic" onclick="skFixOpen(\'' + esc(x.id) + '\')">✎</button>' : '') +
@@ -5586,11 +5598,11 @@ function skRcvOpen() {
   const lab = l => l.code + (l.name && l.name !== l.code ? ' · ' + l.name : '');
   const seg = (name, list, on) => '<div class="seg wrap">' + list.map(x => '<label><input type="radio" name="' + name + '" value="' + esc(x[0]) + '"' + (x[0] === on ? ' checked' : '') + '><span>' + x[1] + '</span></label>').join('') + '</div>';
   openModal('<div class="card"><div class="mid">Приймання від постачальника</div>' +
-    '<div class="muted">Один прихід = одна машина / накладна. Кожна позиція отримає номер партії приймання ПП-…, кожна коробка — наліпку.</div>' +
+    '<div class="muted">Один прихід = одна машина / накладна. Кожна позиція отримає номер партії приймання ПП-…, кожна тара (коробка, котушка, пакет) — наліпку.</div>' +
     '<label>На склад</label><select id="rvLoc" data-nocbx>' + (cur ? '' : '<option value="">— оберіть —</option>') + wh.map(l => '<option value="' + esc(l.code) + '"' + (l.code === cur ? ' selected' : '') + '>' + esc(lab(l)) + '</option>').join('') + '</select>' +
     '<label>Постачальник</label><input type="text" id="rvSup" list="rvSupL" placeholder="назва з накладної"><datalist id="rvSupL">' + (d.suppliers || []).map(x => '<option value="' + esc(x) + '">').join('') + '</datalist>' +
     '<label>Документ</label>' + seg('rvDoc', [['є', 'Є<br><small>фото / PDF</small>'], ['очікується', 'Прийде<br>пізніше'], ['без документа', 'Без<br>документа']], '') +
-    '<div id="rvDocYes" style="display:none"><div class="grid" style="margin-top:8px"><button type="button" class="btn btn2" style="margin:0" onclick="$(\'rvCam\').click()">📷 Фото</button>' +
+    '<div id="rvDocYes" style="display:none"><div class="grid" style="margin-top:8px"><button type="button" class="btn btn2" style="margin:0" id="rvCamB" onclick="$(\'rvCam\').click()">📷 Фото сторінки</button>' +
       '<button type="button" class="btn btn2" style="margin:0" onclick="$(\'rvPdf\').click()">📎 Файл / PDF</button></div>' +
       '<input type="file" accept="image/*" capture="environment" id="rvCam" style="display:none"><input type="file" accept="application/pdf,image/*" multiple id="rvPdf" style="display:none">' +
       '<div id="rvFiles" class="muted" style="margin-top:6px"></div></div>' +
@@ -5616,6 +5628,7 @@ function skUpFile(f, target) {
   const it = { name: f.name || 'фото', id: '', st: 'надсилаю…' }; list.files.push(it); list.up++; skUpDraw(list, box);
   const pdf = /pdf$/i.test(f.type) || /\.pdf$/i.test(f.name || '');
   const rd = pdf ? new Promise((ok, no) => { const r = new FileReader(); r.onload = () => ok(r.result); r.onerror = () => no(new Error('Не вдалося прочитати файл')); r.readAsDataURL(f); }) : skShrink(f);
+  const cb = target ? $('dcCamB') : $('rvCamB'); if (cb) cb.textContent = '📷 Ще сторінка (' + (list.files.length + 1) + ')';
   rd.then(data => post('skladDocUpload', { code: CODE, name: it.name, mime: pdf ? 'application/pdf' : 'image/jpeg', data: String(data).split(',')[1] }))
     .then(r => { it.id = r.id; it.st = '✓'; }).catch(e => { it.st = '✖ ' + String(e.message || e).replace(/^Error:\s*/, ''); it.bad = 1; })
     .then(() => { list.up--; skUpDraw(list, box); });
@@ -5633,8 +5646,9 @@ function skRcvLine() {
     '<div id="rvO' + n + '" style="display:none"><input type="text" id="rvOt' + n + '" placeholder="що саме"></div>' +
     '<div class="row" style="align-items:flex-end;margin-top:6px"><div style="flex:1;min-width:0"><span class="muted">Усього</span><input type="text" inputmode="decimal" id="rvQ' + n + '" placeholder="напр. 100000" style="font-size:20px;font-weight:600;margin:0"></div>' +
     '<select id="rvU' + n + '" data-nocbx style="flex:0 0 26%">' + opts(d.units, 'шт') + '</select></div>' +
-    '<div class="row" style="margin-top:6px"><div style="flex:1;min-width:0"><span class="muted">Коробок / місць</span><input type="text" inputmode="numeric" id="rvB' + n + '" value="1" style="margin:0"></div>' +
-    '<div style="flex:1;min-width:0"><span class="muted">У коробці</span><input type="text" inputmode="decimal" id="rvPer' + n + '" style="margin:0"></div></div>' +
+    '<div class="row" style="margin-top:6px"><div style="flex:0 0 34%;min-width:0"><span class="muted">Тар</span><input type="text" inputmode="numeric" id="rvB' + n + '" value="1" style="margin:0"></div>' +
+    '<div style="flex:1;min-width:0"><span class="muted">В одній тарі</span><input type="text" inputmode="decimal" id="rvPer' + n + '" style="margin:0"></div></div>' +
+    '<div class="muted" style="font-size:13px">Тара — коробка, котушка, пакет. Різна кількість — кожну через «;»: 12,5; 12,3; 12,8</div>' +
     '<div id="rvH' + n + '" class="muted" style="margin-top:4px;min-height:18px"></div>' +
     '<label class="opt" style="margin:6px 0 0;font-size:14px"><input type="checkbox" id="rvC' + n + '">Не перераховували — за етикеткою постачальника</label>' +
     '<input type="text" id="rvL' + n + '" placeholder="партія постачальника (lot, batch, P/N)" style="margin-top:6px">' +
@@ -5647,18 +5661,28 @@ function skRcvLine() {
 /** Підказка під рядком: як розкладено по коробках (так буде на наліпках) */
 function skRcvHint(n) {
   const h = $('rvH' + n); if (!h) return;
-  const tot = skCalc($('rvQ' + n).value), b = Math.round(Number($('rvB' + n).value) || 0), u = $('rvU' + n).value, ps = $('rvPer' + n).value.trim();
-  $('rvPer' + n).placeholder = '';
+  const tot = skCalc($('rvQ' + n).value), u = $('rvU' + n).value, ps = $('rvPer' + n).value.trim();
+  let b = Math.round(Number($('rvB' + n).value) || 0);
+  $('rvPer' + n).placeholder = ''; $('rvB' + n).disabled = /;/.test(ps);
   if (!$('rvQ' + n).value.trim()) { h.innerHTML = ''; return; }
-  if (isNaN(tot) || !(tot > 0)) { h.innerHTML = '<span style="color:#9B231A">усього — лише числа і «+»</span>'; return; }
-  if (!(b >= 1)) { h.innerHTML = '<span style="color:#9B231A">коробок — ціле число від 1</span>'; return; }
+  const red = t => { h.innerHTML = '<span style="color:#9B231A">' + t + '</span>'; };
+  if (isNaN(tot) || !(tot > 0)) return red('усього — лише числа і «+»');
+  if (/;/.test(ps)) {   // кожна тара окремо
+    const list = ps.split(';').map(x => x.trim()).filter(Boolean).map(skCalc);
+    if (list.some(x => isNaN(x) || !(x > 0))) return red('у тарах — числа через «;»');
+    const sum = Math.round(list.reduce((a, x) => a + x, 0) * 1000) / 1000;
+    $('rvB' + n).value = list.length;
+    if (Math.abs(sum - tot) > 1e-6) return red('у тарах разом ' + skNfmt(sum) + ', а всього ' + skNfmt(tot));
+    h.innerHTML = 'Наліпки: ' + list.length + ' тар — ' + list.map(skNfmt).join(' · ') + ' ' + esc(u); return;
+  }
+  if (!(b >= 1)) return red('тар — ціле число від 1');
   let per = ps ? skCalc(ps) : NaN;
   const even = tot / b;
   if (!ps && Math.abs(even * 1000 - Math.round(even * 1000)) < 1e-6) { per = Math.round(even * 1000) / 1000; $('rvPer' + n).placeholder = skNfmt(per); }
-  if (isNaN(per)) { h.innerHTML = ps ? '<span style="color:#9B231A">у коробці — число</span>' : 'Порівну не ділиться — впишіть «у коробці» (остання коробка — решта) або на наліпці буде лише загальна кількість'; return; }
-  if (!(per * (b - 1) < tot - 1e-9 && tot <= per * b + 1e-9)) { h.innerHTML = '<span style="color:#9B231A">' + b + ' кор. по ' + skNfmt(per) + ' — це від ' + skNfmt(per * (b - 1)) + ' до ' + skNfmt(per * b) + '</span>'; return; }
+  if (isNaN(per)) return ps ? red('в одній тарі — число') : red('порівну не ділиться — впишіть, скільки в одній тарі (остання — решта), або кожну через «;»');
+  if (!(per * (b - 1) < tot - 1e-9 && tot <= per * b + 1e-9)) return red(b + ' тар по ' + skNfmt(per) + ' — це від ' + skNfmt(per * (b - 1)) + ' до ' + skNfmt(per * b));
   const last = Math.round((tot - per * (b - 1)) * 1000) / 1000;
-  h.innerHTML = 'Наліпки: ' + (b === 1 ? '1 кор. · ' + skNfmt(tot) + ' ' + esc(u) : last === per ? b + ' кор. по ' + skNfmt(per) + ' ' + esc(u) : (b - 1) + ' кор. по ' + skNfmt(per) + ' + 1 кор. ' + skNfmt(last) + ' ' + esc(u));
+  h.innerHTML = 'Наліпки: ' + (b === 1 ? '1 тара · ' + skNfmt(tot) + ' ' + esc(u) : last === per ? b + ' тар по ' + skNfmt(per) + ' ' + esc(u) : (b - 1) + ' тар по ' + skNfmt(per) + ' + 1 тара ' + skNfmt(last) + ' ' + esc(u));
 }
 function skRcvSave() {
   const b = $('rvGo'); if (b.disabled) return; $('merr').textContent = '';
@@ -5686,7 +5710,7 @@ function skRcvSave() {
   post('skladReceive', { code: CODE, loc: loc, supplier: sup, doc: { st: st, no: st === 'без документа' ? '' : $('rvNo').value, why: $('rvWhy').value, files: files },
     comment: $('rvCm').value, pallet: $('rvPal').checked, lines: lines }).then(r => {
     skIn(r); if (r.card && d.suppliers && d.suppliers.indexOf(sup) < 0) d.suppliers.unshift(sup);
-    skPpShow(r.card, { msg: r.msg, pdf: r.pdf, file: r.file });
+    skPpShow(r.card, { msg: r.msg, pdf: r.pdf, url: r.url, file: r.file });
   }).catch(e => skErr(e, b));
 }
 /** PDF наліпок з base64 — відкрити / зберегти */
@@ -5698,9 +5722,11 @@ function skPpOpen(q) {
 function skPpShow(c, o) {
   o = o || {}; SKD.card = c;
   const docTxt = c.doc === 'є' ? '✓ є' : c.doc === 'очікується' ? '<b style="color:#8A5A00">очікується</b>' : 'без документа';
+  const canW = SKD.canWrite !== false;
+  const pdfBtn = o.pdf ? '<a class="btn" style="display:block;text-align:center;text-decoration:none" href="' + skPdfUrl(o.pdf) + '" download="' + esc(o.file || 'naliepky.pdf') + '" target="_blank">⬇ PDF наліпок (100 × 100 мм)</a>'
+    : o.url ? '<a class="btn" style="display:block;text-align:center;text-decoration:none" href="' + esc(o.url) + '" target="_blank">⬇ PDF наліпок (на Диску)</a>' : '';
   openModal('<div class="card"><div class="mid">Прихід ' + esc(c.pr) + (c.cancelled ? ' · скасовано' : '') + '</div>' +
-    (o.msg ? '<div class="pill ok" style="display:block;margin:6px 0 8px">' + esc(o.msg) + '</div>' : '') +
-    (o.pdf ? '<a class="btn" style="display:block;text-align:center;text-decoration:none" href="' + skPdfUrl(o.pdf) + '" download="' + esc(o.file || 'naliepky.pdf') + '" target="_blank">⬇ PDF наліпок (100 × 100 мм)</a>' : '') +
+    (o.msg ? '<div class="pill ok" style="display:block;margin:6px 0 8px">' + esc(o.msg) + '</div>' : '') + pdfBtn +
     '<div class="muted" style="margin-top:8px">' + esc(c.time) + ' · ' + esc(c.locName) + ' · ' + esc(c.who) + '</div>' +
     '<div style="margin-top:4px"><b>' + esc(c.supplier) + '</b></div>' +
     '<div style="margin-top:4px">Документ: ' + docTxt + (c.docNo ? ' · ' + esc(c.docNo) : '') + (c.docBy ? ' <span class="muted">(' + esc(c.docBy) + ' ' + esc(c.docAt) + ')</span>' : '') + '</div>' +
@@ -5708,33 +5734,68 @@ function skPpShow(c, o) {
     (c.doc === 'очікується' && !c.cancelled ? '<button class="btn btn2" onclick="skDocOpen(\'' + esc(c.pr) + '\')">📄 Додати документ</button>' : '') +
     (c.comment ? '<div class="muted">' + esc(c.comment) + '</div>' : '') +
     '<div class="list" style="padding:0;margin-top:8px">' + c.lines.map(l => {
-      const here = o.pp === l.pp && o.box;
-      const last = l.per === null ? null : Math.round((l.qty - l.per * (l.boxes - 1)) * 1000) / 1000;
-      const inBox = here && l.per !== null ? (o.box < l.boxes ? l.per : last) : null;
-      return '<div class="li"' + (here ? ' style="background:#FFF4D6"' : '') + '><div' + (l.st ? ' class="x"' : '') + '><b>' + esc(l.pp) + '</b> · ' + esc(l.pos) +
-        '<br><b>' + skNfmt(l.qty) + ' ' + esc(l.unit) + '</b> · ' + l.boxes + ' кор.' + (l.per !== null && l.boxes > 1 ? ' по ' + skNfmt(l.per) + (last !== l.per ? ' (остання ' + skNfmt(last) + ')' : '') : '') +
-        (l.counted ? '' : ' · за етикеткою постачальника') +
+      const ts = l.taras || [], live = ts.filter(t => t.q > 0), here = o.pp === l.pp && o.box ? ts.find(t => t.n === o.box) : null;
+      const qs = live.map(t => t.q), same = qs.length && qs.every(q => q === qs[0]);
+      const re = ts.filter(t => t.re);
+      return '<div class="li"' + (here ? ' style="background:#FFF4D6"' : '') + '><div' + (l.st ? ' class="x"' : '') + ' style="min-width:0"><b>' + esc(l.pp) + '</b> · ' + esc(l.pos) +
+        '<br><b>' + skNfmt(l.qty) + ' ' + esc(l.unit) + '</b> прийнято · тар зараз: ' + live.length + (same && live.length > 1 ? ' по ' + skNfmt(qs[0]) : '') + (l.counted ? '' : ' · за етикеткою постачальника') +
         '<br><span class="muted">' + esc([l.code, l.lot ? 'партія ' + l.lot : '', l.det, l.vd, l.st].filter(Boolean).join(' · ')) + '</span>' +
-        (here ? '<br><b>Ця коробка: ' + o.box + ' з ' + l.boxes + (inBox !== null ? ' · ' + skNfmt(inBox) + ' ' + esc(l.unit) : '') + '</b> <span class="muted">(при прийманні)</span>' : '') + '</div>' +
-        (l.st ? '' : '<div class="r"><button class="ic" title="Наліпки ще раз" onclick="skLblAgain(\'' + esc(l.pp) + '\',' + l.boxes + ')">🖨</button></div>') + '</div>';
+        (re.length ? '<details style="margin-top:4px"><summary class="muted">Перемарковано: ' + re.length + '</summary>' + re.map(t => '<div class="muted">№ ' + t.n + ' → ' + (t.q > 0 ? skNfmt(t.q) + ' ' + esc(l.unit) : 'порожня') +
+          ' · ' + esc(t.why) + ' · ' + esc(t.who) + ' ' + esc(t.at) + '</div>').join('') + '</details>' : '') +
+        (here ? '<div style="margin-top:6px"><b>Ця тара № ' + here.n + ': ' + (here.q > 0 ? skNfmt(here.q) + ' ' + esc(l.unit) : 'порожня') + '</b>' + (here.re ? ' <span class="muted">(наліпка ' + esc(here.at) + ')</span>' : ' <span class="muted">(при прийманні)</span>') +
+          (canW && !l.st ? '<button class="btn" style="margin-top:6px" onclick="skRelabelOpen(\'' + esc(l.pp) + '\',' + here.n + ')">✎ Нова наліпка на цю тару</button>' : '') + '</div>' : '') + '</div>' +
+        (l.st ? '' : '<div class="r" style="flex:0 0 auto"><button class="ic" title="Ті самі наліпки ще раз" onclick="skLblAgain(\'' + esc(l.pp) + '\',' + live.length + ')">🖨</button>' +
+          (canW ? '<br><button class="ic" title="Почали або розділили тару — нова наліпка" onclick="skRelabelOpen(\'' + esc(l.pp) + '\',0)">✎</button>' : '') + '</div>') + '</div>';
     }).join('') + '</div>' +
     '<div class="grid" style="margin-top:16px"><button class="btn btn2" onclick="skLblAgain(\'\',0,\'' + esc(c.pr) + '\')">🖨 Наліпка палети</button><button class="btn" onclick="closeModal()">Готово</button></div></div>');
 }
-function skLblAgain(pp, boxes, pr) {
-  const go = q => post('skladLabels', Object.assign({ code: CODE }, q)).then(r => {
-    toast(r.msg); if (r.pdf) { const a = document.createElement('a'); a.href = skPdfUrl(r.pdf); a.download = r.file || 'naliepky.pdf'; a.target = '_blank'; document.body.appendChild(a); a.click(); a.remove(); }
+function skLblGo(q) {
+  return post('skladLabels', Object.assign({ code: CODE }, q)).then(r => {
+    toast(r.msg); skPdfGet(r);
   }).catch(e => toast(String(e.message || e).replace(/^Error:\s*/, ''), true));
-  if (pr) return go({ pr: pr, pallet: true, only: 'pallet' });
-  const v = prompt('Наліпки ' + pp + ' — які коробки? Напр. «3» або «1-5, 8». Порожньо — усі ' + boxes, '');
+}
+/** PDF наліпок: base64 → завантаження; великий — посилання на Диск */
+function skPdfGet(r) {
+  const a = document.createElement('a'); a.target = '_blank';
+  if (r.pdf) { a.href = skPdfUrl(r.pdf); a.download = r.file || 'naliepky.pdf'; } else if (r.url) a.href = r.url; else return;
+  document.body.appendChild(a); a.click(); a.remove();
+}
+function skLblAgain(pp, n, pr) {
+  if (pr) return skLblGo({ pr: pr, pallet: true, only: 'pallet' });
+  const v = prompt('Ті самі наліпки ' + pp + ' ще раз — які тари? Напр. «3» або «1-5, 8». Порожньо — усі (' + n + ')', '');
   if (v === null) return;
-  go({ pp: pp, boxes: v.trim() });
+  skLblGo({ pp: pp, boxes: v.trim() });
+}
+/** v109: тару почали або розділили — нова кількість і нові тари, нові наліпки */
+function skRelabelOpen(pp, n) {
+  const c = SKD.card || {}, l = (c.lines || []).find(x => x.pp === pp) || { taras: [], unit: '' };
+  const t = l.taras.find(x => x.n === n);
+  openModal('<div class="card"><div class="mid">Нова наліпка · ' + esc(pp) + '</div><div class="muted">' + esc(l.pos || '') + '</div>' +
+    '<label>Тара №</label><input type="text" inputmode="numeric" id="rlN" value="' + (n || '') + '" placeholder="номер з наліпки (ПП-… · тара № …)">' +
+    '<div id="rlWas" class="muted"></div>' +
+    '<label>Скільки тепер у цій тарі <span class="muted">(0 — порожня)</span></label><input type="text" inputmode="decimal" id="rlQ" style="font-size:20px;font-weight:600">' +
+    '<label>Переклали частину в нові тари <span class="muted">(необов\'язково; кожна через «;»)</span></label><input type="text" inputmode="decimal" id="rlS" placeholder="напр. 2000; 1000">' +
+    '<label>Коментар</label><input type="text" id="rlC">' +
+    '<p class="muted">Залишок складу не змінюється — лише наліпки. Що взяли зі складу, записуйте як завжди («Беремо зі складу»). Стару наліпку зніміть.</p>' +
+    '<div class="err" id="merr"></div>' +
+    '<div class="grid" style="margin-top:12px"><button class="btn btn2" onclick="skPpShow(SKD.card)">Назад</button><button class="btn" id="rlGo">Друкувати</button></div></div>');
+  const was = () => { const x = l.taras.find(z => z.n === Number($('rlN').value)); $('rlWas').textContent = x ? 'На наліпці зараз: ' + (x.q > 0 ? skNfmt(x.q) + ' ' + l.unit : 'порожня') : ($('rlN').value ? 'Такої тари немає' : ''); };
+  $('rlN').oninput = was; was();
+  $('rlGo').onclick = () => {
+    const b = $('rlGo'); $('merr').textContent = '';
+    if (!$('rlN').value.trim()) { $('merr').textContent = 'Вкажіть номер тари'; return; }
+    if (!$('rlQ').value.trim()) { $('merr').textContent = 'Скільки тепер у тарі? (0 — порожня)'; return; }
+    b.disabled = true; b._t = b.textContent; b.textContent = 'Друкую…';
+    post('skladRelabel', { code: CODE, pp: pp, n: $('rlN').value.trim(), qty: $('rlQ').value, split: $('rlS').value, comment: $('rlC').value })
+      .then(r => { toast(r.msg); skPpShow(r.card, { msg: r.msg, pdf: r.pdf, url: r.url, file: r.file }); }).catch(e => skErr(e, b));
+  };
 }
 /** Додати документ до приходу, що його чекає */
 let DOCU = { files: [], up: 0 };
 function skDocOpen(pr) {
   DOCU = { files: [], up: 0 };
   openModal('<div class="card"><div class="mid">Документ до ' + esc(pr) + '</div>' +
-    '<div class="grid" style="margin-top:8px"><button type="button" class="btn btn2" style="margin:0" onclick="$(\'dcCam\').click()">📷 Фото</button><button type="button" class="btn btn2" style="margin:0" onclick="$(\'dcPdf\').click()">📎 Файл / PDF</button></div>' +
+    '<div class="grid" style="margin-top:8px"><button type="button" class="btn btn2" style="margin:0" id="dcCamB" onclick="$(\'dcCam\').click()">📷 Фото сторінки</button><button type="button" class="btn btn2" style="margin:0" onclick="$(\'dcPdf\').click()">📎 Файл / PDF</button></div>' +
     '<input type="file" accept="image/*" capture="environment" id="dcCam" style="display:none"><input type="file" accept="application/pdf,image/*" multiple id="dcPdf" style="display:none">' +
     '<div id="dcFiles" class="muted" style="margin-top:6px"></div>' +
     '<label>№ документа</label><input type="text" id="dcNo" placeholder="накладна, інвойс, МД"><div class="err" id="merr"></div>' +
