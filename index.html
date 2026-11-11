@@ -1,5 +1,8 @@
 <!DOCTYPE html>
-<!-- МЛП · index.html v110 · 11.11.2026 — «Робота зі складом» за типом локації (Sklad.gs v15): спершу «де я / звідки» (склад чи цех), далі дії:
+<!-- МЛП · index.html v111 · 11.11.2026 — Р-15 «Склад: залишки й рух» (d=sklad, Sklad.gs v16): «Що де лежить» — позиції × локації (склади — за журналом, цехи 🏭 — розрахунок,
+     ГП — ящики), 🚩 у цеху — менше ніж на 1 день; «Цехи: на скільки днів», «ГП: двигуни в ящиках», «Рух» (прийшло / пішло за днями, таблиця); фільтри — рівень назв
+     (технічна · уніфікована · група), локації, група, пошук, період. Плитка «📊 Залишки складу» на головній.
+     v110 · 11.11.2026 — «Робота зі складом» за типом локації (Sklad.gs v15): спершу «де я / звідки» (склад чи цех), далі дії:
      склад — «Перемістити» (куди: цех = передати на виробництво, інший склад — компоненти й ящики ГП, відділ якості / РнД / Антон — без приймання),
      «Прийняти» (від постачальника, ГП з виробництва свого корпусу), «Покупцю» (зібрати ящики будь-якою кількістю → відвантажити з фото ТТН);
      цех — «Перемістити» (на свій склад або без приймання) і «Ящик ГП на склад». Прибрано «Беремо / Приймаємо» й окрему «→ Передати в цех».
@@ -553,6 +556,11 @@
   .opt input{margin-right:8px;transform:scale(1.3)}
   .seg.wrap{flex-wrap:wrap}.seg.wrap label{flex:1 1 30%}
   .kpis{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+  .r15w{overflow:auto;max-height:70vh}.r15t{border-collapse:collapse;font-size:13px;min-width:100%}.r15t th{position:sticky;top:0;background:#fff;text-align:left;padding:6px 8px;border-bottom:1px solid #C5D0D7;color:#66767F;font-weight:600;white-space:nowrap}
+  .r15t td{padding:5px 8px;border-bottom:1px solid #EEF2F5;vertical-align:top}.r15t td.v{text-align:right;white-space:nowrap;font-variant-numeric:tabular-nums}.r15t td.n{min-width:150px}
+  .r15b{display:grid;grid-template-columns:minmax(120px,38%) 1fr auto;gap:8px;align-items:center;margin:4px 0;font-size:13px}.r15b .t{background:#EEF2F5;border-radius:4px;height:12px}.r15b .t div{height:12px;border-radius:4px}
+  .r15b .d{white-space:nowrap;text-align:right;font-variant-numeric:tabular-nums}.r15b .d.bad{color:#9B231A;font-weight:700}
+  .r15lg{display:flex;gap:14px;font-size:13px;color:#66767F}.r15lg i{display:inline-block;width:10px;height:10px;border-radius:2px;margin-right:5px;vertical-align:middle}
   .kpi{background:#fff;border-radius:14px;padding:12px 14px;box-shadow:0 1px 3px rgba(0,0,0,.08)}
   .kpi .v{font-size:26px;font-weight:700;line-height:1.15}.kpi .v small{font-size:14px;font-weight:500;color:#66767F;margin-left:3px}
   .kpi .l{font-size:12px;color:#66767F;text-transform:uppercase;letter-spacing:.04em;font-weight:600}
@@ -650,7 +658,7 @@
 <div class="net" id="net" role="alert" aria-live="assertive"><div class="nb"><div class="rt" id="netr"></div><div class="nt" id="nett">Зберігаю…</div><div class="ns" id="nets"></div><div class="np"><i id="netp"></i></div><div class="nh" id="neth"></div><div class="zc" id="zc"></div><button class="nx" id="netx" type="button">Не чекати</button></div></div>
 
 <script>
-const PAGE_VERSION = 'index.html v110 · 11.11.2026';   // v110: дії за типом локації, переміщення, партія покупцю; v109: кілька фото, тара, перемаркування; v108: приймання від постачальника, наліпки; v107: передачі склад → цех, ящики ГП приймає склад; v106: позиції складу за групами; v105: кнопки складу «Беремо зі складу» / «Приймаємо на склад»; v104: «Історія тари» (?th=) — назва тари на сторінці тари / партії веде на неї (Reports.gs v42)
+const PAGE_VERSION = 'index.html v111 · 11.11.2026';   // v111: Р-15 «Склад: залишки й рух»; v110: дії за типом локації, переміщення, партія покупцю; v109: кілька фото, тара, перемаркування; v108: приймання від постачальника, наліпки; v107: передачі склад → цех, ящики ГП приймає склад; v106: позиції складу за групами; v105: кнопки складу «Беремо зі складу» / «Приймаємо на склад»; v104: «Історія тари» (?th=) — назва тари на сторінці тари / партії веде на неї (Reports.gs v42)
 // v103 (11.11): Р-9_08 «За типом», «Перевірено, все ок»
 // v102 (09.11):   // v74: в1 — і з нашої тари (ящик залишків); в2 — лише партії в2
 // v72 (26.10):   // v72: «Яку партію відкриваємо?»; розшифровка кроків на картці партії; реєстрація — повернення за посиланням з форми
@@ -1306,7 +1314,7 @@ function whoHtml(me, perms, unknown) {
 // =============================================================== v33: ОБОЛОНКА — меню, шапка, Головна, сканер QR, довідка
 /** Роль і права для меню. Сторінки кабінету, звітів і складу не викликають apiPage, тож меню бере роль з пристрою (останнє відоме) */
 let NAV = (() => { try { return JSON.parse(store('mlp_nav') || '{}') || {}; } catch (e) { return {}; } })();
-const NAV_KEYS = ['step', 'separate', 'noBatch', 'sklad', 'dashStan', 'dashTare', 'dashMy', 'history', 'cabinet', 'dashOut', 'dashScrap', 'dashBatches', 'dashControl', 'retro', 'dashBoxes', 'assist', 'dashRecs'];   // v65: + assist (помічник)
+const NAV_KEYS = ['step', 'separate', 'noBatch', 'sklad', 'dashStan', 'dashTare', 'dashMy', 'history', 'cabinet', 'dashOut', 'dashScrap', 'dashBatches', 'dashControl', 'retro', 'dashBoxes', 'assist', 'dashRecs', 'dashSklad'];   // v65: + assist (помічник)
 function navSave(me, perms) {
   const n = { role: me.role, name: me.name, perms: NAV.perms || {} };
   if (perms) { n.perms = {}; NAV_KEYS.forEach(k => n.perms[k] = !!perms[k]); }
@@ -1316,7 +1324,7 @@ function navSave(me, perms) {
 /** v58 (рішення 23.10): «зав. відділу браку» → «зав. відділу якості»; Василь заміщує тімліда — у списках тімлідів */
 const QC_ROLE = 'зав. відділу якості';
 const LEAD_ROLES = ['тімлід', 'зав. виробництва', 'адміністратор', QC_ROLE];
-const DASHT = { stan: ['Р-2', 'Стан зараз'], shop: ['Р-13', 'Цех наживо'], motors: ['Р-11', 'Двигуни в роботі'], boxes: ['Р-12', 'Чисті ящики'], tare: ['Р-5', 'Аналіз тари'], batches: ['Р-7', 'Аналіз партій'], out: ['Р-8', 'Виробіток'], scrap: ['Р-10', 'Аналіз браку'], control: ['Р-9', 'Контроль записів МЛП'], my: ['Р-8с', 'Мій виробіток'], recs: ['Р-14', 'Записи працівника'] };
+const DASHT = { stan: ['Р-2', 'Стан зараз'], shop: ['Р-13', 'Цех наживо'], motors: ['Р-11', 'Двигуни в роботі'], boxes: ['Р-12', 'Чисті ящики'], sklad: ['Р-15', 'Склад: залишки й рух'], tare: ['Р-5', 'Аналіз тари'], batches: ['Р-7', 'Аналіз партій'], out: ['Р-8', 'Виробіток'], scrap: ['Р-10', 'Аналіз браку'], control: ['Р-9', 'Контроль записів МЛП'], my: ['Р-8с', 'Мій виробіток'], recs: ['Р-14', 'Записи працівника'] };
 /** Звіти ролі для меню (Р-0_07). «Мій виробіток» у меню — працівнику (окрема вкладка); тімлідам і зав. відділу якості — 👁 за будь-кого (v58) */
 function navReports() {
   // v71 (рішення 24.10): порядок за важливістю; x[3] — група: 0 — важливі (жирним), далі — тонкий відступ між групами
@@ -1326,6 +1334,7 @@ function navReports() {
   if (p.dashMy && LEAD_ROLES.indexOf(NAV.role) >= 0) r.push(['d=my', 'my', ' 👁', 0]);   // v36: перегляд як працівник (Р-0_08)
   if (p.dashRecs && LEAD_ROLES.indexOf(NAV.role) >= 0) r.push(['d=recs', 'recs', '', 0]);   // v78: Р-14 — записи будь-якого працівника
   if (p.dashStan) r.push(['d=motors', 'motors', '', 1]);   // v55: Р-11
+  if (p.dashSklad) r.push(['d=sklad', 'sklad', '', 1]);   // v111: Р-15
   if (p.dashBoxes && NAV.role !== 'працівник') r.push(['d=boxes', 'boxes', '', 1]);   // v57: Р-12 (працівнику — плитка на головній)
   if (p.dashTare) r.push(['d=tare', 'tare', '', 2]);
   if (p.dashBatches) r.push(['d=batches', 'batches', '', 2]);   // v39
@@ -1409,6 +1418,7 @@ function renderHome() {
     (p.cabinet ? 'за себе або за працівника, сьогодні або минулою датою' : 'підготовка місця, перебирання залишків, навчання — у годинах або штуках') + '</div></a>');
   const skRecv = !p.sklad && S.me && ['тімлід', 'зав. виробництва', 'адміністратор', 'бухгалтер'].indexOf(S.me.role) >= 0;   // v107: тімлід без доступу «Склад» — приймає передачі
   if (p.sklad || skRecv) tiles.push('<a class="tile" href="' + esc(link('sklad=1')) + '"><div class="tn">⌂ Робота зі складом</div><div class="td">' + (p.sklad ? 'переміщення, приймання, партії покупцю' : 'переміщення й приймання в цеху') + '</div></a>');
+  if (p.dashSklad) tiles.push('<a class="tile" href="' + esc(link('d=sklad')) + '"><div class="tn">📊 Залишки складу</div><div class="td">що й де лежить, на скільки днів у цеху, рух</div></a>');   // v111: Р-15
   if (p.dashBoxes && (prod || p.sklad)) tiles.push('<a class="tile" href="' + esc(link('d=boxes')) + '"><div class="tn">📦 Чисті ящики</div><div class="td">неповні ящики на виробництві, ящики на складі</div></a>');   // v57: Р-12
   if (p.retro) tiles.push('<a class="tile" href="' + esc(link('rh=1')) + '"><div class="tn">📄 Ретро-історія партій</div><div class="td">звірити записи, розпізнані з паперових техкарт, і підтвердити</div></a>');   // v53
   if (p.sklad || skRecv) h = '<div id="skInb"></div>' + h;   // v107: плашка «чекає прийняття»
@@ -2964,7 +2974,7 @@ function loadDash(fresh) {
       if (/не зареєстровано/.test(e.message)) { forgetCode(); return loadPage(); }
       $('app').innerHTML = '<div class="card err">' + esc(e.message) + '</div>' +
         '<a class="btn btn2" style="display:block;text-align:center;text-decoration:none;margin:12px;width:auto" href="' + esc(link('')) + '">На головну</a>';
-    }).apiDash(Object.assign({ code: CODE, d: PARAMS.d, per: PARAMS.per || 'w', fresh: fresh ? 1 : 0 }, PARAMS.d === 'my' ? z8q() : PARAMS.d === 'recs' ? Object.assign(zOutQ(), { as: PARAMS.as || '' }) : (PARAMS.d === 'batches' && PARAMS.card) ? { card: PARAMS.card } : (PARAMS.d === 'out' || PARAMS.d === 'scrap' || PARAMS.d === 'batches' || PARAMS.d === 'control') ? zOutQ() : {}));   // v35: Р-8с — режим, дата, 👁
+    }).apiDash(Object.assign({ code: CODE, d: PARAMS.d, per: PARAMS.per || 'w', fresh: fresh ? 1 : 0, days: PARAMS.days || '' }, PARAMS.d === 'my' ? z8q() : PARAMS.d === 'recs' ? Object.assign(zOutQ(), { as: PARAMS.as || '' }) : (PARAMS.d === 'batches' && PARAMS.card) ? { card: PARAMS.card } : (PARAMS.d === 'out' || PARAMS.d === 'scrap' || PARAMS.d === 'batches' || PARAMS.d === 'control') ? zOutQ() : {}));   // v35: Р-8с — режим, дата, 👁
 }
 function kpi(l, v, u, d) {
   return '<div class="kpi"><div class="l">' + l + '</div><div class="v">' + v + (u ? '<small>' + u + '</small>' : '') + '</div>' +
@@ -2977,8 +2987,8 @@ function renderDash() {
   ZA = []; ZDRAW = [];
   // v35: усі звіти без вкладок (переходи — у меню); «Мій виробіток» — Р-8с (старий dashMy лишається для відповіді без mode — прибрати на етапі 8)
   document.body.classList.toggle('wide', d.d === 'shop');   // v70: Р-13 — на всю ширину екрана
-  document.body.classList.toggle('rwide', d.d === 'scrap' || d.d === 'out' || d.d === 'control' || d.d === 'recs' || d.d === 'stan');   // v77: Р-10, Р-8, Р-9 — таблиці на всю ширину, меню лишається; v82: і Р-2
-  let h = d.d === 'stan' ? r2() : d.d === 'shop' ? r13() : d.d === 'motors' ? r11() : d.d === 'boxes' ? r12() : d.d === 'tare' ? r5() : d.d === 'out' ? r8() : d.d === 'scrap' ? r10() : d.d === 'batches' ? (d.card ? r7card() : r7()) : d.d === 'control' ? r9() : d.d === 'recs' ? r14() : r8c();
+  document.body.classList.toggle('rwide', d.d === 'sklad' || d.d === 'scrap' || d.d === 'out' || d.d === 'control' || d.d === 'recs' || d.d === 'stan');   // v77: Р-10, Р-8, Р-9 — таблиці на всю ширину, меню лишається; v82: і Р-2
+  let h = d.d === 'stan' ? r2() : d.d === 'shop' ? r13() : d.d === 'motors' ? r11() : d.d === 'boxes' ? r12() : d.d === 'sklad' ? r15() : d.d === 'tare' ? r5() : d.d === 'out' ? r8() : d.d === 'scrap' ? r10() : d.d === 'batches' ? (d.card ? r7card() : r7()) : d.d === 'control' ? r9() : d.d === 'recs' ? r14() : r8c();
   h += '<p class="muted" style="text-align:center">Дані на ' + esc(d.now) + (d.me.role === 'адміністратор' ? ' · ' + sec(d.ms) + ' / ' + sec(d.total) + (d.cached ? ' · кеш' : '') + (d.logSrc ? ' · ' + esc(d.logSrc) : '') : '') +
     ' · <a class="lnk" href="javascript:loadDash(1)">оновити</a>' +
     ((d.perms || {}).baMode ? ' · <a class="lnk" href="javascript:baToggle()">🏷 Індекси: ' + (baOn() ? 'вимкнути' : 'увімкнути') + '</a>' : '') +   // v61
@@ -4959,6 +4969,102 @@ function r11() {
 
 // ---- v57: Р-12 «Чисті ящики» — ящики ГП на виробництві й на складі (Labels.gs v11, сервер d=boxes)
 const Z12 = { st: 'open', typ: [], under: false };   // v68: типорозмір — мультивибір
+// =============================================================== v111: Р-15 «СКЛАД: ЗАЛИШКИ Й РУХ» (Sklad.gs v16, dashSklad_)
+// Три рівні назв: 1 — технічна (що записано в «Деталях» / назва БАС), 2 — уніфікована (позиція каталогу), 3 — група. Фільтри — на сторінці.
+let Z15 = { lv: 2, locs: null, grp: '', q: '', act: '', only: '' };
+const R15C = { in: '#2a78d6', out: '#d6731f' };   // прийшло / пішло (перевірено валідатором палітри, light)
+function r15() {
+  const D = Z15, x = DB.sk; if (!x) return '<div class="card err">Немає даних складу</div>';
+  const locs = x.locs.filter(l => l[2] !== 'virt'), it = x.items;
+  if (!D.locs) D.locs = locs.map(l => l[0]);
+  const nf = skNfmt, lname = c => { const l = x.locs.find(z => z[0] === c); return l ? l[1] : c; };
+  const name = (k, det) => { const i = it[k] || [k, k, '', '', '']; return D.lv === 3 ? (i[2] || 'Інше') : D.lv === 2 ? i[1] : (det || i[3] || i[1]); };
+  const unitOf = k => (it[k] || [])[4] || 'шт';
+  const pass = (k, det) => { const i = it[k] || []; if (D.grp && (i[2] || 'Інше') !== D.grp) return false;
+    if (D.q) { const s = [i[0], i[1], i[2], i[3], det].join(' ').toLowerCase(); if (D.q.toLowerCase().split(/\s+/).some(w => w && s.indexOf(w) < 0)) return false; } return true; };
+  // матриця: рядок = назва (за рівнем) + одиниця, колонка = локація
+  const M = {}, add = (loc, k, det, q, u, extra) => { if (!pass(k, det)) return; const nm = name(k, det), key = nm + '\u0001' + u;
+    const r = M[key] = M[key] || { nm: nm, u: u, grp: (it[k] || [])[2] || 'Інше', c: {}, flag: {}, tip: {} }; r.c[loc] = (r.c[loc] || 0) + q; if (extra) { if (extra.flag) r.flag[loc] = 1; r.tip[loc] = extra.tip; } };
+  x.bal.forEach(b => { if (D.locs.indexOf(b[0]) >= 0 && skLocOf15(x, b[0]) === 'wh') add(b[0], b[1], b[2], b[3], b[4]); });   // цехи — лише розрахунок цеху (нижче)
+  const shopFlags = [];
+  x.shops.forEach(s => { if (D.locs.indexOf(s.code) < 0) return; s.rows.forEach(r => { const fl = r[4] !== null && r[4] < 1;
+    if (fl && pass(r[0], '')) shopFlags.push([s, r]);
+    add(s.code, r[0], '', r[1], r[2], { flag: fl, tip: 'за день ' + nf(Math.round(r[3])) + ' · на ' + (r[4] === null ? '—' : String(r[4]).replace('.', ',')) + ' дн.' + (r[5] ? ' · в дорозі ' + nf(r[5]) : '') }); }); });
+  if (pass('ГП', '')) x.gp.forEach(g => { if (D.locs.indexOf(g[0]) >= 0) add(g[0], 'ГП', g[1], g[4], 'шт', { tip: g[3] + ' ящ.' }); });
+  const cols = locs.filter(l => D.locs.indexOf(l[0]) >= 0);
+  const rows = Object.keys(M).map(k => M[k]).filter(r => cols.some(c => Math.abs(r.c[c[0]] || 0) > 1e-9));
+  const GO = (x.groups || []).concat(['Інше']);
+  rows.sort((a, b) => (GO.indexOf(a.grp) - GO.indexOf(b.grp)) || a.nm.localeCompare(b.nm));
+  // фільтри
+  const seg = (k, v, t) => '<button class="' + (D[k] === v ? 'on' : '') + '" onclick="Z15.' + k + '=' + JSON.stringify(v).replace(/"/g, '&quot;') + ';renderDash()">' + t + '</button>';
+  let h = '<div class="card r15f"><div class="chips">' + seg('lv', 1, '1 · Технічна') + seg('lv', 2, '2 · Уніфікована') + seg('lv', 3, '3 · Група') + '</div>' +
+    '<div class="chips" style="margin-top:8px">' + locs.map(l => '<button class="' + (D.locs.indexOf(l[0]) >= 0 ? 'on' : '') + '" onclick="r15Loc(\'' + esc(l[0]) + '\')" title="' + esc(l[1]) + '">' + esc(l[0]) + (l[2] === 'shop' ? ' 🏭' : '') + '</button>').join('') +
+      '<button onclick="Z15.locs=null;renderDash()">усі</button></div>' +
+    '<div class="row" style="margin-top:8px"><select id="z15g" data-nocbx style="flex:0 0 46%">' + opts(GO, D.grp, 'усі групи') + '</select>' +
+    '<input type="search" id="z15q" placeholder="пошук: назва, код, деталі" value="' + esc(D.q) + '" style="min-width:0"></div></div>';
+  // KPI
+  const gpWh = x.gp.filter(g => skLocOf15(x, g[0]) === 'wh'), gpQ = gpWh.reduce((a, g) => a + g[4], 0), gpB = gpWh.reduce((a, g) => a + g[3], 0);
+  const neg = rows.filter(r => cols.some(c => (r.c[c[0]] || 0) < -1e-9)).length;
+  h += '<div class="kpis" style="margin:0 12px">' + kpi('Позицій із залишком', rows.length, '', 'за фільтрами') + kpi('🚩 Цех: менше ніж на 1 день', shopFlags.length, '', shopFlags.slice(0, 3).map(f => esc((it[f[1][0]] || [])[1] || '')).join(', ')) +
+    kpi('ГП на складах', nf(gpQ), ' шт', gpB + ' ящиків') + kpi('Від\'ємних залишків', neg, '', 'без інвентаризації складів — див. примітку') + '</div>';
+  // 1) що де лежить
+  const showN = 250;
+  h += dcard('Що де лежить', 'Склади — прийшло − пішло за журналом з ' + esc(x.from.split('-').reverse().join('.')) + '; цехи 🏭 — інвентаризація + переміщення − витрата за нормами; ГП — ящики МЛП. Колір — частка позиції на локації.',
+    rows.length ? '<div class="r15w"><table class="r15t"><thead><tr><th>' + ['', 'Технічна назва', 'Позиція', 'Група'][D.lv] + '</th>' + cols.map(c => '<th title="' + esc(c[1]) + '">' + esc(c[0]) + (c[2] === 'shop' ? ' 🏭' : '') + '</th>').join('') + '<th>Од.</th></tr></thead><tbody>' +
+      rows.slice(0, showN).map(r => { const pos = cols.reduce((a, c) => a + Math.max(0, r.c[c[0]] || 0), 0);
+        return '<tr><td class="n">' + esc(r.nm) + '</td>' + cols.map(c => { const v = r.c[c[0]]; if (v === undefined || Math.abs(v) < 1e-9) return '<td></td>';
+          const sh = v > 0 && pos ? v / pos : 0, bg = v < 0 ? '#FDE3E1' : 'rgba(42,120,214,' + (0.08 + 0.55 * sh).toFixed(2) + ')';
+          return '<td class="v" style="background:' + bg + (sh > 0.6 ? ';color:#fff' : v < 0 ? ';color:#9B231A' : '') + '" title="' + esc(c[1] + ': ' + nf(v) + ' ' + r.u + (r.tip[c[0]] ? ' · ' + r.tip[c[0]] : '') + (v < 0 ? ' · від\'ємний: брали більше, ніж записано приходу' : '')) + '">' +
+            (r.flag[c[0]] ? '🚩 ' : '') + nf(Math.round(v * 10) / 10) + '</td>'; }).join('') + '<td class="muted">' + esc(r.u) + '</td></tr>'; }).join('') + '</tbody></table></div>' +
+      (rows.length > showN ? '<p class="muted">Показано ' + showN + ' з ' + rows.length + ' — звузьте фільтри.</p>' : '')
+      : '<p class="muted">Нічого не знайдено за фільтрами.</p>');
+  // 2) цехи: на скільки днів
+  x.shops.filter(s => D.locs.indexOf(s.code) >= 0).forEach(s => {
+    if (s.noInv) { h += dcard('🏭 ' + esc(s.name) + ': на скільки днів', '', '<p class="muted">Інвентаризації цеху ще немає — залишок не рахується. Порахуйте, що лежить у цеху (як Юля в Жулянах), — і тут з\'являться дні й 🚩.</p>'); return; }
+    const rr = s.rows.filter(r => r[3] > 0 && pass(r[0], '')).sort((a, b) => (a[4] === null ? 1e9 : a[4]) - (b[4] === null ? 1e9 : b[4]));
+    const cap = 30, W = 100;
+    h += dcard('🏭 ' + esc(s.name) + ': на скільки днів', 'Інвентаризація ' + esc((s.rows[0] || [])[7] || '') + ' · витрата за день — середнє за 5 останніх робочих днів · 🚩 — менше ніж на 1 день',
+      rr.length ? rr.map(r => { const d = r[4] === null ? 0 : r[4], w = Math.max(0, Math.min(cap, d)) / cap * W, fl = r[4] !== null && r[4] < 1;
+        return '<div class="r15b" title="' + esc(name(r[0], '') + ': ' + nf(Math.round(r[1])) + ' ' + r[2] + ' · за день ' + nf(Math.round(r[3]))) + '"><div class="l">' + (fl ? '🚩 ' : '') + esc(name(r[0], '')) + '</div>' +
+          '<div class="t"><div style="width:' + w + '%;background:' + (fl ? '#C4314B' : R15C.in) + '"></div></div><div class="d' + (fl ? ' bad' : '') + '">' + (r[1] < 0 ? '0' : String(Math.round(d * 10) / 10).replace('.', ',')) + ' дн.</div></div>'; }).join('') +
+        '<p class="muted" style="margin-top:6px">Шкала — до ' + cap + ' днів. Позиції без витрати за нормами не показані.</p>' : '<p class="muted">Немає позицій з витратою за нормами.</p>');
+  });
+  // 3) ГП
+  const gpl = x.gp.filter(g => (D.locs.indexOf(g[0]) >= 0 || /^вир\./.test(g[0])) && pass('ГП', g[1]));
+  if (gpl.length) { const mx = Math.max(...gpl.map(g => g[4]));
+    h += dcard('📦 ГП: двигуни в ящиках', 'За маркуванням і локацією (склади й «вир.» — відкриті ящики на виробництві корпусу)',
+      gpl.sort((a, b) => a[1].localeCompare(b[1]) || a[0].localeCompare(b[0])).map(g => '<div class="r15b"><div class="l">' + esc(g[1]) + ' · <b>' + esc(g[0]) + '</b></div><div class="t"><div style="width:' + (g[4] / mx * 100) + '%;background:' + R15C.in + '"></div></div>' +
+        '<div class="d">' + nf(g[4]) + ' <span class="muted">· ' + g[3] + ' ящ.</span></div></div>').join('')); }
+  // 4) рух
+  const mv = x.mv.filter(m => (D.locs.indexOf(m[1]) >= 0) && pass(m[4], m[5]) && (!D.act || (D.act === 'in' ? m[2] > 0 : m[2] < 0)));
+  const days = {}; mv.forEach(m => { const k = new Date(m[0]).toISOString().slice(0, 10); const d = days[k] = days[k] || { in: 0, out: 0, qi: 0, qo: 0 }; if (m[2] > 0) { d.in++; d.qi += m[6]; } else { d.out++; d.qo += m[6]; } });
+  const one = [...new Set(mv.map(m => name(m[4], m[5]) + '|' + m[7]))].length === 1;   // одна позиція — показуємо кількість, інакше — записи
+  const ks = []; for (let t = Date.now() - (x.days - 1) * 86400000; t <= Date.now(); t += 86400000) ks.push(new Date(t).toISOString().slice(0, 10));
+  const vals = ks.map(k => { const d = days[k] || { in: 0, out: 0, qi: 0, qo: 0 }; return one ? [d.qi, d.qo] : [d.in, d.out]; });
+  const mxv = Math.max(1, ...vals.map(v => Math.max(v[0], v[1])));
+  const CW = 640, CH = 180, bw = Math.max(2, CW / ks.length - 2), mid = CH / 2;
+  const svg = '<svg viewBox="0 0 ' + CW + ' ' + (CH + 18) + '" style="width:100%;height:auto">' + '<line x1="0" x2="' + CW + '" y1="' + mid + '" y2="' + mid + '" stroke="#C5D0D7"/>' +
+    vals.map((v, i) => { const x0 = i * CW / ks.length + 1, hi = v[0] / mxv * (mid - 6), ho = v[1] / mxv * (mid - 6), t = ks[i].slice(8, 10) + '.' + ks[i].slice(5, 7);
+      return '<g><title>' + t + ': прийшло ' + nf(v[0]) + ', пішло ' + nf(v[1]) + (one ? ' ' + esc(mv[0][7]) : ' записів') + '</title><rect x="' + x0 + '" y="0" width="' + bw + '" height="' + CH + '" fill="transparent"/>' +
+        (hi ? '<rect x="' + x0 + '" y="' + (mid - hi - 1) + '" width="' + bw + '" height="' + hi + '" rx="2" fill="' + R15C.in + '"/>' : '') +
+        (ho ? '<rect x="' + x0 + '" y="' + (mid + 1) + '" width="' + bw + '" height="' + ho + '" rx="2" fill="' + R15C.out + '"/>' : '') +
+        (i % Math.ceil(ks.length / 8) === 0 ? '<text x="' + x0 + '" y="' + (CH + 14) + '" font-size="11" fill="#66767F">' + t + '</text>' : '') + '</g>'; }).join('') + '</svg>';
+  h += dcard('Рух за ' + x.days + ' дн.', (one ? 'Кількість, ' + esc(mv[0][7]) : 'Кількість записів (оберіть одну позицію — покаже кількість)') + ' · вгору — прийшло, вниз — пішло',
+    '<div class="chips" style="margin-bottom:8px">' + [7, 30, 90].map(n => '<button class="' + (x.days === n ? 'on' : '') + '" onclick="PARAMS.days=' + n + ';loadDash(1)">' + n + ' дн.</button>').join('') +
+      seg('act', '', 'усе') + seg('act', 'in', 'прийшло') + seg('act', 'out', 'пішло') + '</div>' +
+    '<div class="r15lg"><span><i style="background:' + R15C.in + '"></i>прийшло</span><span><i style="background:' + R15C.out + '"></i>пішло</span></div>' + svg +
+    '<div class="r15w" style="margin-top:10px"><table class="r15t"><thead><tr><th>Коли</th><th>Лок.</th><th></th><th>Що</th><th>Кількість</th><th>Хто</th><th>Документ</th></tr></thead><tbody>' +
+      mv.slice(0, 200).map(m => '<tr><td class="muted">' + fmtT15(m[0]) + '</td><td>' + esc(m[1]) + '</td><td style="color:' + (m[2] > 0 ? R15C.in : R15C.out) + '">' + (m[2] > 0 ? '▲' : '▼') + '</td><td class="n">' + esc(name(m[4], m[5])) +
+        (m[3] ? '<br><span class="muted">' + esc(m[3]) + '</span>' : '') + '</td><td class="v">' + nf(m[6]) + ' ' + esc(m[7]) + '</td><td>' + esc(m[8]) + '</td><td class="muted">' + esc(m[9] || m[10]) + '</td></tr>').join('') +
+      '</tbody></table></div>' + (mv.length > 200 ? '<p class="muted">Останні 200 з ' + mv.length + '.</p>' : ''));
+  h += '<div class="card muted" style="font-size:13px">Залишки складів — розрахунок за журналом «Робота зі складом» з ' + esc(x.from.split('-').reverse().join('.')) + ' без стартової інвентаризації складів: від\'ємні — брали більше, ніж записали приходу (прихід до запуску журналу не записаний). Точні цифри — після інвентаризації складів. Рівень 1 «Технічна» — що записано в «Деталях» руху (етикетка постачальника) або назва з БАС.</div>';
+  setTimeout(() => { if ($('z15g')) $('z15g').onchange = e => { Z15.grp = e.target.value; renderDash(); };
+    if ($('z15q')) $('z15q').oninput = e => { clearTimeout(Z15.tq); Z15.q = e.target.value; Z15.tq = setTimeout(() => { const p = e.target.selectionStart; renderDash(); const i = $('z15q'); if (i) { i.focus(); try { i.setSelectionRange(p, p); } catch (er) { } } }, 400); }; }, 0);
+  return h;
+}
+function skLocOf15(x, c) { const l = x.locs.find(z => z[0] === c); return l ? l[2] : ''; }
+function fmtT15(t) { const d = new Date(t), p = n => String(n).padStart(2, '0'); return p(d.getDate()) + '.' + p(d.getMonth() + 1) + ' ' + p(d.getHours()) + ':' + p(d.getMinutes()); }
+function r15Loc(c) { const a = Z15.locs || []; const i = a.indexOf(c); if (i >= 0) a.splice(i, 1); else a.push(c); Z15.locs = a; renderDash(); }
 function r12() {
   const d = DB, D = Z12;
   const set = (k, v) => { D[k] = v; if (k !== 'under') D.under = false; renderDash(); };
