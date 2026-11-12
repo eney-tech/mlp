@@ -1,5 +1,7 @@
 <!DOCTYPE html>
-<!-- МЛП · index.html v116 · 12.11.2026 — Р-15: цех за технічними назвами (інвентаризація ± переміщення), решта — «інше: витрата за нормами…» (Sklad.gs v20).
+<!-- МЛП · index.html v117 · 12.11.2026 — вибір позиції — три рівні: пошук «клей» показує під групою уніфіковану назву, а під нею — технічні назви
+     (БАС і як записали, Sklad.gs v21 techAka); натиснули технічну — обрано позицію й технічну назву.
+     index.html v116 · 12.11.2026 — Р-15: цех за технічними назвами (інвентаризація ± переміщення), решта — «інше: витрата за нормами…» (Sklad.gs v20).
      index.html v115 · 12.11.2026 — Р-15 «Що де лежить» деревом: група → уніфікована → технічна (▸ біля рядка, «Розгорнути до»); склад: «Ящики ГП чекають прийняття» і
      «Усі записи» згорнуто (ящики — червоний «!»); вибір позиції — групи згорнуті, пошук і за технічними назвами (БАС, етикетки, журнал); після позиції —
      необов'язкова технічна назва: що є на локації з кількістю й відомі назви (Sklad.gs v18).
@@ -484,6 +486,7 @@
   details.skwarn>summary::after{content:'▸';margin-left:auto;color:#66767F}details.skwarn[open]>summary::after{content:'▾'}
   .skx{display:inline-flex;align-items:center;justify-content:center;width:24px;height:24px;border-radius:50%;background:#C4314B;color:#fff;font-weight:800;font-size:15px;flex:0 0 auto}
   .cbxl div.gh{background:#F4F7F9;font-weight:700;font-size:15px;color:#33434C;letter-spacing:.02em}.cbxl div.gh span{color:#66767F;font-weight:500}
+  .cbxl div.t1{padding:8px 12px 8px 44px;font-size:15px;color:#33434C;background:#FBFCFD}.cbxl div.t1 i{font-style:normal;color:#66767F;font-size:13px}.cbxl div.t1.hi{background:#EAF2FC}
   .cbxl div.dis{color:#9AA8B0;cursor:default}.cbxl div.none{color:#66767F;cursor:default;font-size:15px}
   .cbxl b{background:#FFF1D6;font-weight:inherit}
   .zban .cbx>input.cbxi,.fl .cbx>input.cbxi{font-size:15px;padding:7px 32px 7px 9px;background-position:right 9px center}
@@ -672,7 +675,7 @@
 <div class="net" id="net" role="alert" aria-live="assertive"><div class="nb"><div class="rt" id="netr"></div><div class="nt" id="nett">Зберігаю…</div><div class="ns" id="nets"></div><div class="np"><i id="netp"></i></div><div class="nh" id="neth"></div><div class="zc" id="zc"></div><button class="nx" id="netx" type="button">Не чекати</button></div></div>
 
 <script>
-const PAGE_VERSION = 'index.html v116 · 12.11.2026';   // v116: Р-15 цех — рівень 1; v115: Р-15 деревом, згорнуті блоки складу, дерево позицій, технічна назва; v114: вид — поле, пошук за ключовими словами; v113: групи й види номенклатури; v112: Р-15 — блоки згортаються; v111: Р-15 «Склад: залишки й рух»; v110: дії за типом локації, переміщення, партія покупцю; v109: кілька фото, тара, перемаркування; v108: приймання від постачальника, наліпки; v107: передачі склад → цех, ящики ГП приймає склад; v106: позиції складу за групами; v105: кнопки складу «Беремо зі складу» / «Приймаємо на склад»; v104: «Історія тари» (?th=) — назва тари на сторінці тари / партії веде на неї (Reports.gs v42)
+const PAGE_VERSION = 'index.html v117 · 12.11.2026';   // v117: вибір позиції — три рівні; v116: Р-15 цех — рівень 1; v115: Р-15 деревом, згорнуті блоки складу, дерево позицій, технічна назва; v114: вид — поле, пошук за ключовими словами; v113: групи й види номенклатури; v112: Р-15 — блоки згортаються; v111: Р-15 «Склад: залишки й рух»; v110: дії за типом локації, переміщення, партія покупцю; v109: кілька фото, тара, перемаркування; v108: приймання від постачальника, наліпки; v107: передачі склад → цех, ящики ГП приймає склад; v106: позиції складу за групами; v105: кнопки складу «Беремо зі складу» / «Приймаємо на склад»; v104: «Історія тари» (?th=) — назва тари на сторінці тари / партії веде на неї (Reports.gs v42)
 // v103 (11.11): Р-9_08 «За типом», «Перевірено, все ок»
 // v102 (09.11):   // v74: в1 — і з нашої тари (ящик залишків); в2 — лише партії в2
 // v72 (26.10):   // v72: «Яку партію відкриваємо?»; розшифровка кроків на картці партії; реєстрація — повернення за посиланням з форми
@@ -1038,11 +1041,12 @@ function skPosOpts(d, sel, ph, extra) {
   // v114 (рішення 12.11): заголовки — лише групи (рівень 3); вид — поле, не рівень: без підзаголовків, зате пошук знаходить позицію й за видом,
   // групою, кодом і типорозміром (data-k, cbxWire) — «магніт 3115», «кріплення м3», «CMP-BOLT»
   const groups = (d.groups || []).slice(), by = {};
-  const put = (g, n, k) => { if (groups.indexOf(g) < 0) groups.splice(Math.max(0, groups.length - 1), 0, g); (by[g] = by[g] || []).push([n, k || '']); };
-  d.positions.forEach(p => put(p.group || d.other, p.name, [p.group, p.kind, p.code, p.typ].concat(((d.tech || {})[p.name] || []).slice(0, 12)).filter(Boolean).join(' ')));   // v115: + технічні назви (БАС, етикетки, журнал)
+  const put = (g, n, k, t) => { if (groups.indexOf(g) < 0) groups.splice(Math.max(0, groups.length - 1), 0, g); (by[g] = by[g] || []).push([n, k || '', t || '']); };
+  d.positions.forEach(p => put(p.group || d.other, p.name, [p.group, p.kind, p.code, p.typ].concat(((d.tech || {})[p.name] || []).slice(0, 12)).filter(Boolean).join(' '),
+    ((d.tech || {})[p.name] || []).map(t => [t].concat(((d.techAka || {})[p.name] || {})[t] || []).join('¦')).join('¶')));   // v115: + технічні назви; v117: data-t — рівень 1 для показу (назва¦як записали…)
   if (extra) put('Попередня назва', extra);
   put(d.other, d.other);
-  const o = (x, g) => '<option data-g="' + esc(g) + '"' + (x[1] ? ' data-k="' + esc(x[1]) + '"' : '') + (String(x[0]) === String(sel) ? ' selected' : '') + '>' + esc(x[0]) + '</option>';
+  const o = (x, g) => '<option data-g="' + esc(g) + '"' + (x[1] ? ' data-k="' + esc(x[1]) + '"' : '') + (x[2] ? ' data-t="' + esc(x[2]) + '"' : '') + (String(x[0]) === String(sel) ? ' selected' : '') + '>' + esc(x[0]) + '</option>';
   return (ph ? '<option value="">' + esc(ph) + '</option>' : '') + groups.filter(g => by[g]).map(g => '<option value="" disabled data-gh="' + esc(g) + '">▸ ' + esc(String(g).toUpperCase()) + '</option>' +   // v115: data-gh — групи згорнуті в cbx
     by[g].sort((a, b) => a[0].localeCompare(b[0], 'uk')).map(x => o(x, g)).join('')).join('');
 }
@@ -1052,6 +1056,8 @@ function opts(list, sel, ph) { return (ph ? '<option value="">' + esc(ph) + '</o
  *  Сам select прихований і лишається джерелом значення: $('id').value, onchange, перебудова варіантів — як раніше; властивостей select не підміняємо */
 const CBX_MIN = 6, CBX_SKIP = '.zctl,.zmx,.zfrow,.zpop,.rzpop';
 const SELI = Object.getOwnPropertyDescriptor(HTMLSelectElement.prototype, 'selectedIndex');
+function cbxHl(text, words) { const t = cbxN(text), k = words.length ? t.indexOf(words[0]) : -1;   // v117: підсвітити перше слово пошуку
+  return k < 0 ? esc(text) : esc(text.slice(0, k)) + '<b>' + esc(text.slice(k, k + words[0].length)) + '</b>' + esc(text.slice(k + words[0].length)); }
 function cbxN(x) { return String(x).toLowerCase().replace(/[’ʼ`]/g, "'").replace(/ё/g, 'е'); }
 function cbxPh(o) { return !!o && o.value === '' && /^\s*[—–-]/.test(o.text); }   // «— оберіть —» — підказка, не значення
 function cbxWire(sel) {
@@ -1073,7 +1079,7 @@ function cbxWire(sel) {
   new MutationObserver(() => { sync(); if (w.classList.contains('open')) draw(C.q || ''); }).observe(sel, { childList: true, subtree: true, attributes: true, attributeFilter: ['disabled', 'selected'] });
   const draw = q => {
     C.q = q; const words = cbxN(q).split(/\s+/).filter(Boolean), cur = SELI.get.call(sel);
-    C.vis = []; let h = '';
+    C.vis = []; C.vt = []; let h = '';
     // v115: дерево — групи (option data-gh) згорнуті, натиснули — розгорнули; з пошуком — лише збіги під назвою своєї групи
     if (sel.querySelector('option[data-gh]')) {
       C.og = C.og || {}; const co = sel.options[cur], cg = co && co.dataset.g; if (cg && C.og[cg] === undefined) C.og[cg] = true;
@@ -1085,10 +1091,14 @@ function cbxWire(sel) {
         const g = o.dataset.g || '', t = cbxN(o.text), tk = o.dataset.k ? t + ' ' + cbxN(o.dataset.k) : t;
         if (words.length ? !words.every(x => tk.indexOf(x) >= 0) : (g && !C.og[g])) return;
         if (words.length && g !== lastG) { h += '<div class="gh dis">' + esc(g) + '</div>'; lastG = g; }
-        C.vis.push(i);
-        let txt = esc(o.text);
-        if (words.length) { const k = t.indexOf(words[0]); if (k >= 0) txt = esc(o.text.slice(0, k)) + '<b>' + esc(o.text.slice(k, k + words[0].length)) + '</b>' + esc(o.text.slice(k + words[0].length)); }
-        h += '<div data-i="' + i + '" class="' + (i === cur ? 'cur' : '') + '" style="padding-left:22px">' + txt + '</div>';
+        C.vis.push(i); C.vt.push('');
+        h += '<div data-i="' + i + '" class="' + (i === cur ? 'cur' : '') + '" style="padding-left:22px">' + cbxHl(o.text, words) + '</div>';
+        // v117: рівень 1 — технічні назви цієї позиції, що теж підходять під пошук (назва БАС; «як записали» — дрібно)
+        if (words.length && o.dataset.t) { let n = 0;
+          o.dataset.t.split('¶').forEach(z => { const a = z.split('¦'), nm = a[0], hit = cbxN(a.join(' ')); if (n >= 6 || !words.every(x => hit.indexOf(x) >= 0)) return; n++;
+            const raw = a.slice(1).find(r => words.every(x => cbxN(r).indexOf(x) >= 0) && !words.every(x => cbxN(nm).indexOf(x) >= 0));
+            C.vis.push(i); C.vt.push(nm);
+            h += '<div data-i="' + i + '" data-t="' + esc(nm) + '" class="t1">↳ ' + cbxHl(nm, words) + (raw ? ' <i>· записано: ' + cbxHl(raw, words) + '</i>' : '') + '</div>'; }); }
       });
       ls.innerHTML = h || '<div class="none">Нічого не знайдено — спробуйте інакше (назва, код, як написано на етикетці)</div>';
       C.hi = -1; hiTo(C.vis.findIndex(i => words.length || i === cur));
@@ -1097,7 +1107,7 @@ function cbxWire(sel) {
     [...sel.options].forEach((o, i) => {
       const t = cbxN(o.text), tk = o.dataset.k ? t + ' ' + cbxN(o.dataset.k) : t;   // v114: ще й приховані ключові слова (вид, група, код, типорозмір)
       if (words.length && (cbxPh(o) || !words.every(x => tk.indexOf(x) >= 0))) return;
-      C.vis.push(i);
+      C.vis.push(i); C.vt.push('');
       let txt = esc(o.text);
       if (words.length) { const k = t.indexOf(words[0]); if (k >= 0) txt = esc(o.text.slice(0, k)) + '<b>' + esc(o.text.slice(k, k + words[0].length)) + '</b>' + esc(o.text.slice(k + words[0].length)); }
       h += '<div data-i="' + i + '" class="' + (o.disabled ? 'dis' : '') + (i === cur ? ' cur' : '') + '">' + txt + '</div>';
@@ -1115,9 +1125,10 @@ function cbxWire(sel) {
     if (o && !cbxPh(o)) { inp.placeholder = o.text; inp.value = ''; } draw('');
   };
   const close = () => { w.classList.remove('open'); sync(); };
-  const pick = i => {
+  const pick = (i, tn) => {
     const o = sel.options[i]; if (!o || o.disabled) return;
-    const ch = SELI.get.call(sel) !== i; SELI.set.call(sel, i); close(); inp.blur();
+    if (tn) sel.dataset.pickTech = tn;   // v117: обрали технічну назву — позиція + рівень 1 (skTechWire підхопить)
+    const ch = SELI.get.call(sel) !== i || !!tn; SELI.set.call(sel, i); close(); inp.blur();
     if (ch) { sel.dispatchEvent(new Event('input', { bubbles: true })); sel.dispatchEvent(new Event('change', { bubbles: true })); }
   };
   inp.addEventListener('focus', open);
@@ -1127,12 +1138,12 @@ function cbxWire(sel) {
   inp.addEventListener('keydown', e => {
     if (e.key === 'ArrowDown' || e.key === 'ArrowUp') { e.preventDefault(); if (!w.classList.contains('open')) open();
       const d = e.key === 'ArrowDown' ? 1 : -1; let k = C.hi; do { k += d; } while (k >= 0 && k < C.vis.length && sel.options[C.vis[k]].disabled); if (k >= 0 && k < C.vis.length) hiTo(k); }
-    else if (e.key === 'Enter') { e.preventDefault(); if (C.hi >= 0) pick(C.vis[C.hi]); else close(); }
+    else if (e.key === 'Enter') { e.preventDefault(); if (C.hi >= 0) pick(C.vis[C.hi], C.vt[C.hi]); else close(); }
     else if (e.key === 'Escape') { close(); inp.blur(); }
   });
   ls.addEventListener('mousedown', e => e.preventDefault());   // фокус лишається в полі, поки обирають
   ls.addEventListener('click', e => { const g = e.target.closest('div[data-gh]'); if (g) { C.og = C.og || {}; C.og[g.dataset.gh] = !C.og[g.dataset.gh]; draw(C.q || ''); return; }   // v115: розгорнути / згорнути групу
-    const d = e.target.closest('div[data-i]'); if (d) pick(Number(d.dataset.i)); });
+    const d = e.target.closest('div[data-i]'); if (d) pick(Number(d.dataset.i), d.dataset.t || ''); });
   sync();
 }
 // значення змінили кодом ($('x').value = …, без події) — поле показує його не пізніше ніж за 0,4 с
@@ -5526,7 +5537,7 @@ function skTechWire(pfx, n, loc) {
   const d = SKD, D = $(pfx + 'D' + n), P = $(pfx + 'P' + n); if (!D || !P) return;
   const pos = P.value, at = (((d.techAt || {})[loc] || {})[pos] || []).slice().sort((a, b) => b[1] - a[1]), kn = ((d.tech || {})[pos] || []).filter(x => !at.some(a => a[0] === x));
   let T = $(pfx + 'T' + n);
-  if (!pos || (!at.length && !kn.length)) { if (T) T.remove(); return; }
+  if (!pos || (!at.length && !kn.length)) { if (T) T.remove(); if (P.dataset.pickTech) { D.value = P.dataset.pickTech; delete P.dataset.pickTech; } return; }
   if (!T) { T = document.createElement('select'); T.id = pfx + 'T' + n; T.setAttribute('data-nocbx', ''); T.style.marginTop = '6px'; D.parentNode.insertBefore(T, D);
     T.onchange = () => { const o = T.options[T.selectedIndex]; if (T.value === '__o') { D.value = ''; D.focus(); return; } if (!T.value) return; D.value = T.value;
       const u = o && o.dataset.u, U = $(pfx + 'U' + n); if (u && U && [...U.options].some(x => x.value === u)) U.value = u; }; }
@@ -5534,6 +5545,8 @@ function skTechWire(pfx, n, loc) {
     (at.length ? '<optgroup label="Є на ' + esc(loc) + '">' + at.map(a => '<option value="' + esc(a[0]) + '" data-u="' + esc(a[2]) + '">' + esc(a[0]) + ' — ' + esc(skNfmt(a[1])) + ' ' + esc(a[2]) + (a[3] ? ' · ' + esc(a[3]) : '') + '</option>').join('') + '</optgroup>' : '') +
     (kn.length ? '<optgroup label="Відомі назви (БАС, етикетки)">' + kn.map(x => '<option value="' + esc(x) + '">' + esc(x) + '</option>').join('') + '</optgroup>' : '') +
     '<option value="__o">✎ інша — вписати нижче</option>';
+  const pt = P.dataset.pickTech; delete P.dataset.pickTech;   // v117: технічну назву обрали в пошуку позиції
+  if (pt) { if (![...T.options].some(o => o.value === pt)) T.insertAdjacentHTML('afterbegin', '<option value="' + esc(pt) + '">' + esc(pt) + '</option>'); T.value = pt; D.value = pt; }
 }
 /** Фото етикетки → у перший рядок без позиції (або останній) */
 function skFillMv(f) {
