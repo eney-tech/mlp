@@ -1,5 +1,6 @@
 <!DOCTYPE html>
-<!-- МЛП · index.html v118 · 12.11.2026 — кількість на локації — прямо у списку вибору позиції (рівні 2 і 1); після дії технічні назви оновлюються
+<!-- МЛП · index.html v119 · 12.11.2026 — «Перемістити»: ящики ГП згорнуті — список відкривається кнопкою «📦 Перемістити ящики ГП» (склад → склад).
+     index.html v118 · 12.11.2026 — кількість на локації — прямо у списку вибору позиції (рівні 2 і 1); після дії технічні назви оновлюються
      без перезавантаження (Sklad.gs v22); «Вам передали» → «Прийміть на …» і хто бачить.
      index.html v117 · 12.11.2026 — вибір позиції — три рівні: пошук «клей» показує під групою уніфіковану назву, а під нею — технічні назви
      (БАС і як записали, Sklad.gs v21 techAka); натиснули технічну — обрано позицію й технічну назву.
@@ -677,7 +678,7 @@
 <div class="net" id="net" role="alert" aria-live="assertive"><div class="nb"><div class="rt" id="netr"></div><div class="nt" id="nett">Зберігаю…</div><div class="ns" id="nets"></div><div class="np"><i id="netp"></i></div><div class="nh" id="neth"></div><div class="zc" id="zc"></div><button class="nx" id="netx" type="button">Не чекати</button></div></div>
 
 <script>
-const PAGE_VERSION = 'index.html v118 · 12.11.2026';   // v118: кількість у списку, свіжі технічні назви, «Прийміть на …»; v117: вибір позиції — три рівні; v116: Р-15 цех — рівень 1; v115: Р-15 деревом, згорнуті блоки складу, дерево позицій, технічна назва; v114: вид — поле, пошук за ключовими словами; v113: групи й види номенклатури; v112: Р-15 — блоки згортаються; v111: Р-15 «Склад: залишки й рух»; v110: дії за типом локації, переміщення, партія покупцю; v109: кілька фото, тара, перемаркування; v108: приймання від постачальника, наліпки; v107: передачі склад → цех, ящики ГП приймає склад; v106: позиції складу за групами; v105: кнопки складу «Беремо зі складу» / «Приймаємо на склад»; v104: «Історія тари» (?th=) — назва тари на сторінці тари / партії веде на неї (Reports.gs v42)
+const PAGE_VERSION = 'index.html v119 · 12.11.2026';   // v119: ящики ГП у «Перемістити» — за кнопкою; v118: кількість у списку, свіжі технічні назви, «Прийміть на …»; v117: вибір позиції — три рівні; v116: Р-15 цех — рівень 1; v115: Р-15 деревом, згорнуті блоки складу, дерево позицій, технічна назва; v114: вид — поле, пошук за ключовими словами; v113: групи й види номенклатури; v112: Р-15 — блоки згортаються; v111: Р-15 «Склад: залишки й рух»; v110: дії за типом локації, переміщення, партія покупцю; v109: кілька фото, тара, перемаркування; v108: приймання від постачальника, наліпки; v107: передачі склад → цех, ящики ГП приймає склад; v106: позиції складу за групами; v105: кнопки складу «Беремо зі складу» / «Приймаємо на склад»; v104: «Історія тари» (?th=) — назва тари на сторінці тари / партії веде на неї (Reports.gs v42)
 // v103 (11.11): Р-9_08 «За типом», «Перевірено, все ок»
 // v102 (09.11):   // v74: в1 — і з нашої тари (ящик залишків); в2 — лише партії в2
 // v72 (26.10):   // v72: «Яку партію відкриваємо?»; розшифровка кроків на картці партії; реєстрація — повернення за посиланням з форми
@@ -5508,16 +5509,19 @@ function skMvDraw() {
     '<div id="mvHint" class="muted" style="margin-top:4px"></div>' +
     (d.photo ? '<input type="file" accept="image/*" capture="environment" id="skFile" style="display:none"><button type="button" class="btn btn2" id="skCam">📷 Фото етикетки (заповнить позицію)</button><div id="skPh" class="muted" style="margin-top:6px"></div>' : '') +
     '<div id="mvLines"></div><button type="button" class="btn btn2" id="mvAdd" style="margin-top:8px">+ Ще позиція</button>' +
-    '<div id="mvBoxW" style="display:none;margin-top:12px"><label>📦 Ящики ГП <span class="muted">(лише між складами)</span></label>' +
+    '<div id="mvBoxW" style="display:none;margin-top:12px"><button type="button" class="btn btn2" id="mvBoxT">📦 Перемістити ящики ГП (готові двигуни)</button>' +   // v119: список — лише на вимогу
+      '<div id="mvBoxIn" style="display:none"><label>📦 Ящики ГП <span class="muted">(лише між складами)</span></label>' +
       '<div class="row" style="align-items:center"><input type="text" id="mvBoxQ" placeholder="пошук: 3115 900, M-00087" style="min-width:0"><button type="button" class="ic" id="mvBoxScan" style="flex:0 0 58px;font-size:22px;padding:10px 0;margin:0">📷</button></div>' +
-      '<div id="mvBoxes" class="list" style="padding:0;margin-top:6px"></div></div>' +
+      '<div id="mvBoxes" class="list" style="padding:0;margin-top:6px"></div></div></div>' +
     '<label>Коментар</label><input type="text" id="mvCm"><button class="btn" id="mvGo">Перемістити</button>';
   const hint = () => {
     const t = skLocOf($('mvTo').value), k = t.kind;
     $('mvHint').innerHTML = !t.code ? '' : k === 'shop' ? 'Тімлід цеху прийме. Берете у свій цех самі — одразу прийнято.' : k === 'wh' ? 'Зав. складу прийме на ' + esc(t.name) + '.' : '<b>Без приймання</b> — одразу списується з ' + esc(skLocOf(from).name) + '.';
     $('mvBoxW').style.display = fk === 'wh' && k === 'wh' ? 'block' : 'none';
-    if (fk === 'wh' && k === 'wh' && !SKMV.boxes) skMvBoxesLoad();
   };
+  $('mvBoxT').onclick = () => { const on = $('mvBoxIn').style.display === 'none';   // v119: відкрити / сховати ящики (сховали — вибір скинуто)
+    $('mvBoxIn').style.display = on ? 'block' : 'none'; $('mvBoxT').textContent = on ? '✕ Без ящиків ГП' : '📦 Перемістити ящики ГП (готові двигуни)';
+    if (on && !SKMV.boxes) skMvBoxesLoad(); if (!on) { SKMV.sel = {}; skMvBoxesDraw(); } };
   $('mvTo').onchange = hint; hint();
   $('mvAdd').onclick = skMvLine; skMvLine();
   if (d.photo) { $('skCam').onclick = () => $('skFile').click(); $('skFile').onchange = e => { [...(e.target.files || [])].forEach(skPhoto); e.target.value = ''; }; SKF = { photos: [], raw: '', busy: null }; }
@@ -5594,7 +5598,7 @@ function skMvSave() {
     const p = d.positions.find(x => x.name === pos) || {};
     lines.push({ pos: pos, posOther: $('mvOt' + n).value, typ: p.typ || '', qty: q, unit: $('mvU' + n).value, det: $('mvD' + n).value, lot: $('mvL' + n).value });
   }
-  if ($('mvBoxW').style.display !== 'none') Object.keys(SKMV.sel).forEach(id => lines.push({ box: id }));
+  if ($('mvBoxW').style.display !== 'none' && $('mvBoxIn').style.display !== 'none') Object.keys(SKMV.sel).forEach(id => lines.push({ box: id }));
   if (!lines.length) return err('Додайте позицію або оберіть ящики');
   const go = () => {
     b.disabled = true; b._t = b.textContent; b.textContent = 'Переміщую…';
