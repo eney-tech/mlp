@@ -1,7 +1,8 @@
 <!DOCTYPE html>
-<!-- МЛП · index.html v120 · 12.11.2026 — Р-2: дві вкладки — «Стан зараз» і «Гравіювання роторів» (для звітів тімліда Жулян): ротори, що пройшли гравіювання за період —
-     F4 у партіях роторів (в2 власні, в1 покупні) і F4п у партіях двигунів; картки, таблиця «період × типорозмір · KV» (день / тиждень / місяць / весь період),
-     фільтри локація / де гравіювали / версія / типорозмір / KV, CSV, «За партіями» (Reports.gs v44, apiDash d=stan + engr).
+<!-- МЛП · index.html v121 · 12.11.2026 — Р-2 (рішення 12.11, для тімліда Жулян): вкладку «Гравіювання роторів» (v120) прибрано. Р-2_05 «Готові до збирання» — колонки
+     «Статори, шт» і «Ротори, шт» замість «шт», рядок «Разом» (з них у партіях двигунів), і партії двигунів зі статорами / роторами, що чекають F1 (ротори — з гравіюванням,
+     покупні — після F4п; Reports.gs cl.S / cl.R); картки «Статори / Ротори готові до збирання» — разом із деталями в партіях двигунів. Reports.gs v45.
+     index.html v120 · 12.11.2026 — Р-2: вкладка «Гравіювання роторів» (прибрано у v121).
      index.html v119 · 12.11.2026 — «Перемістити»: ящики ГП згорнуті — список відкривається кнопкою «📦 Перемістити ящики ГП» (склад → склад).
      index.html v118 · 12.11.2026 — кількість на локації — прямо у списку вибору позиції (рівні 2 і 1); після дії технічні назви оновлюються
      без перезавантаження (Sklad.gs v22); «Вам передали» → «Прийміть на …» і хто бачить.
@@ -681,7 +682,7 @@
 <div class="net" id="net" role="alert" aria-live="assertive"><div class="nb"><div class="rt" id="netr"></div><div class="nt" id="nett">Зберігаю…</div><div class="ns" id="nets"></div><div class="np"><i id="netp"></i></div><div class="nh" id="neth"></div><div class="zc" id="zc"></div><button class="nx" id="netx" type="button">Не чекати</button></div></div>
 
 <script>
-const PAGE_VERSION = 'index.html v120 · 12.11.2026';   // v120: Р-2 вкладка «Гравіювання роторів»; v119: ящики ГП у «Перемістити» — за кнопкою; v118: кількість у списку, свіжі технічні назви, «Прийміть на …»; v117: вибір позиції — три рівні; v116: Р-15 цех — рівень 1; v115: Р-15 деревом, згорнуті блоки складу, дерево позицій, технічна назва; v114: вид — поле, пошук за ключовими словами; v113: групи й види номенклатури; v112: Р-15 — блоки згортаються; v111: Р-15 «Склад: залишки й рух»; v110: дії за типом локації, переміщення, партія покупцю; v109: кілька фото, тара, перемаркування; v108: приймання від постачальника, наліпки; v107: передачі склад → цех, ящики ГП приймає склад; v106: позиції складу за групами; v105: кнопки складу «Беремо зі складу» / «Приймаємо на склад»; v104: «Історія тари» (?th=) — назва тари на сторінці тари / партії веде на неї (Reports.gs v42)
+const PAGE_VERSION = 'index.html v121 · 12.11.2026';   // v121: Р-2_05 готові до збирання — статори й ротори окремо, разом, деталі в партіях двигунів; v120: (прибрано); v119: ящики ГП у «Перемістити» — за кнопкою; v118: кількість у списку, свіжі технічні назви, «Прийміть на …»; v117: вибір позиції — три рівні; v116: Р-15 цех — рівень 1; v115: Р-15 деревом, згорнуті блоки складу, дерево позицій, технічна назва; v114: вид — поле, пошук за ключовими словами; v113: групи й види номенклатури; v112: Р-15 — блоки згортаються; v111: Р-15 «Склад: залишки й рух»; v110: дії за типом локації, переміщення, партія покупцю; v109: кілька фото, тара, перемаркування; v108: приймання від постачальника, наліпки; v107: передачі склад → цех, ящики ГП приймає склад; v106: позиції складу за групами; v105: кнопки складу «Беремо зі складу» / «Приймаємо на склад»; v104: «Історія тари» (?th=) — назва тари на сторінці тари / партії веде на неї (Reports.gs v42)
 // v103 (11.11): Р-9_08 «За типом», «Перевірено, все ок»
 // v102 (09.11):   // v74: в1 — і з нашої тари (ящик залишків); в2 — лише партії в2
 // v72 (26.10):   // v72: «Яку партію відкриваємо?»; розшифровка кроків на картці партії; реєстрація — повернення за посиланням з форми
@@ -3023,7 +3024,6 @@ const LOCN = { 'П': 'Печерськ', 'Ж': 'Жуляни' };
 function fn(n) { return Math.round(Number(n) || 0).toLocaleString('uk-UA'); }
 function pct(a, b) { return b ? (a / b * 100).toFixed(1).replace('.', ',') + ' %' : ''; }
 function loadDash(fresh) {
-  if (fresh) ZE.key = '';   // v120: «оновити» — і вкладка «Гравіювання роторів» Р-2
   { const t = DASHT[PARAMS.d] || DASHT.stan; setView(t[0], t[1], PARAMS.d === 'my' && NAV.role === 'працівник' ? 'my' : 'rep'); }
   if (!DB) $('app').innerHTML = '<div class="center muted">Завантаження…</div>';
   const t0 = Date.now();
@@ -3064,7 +3064,7 @@ function renderDash() {
 // Індекс ставиться на блоки верхнього рівня звіту: фільтри — _01, картки показників — _02, згорнуті блоки — за ключем zFold, картки — за назвою.
 // Індекси — як у прототипі звітів (Р-8_04 тощо); нові блоки без індексу показують «?» — додати в BAIX.
 const BAIX = {
-  'Р-2': { f: { r2_04: 'Р-2_04', r2_05: 'Р-2_05', r2e_t: 'Р-2_12', r2e_b: 'Р-2_13' }, c: {} },   // v120: вкладка «Гравіювання роторів»   // v68: Р-2_11 — у Р-2_05
+  'Р-2': { f: { r2_04: 'Р-2_04', r2_05: 'Р-2_05' }, c: {} },   // v68: Р-2_11 — у Р-2_05
   'Р-11': { f: { r11_01: 'Р-11_03', r11_leg: 'Р-11_04' }, c: {} },
   'Р-13': { f: { r13map: 'Р-13_03', r13rp: 'Р-13_04' }, c: {} },   // v70
   'Р-12': { f: { r12box: 'Р-12_03' }, c: {} },
@@ -4499,7 +4499,7 @@ function zCubePop(u, e) {
 function zCubeClose() { const p = $('zcpop'); if (p) p.style.display = 'none'; }
 document.addEventListener('pointerdown', e => { const p = $('zcpop'); if (p && p.style.display !== 'none' && !p.contains(e.target) && !e.target.closest('.zcb')) zCubeClose(); });
 document.addEventListener('keydown', e => { if (e.key === 'Escape') zCubeClose(); });
-function r2now() {
+function r2() {
   const d = DB, D = Z2;
   if (D.loc === null) D.loc = d.me && /^[ПЖ]/.test(d.me.site || '') ? [d.me.site.charAt(0)] : [];
   const FL = ['ST', 'RT', 'MT'].filter(f => zHas(D.flow, f));
@@ -4522,6 +4522,10 @@ function r2now() {
   const inw = D.step ? inw0.filter(b => b.wait[D.step]) : inw0;
   const stk = inw.filter(b => b.stuck);
   const rdyB = k => all0.filter(b => b.stream === k && isReady(b)), rq = k => rdyB(k).reduce((a, b) => a + b.rem, 0);
+  // v121: статори й ротори, що вже лежать у партіях двигунів і чекають збирання (F1): ротори — з гравіюванням (покупні — після F4п), без пари або в парах до F1
+  const mtP = (!D.step || D.step === 'F1') ? d.batches.filter(b => b.stream === 'MT' && b.cl && fit(b) && ((flowOk('ST') && b.cl.S > 0) || (flowOk('RT') && b.cl.R > 0))) : [];
+  const mq = k => mtP.reduce((a, b) => a + (b.cl[k] || 0), 0), mn = k => mtP.filter(b => b.cl[k] > 0).length;
+  const qS = b => b.stream === 'ST' ? b.rem : b.stream === 'MT' ? b.cl.S || 0 : 0, qR = b => b.stream === 'RT' ? b.rem : b.stream === 'MT' ? b.cl.R || 0 : 0;
   // ящики ГП (Reports.gs v29): відкриті на виробництві й на складі
   const norm = d.boxNorm || {}, per = t => norm[t] || norm['*'] || 160;
   const boxes = (d.boxes || []).filter(x => flowOk('MT') && zHas(D.loc, x.st === 'wh' ? (x.wh || x.loc).charAt(0) : x.loc) && zHas(D.typ, x.typ) && zHas(D.kv, x.kv || '—') && colOk(x.colors || []));
@@ -4545,14 +4549,15 @@ function r2now() {
     zFrow('Колір', cols.map(x => [x, lab(x)]), D.col, v => z2set('col', v)) +
     (D.step ? zFrow('Крок', [[D.step, D.step + ' ✕']], D.step, v => z2set('step', v)) : ''));
   // Р-2_02 картки: готові статори, готові ротори, у роботі (з них без руху — у тій самій картці)
-  const RTIP = 'Пройшли маршрут і лежать у тарі, доки їх не візьмуть у партію двигунів.';
+  const RTIP = 'Партії статорів / роторів, що пройшли маршрут і лежать у тарі, плюс статори й ротори, що вже лежать у партіях двигунів і чекають збирання (F1). Покупні ротори в партії двигунів рахуються тільки після гравіювання F4п.';
+  const kSub = (k, c) => rdyB(k).length + ' ' + PLR(rdyB(k).length) + (mq(c) ? ' + ' + fn(mq(c)) + ' шт у партіях двигунів (' + mn(c) + ')' : '') + ' · показати ▾';
   const goP = only => zAct(() => { D.only = only; D.more = false; zOpen('r2_05'); renderDash(); });
   const goD = k => zAct(() => { D.only = 'ready'; D.rk = k; D.more = false; zOpen('r2_05'); renderDash(); });
   const units = inw.reduce((a, b) => a + (D.step ? b.wait[D.step] || 0 : Math.max(0, b.rem)), 0), stU = stk.reduce((a, b) => a + Math.max(0, b.rem), 0);
   const stLine = stk.length ? '<a class="zkx" href="javascript:void 0" onclick="event.stopPropagation();zA(' + goP('stuck') + ')">без руху: ' + fn(stk.length) + ' ' + PLR(stk.length) + ' · ' + fn(stU) + ' шт ▾</a>' : 'без руху: немає';
   h += '<div class="zkpis">' +
-    (flowOk('ST') ? zKpi('Статори готові до збирання', fn(rq('ST')), 'шт', rdyB('ST').length + ' ' + PLR(rdyB('ST').length) + ' · показати ▾', RTIP, 'kgood', goD('ST')) : '') +
-    (flowOk('RT') ? zKpi('Ротори готові до збирання', fn(rq('RT')), 'шт', rdyB('RT').length + ' ' + PLR(rdyB('RT').length) + ' · показати ▾', RTIP, 'kgood', goD('RT')) : '') +
+    (flowOk('ST') ? zKpi('Статори готові до збирання', fn(rq('ST') + mq('S')), 'шт', kSub('ST', 'S'), RTIP, 'kgood', goD('ST')) : '') +
+    (flowOk('RT') ? zKpi('Ротори готові до збирання', fn(rq('RT') + mq('R')), 'шт', kSub('RT', 'R'), RTIP, 'kgood', goD('RT')) : '') +
     zKpi('У роботі', fn(inw.length), 'партій', fn(units) + ' шт у них · показати ▾<br>' + stLine, 'Партії, що зараз ідуть маршрутом (без готових до збирання). ' + IDLE_TIP(d.idleDays), '', goP('all')) + '</div>';
   // Р-2_04 Де зараз — рядки: заголовки груп, кроки, «готово до збирання», відкриті ящики, склад ГП
   const U = (b, q) => ({ q: q, typ: b.typ, kv: b.kv || '', cols: bCols(b), t: b.no, no: b.no, tare: b.tare || '', tare2: b.tare2 || '', href: blHref(b.no), per: per(b.typ), stk: b.stuck, idle: b.idle });
@@ -4643,128 +4648,39 @@ function r2now() {
     '<span class="zg">Показати:' + zChips(D.unit, [['qty', 'Штуки'], ['cube', 'Ящики ▣']], v => z2set('unit', v)) + '</span></div>' + leg + body +
     (D.unit === 'cube' ? '<p class="muted" style="margin:6px 0 0">Кубик — партія в тарі на кроці або ящик ГП. Розмір — від норми чистого ящика для типорозміру. Наведіть — номер тари; натисніть — віконце з посиланнями на тару, партію чи ящик.</p>' : ''), true);
   // Р-2_05 Партії: у роботі / без руху / готові до збирання (v68: колишній Р-2_11 «Партії завершені» — тут)
-  const rdyAll = [].concat(...['ST', 'RT'].filter(flowOk).map(rdyB));
-  const list = (D.only === 'stuck' ? stk : D.only === 'ready' ? rdyAll.filter(b => D.rk === 'all' || b.stream === D.rk) : inw).slice()
-    .sort((a, b) => D.only === 'ready' ? a.stream.localeCompare(b.stream) || b.idle - a.idle || a.no.localeCompare(b.no) : b.idle - a.idle || a.no.localeCompare(b.no));
+  const rdyAll = [].concat(...['ST', 'RT'].filter(flowOk).map(rdyB), mtP);   // v121: + партії двигунів з деталями до F1
+  const rdyOk = b => D.rk === 'all' || b.stream === D.rk || (b.stream === 'MT' && (D.rk === 'ST' ? b.cl.S > 0 : b.cl.R > 0));
+  const SO = { ST: 0, RT: 1, MT: 2 };
+  const list = (D.only === 'stuck' ? stk : D.only === 'ready' ? rdyAll.filter(rdyOk) : inw).slice()
+    .sort((a, b) => D.only === 'ready' ? SO[a.stream] - SO[b.stream] || b.idle - a.idle || a.no.localeCompare(b.no) : b.idle - a.idle || a.no.localeCompare(b.no));
   const shown = D.more ? list : list.slice(0, 15);
   const rdy = D.only === 'ready';
-  h += zFold('r2_05', 'Партії', inw.length + rdyAll.length, '<div class="muted">' + (D.step ? 'Крок ' + esc(D.step) + ': ' : '') + 'у роботі ' + inw.length + ' ' + PLR(inw.length) + ' (без руху ' + stk.length + ') · готові до збирання ' + rdyAll.length + ' — ' + fn(rdyAll.reduce((a, b) => a + b.rem, 0)) + ' шт</div>' +
+  const cS = rdy && flowOk('ST') && D.rk !== 'RT', cR = rdy && flowOk('RT') && D.rk !== 'ST';   // v121: «готові до збирання» — окремо статори й ротори
+  const sumS = rdyAll.reduce((a, b) => a + qS(b), 0), sumR = rdyAll.reduce((a, b) => a + qR(b), 0);
+  const qc = v => '<td class="r">' + (v ? fn(v) : '<span class="muted">·</span>') + '</td>';
+  const mtState = b => { const c = b.cl, uS = Math.max(0, (c.S || 0) - (c.P || 0)), uR = Math.max(0, (c.R || 0) - (c.P || 0));
+    return 'у партії двигунів<br><span class="muted">' + [c.P ? fn(c.P) + ' пар чекають F1' : '', uR ? fn(uR) + ' рот. чекають статорів' : '', uS ? fn(uS) + ' стат. чекають роторів' : '',
+      c.w4 ? 'ще ' + fn(c.w4) + ' рот. чекають F4п' : ''].filter(Boolean).join(' · ') + '</span>'; };
+  const lS = list.reduce((a, b) => a + qS(b), 0), lR = list.reduce((a, b) => a + qR(b), 0);
+  const mS = list.filter(b => b.stream === 'MT').reduce((a, b) => a + qS(b), 0), mR = list.filter(b => b.stream === 'MT').reduce((a, b) => a + qR(b), 0);
+  h += zFold('r2_05', 'Партії', inw.length + rdyAll.length, '<div class="muted">' + (D.step ? 'Крок ' + esc(D.step) + ': ' : '') + 'у роботі ' + inw.length + ' ' + PLR(inw.length) + ' (без руху ' + stk.length + ') · готові до збирання ' + rdyAll.length + ' — ' +
+    [flowOk('ST') ? 'статори ' + fn(sumS) : '', flowOk('RT') ? 'ротори ' + fn(sumR) : ''].filter(Boolean).join(' · ') + ' шт</div>' +
     '<div class="zctl">' + zChips(D.only, [['all', 'У роботі'], ['stuck', 'Тільки без руху'], ['ready', 'Готові до збирання']], v => { D.only = v; D.more = false; renderDash(); }) +
     (rdy && ['ST', 'RT'].filter(flowOk).length > 1 ? zChips(D.rk, [['all', 'Статори й ротори'], ['ST', 'Статори'], ['RT', 'Ротори']], v => { D.rk = v; D.more = false; renderDash(); }) : '') + '</div>' +
-    (list.length ? '<div class="tw" style="margin-top:6px"><table class="t"><tr><th>Партія</th><th>Тип · KV</th><th>' + (rdy ? 'Стан' : 'Крок') + '</th><th>Тара</th><th class="r">шт</th><th>' + (rdy ? 'Завершено' : 'Остання операція') + '</th><th></th></tr>' +
-      shown.map(b => '<tr><td>' + bl(b.no) + '</td><td>' + esc(b.typ) + ' · ' + esc(b.kv || '—') + (b.color ? '<br><span class="muted">' + esc(b.color) + '</span>' : '') + '</td><td>' + (rdy ? '✓ готово' : esc(b.step || '—')) +
-        (b.purpose ? ' <span class="pill warn" style="margin:0">' + esc(b.purpose) + '</span>' : '') + '</td><td>' + tl(b.tare) + (b.tare2 ? ' + ' + esc(b.tare2) : '') + '</td><td class="r">' +
-        fn(D.step && !rdy ? b.wait[D.step] : b.rem) + '</td><td>' + esc(b.last || '—') + '</td><td>' + (b.stuck ? xmark((rdy ? 'Лежить без руху ' : 'Без руху ') + b.idle + ' роб. дн. (' + d.idleDays + ' і більше)') : '') + '</td></tr>').join('') + '</table></div>' +
+    (list.length ? '<div class="tw" style="margin-top:6px"><table class="t zdt"><tr><th>Партія</th><th>Тип · KV</th><th>' + (rdy ? 'Стан' : 'Крок') + '</th><th>Тара</th>' +
+      (rdy ? (cS ? '<th class="r">Статори, шт</th>' : '') + (cR ? '<th class="r">Ротори, шт</th>' : '') : '<th class="r">шт</th>') + '<th>' + (rdy ? 'Завершено' : 'Остання операція') + '</th><th></th></tr>' +
+      shown.map(b => '<tr><td>' + bl(b.no) + '</td><td>' + esc(b.typ) + ' · ' + esc(b.kv || '—') + (b.color ? '<br><span class="muted">' + esc(b.color) + '</span>' : '') + '</td><td>' +
+        (rdy ? (b.stream === 'MT' ? mtState(b) : '✓ готово') : esc(b.step || '—')) +
+        (b.purpose ? ' <span class="pill warn" style="margin:0">' + esc(b.purpose) + '</span>' : '') + '</td><td>' + tl(b.tare) + (b.tare2 ? ' + ' + esc(b.tare2) : '') + '</td>' +
+        (rdy ? (cS ? qc(qS(b)) : '') + (cR ? qc(qR(b)) : '') : '<td class="r">' + fn(D.step ? b.wait[D.step] : b.rem) + '</td>') +
+        '<td>' + esc(b.last || '—') + (rdy && b.stream === 'MT' ? '<br><span class="muted">остання операція</span>' : '') + '</td><td>' + (b.stuck ? xmark((rdy ? 'Лежить без руху ' : 'Без руху ') + b.idle + ' роб. дн. (' + d.idleDays + ' і більше)') : '') + '</td></tr>').join('') +
+      (rdy ? '<tr class="tot"><td colspan="4">Разом · ' + list.length + ' ' + PLR(list.length) + (mS || mR ? '<br><span class="muted" style="font-weight:400">з них у партіях двигунів: ' +
+        [cS ? 'статори ' + fn(mS) : '', cR ? 'ротори ' + fn(mR) : ''].filter(Boolean).join(' · ') + '</span>' : '') + '</td>' + (cS ? '<td class="r">' + fn(lS) + '</td>' : '') + (cR ? '<td class="r">' + fn(lR) + '</td>' : '') + '<td colspan="2"></td></tr>' : '') +
+      '</table></div>' +
       (list.length > 15 ? '<button type="button" class="ic" style="margin-top:8px" onclick="zA(' + zAct(() => { D.more = !D.more; renderDash(); }) + ')">' + (D.more ? 'Згорнути' : 'Показати всі ' + list.length) + '</button>' : '')
       : '<p class="muted">Немає партій за цими фільтрами.</p>'));
   return h;
 }
-// ---- v120: Р-2 — дві вкладки: «Стан зараз» і «Гравіювання роторів» (рішення 12.11, для звітів тімліда Жулян).
-// Гравіювання: успішні записи F4 у партіях роторів (власні в2 і покупні в1) і F4п у партіях двигунів (покупні ротори в1) за період —
-// з денних підсумків (Reports.gs v44, apiDash d=stan + engr). Період змінився — новий запит; фільтри й розрізи — на сторінці.
-let Z2TAB = store('mlp_z2tab') === 'engr' ? 'engr' : 'now';
-function r2() {
-  const tabs = [['now', 'Стан зараз'], ['engr', 'Гравіювання роторів']];
-  return '<div class="tabs" style="margin-bottom:4px">' + tabs.map(x => '<a href="javascript:void 0" class="' + (Z2TAB === x[0] ? 'on' : '') + '" onclick="zA(' +
-    zAct(() => { Z2TAB = x[0]; store('mlp_z2tab', x[0]); renderDash(); }) + ')">' + esc(x[1]) + '</a>').join('') + '</div>' + (Z2TAB === 'engr' ? r2engr() : r2now());
-}
-const ZE = { F: zMkF('month', 'd'), loc: null, kind: [], ver: [], typ: [], kv: [], data: null, key: '', busy: false, err: '', more: false };
-try { const v = JSON.parse(store('mlp_per_engr') || 'null'); if (v && v.per) Object.assign(ZE.F, { per: v.per, from: v.from || '', to: v.to || '', gran: v.gran || 'd' }); } catch (e) { }
-function zeSave() { const F = ZE.F; store('mlp_per_engr', JSON.stringify({ per: F.per, from: F.from, to: F.to, gran: F.gran })); }
-function zeLoad() {
-  const rg = zRange(ZE.F), key = rg.join('|');
-  ZE.busy = true; ZE.err = ''; ZE.key = key;
-  google.script.run.withSuccessHandler(x => { if (ZE.key !== key) return; ZE.busy = false; ZE.data = x; if (DB && DB.d === 'stan') renderDash(); })
-    .withFailureHandler(e => { if (ZE.key !== key) return; ZE.busy = false; ZE.err = e.message; if (DB && DB.d === 'stan') renderDash(); })
-    .apiDash({ code: CODE, d: 'stan', engr: 1, from: rg[0], to: rg[1] });
-}
-/** колонки: де гравіювали × версія ротора */
-const ZECOLS = [['RT|в2', 'Партії роторів', 'в2 власні · F4'], ['RT|в1', 'Партії роторів', 'в1 покупні · F4'], ['MT|в1', 'Партії двигунів', 'в1 покупні · F4п']];
-function r2engr() {
-  const d = DB, E = ZE, F = E.F, rg = zRange(F);
-  if (E.loc === null) E.loc = d.me && /^[ПЖ]/.test(d.me.site || '') ? [d.me.site.charAt(0)] : [];
-  if (E.key !== rg.join('|')) zeLoad();
-  const ready = E.data && !E.busy && E.key === rg.join('|');
-  const recs = ready ? (E.data.eg || []).map(x => ({ d: x[0], k: x[1], v: x[2] || 'в2', typ: String(x[3] || ''), kv: String(x[4] || '') || '—', loc: x[5] || '—', no: x[6], g: Number(x[7]) || 0, s: Number(x[8]) || 0 })) : [];
-  const typs = zUniq(recs.map(r => r.typ)).filter(Boolean).sort();
-  const kvs = zUniq(recs.filter(r => zHas(E.typ, r.typ)).map(r => r.kv)).sort(zKvSort);
-  if (ready) ['typ', 'kv'].forEach(k => { const av = { typ: typs, kv: kvs }[k]; E[k] = E[k].filter(x => av.indexOf(x) >= 0); });
-  const perSet = v => { F.per = v; if (v === 'custom' && !F.from) { const r = zRange(zMkF('month')); F.from = r[0]; F.to = r[1]; } if (v === 'today' || v === 'prev') F.gran = 'd'; E.more = false; zeSave(); renderDash(); };
-  const dIn = (k, v) => '<input type="date" class="zdate" value="' + esc(v) + '" max="' + esc(zToday()) + '" onchange="zA(' + zAct(x => { if (x) { F[k] = x; E.more = false; zeSave(); renderDash(); } }) + ',this.value)">';
-  const dates = F.per === 'custom' ? dIn('from', rg[0]) + '<span class="muted">–</span>' + dIn('to', rg[1]) : '';
-  const lab = x => x === '—' ? 'не вказано' : x;
-  const set = (k, v) => { E[k] = v; E.more = false; renderDash(); };
-  const sum = [zPerLabel(F), E.loc.length ? E.loc.map(x => LOCN[x] || x).join(', ') : 'усі локації']
-    .concat(E.kind.length ? [E.kind.map(k => k === 'RT' ? 'партії роторів' : 'партії двигунів').join(', ')] : [], E.ver.length ? [E.ver.join(', ')] : [],
-      E.typ.length ? [E.typ.join(', ')] : [], E.kv.length ? ['KV ' + E.kv.map(lab).join(', ')] : []).join(' · ');
-  let h = zFbar('r2e', sum, [E.kind.length, E.ver.length, E.typ.length, E.kv.length].filter(x => x).length,
-    zFrow('Період', ZPERS, F.per, perSet, dates) +
-    zFrow('Розбивка', [['d', 'За днями'], ['w', 'За тижнями'], ['m', 'За місяцями'], ['all', 'Весь період разом']], F.gran, v => { F.gran = v; zeSave(); renderDash(); }) +
-    zFrow('Локація', [['П', 'Печерськ'], ['Ж', 'Жуляни']], E.loc, v => set('loc', v)) +
-    zFrow('Де гравіювали', [['RT', 'Партії роторів · F4'], ['MT', 'Партії двигунів · F4п']], E.kind, v => set('kind', v)) +
-    zFrow('Ротори', [['в2', 'в2 · власні'], ['в1', 'в1 · покупні']], E.ver, v => set('ver', v)) +
-    (typs.length ? zFrow('Типорозмір', typs.map(x => [x, x]), E.typ, v => set('typ', v)) : '') +
-    (kvs.length ? zFrow('KV', kvs.map(x => [x, lab(x)]), E.kv, v => set('kv', v)) : ''));
-  if (E.err) return h + '<div class="card err">' + esc(E.err) + ' · <a class="lnk" href="javascript:void 0" onclick="zA(' + zAct(() => { ZE.key = ''; renderDash(); }) + ')">ще раз</a></div>';
-  if (!ready) return h + '<div class="card muted">Завантаження гравіювання за ' + esc(zPerLabel(F)) + '…</div>';
-  const rs = recs.filter(r => zHas(E.loc, r.loc) && zHas(E.kind, r.k) && zHas(E.ver, r.v) && zHas(E.typ, r.typ) && zHas(E.kv, r.kv));
-  const cols = ZECOLS.filter(c => zHas(E.kind, c[0].split('|')[0]) && zHas(E.ver, c[0].split('|')[1]));
-  const ck = r => r.k + '|' + r.v;
-  const tot = { g: 0, s: 0 }; cols.forEach(c => tot[c[0]] = 0);
-  rs.forEach(r => { tot.g += r.g; tot.s += r.s; tot[ck(r)] = (tot[ck(r)] || 0) + r.g; });
-  const gRT = (tot['RT|в2'] || 0) + (tot['RT|в1'] || 0), gMT = tot['MT|в1'] || 0;
-  const TIP = 'Ротори, що успішно пройшли гравіювання: F4 — у партіях роторів (власні в2 і покупні в1, що йдуть одразу на гравіювання), F4п — у партіях двигунів (покупні ротори в1, що прийшли без гравіювання). ' +
-    'Брак гравіювання — окремо, в «програвійовано» не входить. Скасовані записи не рахуються, виправлені — за новим значенням; дата — коли зроблено роботу.';
-  h += '<div class="zkpis">' +
-    zKpi('Програвійовано роторів', fn(tot.g), 'шт', esc(zPerLabel(F)), TIP, 'kgood') +
-    zKpi('У партіях роторів · F4', fn(gRT), 'шт', 'в2 власні ' + fn(tot['RT|в2'] || 0) + ' · в1 покупні ' + fn(tot['RT|в1'] || 0)) +
-    zKpi('У партіях двигунів · F4п', fn(gMT), 'шт', 'покупні ротори в1') +
-    zKpi('Брак на гравіюванні', fn(tot.s), 'шт', tot.s ? zPc(tot.s, tot.g + tot.s) + ' від гравійованих' : 'немає') + '</div>';
-  // таблиця: період × типорозмір · KV, колонки — де гравіювали
-  const g = F.gran, bk = r => g === 'all' ? 'all' : zBk(r.d, g), bLab = k => k === 'all' ? zPerLabel(F) : zBkLabel(k, g, true);
-  const tkOf = r => r.typ + '|' + r.kv;
-  const M = new Map();
-  rs.forEach(r => { const b = bk(r); let m = M.get(b); if (!m) M.set(b, m = new Map()); const t = tkOf(r); let a = m.get(t); if (!a) m.set(t, a = { g: 0, s: 0 }); a.g += r.g; a.s += r.s; a[ck(r)] = (a[ck(r)] || 0) + r.g; });
-  const tkSort = (a, b) => { const x = a.split('|'), y = b.split('|'); return x[0].localeCompare(y[0]) || zKvSort(x[1], y[1]); };
-  const cell = v => '<td class="r">' + (v ? fn(v) : '<span class="muted">·</span>') + '</td>';
-  const line = (c1, c2, a, cls) => '<tr' + (cls ? ' class="' + cls + '"' : '') + '><td>' + c1 + '</td><td>' + c2 + '</td>' + cols.map(c => cell(a[c[0]] || 0)).join('') + '<td class="r"><b>' + fn(a.g) + '</b></td>' + cell(a.s) + '</tr>';
-  const buckets = [...M.keys()].sort(), csv = [];
-  let tb = '';
-  buckets.forEach(b => {
-    const m = M.get(b), tks = [...m.keys()].sort(tkSort), bt = { g: 0, s: 0 };
-    tks.forEach((t, i) => { const a = m.get(t), p = t.split('|');
-      tb += line(i ? '' : '<b>' + esc(bLab(b)) + '</b>', esc(p[0]) + ' · ' + esc(lab(p[1])), a);
-      csv.push([bLab(b), p[0], lab(p[1])].concat(cols.map(c => a[c[0]] || 0), [a.g, a.s]));
-      Object.keys(a).forEach(k => bt[k] = (bt[k] || 0) + a[k]); });
-    if (tks.length > 1) tb += line('', '<span class="muted">разом</span>', bt, 'sub');
-  });
-  if (buckets.length > 1) tb += line('<b>Разом за період</b>', '', tot, 'tot');
-  const csvGo = () => {
-    const head = ['Період', 'Типорозмір', 'KV'].concat(cols.map(c => c[1] + ' · ' + c[2] + ', шт'), ['Програвійовано разом, шт', 'Брак, шт']);
-    const out = [['Р-2 · Гравіювання роторів · ' + zPerLabel(F) + ' · ' + sum]].concat([head], csv);
-    const txt = '﻿' + out.map(r => r.map(x => '"' + String(x).replace(/"/g, '""') + '"').join(';')).join('\r\n');
-    const a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([txt], { type: 'text/csv;charset=utf-8' }));
-    a.download = 'ENEY_MLP_R-2_Hraviyuvannia-rotoriv_' + rg[0] + '_' + rg[1] + '.csv'; document.body.appendChild(a); a.click(); a.remove(); toast('CSV завантажено');
-  };
-  h += zFold('r2e_t', 'Програвійовані ротори · ' + (g === 'd' ? 'за днями' : g === 'w' ? 'за тижнями' : g === 'm' ? 'за місяцями' : 'за період'), fn(tot.g) + ' шт',
-    (rs.length ? '<div class="zctl"><button type="button" class="ic" onclick="zA(' + zAct(csvGo) + ')">⬇ CSV (Excel)</button></div>' +
-      '<div class="tw zmaxh" style="margin-top:6px"><table class="t zdt"><tr><th>' + (g === 'all' ? 'Період' : g === 'd' ? 'День' : g === 'w' ? 'Тиждень' : 'Місяць') + '</th><th>Типорозмір · KV</th>' +
-      cols.map(c => '<th class="r">' + esc(c[1]) + '<br><span class="muted" style="font-weight:400">' + esc(c[2]) + '</span></th>').join('') +
-      '<th class="r">Програвійовано<br><span class="muted" style="font-weight:400">разом</span></th><th class="r">Брак</th></tr>' + tb + '</table></div>'
-      : '<p class="muted">За цей період і фільтри гравіювання не записано.</p>') +
-    '<p class="muted" style="margin:6px 0 0">Записи минулих днів, які внесли або виправили сьогодні, потрапляють сюди після нічного перерахунку підсумків.</p>', true);
-  // за партіями
-  const P = new Map();
-  rs.forEach(r => { let a = P.get(r.no); if (!a) P.set(r.no, a = { no: r.no, k: r.k, v: r.v, typ: r.typ, kv: r.kv, loc: r.loc, g: 0, s: 0, d1: r.d, d2: r.d }); a.g += r.g; a.s += r.s; if (r.d < a.d1) a.d1 = r.d; if (r.d > a.d2) a.d2 = r.d; });
-  const pl = [...P.values()].sort((a, b) => b.d2.localeCompare(a.d2) || a.no.localeCompare(b.no)), shown = E.more ? pl : pl.slice(0, 30);
-  h += zFold('r2e_b', 'За партіями', pl.length, pl.length ? '<div class="tw" style="margin-top:6px"><table class="t"><tr><th>Партія</th><th>Де · ротори</th><th>Типорозмір · KV</th><th>Локація</th><th>Дні</th><th class="r">Програвійовано</th><th class="r">Брак</th></tr>' +
-    shown.map(a => '<tr><td>' + bl(a.no) + '</td><td>' + (a.k === 'MT' ? 'двигуни · F4п' : 'ротори · F4') + ' · ' + esc(a.v) + '</td><td>' + esc(a.typ) + ' · ' + esc(lab(a.kv)) + '</td><td>' + esc(LOCN[a.loc] || a.loc) + '</td><td>' +
-      esc(a.d1 === a.d2 ? zDm(a.d1) : zDm(a.d1) + ' – ' + zDm(a.d2)) + '</td><td class="r">' + fn(a.g) + '</td><td class="r">' + (a.s ? fn(a.s) : '') + '</td></tr>').join('') + '</table></div>' +
-    (pl.length > 30 ? '<button type="button" class="ic" style="margin-top:8px" onclick="zA(' + zAct(() => { E.more = !E.more; renderDash(); }) + ')">' + (E.more ? 'Згорнути' : 'Показати всі ' + pl.length) + '</button>' : '')
-    : '<p class="muted">Немає партій за цими фільтрами.</p>');
-  return h;
-}
-
 // =============================================================== v70: Р-13 «ЦЕХ НАЖИВО» — план поверхів Печерська: ящики (кубики Р-2_04) чекають біля столів своїх кроків
 // План — ENEY_MLP_Plan-poverhiv_Pechersk_v1 (24.10.2026; поверх 1 погоджено, 2 — чернетка, 3 — з малюнка тімліда). Ящик стоїть ПЕРЕД столом (бік до центру
 // приміщення), ряди від столу; три ряди заповнені — наступний шар зверху (як у цеху, «хаос» видно). Готові статори / ротори чекають F1 — біля місця F1.
