@@ -1,5 +1,6 @@
 <!DOCTYPE html>
-<!-- МЛП · index.html v112 · 12.11.2026 — Р-15: кожна візуалка згортається (стан пам'ятає пристрій), «Згорнути / Розгорнути всі».
+<!-- МЛП · index.html v113 · 12.11.2026 — універсальні групи номенклатури (Sklad.gs v17): у виборі позиції — підзаголовки «група · вид»; Р-15, рівень 3 — «група / вид».
+     v112 · 12.11.2026 — Р-15: кожна візуалка згортається (стан пам'ятає пристрій), «Згорнути / Розгорнути всі».
      v111 · 11.11.2026 — Р-15 «Склад: залишки й рух» (d=sklad, Sklad.gs v16): «Що де лежить» — позиції × локації (склади — за журналом, цехи 🏭 — розрахунок,
      ГП — ящики), 🚩 у цеху — менше ніж на 1 день; «Цехи: на скільки днів», «ГП: двигуни в ящиках», «Рух» (прийшло / пішло за днями, таблиця); фільтри — рівень назв
      (технічна · уніфікована · група), локації, група, пошук, період. Плитка «📊 Залишки складу» на головній.
@@ -660,7 +661,7 @@
 <div class="net" id="net" role="alert" aria-live="assertive"><div class="nb"><div class="rt" id="netr"></div><div class="nt" id="nett">Зберігаю…</div><div class="ns" id="nets"></div><div class="np"><i id="netp"></i></div><div class="nh" id="neth"></div><div class="zc" id="zc"></div><button class="nx" id="netx" type="button">Не чекати</button></div></div>
 
 <script>
-const PAGE_VERSION = 'index.html v112 · 12.11.2026';   // v112: Р-15 — блоки згортаються; v111: Р-15 «Склад: залишки й рух»; v110: дії за типом локації, переміщення, партія покупцю; v109: кілька фото, тара, перемаркування; v108: приймання від постачальника, наліпки; v107: передачі склад → цех, ящики ГП приймає склад; v106: позиції складу за групами; v105: кнопки складу «Беремо зі складу» / «Приймаємо на склад»; v104: «Історія тари» (?th=) — назва тари на сторінці тари / партії веде на неї (Reports.gs v42)
+const PAGE_VERSION = 'index.html v113 · 12.11.2026';   // v113: групи й види номенклатури; v112: Р-15 — блоки згортаються; v111: Р-15 «Склад: залишки й рух»; v110: дії за типом локації, переміщення, партія покупцю; v109: кілька фото, тара, перемаркування; v108: приймання від постачальника, наліпки; v107: передачі склад → цех, ящики ГП приймає склад; v106: позиції складу за групами; v105: кнопки складу «Беремо зі складу» / «Приймаємо на склад»; v104: «Історія тари» (?th=) — назва тари на сторінці тари / партії веде на неї (Reports.gs v42)
 // v103 (11.11): Р-9_08 «За типом», «Перевірено, все ок»
 // v102 (09.11):   // v74: в1 — і з нашої тари (ящик залишків); в2 — лише партії в2
 // v72 (26.10):   // v72: «Яку партію відкриваємо?»; розшифровка кроків на картці партії; реєстрація — повернення за посиланням з форми
@@ -1023,13 +1024,16 @@ function numInput(id, val) {
 function bump(id, d) { const i = $(id); i.value = Math.max(0, (Number(i.value) || 0) + d); i.dispatchEvent(new Event('input')); }
 /** v106: позиції складу за групами (d.groups з Sklad.gs v10): заголовок групи — неактивний рядок, «Інше» — остання група. extra — назва старого запису, якої вже немає в списку */
 function skPosOpts(d, sel, ph, extra) {
-  const groups = (d.groups || []).slice(), by = {};
-  const put = (g, n) => { if (groups.indexOf(g) < 0) groups.splice(Math.max(0, groups.length - 1), 0, g); (by[g] = by[g] || []).push(n); };
-  d.positions.forEach(p => put(p.group || d.other, p.name));
+  // v113: у групі — підзаголовки видів («Компоненти · Магніти», d.kinds з Sklad.gs v17), за порядком видів; позиції без виду — першими
+  const groups = (d.groups || []).slice(), by = {}, K = d.kinds || {};
+  const put = (g, n, k) => { if (groups.indexOf(g) < 0) groups.splice(Math.max(0, groups.length - 1), 0, g); const b = by[g] = by[g] || {}; (b[k || ''] = b[k || ''] || []).push(n); };
+  d.positions.forEach(p => put(p.group || d.other, p.name, p.kind));
   if (extra) put('Попередня назва', extra);
   put(d.other, d.other);
-  return (ph ? '<option value="">' + esc(ph) + '</option>' : '') + groups.filter(g => by[g]).map(g => '<option value="" disabled>▸ ' + esc(String(g).toUpperCase()) + '</option>' +
-    by[g].map(n => '<option' + (String(n) === String(sel) ? ' selected' : '') + '>' + esc(n) + '</option>').join('')).join('');
+  const ko = g => Object.keys(by[g]).sort((a, b) => ((K[g] || []).indexOf(a) + 1 || (a ? 99 : 0)) - ((K[g] || []).indexOf(b) + 1 || (b ? 99 : 0)) || a.localeCompare(b));
+  const o = n => '<option' + (String(n) === String(sel) ? ' selected' : '') + '>' + esc(n) + '</option>';
+  return (ph ? '<option value="">' + esc(ph) + '</option>' : '') + groups.filter(g => by[g]).map(g => ko(g).map(k =>
+    '<option value="" disabled>▸ ' + esc(String(g).toUpperCase()) + (k ? ' · ' + esc(k) : '') + '</option>' + by[g][k].map(o).join('')).join('')).join('');
 }
 function opts(list, sel, ph) { return (ph ? '<option value="">' + esc(ph) + '</option>' : '') + list.map(x => '<option' + (String(x) === String(sel) ? ' selected' : '') + '>' + esc(x) + '</option>').join(''); }
 // =============================================================== v52: ПОШУК У ВИПАДНИХ СПИСКАХ
@@ -4981,7 +4985,7 @@ function r15() {
   const locs = x.locs.filter(l => l[2] !== 'virt'), it = x.items;
   if (!D.locs) D.locs = locs.map(l => l[0]);
   const nf = skNfmt, lname = c => { const l = x.locs.find(z => z[0] === c); return l ? l[1] : c; };
-  const name = (k, det) => { const i = it[k] || [k, k, '', '', '']; return D.lv === 3 ? (i[2] || 'Інше') : D.lv === 2 ? i[1] : (det || i[3] || i[1]); };
+  const name = (k, det) => { const i = it[k] || [k, k, '', '', '', '']; return D.lv === 3 ? (i[2] || 'Інше') + (i[5] ? ' / ' + i[5] : '') : D.lv === 2 ? i[1] : (det || i[3] || i[1]); };   // v113: група / вид
   const unitOf = k => (it[k] || [])[4] || 'шт';
   // v112: кожна візуалка — у блоці, що згортається (стан пам'ятає пристрій, як у Р-8 / Р-10)
   const fold = (id, title, cnt, sub, body) => zFold(id, title, cnt, (sub ? '<div class="muted" style="margin-bottom:10px">' + sub + '</div>' : '') + body, true);
