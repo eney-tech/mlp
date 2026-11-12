@@ -1,5 +1,6 @@
 <!DOCTYPE html>
-<!-- МЛП · index.html v111 · 11.11.2026 — Р-15 «Склад: залишки й рух» (d=sklad, Sklad.gs v16): «Що де лежить» — позиції × локації (склади — за журналом, цехи 🏭 — розрахунок,
+<!-- МЛП · index.html v112 · 12.11.2026 — Р-15: кожна візуалка згортається (стан пам'ятає пристрій), «Згорнути / Розгорнути всі».
+     v111 · 11.11.2026 — Р-15 «Склад: залишки й рух» (d=sklad, Sklad.gs v16): «Що де лежить» — позиції × локації (склади — за журналом, цехи 🏭 — розрахунок,
      ГП — ящики), 🚩 у цеху — менше ніж на 1 день; «Цехи: на скільки днів», «ГП: двигуни в ящиках», «Рух» (прийшло / пішло за днями, таблиця); фільтри — рівень назв
      (технічна · уніфікована · група), локації, група, пошук, період. Плитка «📊 Залишки складу» на головній.
      v110 · 11.11.2026 — «Робота зі складом» за типом локації (Sklad.gs v15): спершу «де я / звідки» (склад чи цех), далі дії:
@@ -560,6 +561,7 @@
   .r15t td{padding:5px 8px;border-bottom:1px solid #EEF2F5;vertical-align:top}.r15t td.v{text-align:right;white-space:nowrap;font-variant-numeric:tabular-nums}.r15t td.n{min-width:150px}
   .r15b{display:grid;grid-template-columns:minmax(120px,38%) 1fr auto;gap:8px;align-items:center;margin:4px 0;font-size:13px}.r15b .t{background:#EEF2F5;border-radius:4px;height:12px}.r15b .t div{height:12px;border-radius:4px}
   .r15b .d{white-space:nowrap;text-align:right;font-variant-numeric:tabular-nums}.r15b .d.bad{color:#9B231A;font-weight:700}
+  .r15fa{display:flex;gap:8px;justify-content:flex-end;margin:4px 12px 0}.r15fa button{background:none;border:1px solid #C5D0D7;border-radius:8px;padding:4px 10px;font-size:13px;color:#55656E;cursor:pointer}
   .r15lg{display:flex;gap:14px;font-size:13px;color:#66767F}.r15lg i{display:inline-block;width:10px;height:10px;border-radius:2px;margin-right:5px;vertical-align:middle}
   .kpi{background:#fff;border-radius:14px;padding:12px 14px;box-shadow:0 1px 3px rgba(0,0,0,.08)}
   .kpi .v{font-size:26px;font-weight:700;line-height:1.15}.kpi .v small{font-size:14px;font-weight:500;color:#66767F;margin-left:3px}
@@ -658,7 +660,7 @@
 <div class="net" id="net" role="alert" aria-live="assertive"><div class="nb"><div class="rt" id="netr"></div><div class="nt" id="nett">Зберігаю…</div><div class="ns" id="nets"></div><div class="np"><i id="netp"></i></div><div class="nh" id="neth"></div><div class="zc" id="zc"></div><button class="nx" id="netx" type="button">Не чекати</button></div></div>
 
 <script>
-const PAGE_VERSION = 'index.html v111 · 11.11.2026';   // v111: Р-15 «Склад: залишки й рух»; v110: дії за типом локації, переміщення, партія покупцю; v109: кілька фото, тара, перемаркування; v108: приймання від постачальника, наліпки; v107: передачі склад → цех, ящики ГП приймає склад; v106: позиції складу за групами; v105: кнопки складу «Беремо зі складу» / «Приймаємо на склад»; v104: «Історія тари» (?th=) — назва тари на сторінці тари / партії веде на неї (Reports.gs v42)
+const PAGE_VERSION = 'index.html v112 · 12.11.2026';   // v112: Р-15 — блоки згортаються; v111: Р-15 «Склад: залишки й рух»; v110: дії за типом локації, переміщення, партія покупцю; v109: кілька фото, тара, перемаркування; v108: приймання від постачальника, наліпки; v107: передачі склад → цех, ящики ГП приймає склад; v106: позиції складу за групами; v105: кнопки складу «Беремо зі складу» / «Приймаємо на склад»; v104: «Історія тари» (?th=) — назва тари на сторінці тари / партії веде на неї (Reports.gs v42)
 // v103 (11.11): Р-9_08 «За типом», «Перевірено, все ок»
 // v102 (09.11):   // v74: в1 — і з нашої тари (ящик залишків); в2 — лише партії в2
 // v72 (26.10):   // v72: «Яку партію відкриваємо?»; розшифровка кроків на картці партії; реєстрація — повернення за посиланням з форми
@@ -3008,6 +3010,7 @@ const BAIX = {
   'Р-11': { f: { r11_01: 'Р-11_03', r11_leg: 'Р-11_04' }, c: {} },
   'Р-13': { f: { r13map: 'Р-13_03', r13rp: 'Р-13_04' }, c: {} },   // v70
   'Р-12': { f: { r12box: 'Р-12_03' }, c: {} },
+  'Р-15': { f: { r15map: 'Р-15_03', r15gp: 'Р-15_05', r15mv: 'Р-15_06' }, c: {} },   // v112
   'Р-5': { f: { r5_04: 'Р-5_04', r5idle: 'Р-5_05', r5types: 'Р-5_03' }, c: {} },
   'Р-7': { f: { r7idle: 'Р-7_12', r7lead: 'Р-7_04', r7wait: 'Р-7_05', r7tbl: 'Р-7_06', r7recs: 'Р-7_07', r7c: 'Р-7_03', r7path: 'Р-7_07' }, c: { '': 'Р-7_07' } },
   'Р-8': { f: { r8c: 'Р-8_04', r8s: 'Р-8_05', r8r: 'Р-8_12', r8f: 'Р-8_13', r8m: 'Р-8_06' }, c: {} },
@@ -4980,6 +4983,8 @@ function r15() {
   const nf = skNfmt, lname = c => { const l = x.locs.find(z => z[0] === c); return l ? l[1] : c; };
   const name = (k, det) => { const i = it[k] || [k, k, '', '', '']; return D.lv === 3 ? (i[2] || 'Інше') : D.lv === 2 ? i[1] : (det || i[3] || i[1]); };
   const unitOf = k => (it[k] || [])[4] || 'шт';
+  // v112: кожна візуалка — у блоці, що згортається (стан пам'ятає пристрій, як у Р-8 / Р-10)
+  const fold = (id, title, cnt, sub, body) => zFold(id, title, cnt, (sub ? '<div class="muted" style="margin-bottom:10px">' + sub + '</div>' : '') + body, true);
   const pass = (k, det) => { const i = it[k] || []; if (D.grp && (i[2] || 'Інше') !== D.grp) return false;
     if (D.q) { const s = [i[0], i[1], i[2], i[3], det].join(' ').toLowerCase(); if (D.q.toLowerCase().split(/\s+/).some(w => w && s.indexOf(w) < 0)) return false; } return true; };
   // матриця: рядок = назва (за рівнем) + одиниця, колонка = локація
@@ -5009,7 +5014,8 @@ function r15() {
     kpi('ГП на складах', nf(gpQ), ' шт', gpB + ' ящиків') + kpi('Від\'ємних залишків', neg, '', 'без інвентаризації складів — див. примітку') + '</div>';
   // 1) що де лежить
   const showN = 250;
-  h += dcard('Що де лежить', 'Склади — прийшло − пішло за журналом з ' + esc(x.from.split('-').reverse().join('.')) + '; цехи 🏭 — інвентаризація + переміщення − витрата за нормами; ГП — ящики МЛП. Колір — частка позиції на локації.',
+  h += '<div class="r15fa"><button type="button" onclick="r15FoldAll(false)">▸ Згорнути всі</button><button type="button" onclick="r15FoldAll(true)">▾ Розгорнути всі</button></div>';
+  h += fold('r15map', 'Що де лежить', rows.length + ' поз.', 'Склади — прийшло − пішло за журналом з ' + esc(x.from.split('-').reverse().join('.')) + '; цехи 🏭 — інвентаризація + переміщення − витрата за нормами; ГП — ящики МЛП. Колір — частка позиції на локації.',
     rows.length ? '<div class="r15w"><table class="r15t"><thead><tr><th>' + ['', 'Технічна назва', 'Позиція', 'Група'][D.lv] + '</th>' + cols.map(c => '<th title="' + esc(c[1]) + '">' + esc(c[0]) + (c[2] === 'shop' ? ' 🏭' : '') + '</th>').join('') + '<th>Од.</th></tr></thead><tbody>' +
       rows.slice(0, showN).map(r => { const pos = cols.reduce((a, c) => a + Math.max(0, r.c[c[0]] || 0), 0);
         return '<tr><td class="n">' + esc(r.nm) + '</td>' + cols.map(c => { const v = r.c[c[0]]; if (v === undefined || Math.abs(v) < 1e-9) return '<td></td>';
@@ -5020,10 +5026,11 @@ function r15() {
       : '<p class="muted">Нічого не знайдено за фільтрами.</p>');
   // 2) цехи: на скільки днів
   x.shops.filter(s => D.locs.indexOf(s.code) >= 0).forEach(s => {
-    if (s.noInv) { h += dcard('🏭 ' + esc(s.name) + ': на скільки днів', '', '<p class="muted">Інвентаризації цеху ще немає — залишок не рахується. Порахуйте, що лежить у цеху (як Юля в Жулянах), — і тут з\'являться дні й 🚩.</p>'); return; }
+    if (s.noInv) { h += fold('r15shop' + s.code, '🏭 ' + esc(s.name) + ': на скільки днів', 'немає інвентаризації', '', '<p class="muted">Інвентаризації цеху ще немає — залишок не рахується. Порахуйте, що лежить у цеху (як Юля в Жулянах), — і тут з\'являться дні й 🚩.</p>'); return; }
     const rr = s.rows.filter(r => r[3] > 0 && pass(r[0], '')).sort((a, b) => (a[4] === null ? 1e9 : a[4]) - (b[4] === null ? 1e9 : b[4]));
     const cap = 30, W = 100;
-    h += dcard('🏭 ' + esc(s.name) + ': на скільки днів', 'Інвентаризація ' + esc((s.rows[0] || [])[7] || '') + ' · витрата за день — середнє за 5 останніх робочих днів · 🚩 — менше ніж на 1 день',
+    const nfl = rr.filter(r => r[4] !== null && r[4] < 1).length;
+    h += fold('r15shop' + s.code, '🏭 ' + esc(s.name) + ': на скільки днів', nfl ? '🚩 ' + nfl : rr.length + ' поз.', 'Інвентаризація ' + esc((s.rows[0] || [])[7] || '') + ' · витрата за день — середнє за 5 останніх робочих днів · 🚩 — менше ніж на 1 день',
       rr.length ? rr.map(r => { const d = r[4] === null ? 0 : r[4], w = Math.max(0, Math.min(cap, d)) / cap * W, fl = r[4] !== null && r[4] < 1;
         return '<div class="r15b" title="' + esc(name(r[0], '') + ': ' + nf(Math.round(r[1])) + ' ' + r[2] + ' · за день ' + nf(Math.round(r[3]))) + '"><div class="l">' + (fl ? '🚩 ' : '') + esc(name(r[0], '')) + '</div>' +
           '<div class="t"><div style="width:' + w + '%;background:' + (fl ? '#C4314B' : R15C.in) + '"></div></div><div class="d' + (fl ? ' bad' : '') + '">' + (r[1] < 0 ? '0' : String(Math.round(d * 10) / 10).replace('.', ',')) + ' дн.</div></div>'; }).join('') +
@@ -5032,7 +5039,7 @@ function r15() {
   // 3) ГП
   const gpl = x.gp.filter(g => (D.locs.indexOf(g[0]) >= 0 || /^вир\./.test(g[0])) && pass('ГП', g[1]));
   if (gpl.length) { const mx = Math.max(...gpl.map(g => g[4]));
-    h += dcard('📦 ГП: двигуни в ящиках', 'За маркуванням і локацією (склади й «вир.» — відкриті ящики на виробництві корпусу)',
+    h += fold('r15gp', '📦 ГП: двигуни в ящиках', nf(gpl.reduce((a, g) => a + g[4], 0)) + ' шт', 'За маркуванням і локацією (склади й «вир.» — відкриті ящики на виробництві корпусу)',
       gpl.sort((a, b) => a[1].localeCompare(b[1]) || a[0].localeCompare(b[0])).map(g => '<div class="r15b"><div class="l">' + esc(g[1]) + ' · <b>' + esc(g[0]) + '</b></div><div class="t"><div style="width:' + (g[4] / mx * 100) + '%;background:' + R15C.in + '"></div></div>' +
         '<div class="d">' + nf(g[4]) + ' <span class="muted">· ' + g[3] + ' ящ.</span></div></div>').join('')); }
   // 4) рух
@@ -5049,7 +5056,7 @@ function r15() {
         (hi ? '<rect x="' + x0 + '" y="' + (mid - hi - 1) + '" width="' + bw + '" height="' + hi + '" rx="2" fill="' + R15C.in + '"/>' : '') +
         (ho ? '<rect x="' + x0 + '" y="' + (mid + 1) + '" width="' + bw + '" height="' + ho + '" rx="2" fill="' + R15C.out + '"/>' : '') +
         (i % Math.ceil(ks.length / 8) === 0 ? '<text x="' + x0 + '" y="' + (CH + 14) + '" font-size="11" fill="#66767F">' + t + '</text>' : '') + '</g>'; }).join('') + '</svg>';
-  h += dcard('Рух за ' + x.days + ' дн.', (one ? 'Кількість, ' + esc(mv[0][7]) : 'Кількість записів (оберіть одну позицію — покаже кількість)') + ' · вгору — прийшло, вниз — пішло',
+  h += fold('r15mv', 'Рух за ' + x.days + ' дн.', mv.length + ' зап.', (one ? 'Кількість, ' + esc(mv[0][7]) : 'Кількість записів (оберіть одну позицію — покаже кількість)') + ' · вгору — прийшло, вниз — пішло',
     '<div class="chips" style="margin-bottom:8px">' + [7, 30, 90].map(n => '<button class="' + (x.days === n ? 'on' : '') + '" onclick="PARAMS.days=' + n + ';loadDash(1)">' + n + ' дн.</button>').join('') +
       seg('act', '', 'усе') + seg('act', 'in', 'прийшло') + seg('act', 'out', 'пішло') + '</div>' +
     '<div class="r15lg"><span><i style="background:' + R15C.in + '"></i>прийшло</span><span><i style="background:' + R15C.out + '"></i>пішло</span></div>' + svg +
@@ -5064,6 +5071,8 @@ function r15() {
 }
 function skLocOf15(x, c) { const l = x.locs.find(z => z[0] === c); return l ? l[2] : ''; }
 function fmtT15(t) { const d = new Date(t), p = n => String(n).padStart(2, '0'); return p(d.getDate()) + '.' + p(d.getMonth() + 1) + ' ' + p(d.getHours()) + ':' + p(d.getMinutes()); }
+/** v112: згорнути / розгорнути всі блоки Р-15 (стан кожного — у пам'яті пристрою, zFoldT) */
+function r15FoldAll(op) { document.querySelectorAll('#app details.zfold[id^="zf_r15"]').forEach(d => { if (d.open !== op) d.open = op; }); }
 function r15Loc(c) { const a = Z15.locs || []; const i = a.indexOf(c); if (i >= 0) a.splice(i, 1); else a.push(c); Z15.locs = a; renderDash(); }
 function r12() {
   const d = DB, D = Z12;
