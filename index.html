@@ -1,5 +1,8 @@
 <!DOCTYPE html>
-<!-- МЛП · index.html v119 · 12.11.2026 — «Перемістити»: ящики ГП згорнуті — список відкривається кнопкою «📦 Перемістити ящики ГП» (склад → склад).
+<!-- МЛП · index.html v120 · 12.11.2026 — Р-2: дві вкладки — «Стан зараз» і «Гравіювання роторів» (для звітів тімліда Жулян): ротори, що пройшли гравіювання за період —
+     F4 у партіях роторів (в2 власні, в1 покупні) і F4п у партіях двигунів; картки, таблиця «період × типорозмір · KV» (день / тиждень / місяць / весь період),
+     фільтри локація / де гравіювали / версія / типорозмір / KV, CSV, «За партіями» (Reports.gs v44, apiDash d=stan + engr).
+     index.html v119 · 12.11.2026 — «Перемістити»: ящики ГП згорнуті — список відкривається кнопкою «📦 Перемістити ящики ГП» (склад → склад).
      index.html v118 · 12.11.2026 — кількість на локації — прямо у списку вибору позиції (рівні 2 і 1); після дії технічні назви оновлюються
      без перезавантаження (Sklad.gs v22); «Вам передали» → «Прийміть на …» і хто бачить.
      index.html v117 · 12.11.2026 — вибір позиції — три рівні: пошук «клей» показує під групою уніфіковану назву, а під нею — технічні назви
@@ -355,7 +358,7 @@
   table.zdt td.tok,.zlg.tok{background:#9FD8B5;color:#17643D;font-weight:700}table.zdt td.tS:not(.on),.zlg.tS{outline:2px dashed #1F7A4D;outline-offset:-5px}
   table.zdt td sup{font-size:9px;margin-left:1px}.zlg{display:inline-block;width:14px;height:12px;border-radius:2px;vertical-align:-1px;margin-right:4px;border:1px solid #C5D0D7}
   .zack{border:1px solid #C5D0D7;border-radius:10px;padding:10px 12px;margin:10px 0}.zack.ok{border-color:#1F7A4D;background:#EEF8F2}.zack.st{border-color:#E8710A;background:#FFF5EA}
-  .zack textarea{width:100%;min-height:54px;box-sizing:border-box;border:1px solid #C5D0D7;border-radius:8px;padding:6px 8px;font:inherit;margin:6px 0}table.zdt tr.tot td{border-top:2px solid #C5D0D7;font-weight:600}
+  .zack textarea{width:100%;min-height:54px;box-sizing:border-box;border:1px solid #C5D0D7;border-radius:8px;padding:6px 8px;font:inherit;margin:6px 0}table.zdt tr.tot td{border-top:2px solid #C5D0D7;font-weight:600}table.zdt tr.sub td{border-bottom:2px solid #E3E9ED;color:#3D4B53}
   .zseg{display:flex;height:100%}.zseg i{display:block;height:100%}
   .zpanel{display:flex;gap:8px;align-items:baseline;margin:14px 0 0;font-size:15px}.zpanel:first-child{margin-top:4px}
   .zleg2{display:grid;grid-template-columns:max-content 1fr;gap:4px 12px;font-size:14px}.zleg2 b{font-variant-numeric:tabular-nums}
@@ -678,7 +681,7 @@
 <div class="net" id="net" role="alert" aria-live="assertive"><div class="nb"><div class="rt" id="netr"></div><div class="nt" id="nett">Зберігаю…</div><div class="ns" id="nets"></div><div class="np"><i id="netp"></i></div><div class="nh" id="neth"></div><div class="zc" id="zc"></div><button class="nx" id="netx" type="button">Не чекати</button></div></div>
 
 <script>
-const PAGE_VERSION = 'index.html v119 · 12.11.2026';   // v119: ящики ГП у «Перемістити» — за кнопкою; v118: кількість у списку, свіжі технічні назви, «Прийміть на …»; v117: вибір позиції — три рівні; v116: Р-15 цех — рівень 1; v115: Р-15 деревом, згорнуті блоки складу, дерево позицій, технічна назва; v114: вид — поле, пошук за ключовими словами; v113: групи й види номенклатури; v112: Р-15 — блоки згортаються; v111: Р-15 «Склад: залишки й рух»; v110: дії за типом локації, переміщення, партія покупцю; v109: кілька фото, тара, перемаркування; v108: приймання від постачальника, наліпки; v107: передачі склад → цех, ящики ГП приймає склад; v106: позиції складу за групами; v105: кнопки складу «Беремо зі складу» / «Приймаємо на склад»; v104: «Історія тари» (?th=) — назва тари на сторінці тари / партії веде на неї (Reports.gs v42)
+const PAGE_VERSION = 'index.html v120 · 12.11.2026';   // v120: Р-2 вкладка «Гравіювання роторів»; v119: ящики ГП у «Перемістити» — за кнопкою; v118: кількість у списку, свіжі технічні назви, «Прийміть на …»; v117: вибір позиції — три рівні; v116: Р-15 цех — рівень 1; v115: Р-15 деревом, згорнуті блоки складу, дерево позицій, технічна назва; v114: вид — поле, пошук за ключовими словами; v113: групи й види номенклатури; v112: Р-15 — блоки згортаються; v111: Р-15 «Склад: залишки й рух»; v110: дії за типом локації, переміщення, партія покупцю; v109: кілька фото, тара, перемаркування; v108: приймання від постачальника, наліпки; v107: передачі склад → цех, ящики ГП приймає склад; v106: позиції складу за групами; v105: кнопки складу «Беремо зі складу» / «Приймаємо на склад»; v104: «Історія тари» (?th=) — назва тари на сторінці тари / партії веде на неї (Reports.gs v42)
 // v103 (11.11): Р-9_08 «За типом», «Перевірено, все ок»
 // v102 (09.11):   // v74: в1 — і з нашої тари (ящик залишків); в2 — лише партії в2
 // v72 (26.10):   // v72: «Яку партію відкриваємо?»; розшифровка кроків на картці партії; реєстрація — повернення за посиланням з форми
@@ -3020,6 +3023,7 @@ const LOCN = { 'П': 'Печерськ', 'Ж': 'Жуляни' };
 function fn(n) { return Math.round(Number(n) || 0).toLocaleString('uk-UA'); }
 function pct(a, b) { return b ? (a / b * 100).toFixed(1).replace('.', ',') + ' %' : ''; }
 function loadDash(fresh) {
+  if (fresh) ZE.key = '';   // v120: «оновити» — і вкладка «Гравіювання роторів» Р-2
   { const t = DASHT[PARAMS.d] || DASHT.stan; setView(t[0], t[1], PARAMS.d === 'my' && NAV.role === 'працівник' ? 'my' : 'rep'); }
   if (!DB) $('app').innerHTML = '<div class="center muted">Завантаження…</div>';
   const t0 = Date.now();
@@ -3060,7 +3064,7 @@ function renderDash() {
 // Індекс ставиться на блоки верхнього рівня звіту: фільтри — _01, картки показників — _02, згорнуті блоки — за ключем zFold, картки — за назвою.
 // Індекси — як у прототипі звітів (Р-8_04 тощо); нові блоки без індексу показують «?» — додати в BAIX.
 const BAIX = {
-  'Р-2': { f: { r2_04: 'Р-2_04', r2_05: 'Р-2_05' }, c: {} },   // v68: Р-2_11 — у Р-2_05
+  'Р-2': { f: { r2_04: 'Р-2_04', r2_05: 'Р-2_05', r2e_t: 'Р-2_12', r2e_b: 'Р-2_13' }, c: {} },   // v120: вкладка «Гравіювання роторів»   // v68: Р-2_11 — у Р-2_05
   'Р-11': { f: { r11_01: 'Р-11_03', r11_leg: 'Р-11_04' }, c: {} },
   'Р-13': { f: { r13map: 'Р-13_03', r13rp: 'Р-13_04' }, c: {} },   // v70
   'Р-12': { f: { r12box: 'Р-12_03' }, c: {} },
@@ -4495,7 +4499,7 @@ function zCubePop(u, e) {
 function zCubeClose() { const p = $('zcpop'); if (p) p.style.display = 'none'; }
 document.addEventListener('pointerdown', e => { const p = $('zcpop'); if (p && p.style.display !== 'none' && !p.contains(e.target) && !e.target.closest('.zcb')) zCubeClose(); });
 document.addEventListener('keydown', e => { if (e.key === 'Escape') zCubeClose(); });
-function r2() {
+function r2now() {
   const d = DB, D = Z2;
   if (D.loc === null) D.loc = d.me && /^[ПЖ]/.test(d.me.site || '') ? [d.me.site.charAt(0)] : [];
   const FL = ['ST', 'RT', 'MT'].filter(f => zHas(D.flow, f));
@@ -4653,6 +4657,111 @@ function r2() {
         fn(D.step && !rdy ? b.wait[D.step] : b.rem) + '</td><td>' + esc(b.last || '—') + '</td><td>' + (b.stuck ? xmark((rdy ? 'Лежить без руху ' : 'Без руху ') + b.idle + ' роб. дн. (' + d.idleDays + ' і більше)') : '') + '</td></tr>').join('') + '</table></div>' +
       (list.length > 15 ? '<button type="button" class="ic" style="margin-top:8px" onclick="zA(' + zAct(() => { D.more = !D.more; renderDash(); }) + ')">' + (D.more ? 'Згорнути' : 'Показати всі ' + list.length) + '</button>' : '')
       : '<p class="muted">Немає партій за цими фільтрами.</p>'));
+  return h;
+}
+// ---- v120: Р-2 — дві вкладки: «Стан зараз» і «Гравіювання роторів» (рішення 12.11, для звітів тімліда Жулян).
+// Гравіювання: успішні записи F4 у партіях роторів (власні в2 і покупні в1) і F4п у партіях двигунів (покупні ротори в1) за період —
+// з денних підсумків (Reports.gs v44, apiDash d=stan + engr). Період змінився — новий запит; фільтри й розрізи — на сторінці.
+let Z2TAB = store('mlp_z2tab') === 'engr' ? 'engr' : 'now';
+function r2() {
+  const tabs = [['now', 'Стан зараз'], ['engr', 'Гравіювання роторів']];
+  return '<div class="tabs" style="margin-bottom:4px">' + tabs.map(x => '<a href="javascript:void 0" class="' + (Z2TAB === x[0] ? 'on' : '') + '" onclick="zA(' +
+    zAct(() => { Z2TAB = x[0]; store('mlp_z2tab', x[0]); renderDash(); }) + ')">' + esc(x[1]) + '</a>').join('') + '</div>' + (Z2TAB === 'engr' ? r2engr() : r2now());
+}
+const ZE = { F: zMkF('month', 'd'), loc: null, kind: [], ver: [], typ: [], kv: [], data: null, key: '', busy: false, err: '', more: false };
+try { const v = JSON.parse(store('mlp_per_engr') || 'null'); if (v && v.per) Object.assign(ZE.F, { per: v.per, from: v.from || '', to: v.to || '', gran: v.gran || 'd' }); } catch (e) { }
+function zeSave() { const F = ZE.F; store('mlp_per_engr', JSON.stringify({ per: F.per, from: F.from, to: F.to, gran: F.gran })); }
+function zeLoad() {
+  const rg = zRange(ZE.F), key = rg.join('|');
+  ZE.busy = true; ZE.err = ''; ZE.key = key;
+  google.script.run.withSuccessHandler(x => { if (ZE.key !== key) return; ZE.busy = false; ZE.data = x; if (DB && DB.d === 'stan') renderDash(); })
+    .withFailureHandler(e => { if (ZE.key !== key) return; ZE.busy = false; ZE.err = e.message; if (DB && DB.d === 'stan') renderDash(); })
+    .apiDash({ code: CODE, d: 'stan', engr: 1, from: rg[0], to: rg[1] });
+}
+/** колонки: де гравіювали × версія ротора */
+const ZECOLS = [['RT|в2', 'Партії роторів', 'в2 власні · F4'], ['RT|в1', 'Партії роторів', 'в1 покупні · F4'], ['MT|в1', 'Партії двигунів', 'в1 покупні · F4п']];
+function r2engr() {
+  const d = DB, E = ZE, F = E.F, rg = zRange(F);
+  if (E.loc === null) E.loc = d.me && /^[ПЖ]/.test(d.me.site || '') ? [d.me.site.charAt(0)] : [];
+  if (E.key !== rg.join('|')) zeLoad();
+  const ready = E.data && !E.busy && E.key === rg.join('|');
+  const recs = ready ? (E.data.eg || []).map(x => ({ d: x[0], k: x[1], v: x[2] || 'в2', typ: String(x[3] || ''), kv: String(x[4] || '') || '—', loc: x[5] || '—', no: x[6], g: Number(x[7]) || 0, s: Number(x[8]) || 0 })) : [];
+  const typs = zUniq(recs.map(r => r.typ)).filter(Boolean).sort();
+  const kvs = zUniq(recs.filter(r => zHas(E.typ, r.typ)).map(r => r.kv)).sort(zKvSort);
+  if (ready) ['typ', 'kv'].forEach(k => { const av = { typ: typs, kv: kvs }[k]; E[k] = E[k].filter(x => av.indexOf(x) >= 0); });
+  const perSet = v => { F.per = v; if (v === 'custom' && !F.from) { const r = zRange(zMkF('month')); F.from = r[0]; F.to = r[1]; } if (v === 'today' || v === 'prev') F.gran = 'd'; E.more = false; zeSave(); renderDash(); };
+  const dIn = (k, v) => '<input type="date" class="zdate" value="' + esc(v) + '" max="' + esc(zToday()) + '" onchange="zA(' + zAct(x => { if (x) { F[k] = x; E.more = false; zeSave(); renderDash(); } }) + ',this.value)">';
+  const dates = F.per === 'custom' ? dIn('from', rg[0]) + '<span class="muted">–</span>' + dIn('to', rg[1]) : '';
+  const lab = x => x === '—' ? 'не вказано' : x;
+  const set = (k, v) => { E[k] = v; E.more = false; renderDash(); };
+  const sum = [zPerLabel(F), E.loc.length ? E.loc.map(x => LOCN[x] || x).join(', ') : 'усі локації']
+    .concat(E.kind.length ? [E.kind.map(k => k === 'RT' ? 'партії роторів' : 'партії двигунів').join(', ')] : [], E.ver.length ? [E.ver.join(', ')] : [],
+      E.typ.length ? [E.typ.join(', ')] : [], E.kv.length ? ['KV ' + E.kv.map(lab).join(', ')] : []).join(' · ');
+  let h = zFbar('r2e', sum, [E.kind.length, E.ver.length, E.typ.length, E.kv.length].filter(x => x).length,
+    zFrow('Період', ZPERS, F.per, perSet, dates) +
+    zFrow('Розбивка', [['d', 'За днями'], ['w', 'За тижнями'], ['m', 'За місяцями'], ['all', 'Весь період разом']], F.gran, v => { F.gran = v; zeSave(); renderDash(); }) +
+    zFrow('Локація', [['П', 'Печерськ'], ['Ж', 'Жуляни']], E.loc, v => set('loc', v)) +
+    zFrow('Де гравіювали', [['RT', 'Партії роторів · F4'], ['MT', 'Партії двигунів · F4п']], E.kind, v => set('kind', v)) +
+    zFrow('Ротори', [['в2', 'в2 · власні'], ['в1', 'в1 · покупні']], E.ver, v => set('ver', v)) +
+    (typs.length ? zFrow('Типорозмір', typs.map(x => [x, x]), E.typ, v => set('typ', v)) : '') +
+    (kvs.length ? zFrow('KV', kvs.map(x => [x, lab(x)]), E.kv, v => set('kv', v)) : ''));
+  if (E.err) return h + '<div class="card err">' + esc(E.err) + ' · <a class="lnk" href="javascript:void 0" onclick="zA(' + zAct(() => { ZE.key = ''; renderDash(); }) + ')">ще раз</a></div>';
+  if (!ready) return h + '<div class="card muted">Завантаження гравіювання за ' + esc(zPerLabel(F)) + '…</div>';
+  const rs = recs.filter(r => zHas(E.loc, r.loc) && zHas(E.kind, r.k) && zHas(E.ver, r.v) && zHas(E.typ, r.typ) && zHas(E.kv, r.kv));
+  const cols = ZECOLS.filter(c => zHas(E.kind, c[0].split('|')[0]) && zHas(E.ver, c[0].split('|')[1]));
+  const ck = r => r.k + '|' + r.v;
+  const tot = { g: 0, s: 0 }; cols.forEach(c => tot[c[0]] = 0);
+  rs.forEach(r => { tot.g += r.g; tot.s += r.s; tot[ck(r)] = (tot[ck(r)] || 0) + r.g; });
+  const gRT = (tot['RT|в2'] || 0) + (tot['RT|в1'] || 0), gMT = tot['MT|в1'] || 0;
+  const TIP = 'Ротори, що успішно пройшли гравіювання: F4 — у партіях роторів (власні в2 і покупні в1, що йдуть одразу на гравіювання), F4п — у партіях двигунів (покупні ротори в1, що прийшли без гравіювання). ' +
+    'Брак гравіювання — окремо, в «програвійовано» не входить. Скасовані записи не рахуються, виправлені — за новим значенням; дата — коли зроблено роботу.';
+  h += '<div class="zkpis">' +
+    zKpi('Програвійовано роторів', fn(tot.g), 'шт', esc(zPerLabel(F)), TIP, 'kgood') +
+    zKpi('У партіях роторів · F4', fn(gRT), 'шт', 'в2 власні ' + fn(tot['RT|в2'] || 0) + ' · в1 покупні ' + fn(tot['RT|в1'] || 0)) +
+    zKpi('У партіях двигунів · F4п', fn(gMT), 'шт', 'покупні ротори в1') +
+    zKpi('Брак на гравіюванні', fn(tot.s), 'шт', tot.s ? zPc(tot.s, tot.g + tot.s) + ' від гравійованих' : 'немає') + '</div>';
+  // таблиця: період × типорозмір · KV, колонки — де гравіювали
+  const g = F.gran, bk = r => g === 'all' ? 'all' : zBk(r.d, g), bLab = k => k === 'all' ? zPerLabel(F) : zBkLabel(k, g, true);
+  const tkOf = r => r.typ + '|' + r.kv;
+  const M = new Map();
+  rs.forEach(r => { const b = bk(r); let m = M.get(b); if (!m) M.set(b, m = new Map()); const t = tkOf(r); let a = m.get(t); if (!a) m.set(t, a = { g: 0, s: 0 }); a.g += r.g; a.s += r.s; a[ck(r)] = (a[ck(r)] || 0) + r.g; });
+  const tkSort = (a, b) => { const x = a.split('|'), y = b.split('|'); return x[0].localeCompare(y[0]) || zKvSort(x[1], y[1]); };
+  const cell = v => '<td class="r">' + (v ? fn(v) : '<span class="muted">·</span>') + '</td>';
+  const line = (c1, c2, a, cls) => '<tr' + (cls ? ' class="' + cls + '"' : '') + '><td>' + c1 + '</td><td>' + c2 + '</td>' + cols.map(c => cell(a[c[0]] || 0)).join('') + '<td class="r"><b>' + fn(a.g) + '</b></td>' + cell(a.s) + '</tr>';
+  const buckets = [...M.keys()].sort(), csv = [];
+  let tb = '';
+  buckets.forEach(b => {
+    const m = M.get(b), tks = [...m.keys()].sort(tkSort), bt = { g: 0, s: 0 };
+    tks.forEach((t, i) => { const a = m.get(t), p = t.split('|');
+      tb += line(i ? '' : '<b>' + esc(bLab(b)) + '</b>', esc(p[0]) + ' · ' + esc(lab(p[1])), a);
+      csv.push([bLab(b), p[0], lab(p[1])].concat(cols.map(c => a[c[0]] || 0), [a.g, a.s]));
+      Object.keys(a).forEach(k => bt[k] = (bt[k] || 0) + a[k]); });
+    if (tks.length > 1) tb += line('', '<span class="muted">разом</span>', bt, 'sub');
+  });
+  if (buckets.length > 1) tb += line('<b>Разом за період</b>', '', tot, 'tot');
+  const csvGo = () => {
+    const head = ['Період', 'Типорозмір', 'KV'].concat(cols.map(c => c[1] + ' · ' + c[2] + ', шт'), ['Програвійовано разом, шт', 'Брак, шт']);
+    const out = [['Р-2 · Гравіювання роторів · ' + zPerLabel(F) + ' · ' + sum]].concat([head], csv);
+    const txt = '﻿' + out.map(r => r.map(x => '"' + String(x).replace(/"/g, '""') + '"').join(';')).join('\r\n');
+    const a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([txt], { type: 'text/csv;charset=utf-8' }));
+    a.download = 'ENEY_MLP_R-2_Hraviyuvannia-rotoriv_' + rg[0] + '_' + rg[1] + '.csv'; document.body.appendChild(a); a.click(); a.remove(); toast('CSV завантажено');
+  };
+  h += zFold('r2e_t', 'Програвійовані ротори · ' + (g === 'd' ? 'за днями' : g === 'w' ? 'за тижнями' : g === 'm' ? 'за місяцями' : 'за період'), fn(tot.g) + ' шт',
+    (rs.length ? '<div class="zctl"><button type="button" class="ic" onclick="zA(' + zAct(csvGo) + ')">⬇ CSV (Excel)</button></div>' +
+      '<div class="tw zmaxh" style="margin-top:6px"><table class="t zdt"><tr><th>' + (g === 'all' ? 'Період' : g === 'd' ? 'День' : g === 'w' ? 'Тиждень' : 'Місяць') + '</th><th>Типорозмір · KV</th>' +
+      cols.map(c => '<th class="r">' + esc(c[1]) + '<br><span class="muted" style="font-weight:400">' + esc(c[2]) + '</span></th>').join('') +
+      '<th class="r">Програвійовано<br><span class="muted" style="font-weight:400">разом</span></th><th class="r">Брак</th></tr>' + tb + '</table></div>'
+      : '<p class="muted">За цей період і фільтри гравіювання не записано.</p>') +
+    '<p class="muted" style="margin:6px 0 0">Записи минулих днів, які внесли або виправили сьогодні, потрапляють сюди після нічного перерахунку підсумків.</p>', true);
+  // за партіями
+  const P = new Map();
+  rs.forEach(r => { let a = P.get(r.no); if (!a) P.set(r.no, a = { no: r.no, k: r.k, v: r.v, typ: r.typ, kv: r.kv, loc: r.loc, g: 0, s: 0, d1: r.d, d2: r.d }); a.g += r.g; a.s += r.s; if (r.d < a.d1) a.d1 = r.d; if (r.d > a.d2) a.d2 = r.d; });
+  const pl = [...P.values()].sort((a, b) => b.d2.localeCompare(a.d2) || a.no.localeCompare(b.no)), shown = E.more ? pl : pl.slice(0, 30);
+  h += zFold('r2e_b', 'За партіями', pl.length, pl.length ? '<div class="tw" style="margin-top:6px"><table class="t"><tr><th>Партія</th><th>Де · ротори</th><th>Типорозмір · KV</th><th>Локація</th><th>Дні</th><th class="r">Програвійовано</th><th class="r">Брак</th></tr>' +
+    shown.map(a => '<tr><td>' + bl(a.no) + '</td><td>' + (a.k === 'MT' ? 'двигуни · F4п' : 'ротори · F4') + ' · ' + esc(a.v) + '</td><td>' + esc(a.typ) + ' · ' + esc(lab(a.kv)) + '</td><td>' + esc(LOCN[a.loc] || a.loc) + '</td><td>' +
+      esc(a.d1 === a.d2 ? zDm(a.d1) : zDm(a.d1) + ' – ' + zDm(a.d2)) + '</td><td class="r">' + fn(a.g) + '</td><td class="r">' + (a.s ? fn(a.s) : '') + '</td></tr>').join('') + '</table></div>' +
+    (pl.length > 30 ? '<button type="button" class="ic" style="margin-top:8px" onclick="zA(' + zAct(() => { E.more = !E.more; renderDash(); }) + ')">' + (E.more ? 'Згорнути' : 'Показати всі ' + pl.length) + '</button>' : '')
+    : '<p class="muted">Немає партій за цими фільтрами.</p>');
   return h;
 }
 
