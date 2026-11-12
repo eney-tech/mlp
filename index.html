@@ -1,5 +1,7 @@
 <!DOCTYPE html>
-<!-- МЛП · index.html v117 · 12.11.2026 — вибір позиції — три рівні: пошук «клей» показує під групою уніфіковану назву, а під нею — технічні назви
+<!-- МЛП · index.html v118 · 12.11.2026 — кількість на локації — прямо у списку вибору позиції (рівні 2 і 1); після дії технічні назви оновлюються
+     без перезавантаження (Sklad.gs v22); «Вам передали» → «Прийміть на …» і хто бачить.
+     index.html v117 · 12.11.2026 — вибір позиції — три рівні: пошук «клей» показує під групою уніфіковану назву, а під нею — технічні назви
      (БАС і як записали, Sklad.gs v21 techAka); натиснули технічну — обрано позицію й технічну назву.
      index.html v116 · 12.11.2026 — Р-15: цех за технічними назвами (інвентаризація ± переміщення), решта — «інше: витрата за нормами…» (Sklad.gs v20).
      index.html v115 · 12.11.2026 — Р-15 «Що де лежить» деревом: група → уніфікована → технічна (▸ біля рядка, «Розгорнути до»); склад: «Ящики ГП чекають прийняття» і
@@ -486,7 +488,7 @@
   details.skwarn>summary::after{content:'▸';margin-left:auto;color:#66767F}details.skwarn[open]>summary::after{content:'▾'}
   .skx{display:inline-flex;align-items:center;justify-content:center;width:24px;height:24px;border-radius:50%;background:#C4314B;color:#fff;font-weight:800;font-size:15px;flex:0 0 auto}
   .cbxl div.gh{background:#F4F7F9;font-weight:700;font-size:15px;color:#33434C;letter-spacing:.02em}.cbxl div.gh span{color:#66767F;font-weight:500}
-  .cbxl div.t1{padding:8px 12px 8px 44px;font-size:15px;color:#33434C;background:#FBFCFD}.cbxl div.t1 i{font-style:normal;color:#66767F;font-size:13px}.cbxl div.t1.hi{background:#EAF2FC}
+  .cbxl i.cbxq{font-style:normal;font-weight:700;color:#1F7A4D;font-size:14px;white-space:nowrap}.cbxl div.t1{padding:8px 12px 8px 44px;font-size:15px;color:#33434C;background:#FBFCFD}.cbxl div.t1 i{font-style:normal;color:#66767F;font-size:13px}.cbxl div.t1.hi{background:#EAF2FC}
   .cbxl div.dis{color:#9AA8B0;cursor:default}.cbxl div.none{color:#66767F;cursor:default;font-size:15px}
   .cbxl b{background:#FFF1D6;font-weight:inherit}
   .zban .cbx>input.cbxi,.fl .cbx>input.cbxi{font-size:15px;padding:7px 32px 7px 9px;background-position:right 9px center}
@@ -675,7 +677,7 @@
 <div class="net" id="net" role="alert" aria-live="assertive"><div class="nb"><div class="rt" id="netr"></div><div class="nt" id="nett">Зберігаю…</div><div class="ns" id="nets"></div><div class="np"><i id="netp"></i></div><div class="nh" id="neth"></div><div class="zc" id="zc"></div><button class="nx" id="netx" type="button">Не чекати</button></div></div>
 
 <script>
-const PAGE_VERSION = 'index.html v117 · 12.11.2026';   // v117: вибір позиції — три рівні; v116: Р-15 цех — рівень 1; v115: Р-15 деревом, згорнуті блоки складу, дерево позицій, технічна назва; v114: вид — поле, пошук за ключовими словами; v113: групи й види номенклатури; v112: Р-15 — блоки згортаються; v111: Р-15 «Склад: залишки й рух»; v110: дії за типом локації, переміщення, партія покупцю; v109: кілька фото, тара, перемаркування; v108: приймання від постачальника, наліпки; v107: передачі склад → цех, ящики ГП приймає склад; v106: позиції складу за групами; v105: кнопки складу «Беремо зі складу» / «Приймаємо на склад»; v104: «Історія тари» (?th=) — назва тари на сторінці тари / партії веде на неї (Reports.gs v42)
+const PAGE_VERSION = 'index.html v118 · 12.11.2026';   // v118: кількість у списку, свіжі технічні назви, «Прийміть на …»; v117: вибір позиції — три рівні; v116: Р-15 цех — рівень 1; v115: Р-15 деревом, згорнуті блоки складу, дерево позицій, технічна назва; v114: вид — поле, пошук за ключовими словами; v113: групи й види номенклатури; v112: Р-15 — блоки згортаються; v111: Р-15 «Склад: залишки й рух»; v110: дії за типом локації, переміщення, партія покупцю; v109: кілька фото, тара, перемаркування; v108: приймання від постачальника, наліпки; v107: передачі склад → цех, ящики ГП приймає склад; v106: позиції складу за групами; v105: кнопки складу «Беремо зі складу» / «Приймаємо на склад»; v104: «Історія тари» (?th=) — назва тари на сторінці тари / партії веде на неї (Reports.gs v42)
 // v103 (11.11): Р-9_08 «За типом», «Перевірено, все ок»
 // v102 (09.11):   // v74: в1 — і з нашої тари (ящик залишків); в2 — лише партії в2
 // v72 (26.10):   // v72: «Яку партію відкриваємо?»; розшифровка кроків на картці партії; реєстрація — повернення за посиланням з форми
@@ -709,7 +711,9 @@ function post(api, q) {
   const tk = netStart(api, q);   // v59
   return fetch(API, { method: 'POST', headers: { 'Content-Type': 'text/plain;charset=utf-8' }, body: JSON.stringify({ api: api, q: netPf(api, q) }), credentials: 'omit', redirect: 'follow' })
     .then(r => r.json(), () => { netEnd(tk, null); const e = new Error('Немає зв\'язку з сервером. Перевірте інтернет і спробуйте ще раз.'); e.net = true; throw e; })
-    .then(j => { netEnd(tk, j); if (!j.ok) throw new Error(j.error); return j.data; });
+    .then(j => { netEnd(tk, j); if (!j.ok) throw new Error(j.error);
+      try { const d = j.data; if (d && d.techAt && typeof SKD === 'object' && SKD) { SKD.tech = d.tech; SKD.techAt = d.techAt; SKD.techAka = d.techAka; } } catch (e) { }   // v118: свіжі технічні назви після дії
+      return j.data; });
 }
 
 // ======================================================================= v59: плашка «Зберігаю… / Відкриваю…», стан запису після оновлення
@@ -1092,13 +1096,15 @@ function cbxWire(sel) {
         if (words.length ? !words.every(x => tk.indexOf(x) >= 0) : (g && !C.og[g])) return;
         if (words.length && g !== lastG) { h += '<div class="gh dis">' + esc(g) + '</div>'; lastG = g; }
         C.vis.push(i); C.vt.push('');
-        h += '<div data-i="' + i + '" class="' + (i === cur ? 'cur' : '') + '" style="padding-left:22px">' + cbxHl(o.text, words) + '</div>';
+        const q2 = sel.cbxQ ? sel.cbxQ(o.text) : '';   // v118: скільки є на локації (форма задає sel.cbxQ)
+        h += '<div data-i="' + i + '" class="' + (i === cur ? 'cur' : '') + '" style="padding-left:22px">' + cbxHl(o.text, words) + (q2 ? ' <i class="cbxq">' + esc(q2) + '</i>' : '') + '</div>';
         // v117: рівень 1 — технічні назви цієї позиції, що теж підходять під пошук (назва БАС; «як записали» — дрібно)
         if (words.length && o.dataset.t) { let n = 0;
-          o.dataset.t.split('¶').forEach(z => { const a = z.split('¦'), nm = a[0], hit = cbxN(a.join(' ')); if (n >= 6 || !words.every(x => hit.indexOf(x) >= 0)) return; n++;
+          const tl = o.dataset.t.split('¶').map(z => { const a = z.split('¦'); return { a: a, q: sel.cbxQ ? sel.cbxQ(o.text, a[0]) : '' }; }).sort((x, y) => (y.q ? 1 : 0) - (x.q ? 1 : 0));   // v118: що є на локації — першим
+          tl.forEach(({ a, q }) => { const nm = a[0], hit = cbxN(a.join(' ')); if (n >= 6 || !words.every(x => hit.indexOf(x) >= 0)) return; n++;
             const raw = a.slice(1).find(r => words.every(x => cbxN(r).indexOf(x) >= 0) && !words.every(x => cbxN(nm).indexOf(x) >= 0));
             C.vis.push(i); C.vt.push(nm);
-            h += '<div data-i="' + i + '" data-t="' + esc(nm) + '" class="t1">↳ ' + cbxHl(nm, words) + (raw ? ' <i>· записано: ' + cbxHl(raw, words) + '</i>' : '') + '</div>'; }); }
+            h += '<div data-i="' + i + '" data-t="' + esc(nm) + '" class="t1">↳ ' + cbxHl(nm, words) + (q ? ' <i class="cbxq">' + esc(q) + '</i>' : '') + (raw ? ' <i>· записано: ' + cbxHl(raw, words) + '</i>' : '') + '</div>'; }); }
       });
       ls.innerHTML = h || '<div class="none">Нічого не знайдено — спробуйте інакше (назва, код, як написано на етикетці)</div>';
       C.hi = -1; hiTo(C.vis.findIndex(i => words.length || i === cur));
@@ -5466,7 +5472,7 @@ function skPanelDraw() {
   if (a === 'rcv') {
     p.innerHTML = '<button type="button" class="btn" style="margin-top:12px" onclick="skRcvOpen()">📦 Від постачальника</button>' +
       '<p class="muted">Документ (фото, PDF або «прийде пізніше»), кількість по тарах і наліпки на кожну тару.</p>' + skGpHtml('ГП з виробництва (неповні ящики свого корпусу)') +
-      '<p class="muted">Повні ящики після пакування МЛП кладе на склад сам — їх треба лише підтвердити (блок «Ящики ГП чекають прийняття» вгорі). Переміщення з інших складів і цехів — «Вам передали» вгорі.</p>';
+      '<p class="muted">Повні ящики після пакування МЛП кладе на склад сам — їх треба лише підтвердити (блок «Ящики ГП чекають прийняття» вгорі). Переміщення з інших складів і цехів — «Прийміть на …» вгорі.</p>';
     return skGpWire();
   }
   if (a === 'gp') {
@@ -5529,7 +5535,14 @@ function skMvLine() {
     '<input type="text" id="mvL' + n + '" placeholder="партія постачальника / ПП (необов\'язково)" style="margin-top:6px">' +
     '<input type="text" id="mvD' + n + '" placeholder="технічна назва / деталі (необов\'язково)" style="margin-top:6px">';
   $('mvLines').appendChild(div);
+  $('mvP' + n).cbxQ = (pos, nm) => skQtyAt(SKS.loc, pos, nm);   // v118: кількість у списку
   $('mvP' + n).onchange = () => { const v = $('mvP' + n).value; $('mvO' + n).style.display = v === d.other ? 'block' : 'none'; const p = d.positions.find(x => x.name === v); if (p) $('mvU' + n).value = p.unit; skTechWire('mv', n, SKS.loc); };
+}
+/** v118: скільки є на локації: позиції (сума за технічними назвами однієї одиниці) або однієї технічної назви — «є 36 шт» */
+function skQtyAt(loc, pos, nm) {
+  const at = ((((SKD || {}).techAt || {})[loc] || {})[pos] || []).filter(a => !nm || a[0] === nm); if (!at.length) return '';
+  const us = [...new Set(at.map(a => a[2]))]; if (us.length > 1) return 'є';
+  return 'є ' + skNfmt(Math.round(at.reduce((s, a) => s + a[1], 0) * 1000) / 1000) + ' ' + us[0];
 }
 /** v115: рівень 1 — технічна назва (необов'язково) після вибору позиції: що є на цій локації (за журналом / інвентаризацією, з кількістю) і відомі назви
  *  (БАС, етикетки постачальника, записи журналу — d.tech, d.techAt з Sklad.gs v18). Вибір пише назву в «Деталі»; «інша» — вписати вручну */
@@ -5845,7 +5858,9 @@ function renderSkIn() {
   const L = SKS.loc, inb = x.inbox.filter(t => !L || t.to === L), bxs = x.boxes.filter(b => !L || b.loc === L);   // v110: для обраної локації
   let h = '';
   inb.forEach(t => {
-    h += '<div class="card" style="border:2px solid #E0A400"><div class="mid">📥 Вам передали · ' + esc(t.id) + '</div>' +
+    const twh = (d.whLocs || []).some(l => l.code === t.to);   // v118: «Вам» — хто приймає: на склад — будь-хто зі складу, у цех — тімлід цеху
+    h += '<div class="card" style="border:2px solid #E0A400"><div class="mid">📥 Прийміть на ' + esc(t.toName || t.to) + ' · ' + esc(t.id) + '</div>' +
+      '<div class="muted" style="font-size:13px">Бачать і можуть прийняти: ' + (twh ? 'усі працівники складу' : 'тімлід цеху') + ' — приймає той, хто фізично отримав</div>' +
       '<div class="muted">' + esc(t.who) + ' · ' + esc(t.time) + ' · ' + esc(t.fromName) + ' → <b>' + esc(t.toName) + '</b>' + (t.comment ? '<br>' + esc(t.comment) : '') + '</div>' +
       '<div class="list" style="padding:0;margin-top:8px">' + t.lines.map(l => '<div class="li"><div><b>' + esc(l.pos) + '</b>' + (l.det ? '<br><span class="muted">' + esc(l.det) + '</span>' : '') +
         '<br><span class="muted">передали: <b>' + esc(skNum(l.qty)) + '</b> ' + esc(l.unit) + '</span></div>' +
@@ -5950,6 +5965,7 @@ function skTrLine() {
     '<select id="trU' + n + '" data-nocbx style="flex:0 0 28%">' + opts(d.units, 'шт') + '</select></div>' +
     '<input type="text" id="trD' + n + '" placeholder="деталі / партія приймання (необов\'язково)" style="margin-top:6px">';
   $('trLines').appendChild(div);
+  $('trP' + n).cbxQ = (pos, nm) => skQtyAt(($('trFrom') || {}).value || SKS.loc, pos, nm);   // v118
   $('trP' + n).onchange = () => { const v = $('trP' + n).value; $('trO' + n).style.display = v === d.other ? 'block' : 'none';
     const p = d.positions.find(x => x.name === v); if (p) $('trU' + n).value = p.unit; skTechWire('tr', n, ($('trFrom') || {}).value || SKS.loc); };
 }
