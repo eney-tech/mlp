@@ -1,0 +1,634 @@
+<!DOCTYPE html>
+<!-- МЛП · nomenklatura.html v1 · 12.11.2026 — перевірка номенклатури: три рівні назв, масштаб залишків, перенесення технічних назв,
+     перейменування й додавання рівнів 2 і 3, підтвердження бухгалтером і зав. складу, журнал змін (сервер — Nomen.gs v1, Code.gs v101).
+     Даних у файлі немає: залишки віддає сервер лише зареєстрованим у МЛП (бухгалтер, зав. складу, адміністратор; перегляд — керівництво). -->
+<html lang="uk">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex">
+<title>Номенклатура · перевірка</title>
+<style>
+  *{box-sizing:border-box}
+  body{margin:0;font-family:-apple-system,"Segoe UI",Roboto,Arial,sans-serif;background:#EEF2F5;color:#1D2B33;font-size:15px;-webkit-text-size-adjust:100%}
+  button{font:inherit;cursor:pointer}
+  .hdr{background:#2F4858;color:#fff;padding:10px 16px;display:flex;align-items:center;gap:12px;position:sticky;top:0;z-index:20}
+  .hdr .ttl{font-size:17px;font-weight:700;flex:1;min-width:0}
+  .hdr .ttl small{display:block;font-size:11px;font-weight:600;opacity:.65;letter-spacing:.06em;text-transform:uppercase}
+  .hdr .who{font-size:12px;opacity:.9;text-align:right;line-height:1.35}
+  .sync{font-size:12px;padding:4px 9px;border-radius:999px;background:rgba(255,255,255,.14);white-space:nowrap}
+  .sync.bad{background:#B3261E}
+  .main{max-width:1280px;margin:0 auto;padding:12px 14px 80px}
+  .card{background:#fff;border-radius:14px;padding:14px 16px;margin-bottom:12px;box-shadow:0 1px 2px rgba(0,0,0,.05)}
+  .intro{font-size:14px;line-height:1.5;color:#3C4C55}
+  .intro b{color:#1D2B33}
+  .intro details summary{cursor:pointer;color:#2F6F9F;font-weight:600;margin-top:6px}
+  .intro ul{margin:6px 0 0;padding-left:20px}
+  .prog{display:flex;gap:18px;flex-wrap:wrap;align-items:center;margin-top:10px;font-size:13px;color:#66767F}
+  .prog .pb{flex:1;min-width:180px;height:8px;border-radius:99px;background:#E3E9ED;overflow:hidden;display:flex}
+  .prog .pb i{display:block;height:100%}
+  .tools{position:sticky;top:52px;z-index:15;background:#EEF2F5;padding:8px 0;display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+  .tools input[type=search]{flex:1;min-width:200px;padding:9px 12px;border:1px solid #C9D3D9;border-radius:10px;font:inherit;background:#fff}
+  select{padding:8px 10px;border:1px solid #C9D3D9;border-radius:10px;font:inherit;background:#fff;max-width:100%}
+  .btn{padding:8px 12px;border-radius:10px;border:1px solid #C9D3D9;background:#fff;color:#1D2B33;white-space:nowrap}
+  .btn:hover{background:#F4F7F9}
+  .btn.pri{background:#1F7A4D;border-color:#1F7A4D;color:#fff}
+  .btn.pri:hover{background:#196640}
+  .btn.sm{padding:4px 9px;font-size:13px;border-radius:8px}
+  .btn.ghost{border-color:transparent;background:transparent}
+  .btn.ghost:hover{background:#EEF2F5}
+  .btn.dang{color:#B3261E}
+  .btn[disabled]{opacity:.45;cursor:default}
+  .grp{background:#fff;border-radius:14px;margin-bottom:12px;overflow:hidden;box-shadow:0 1px 2px rgba(0,0,0,.05)}
+  .gh{display:flex;align-items:center;gap:10px;padding:10px 14px;background:#DCE4E9;cursor:pointer;user-select:none}
+  .gh .gn{font-weight:700;font-size:16px}
+  .gh .gc{font-size:13px;color:#4F5F68}
+  .gh .sp{flex:1}
+  .gh .chev{transition:transform .15s;display:inline-block;width:14px}
+  .grp.closed .chev{transform:rotate(-90deg)}
+  .grp.closed .gb{display:none}
+  .thead,.urow{display:grid;grid-template-columns:28px minmax(220px,1fr) 150px 150px 210px 40px;gap:10px;align-items:center;padding:8px 14px}
+  .thead{font-size:11px;text-transform:uppercase;letter-spacing:.05em;color:#66767F;border-bottom:1px solid #E3E9ED;padding-top:6px;padding-bottom:6px}
+  .urow{border-top:1px solid #EEF2F5}
+  .urow:hover{background:#FAFBFC}
+  .urow.open{background:#F4F8FB}
+  .tg{width:24px;height:24px;border-radius:6px;border:0;background:transparent;color:#66767F;font-size:13px}
+  .tg:hover{background:#E3E9ED}
+  .un{font-weight:600;line-height:1.3}
+  .un .meta{display:block;font-weight:400;font-size:12px;color:#66767F;margin-top:2px}
+  .tag{display:inline-block;font-size:11px;padding:1px 7px;border-radius:99px;background:#EEF2F5;color:#4F5F68;margin:2px 4px 0 0;font-weight:500}
+  .tag.new{background:#E1F3EA;color:#1F7A4D}
+  .tag.chg{background:#E5EEF8;color:#2F6F9F}
+  .tag.warn{background:#FFF4D6;color:#7A5A00}
+  .hint{display:block;font-size:12px;color:#8A6200;margin-top:3px;font-weight:400}
+  .note{display:block;font-size:12px;color:#2F6F9F;margin-top:3px;font-weight:400}
+  .q{font-variant-numeric:tabular-nums;text-align:right;font-size:14px;line-height:1.2}
+  .q .bar{display:block;height:5px;border-radius:3px;margin:4px 0 0 auto;background:#9FB4C2}
+  .q .bar.neg{background:#E2918B}
+  .q .bar.b{background:#7FA7D1}
+  .q .bar.v{background:#7EBE9C}
+  .q .no{color:#B6C1C8}
+  .q .neg{color:#B3261E}
+  .q small{display:block;font-size:11px;color:#8896A0}
+  .ok{display:flex;flex-direction:column;gap:4px;align-items:flex-start}
+  .pill{font-size:12px;padding:2px 8px;border-radius:99px;background:#F0F2F4;color:#8896A0;white-space:nowrap}
+  .pill.y{background:#E1F3EA;color:#1F7A4D;font-weight:600}
+  .pill.s{background:#FFF4D6;color:#7A5A00}
+  .okb{display:flex;gap:6px;flex-wrap:wrap}
+  .tl{padding:0 14px 10px 52px;background:#F4F8FB}
+  .trow{display:grid;grid-template-columns:24px minmax(200px,1fr) 150px 150px 210px 40px;gap:10px;align-items:center;padding:6px 0;border-top:1px dashed #DCE4E9;font-size:14px}
+  .trow:first-child{border-top:0}
+  .trow .tn{line-height:1.3;word-break:break-word}
+  .trow .src{font-size:11px;color:#66767F;display:block}
+  .trow.moved .tn{color:#2F6F9F}
+  .locs{font-size:12px;color:#4F5F68;line-height:1.5}
+  .locs span{white-space:nowrap;margin-right:8px}
+  .ulocs{padding:4px 0 8px;font-size:12px;color:#4F5F68}
+  .empty{padding:12px 14px;color:#8896A0;font-size:14px}
+  .bulk{position:fixed;left:50%;transform:translateX(-50%);bottom:16px;background:#1D2B33;color:#fff;border-radius:14px;padding:10px 14px;display:none;gap:10px;align-items:center;z-index:30;box-shadow:0 6px 20px rgba(0,0,0,.25)}
+  .bulk.on{display:flex}
+  .bulk .btn{border-color:rgba(255,255,255,.3);background:rgba(255,255,255,.1);color:#fff}
+  .bulk .btn.pri{background:#1F7A4D;border-color:#1F7A4D}
+  .modal{position:fixed;inset:0;background:rgba(20,30,36,.45);display:none;align-items:flex-start;justify-content:center;z-index:50;padding:6vh 12px;overflow:auto}
+  .modal.on{display:flex}
+  .sheet{background:#fff;border-radius:16px;width:100%;max-width:640px;padding:18px 18px 14px;box-shadow:0 10px 30px rgba(0,0,0,.25)}
+  .sheet h3{margin:0 0 4px;font-size:18px}
+  .sheet .sub{font-size:13px;color:#66767F;margin-bottom:12px;line-height:1.4}
+  .sheet label{display:block;font-size:13px;color:#4F5F68;margin:10px 0 4px}
+  .sheet input[type=text],.sheet input[type=search],.sheet textarea{width:100%;padding:10px 12px;border:1px solid #C9D3D9;border-radius:10px;font:inherit}
+  .sheet textarea{min-height:80px;resize:vertical}
+  .sheet .acts{display:flex;gap:8px;justify-content:flex-end;margin-top:16px;flex-wrap:wrap}
+  .plist{max-height:50vh;overflow:auto;border:1px solid #E3E9ED;border-radius:10px;margin-top:10px}
+  .plist .pg{font-size:11px;text-transform:uppercase;letter-spacing:.05em;color:#66767F;background:#F4F7F9;padding:6px 10px;position:sticky;top:0}
+  .plist .pi{padding:8px 10px;border-top:1px solid #EEF2F5;cursor:pointer;display:flex;gap:8px;align-items:baseline}
+  .plist .pi:hover,.plist .pi.sel{background:#E5EEF8}
+  .plist .pi small{color:#8896A0;margin-left:auto;white-space:nowrap}
+  .plist .pi.cur{color:#8896A0;cursor:default;background:#fff}
+  .menu{position:absolute;background:#fff;border-radius:12px;box-shadow:0 8px 24px rgba(0,0,0,.2);padding:6px;z-index:40;min-width:230px;display:none}
+  .menu.on{display:block}
+  .menu button{display:block;width:100%;text-align:left;border:0;background:transparent;padding:9px 12px;border-radius:8px}
+  .menu button:hover{background:#EEF2F5}
+  .menu button[disabled]{opacity:.4;cursor:default;background:transparent}
+  .menu hr{border:0;border-top:1px solid #EEF2F5;margin:4px 0}
+  .jr{display:grid;grid-template-columns:46px 1fr auto;gap:10px;padding:9px 4px;border-top:1px solid #EEF2F5;font-size:14px;align-items:start}
+  .jr .jn{color:#8896A0;font-variant-numeric:tabular-nums}
+  .jr .jw{font-size:12px;color:#66767F}
+  .jr.off{opacity:.5}
+  .jr.off .jt{text-decoration:line-through}
+  .toast{position:fixed;left:50%;transform:translateX(-50%);top:70px;background:#1F7A4D;color:#fff;padding:10px 16px;border-radius:12px;z-index:60;display:none;max-width:90vw;box-shadow:0 6px 20px rgba(0,0,0,.25)}
+  .gate{max-width:560px;margin:10vh auto;text-align:center}
+  .gate p{color:#4F5F68;line-height:1.5}
+  .gate a{color:#2F6F9F}
+  .legend{display:flex;gap:14px;flex-wrap:wrap;font-size:12px;color:#66767F;margin-top:8px}
+  .legend i{display:inline-block;width:22px;height:5px;border-radius:3px;vertical-align:middle;margin-right:5px}
+  @media (max-width:860px){
+    .thead{display:none}
+    .urow{grid-template-columns:28px 1fr 40px;grid-template-areas:"tg un mn" ". qb qb" ". qv qv" ". ok ok";row-gap:6px}
+    .urow>.tgc{grid-area:tg}.urow>.un{grid-area:un}.urow>.qb{grid-area:qb}.urow>.qv{grid-area:qv}.urow>.ok{grid-area:ok}.urow>.mn{grid-area:mn}
+    .urow .q{text-align:left;display:flex;gap:8px;align-items:center}
+    .urow .q::before{content:attr(data-l);font-size:12px;color:#66767F;min-width:90px}
+    .urow .q .bar{margin:0;width:60px!important;max-width:60px}
+    .tl{padding-left:14px}
+    .trow{grid-template-columns:24px 1fr 40px;grid-template-areas:"ck tn mn" ". qb qb" ". qv qv" ". lc lc"}
+    .trow>.ck{grid-area:ck}.trow>.tn{grid-area:tn}.trow>.qb{grid-area:qb}.trow>.qv{grid-area:qv}.trow>.locs{grid-area:lc}.trow>.mn{grid-area:mn}
+    .trow .q{text-align:left;display:flex;gap:8px}
+    .trow .q::before{content:attr(data-l);font-size:12px;color:#66767F;min-width:90px}
+    .trow .q .bar{display:none}
+    .tools{position:static}
+    .gh{flex-wrap:wrap;row-gap:2px}
+    .gh .gc{order:5;width:100%;padding-left:24px}
+    .hdr .ttl{font-size:15px}
+  }
+</style>
+</head>
+<body>
+<div class="hdr">
+  <div class="ttl"><small>МЛП · номенклатура</small>Перевірка назв і груп запасів</div>
+  <span class="sync" id="sync">…</span>
+  <div class="who" id="who"></div>
+</div>
+<div class="main" id="app"><div class="gate"><p>Відкриваю…</p></div></div>
+<div class="bulk" id="bulk"></div>
+<div class="modal" id="modal" onclick="if(event.target===this)closeModal()"><div class="sheet" id="sheet"></div></div>
+<div class="menu" id="menu"></div>
+<div class="toast" id="toast"></div>
+
+<script>
+'use strict';
+/* ======================================================================= зв'язок із сервером (той самий, що й МЛП) */
+const PAGE_VERSION = 'nomenklatura.html v1 · 12.11.2026';
+const API = 'https://script.google.com/macros/s/AKfycbx-JUajnAtVsxaLHDgwRpfzE12g4LUtlf6JnWYAQScAVZ5FCpxzGHSrA5PDESqP80KD/exec';
+const MLP_URL = location.origin + location.pathname.replace(/[^/]*$/, '');
+const ROLE_ACC = 'бухгалтер', ROLE_WH = 'зав. складу', ROLE_ADMIN = 'адміністратор';
+const CONFIRMERS = [[ROLE_ACC, 'Бухгалтерія'], [ROLE_WH, 'Склад']];
+function store(k) { try { return localStorage.getItem(k) || ''; } catch (e) { return ''; } }
+const CODE = store('mlp_code');
+
+function apiGet(api, q) {
+  return fetch(API + '?api=' + api + '&q=' + encodeURIComponent(JSON.stringify(Object.assign({ code: CODE }, q))), { credentials: 'omit', redirect: 'follow' })
+    .then(r => r.json(), () => { throw netErr(); }).then(j => { if (!j.ok) throw new Error(j.error); return j.data; });
+}
+function apiPost(api, q) {
+  return fetch(API, { method: 'POST', headers: { 'Content-Type': 'text/plain;charset=utf-8' }, body: JSON.stringify({ api: api, q: Object.assign({ code: CODE }, q) }), credentials: 'omit', redirect: 'follow' })
+    .then(r => r.json(), () => { throw netErr(); }).then(j => { if (!j.ok) throw new Error(j.error); return j.data; });
+}
+function netErr() { const e = new Error('Немає зв\'язку з сервером. Перевірте інтернет'); e.net = true; return e; }
+
+/* ======================================================================= стан */
+let SEED = null, ME = null, CAN = false;
+let OPS = [];          // операції з сервера {n, at, who, em, role, op}
+let PEND = [];         // ще не записані {op, act, txt}
+let SENDING = false;
+let ST = null;         // поточний стан після replay
+const UI = { q: '', f: 'all', sort: 'scale', open: new Set(), closed: new Set(), sel: new Set() };
+const $ = id => document.getElementById(id);
+const esc = s => String(s === null || s === undefined ? '' : s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+const nf = new Intl.NumberFormat('uk-UA', { maximumFractionDigits: 3 });
+const lastN = () => OPS.length ? OPS[OPS.length - 1].n : 0;
+const uid = p => p + Date.now().toString(36) + Math.random().toString(36).slice(2, 6);
+
+/** Старт + операції журналу по черзі → поточний стан. Операцію, яку скасовано (undo), пропускаємо. */
+function replay() {
+  const G = new Map(), U = new Map(), T = new Map();
+  SEED.g.forEach((g, i) => G.set(g.id, { id: g.id, n: g.n, o: i, seed: g.n }));
+  SEED.u.forEach((u, i) => U.set(u.id, Object.assign({}, u, { o: i, seed: { n: u.n, g: u.g, e: u.e, k: u.k, c: u.c }, ok: {}, chg: 0, note: null })));
+  SEED.t.forEach((t, i) => T.set(t.id, Object.assign({}, t, { o: i, u0: t.u, note: null })));
+  const all = OPS.map(o => Object.assign({}, o, { pend: false })).concat(PEND.map((p, i) => ({ n: 1e9 + i, at: Date.now(), who: ME.name, em: ME.email, role: ME.role, op: p.op, pend: true })));
+  const undone = new Set(all.filter(o => o.op.t === 'undo').map(o => Number(o.op.n)));
+  const res = new Map();   // n → '' (застосовано) | причина, чому ні
+  const touch = (id, n) => { const u = U.get(id); if (u) u.chg = Math.max(u.chg, n); };
+  const live = (m, id) => { const x = m.get(id); return x && !x.del ? x : null; };
+  let order = 1e6;
+  all.forEach(o => {
+    const op = o.op, n = o.n;
+    if (op.t === 'undo') { res.set(n, ''); return; }
+    if (undone.has(n)) { res.set(n, 'скасовано'); return; }
+    let why = '';
+    const u = live(U, op.id), g = live(G, op.id), t = T.get(op.id);
+    switch (op.t) {
+      case 'mv': { const to = live(U, op.to); if (!t || !to) { why = 'позиції вже немає'; break; } if (t.u === op.to) { why = 'вже там'; break; } touch(t.u, n); t.u = op.to; touch(op.to, n); break; }
+      case 'mvu': { if (!u || !live(G, op.to)) { why = 'позиції вже немає'; break; } u.g = op.to; touch(u.id, n); break; }
+      case 'ren': { const x = op.id[0] === 'g' ? g : u; if (!x) { why = 'позиції вже немає'; break; } x.n = op.n; if (op.id[0] === 'u') touch(u.id, n); break; }
+      case 'addg': G.set(op.id, { id: op.id, n: op.n, o: order++, added: true }); break;
+      case 'addu': { if (!live(G, op.g)) { why = 'групи вже немає'; break; } U.set(op.id, { id: op.id, g: op.g, n: op.n, c: op.c || '', e: op.e || 'шт', k: op.k || '', o: order++, added: true, ok: {}, chg: n, note: null }); break; }
+      case 'set': { if (!u) { why = 'позиції вже немає'; break; } u[op.f] = op.v; touch(u.id, n); break; }
+      case 'del': {
+        if (op.id[0] === 'u') { if (!u) { why = 'вже видалено'; break; } if ([...T.values()].some(x => x.u === u.id)) { why = 'у позиції є технічні назви'; break; } u.del = true; }
+        else { if (!g) { why = 'вже видалено'; break; } if ([...U.values()].some(x => !x.del && x.g === g.id)) { why = 'у групі є позиції'; break; } g.del = true; }
+        break; }
+      case 'merge': { const to = live(U, op.to); if (!u || !to || u.id === to.id) { why = 'позиції вже немає'; break; } T.forEach(x => { if (x.u === u.id) x.u = to.id; }); u.del = true; u.mergedTo = to.id; touch(to.id, n); break; }
+      case 'ok': { if (!u) { why = 'позиції вже немає'; break; } u.ok[o.role] = { n: n, who: o.who, at: o.at }; break; }
+      case 'unok': { if (!u) { why = 'позиції вже немає'; break; } delete u.ok[o.role]; break; }
+      case 'note': { const x = op.id[0] === 't' ? t : u; if (!x) { why = 'позиції вже немає'; break; } x.note = op.v ? { v: op.v, who: o.who, at: o.at } : null; break; }
+      default: why = 'невідома зміна';
+    }
+    res.set(n, why);
+  });
+  // суми рівня 2 — лише рядки в тій самій одиниці
+  U.forEach(u => { u.ts = []; u.b = null; u.v = null; u.lq = SEED.locs.map(() => 0); u.hasV = false; });
+  T.forEach(t => {
+    const u = U.get(t.u); if (!u || u.del) return;
+    u.ts.push(t);
+    if (t.e !== u.e) return;
+    if (t.b !== undefined) u.b = (u.b || 0) + t.b;
+    if (t.q) { u.hasV = true; t.q.forEach((x, i) => u.lq[i] += x); u.v = (u.v || 0) + t.q.reduce((a, b) => a + b, 0); }
+  });
+  ST = { G, U, T, res, undone, all };
+}
+function vulyk(t) { return t.q ? t.q.reduce((a, b) => a + b, 0) : null; }
+function scale(u) { return Math.max(Math.abs(u.b || 0), Math.abs(u.v || 0)); }
+/** Підтвердження дійсне, якщо після нього позицію не змінювали */
+function okState(u, role) { const k = u.ok[role]; if (!k) return null; return k.n > u.chg ? 'y' : 's'; }
+function changed(u) {
+  if (u.added) return true;
+  const s = u.seed; if (u.n !== s.n || u.g !== s.g || u.e !== s.e || u.k !== s.k || u.c !== s.c) return true;
+  return u.ts.some(t => t.u !== t.u0) || [...ST.T.values()].some(t => t.u0 === u.id && t.u !== u.id);
+}
+
+/* ======================================================================= відкриття */
+function boot() {
+  if (!CODE) return gate('Цей браузер ще не зареєстровано в МЛП.', 'Відкрийте <a href="' + esc(MLP_URL) + '">сторінку МЛП</a> у цьому самому браузері, зареєструйтесь (як на телефоні) і поверніться за цим посиланням.');
+  setSync('Відкриваю…');
+  apiGet('nomen', {}).then(d => {
+    SEED = d.seed; ME = d.me; CAN = !!d.canEdit; OPS = d.ops || [];
+    $('who').innerHTML = esc(ME.name) + '<br>' + esc(ME.role) + (CAN ? '' : ' · лише перегляд');
+    replay(); render(); setSync('Збережено');
+    setInterval(poll, 30000);
+    document.addEventListener('visibilitychange', () => { if (!document.hidden) poll(); });
+  }, e => gate(e.net ? 'Немає зв\'язку з сервером.' : 'Не вдалося відкрити.', esc(e.message) + (e.net ? '<br><br><a href="" onclick="location.reload();return false">Спробувати ще раз</a>' : '')));
+}
+function gate(h, p) { $('app').innerHTML = '<div class="gate card"><h2>' + esc(h) + '</h2><p>' + p + '</p></div>'; setSync('—'); }
+function setSync(t, bad) { const s = $('sync'); s.textContent = t; s.className = 'sync' + (bad ? ' bad' : ''); }
+function poll() {
+  if (document.hidden || SENDING || PEND.length || !SEED) return;
+  apiGet('nomen', { after: lastN() }).then(d => { const nw = (d.ops || []).filter(o => o.n > lastN()); if (nw.length && !SENDING && !PEND.length) { OPS = OPS.concat(nw); replay(); render(); toast('Оновлено: нових змін — ' + nw.length); } setSync('Збережено'); }, () => setSync('Немає зв\'язку', true));
+}
+
+/* ======================================================================= запис змін: одразу на сторінці, потім на сервер */
+function commit(list) {
+  if (!CAN || !list.length) return;
+  PEND = PEND.concat(list); replay(); render(); flush();
+}
+function flush() {
+  if (SENDING || !PEND.length) return;
+  SENDING = true; const batch = PEND.slice(); setSync('Зберігаю…');
+  apiPost('nomenAct', { after: lastN(), ops: batch }).then(d => {
+    SENDING = false; PEND = PEND.slice(batch.length); OPS = OPS.concat((d.ops || []).filter(o => o.n > lastN()));
+    replay(); render(); setSync(PEND.length ? 'Зберігаю…' : 'Збережено'); flush();
+    const bad = (d.ops || []).filter(o => o.em === ME.email && ST.res.get(o.n));
+    if (bad.length) toast('Не застосовано: ' + ST.res.get(bad[0].n) + ' (хтось змінив раніше). Перевірте журнал', true);
+  }, e => {
+    SENDING = false; PEND = PEND.slice(batch.length); replay(); render();
+    setSync('Не збережено', true); toast('Не збережено: ' + e.message, true);
+  });
+}
+
+/* ======================================================================= малювання */
+function qcell(v, cls, label, extra) {
+  if (v === null || v === undefined) return '<div class="q ' + (extra || '') + '" data-l="' + label + '"><span class="no">—</span></div>';
+  const a = Math.abs(v), w = a === 0 ? 2 : Math.max(4, Math.min(1, Math.log10(a + 1) / 6) * 120);
+  return '<div class="q ' + (extra || '') + '" data-l="' + label + '"><span class="' + (v < 0 ? 'neg' : '') + '">' + nf.format(v) + '</span><span class="bar ' + (v < 0 ? 'neg' : cls) + '" style="width:' + w.toFixed(0) + 'px"></span></div>';
+}
+function match(u) {
+  const q = UI.q.trim().toLowerCase(); if (!q) return true;
+  const g = ST.G.get(u.g);
+  const hay = [u.n, u.c, u.k, g && g.n, u.note && u.note.v].concat(u.ts.map(t => t.n + ' ' + (t.note ? t.note.v : ''))).join(' ').toLowerCase();
+  return q.split(/\s+/).every(w => hay.indexOf(w) >= 0);
+}
+function filt(u) {
+  switch (UI.f) {
+    case 'mine': return okState(u, ME.role) !== 'y';
+    case 'none': return !CONFIRMERS.some(([r]) => okState(u, r) === 'y');
+    case 'notall': return !CONFIRMERS.every(([r]) => okState(u, r) === 'y');
+    case 'hint': return !!(u.h || u.ts.some(t => t.h));
+    case 'chg': return changed(u);
+    case 'note': return !!(u.note || u.ts.some(t => t.note));
+    case 'big': return scale(u) >= 1000;
+    default: return true;
+  }
+}
+function render() {
+  if (!ST) return;
+  const sy = window.scrollY;
+  const Us = [...ST.U.values()].filter(u => !u.del);
+  const total = Us.length;
+  const both = Us.filter(u => CONFIRMERS.every(([r]) => okState(u, r) === 'y')).length;
+  const one = Us.filter(u => CONFIRMERS.some(([r]) => okState(u, r) === 'y')).length - both;
+  const nChg = Us.filter(changed).length;
+  const mineDone = Us.filter(u => okState(u, ME.role) === 'y').length;
+  let h = '<div class="card intro">' +
+    '<b>Що тут робимо.</b> Кожну позицію запасів записано в трьох рівнях: <b>група</b> (сірий рядок) → <b>уніфікована назва</b> (одна назва однієї речі — як буде в Odoo, у журналі складу й на наліпках) → <b>технічні назви</b> (як записано в БАС за документами постачальника і як записали в журнал Вулика). ' +
+    'Пройдіть позиції, виправте, що не так, і натисніть <b>«✓ Підтвердити»</b>. Почніть з великих кількостей — вони вгорі кожної групи.' +
+    '<details><summary>Як працювати</summary><ul>' +
+    '<li><b>▸</b> зліва — розгорнути позицію й побачити її технічні назви та кількості за складами.</li>' +
+    '<li>Технічна назва не на своєму місці — <b>«→»</b> біля неї (або позначте кілька галочками) і виберіть, до якої уніфікованої назви вона належить. Там же — створити нову.</li>' +
+    '<li><b>⋯</b> біля позиції — перейменувати, перенести в іншу групу, змінити одиницю, вид чи код, обʼєднати з іншою, залишити коментар.</li>' +
+    '<li>Групу — перейменувати чи додати в ній позицію — кнопками в сірому рядку; нова група — вгорі.</li>' +
+    '<li>Кожна зміна одразу зберігається й видна всім. Що й хто змінив — у <b>«Журнал змін»</b>; свою зміну там можна скасувати.</li>' +
+    '<li>Якщо позицію змінили після підтвердження, підтвердження стає жовтим <span class="pill s">⚠ змінено</span> — перегляньте ще раз.</li>' +
+    '</ul><p style="margin:8px 0 0"><b>Кількості</b> — орієнтир масштабу, не звірка: «Бухгалтерія» — ОСВ 201 на ' + esc(SEED.asOf.bas) + ', «Вулик» — облік складів і цехів на ' + esc(SEED.asOf.vulyk) + ' (мінус — брали більше, ніж записали приходу). Дати різні, тому розбіжність — підказка, де шукати.</p></details>' +
+    '<div class="prog"><span>Позицій: <b>' + total + '</b></span><span>підтверджено обома: <b>' + both + '</b></span><span>одним: <b>' + one + '</b></span><span>вами: <b>' + mineDone + '</b></span><span>змінено: <b>' + nChg + '</b></span>' +
+    '<span class="pb"><i style="width:' + (100 * both / total) + '%;background:#1F7A4D"></i><i style="width:' + (100 * one / total) + '%;background:#9FD3B7"></i></span></div>' +
+    '<div class="legend"><span><i style="background:#7FA7D1"></i>бухгалтерія</span><span><i style="background:#7EBE9C"></i>Вулик</span><span><i style="background:#E2918B"></i>мінус</span><span>довжина смужки — масштаб: одиниці · десятки · сотні · тисячі · …</span></div></div>';
+  h += '<div class="tools"><input type="search" id="qs" placeholder="Пошук: магніт, 3115, гвинт М3…" value="' + esc(UI.q) + '">' +
+    '<select id="fs">' + [['all', 'Усі позиції'], ['mine', 'Не підтверджено мною'], ['notall', 'Не підтверджено обома'], ['none', 'Ніким не підтверджено'], ['big', 'Від 1 000 шт'], ['hint', 'З підказками «що перевірити»'], ['chg', 'Змінені'], ['note', 'З коментарями']]
+      .map(([v, l]) => '<option value="' + v + '"' + (UI.f === v ? ' selected' : '') + '>' + l + '</option>').join('') + '</select>' +
+    '<select id="ss">' + [['scale', 'Спершу великі кількості'], ['name', 'За назвою'], ['file', 'Як у файлі']].map(([v, l]) => '<option value="' + v + '"' + (UI.sort === v ? ' selected' : '') + '>' + l + '</option>').join('') + '</select>' +
+    '<button class="btn" onclick="toggleAll()">' + (UI.closed.size ? 'Розгорнути групи' : 'Згорнути групи') + '</button>' +
+    (CAN ? '<button class="btn" onclick="addGroup()">+ Група</button>' : '') +
+    '<button class="btn" onclick="journal()">Журнал змін (' + OPS.length + ')</button>' +
+    '<button class="btn" onclick="exportCsv()">⬇ Результат</button></div>';
+  const Gs = [...ST.G.values()].filter(g => !g.del).sort((a, b) => a.o - b.o);
+  let shown = 0;
+  Gs.forEach(g => {
+    let us = Us.filter(u => u.g === g.id);
+    const n = us.length, nb = us.filter(u => CONFIRMERS.every(([r]) => okState(u, r) === 'y')).length;
+    us = us.filter(u => match(u) && filt(u));
+    if ((UI.q || UI.f !== 'all') && !us.length) return;
+    shown += us.length;
+    us.sort(UI.sort === 'scale' ? (a, b) => scale(b) - scale(a) || a.o - b.o : UI.sort === 'name' ? (a, b) => a.n.localeCompare(b.n, 'uk') : (a, b) => a.o - b.o);
+    const closed = UI.closed.has(g.id) && !UI.q;
+    h += '<div class="grp' + (closed ? ' closed' : '') + '"><div class="gh" onclick="toggleG(\'' + g.id + '\')"><span class="chev">▾</span><span class="gn">' + esc(g.n) + '</span>' +
+      (g.added ? '<span class="tag new">нова</span>' : g.seed && g.n !== g.seed ? '<span class="tag chg">було: ' + esc(g.seed) + '</span>' : '') +
+      '<span class="gc">рівень 3 · позицій ' + n + ' · підтверджено обома ' + nb + '</span><span class="sp"></span>' +
+      (CAN ? '<button class="btn sm ghost" onclick="event.stopPropagation();renGroup(\'' + g.id + '\')">✎ Назва</button><button class="btn sm ghost" onclick="event.stopPropagation();addU(\'' + g.id + '\')">+ Позиція</button>' +
+        (n ? '' : '<button class="btn sm ghost dang" onclick="event.stopPropagation();delG(\'' + g.id + '\')">Видалити</button>') : '') + '</div><div class="gb">';
+    if (!us.length) h += '<div class="empty">Порожня група' + (CAN ? ' — додайте позицію або видаліть групу' : '') + '</div>';
+    else h += '<div class="thead"><span></span><span>Уніфікована назва (рівень 2)</span><span style="text-align:right">Бухгалтерія</span><span style="text-align:right">Вулик</span><span>Підтверджено</span><span></span></div>';
+    us.forEach(u => h += urow(u));
+    h += '</div></div>';
+  });
+  if (!shown) h += '<div class="card empty">Нічого не знайдено. Змініть пошук або фільтр.</div>';
+  $('app').innerHTML = h;
+  const qs = $('qs'); qs.oninput = () => { UI.q = qs.value; const p = qs.selectionStart; render(); const n = $('qs'); n.focus(); n.setSelectionRange(p, p); };
+  $('fs').onchange = e => { UI.f = e.target.value; render(); };
+  $('ss').onchange = e => { UI.sort = e.target.value; render(); };
+  window.scrollTo(0, sy);
+  drawBulk();
+}
+function urow(u) {
+  const open = UI.open.has(u.id) || (UI.q && u.ts.some(t => t.n.toLowerCase().indexOf(UI.q.trim().toLowerCase()) >= 0));
+  const s = u.seed || {};
+  const tags = [];
+  if (u.added) tags.push('<span class="tag new">нова</span>');
+  else {
+    if (u.n !== s.n) tags.push('<span class="tag chg">було: ' + esc(s.n) + '</span>');
+    if (u.g !== s.g) { const og = ST.G.get(s.g); tags.push('<span class="tag chg">з групи «' + esc(og ? og.n : '') + '»</span>'); }
+  }
+  const inn = u.ts.filter(t => t.u0 !== u.id).length, out = [...ST.T.values()].filter(t => t.u0 === u.id && t.u !== u.id).length;
+  if (inn) tags.push('<span class="tag chg">+' + inn + ' перенесено сюди</span>');
+  if (out) tags.push('<span class="tag chg">−' + out + ' перенесено звідси</span>');
+  const odd = u.ts.filter(t => t.e !== u.e).length;
+  if (odd) tags.push('<span class="tag warn">' + odd + ' в іншій од. — не в сумі</span>');
+  const meta = [u.c ? 'код ' + esc(u.c) : 'без коду', esc(u.e), u.k ? 'вид: ' + esc(u.k) : '', 'технічних назв: ' + u.ts.length].filter(x => x).join(' · ');
+  const hints = u.ts.filter(t => t.h).length;
+  let h = '<div class="urow' + (open ? ' open' : '') + '"><span class="tgc"><button class="tg" onclick="toggleU(\'' + u.id + '\')" title="Технічні назви">' + (open ? '▾' : '▸') + '</button></span>' +
+    '<div class="un">' + esc(u.n) + '<span class="meta">' + meta + '</span>' + tags.join('') +
+    (u.h ? '<span class="hint">⚑ ' + esc(u.h) + '</span>' : '') + (!open && hints ? '<span class="hint">⚑ підказок у технічних назвах: ' + hints + '</span>' : '') +
+    (u.note ? '<span class="note">💬 ' + esc(u.note.v) + ' — ' + esc(u.note.who) + '</span>' : '') + '</div>' +
+    qcell(u.b, 'b', 'Бухгалтерія', 'qb') + qcell(u.hasV ? u.v : null, 'v', 'Вулик', 'qv') +
+    '<div class="ok"><div class="okb">' + CONFIRMERS.map(([r, l]) => { const st = okState(u, r), k = u.ok[r];
+      return '<span class="pill ' + (st || '') + '" title="' + (k ? esc(k.who + ' · ' + dt(k.at)) : 'ще не підтверджено') + '">' + (st === 'y' ? '✓ ' : st === 's' ? '⚠ ' : '') + l + (st === 's' ? ': змінено' : '') + '</span>'; }).join('') +
+    (u.ok[ROLE_ADMIN] ? '<span class="pill ' + okState(u, ROLE_ADMIN) + '">адмін</span>' : '') + '</div>' +
+    (CAN ? (okState(u, ME.role) === 'y' ? '<button class="btn sm ghost" onclick="unok(\'' + u.id + '\')">Зняти моє підтвердження</button>' : '<button class="btn sm pri" onclick="ok(\'' + u.id + '\')">✓ Підтвердити</button>') : '') + '</div>' +
+    '<span class="mn">' + (CAN ? '<button class="tg" onclick="umenu(event,\'' + u.id + '\')" title="Дії">⋯</button>' : '') + '</span></div>';
+  if (open) {
+    h += '<div class="tl">';
+    if (u.hasV) h += '<div class="ulocs">Вулик за локаціями: ' + SEED.locs.map((l, i) => u.lq[i] ? '<b>' + l[0] + '</b> ' + esc(l[1]) + ' ' + nf.format(u.lq[i]) : '').filter(x => x).join(' · ') + '</div>';
+    if (!u.ts.length) h += '<div class="empty" style="padding-left:0">Технічних назв немає' + (CAN ? ' — перенесіть сюди з інших позицій або видаліть позицію (⋯)' : '') + '</div>';
+    u.ts.slice().sort((a, b) => (Math.max(Math.abs(b.b || 0), Math.abs(vulyk(b) || 0)) - Math.max(Math.abs(a.b || 0), Math.abs(vulyk(a) || 0))) || a.o - b.o).forEach(t => h += trow(t, u));
+    h += '</div>';
+  }
+  return h;
+}
+function trow(t, u) {
+  const from = t.u0 !== t.u ? ST.U.get(t.u0) : null;
+  const locs = t.q ? SEED.locs.map((l, i) => t.q[i] ? '<span><b>' + l[0] + '</b> ' + nf.format(t.q[i]) + '</span>' : '').join('') : '';
+  return '<div class="trow' + (from ? ' moved' : '') + '"><span class="ck">' + (CAN ? '<input type="checkbox" ' + (UI.sel.has(t.id) ? 'checked ' : '') + 'onchange="sel(\'' + t.id + '\',this.checked)" title="Позначити для перенесення">' : '') + '</span>' +
+    '<div class="tn">' + esc(t.n) + '<span class="src">' + esc(t.s) + (t.e !== u.e ? ' · <b style="color:#8A6200">од.: ' + esc(t.e) + ' — не в сумі</b>' : '') + '</span>' +
+    (from ? '<span class="note">↪ перенесено з «' + esc(from.n) + '»</span>' : '') + (t.h ? '<span class="hint">⚑ ' + esc(t.h) + '</span>' : '') +
+    (t.note ? '<span class="note">💬 ' + esc(t.note.v) + ' — ' + esc(t.note.who) + '</span>' : '') + '</div>' +
+    qcell(t.b === undefined ? null : t.b, 'b', 'Бухгалтерія', 'qb') + qcell(vulyk(t), 'v', 'Вулик', 'qv') +
+    '<div class="locs">' + locs + '</div>' +
+    '<span class="mn">' + (CAN ? '<button class="tg" onclick="tmenu(event,\'' + t.id + '\')" title="Перенести / коментар">→</button>' : '') + '</span></div>';
+}
+function dt(ms) { if (!ms) return ''; const d = new Date(ms); return d.toLocaleDateString('uk-UA', { day: '2-digit', month: '2-digit' }) + ' ' + d.toLocaleTimeString('uk-UA', { hour: '2-digit', minute: '2-digit' }); }
+function toggleU(id) { UI.open.has(id) ? UI.open.delete(id) : UI.open.add(id); render(); }
+function toggleG(id) { UI.closed.has(id) ? UI.closed.delete(id) : UI.closed.add(id); render(); }
+function toggleAll() { if (UI.closed.size) UI.closed.clear(); else ST.G.forEach(g => UI.closed.add(g.id)); render(); }
+function toast(m, bad) { const t = $('toast'); t.textContent = m; t.style.background = bad ? '#B3261E' : '#1F7A4D'; t.style.display = 'block'; clearTimeout(t._h); t._h = setTimeout(() => t.style.display = 'none', bad ? 7000 : 3000); }
+function closeModal() { $('modal').classList.remove('on'); }
+function openModal(html) { $('sheet').innerHTML = html; $('modal').classList.add('on'); const f = $('sheet').querySelector('input,textarea'); if (f) setTimeout(() => f.focus(), 30); }
+document.addEventListener('keydown', e => { if (e.key === 'Escape') { closeModal(); hideMenu(); } });
+document.addEventListener('click', e => { if (!e.target.closest('.menu') && !e.target.closest('.mn')) hideMenu(); });
+
+/* ======================================================================= меню */
+function showMenu(ev, items) {
+  const m = $('menu');
+  m.innerHTML = items.map((x, i) => x === '-' ? '<hr>' : '<button ' + (x[2] ? 'disabled title="' + esc(x[2]) + '"' : '') + ' data-i="' + i + '">' + x[0] + '</button>').join('');
+  m.querySelectorAll('button').forEach(b => b.onclick = () => { hideMenu(); items[Number(b.dataset.i)][1](); });
+  m.classList.add('on');
+  const r = ev.target.getBoundingClientRect();
+  const w = m.offsetWidth, hgt = m.offsetHeight;
+  m.style.left = Math.max(8, Math.min(window.scrollX + r.right - w, window.scrollX + document.documentElement.clientWidth - w - 8)) + 'px';
+  m.style.top = (window.scrollY + (r.bottom + hgt + 8 > window.innerHeight ? r.top - hgt - 4 : r.bottom + 4)) + 'px';
+}
+function hideMenu() { $('menu').classList.remove('on'); }
+function umenu(ev, id) {
+  const u = ST.U.get(id);
+  showMenu(ev, [
+    ['✎ Перейменувати', () => renU(id)],
+    ['↦ Перенести в іншу групу', () => moveU(id)],
+    ['Одиниця: ' + esc(u.e), () => setU(id, 'e', 'Одиниця виміру', 'шт, кг, м, л, упаковка…')],
+    ['Вид (ознака): ' + (esc(u.k) || '—'), () => setU(id, 'k', 'Вид (ознака)', 'магніти, кріплення, провід… — порожньо, якщо не потрібно')],
+    ['Код: ' + (esc(u.c) || '—'), () => setU(id, 'c', 'Код позиції', 'напр. CMP-BASE-3115')],
+    '-',
+    ['⇄ Обʼєднати з іншою позицією…', () => mergeU(id)],
+    ['💬 Коментар', () => noteX(id)],
+    '-',
+    ['🗑 Видалити позицію', () => delU(id), u.ts.length ? 'Спершу перенесіть технічні назви або обʼєднайте з іншою' : '']
+  ]);
+}
+function tmenu(ev, id) {
+  showMenu(ev, [['→ Перенести до іншої уніфікованої…', () => pickTarget([id])], ['💬 Коментар до технічної назви', () => noteX(id)]]);
+}
+
+/* ======================================================================= дії */
+function nm(id) { const x = ST.U.get(id) || ST.G.get(id) || ST.T.get(id); return x ? x.n : '?'; }
+function gn(u) { const g = ST.G.get(u.g); return g ? g.n : ''; }
+function ok(id) { const u = ST.U.get(id); commit([{ op: { t: 'ok', id: id }, act: 'Підтверджено', txt: '«' + u.n + '» (' + gn(u) + ')' }]); }
+function unok(id) { commit([{ op: { t: 'unok', id: id }, act: 'Знято підтвердження', txt: '«' + nm(id) + '»' }]); }
+function ask(title, sub, val, onOk, multi) {
+  openModal('<h3>' + esc(title) + '</h3>' + (sub ? '<div class="sub">' + sub + '</div>' : '') +
+    (multi ? '<textarea id="mv">' + esc(val || '') + '</textarea>' : '<input type="text" id="mv" value="' + esc(val || '') + '">') +
+    '<div class="acts"><button class="btn" onclick="closeModal()">Скасувати</button><button class="btn pri" id="mok">Зберегти</button></div>');
+  const go = () => { const v = $('mv').value.trim(); if (!multi && !v) return $('mv').focus(); closeModal(); onOk(v); };
+  $('mok').onclick = go;
+  if (!multi) $('mv').onkeydown = e => { if (e.key === 'Enter') go(); };
+}
+function dupName(n, except) { const k = n.trim().toLowerCase(); return [...ST.U.values()].find(u => !u.del && u.id !== except && u.n.trim().toLowerCase() === k); }
+function renU(id) {
+  const u = ST.U.get(id);
+  ask('Уніфікована назва', 'Одна назва для однієї речі: як буде в Odoo, у журналі складу й на наліпках. Без постачальника й без складу.', u.n, v => {
+    if (v === u.n) return;
+    const d = dupName(v, id); if (d) return toast('Така назва вже є в групі «' + gn(d) + '». Щоб звести разом — ⋯ → «Обʼєднати з іншою позицією»', true);
+    commit([{ op: { t: 'ren', id: id, n: v }, act: 'Перейменовано позицію', txt: '«' + u.n + '» → «' + v + '»' }]);
+  });
+}
+function setU(id, f, title, sub) {
+  const u = ST.U.get(id);
+  ask(title + ' — «' + u.n + '»', sub, u[f], v => { if (v === u[f]) return; commit([{ op: { t: 'set', id: id, f: f, v: v }, act: 'Змінено: ' + title.toLowerCase(), txt: '«' + u.n + '»: ' + (u[f] || '—') + ' → ' + (v || '—') }]); }, f === 'k' || f === 'c');
+}
+function noteX(id) {
+  const x = ST.U.get(id) || ST.T.get(id);
+  ask('Коментар', '«' + esc(x.n) + '». Що не так: інша назва, інша група, правильна кількість… Порожньо — прибрати коментар.', x.note ? x.note.v : '', v => {
+    if ((x.note ? x.note.v : '') === v) return;
+    commit([{ op: { t: 'note', id: id, v: v }, act: v ? 'Коментар' : 'Прибрано коментар', txt: '«' + x.n + '»' + (v ? ': ' + v : '') }]);
+  }, true);
+}
+function delU(id) {
+  const u = ST.U.get(id);
+  confirmBox('Видалити позицію «' + u.n + '»?', 'Технічних назв у ній немає. Видалення буде в журналі — його можна скасувати.', 'Видалити', () =>
+    commit([{ op: { t: 'del', id: id }, act: 'Видалено позицію', txt: '«' + u.n + '» (' + gn(u) + ')' }]));
+}
+function delG(id) {
+  confirmBox('Видалити групу «' + nm(id) + '»?', 'Група порожня. Видалення буде в журналі — його можна скасувати.', 'Видалити', () =>
+    commit([{ op: { t: 'del', id: id }, act: 'Видалено групу', txt: '«' + nm(id) + '»' }]));
+}
+function confirmBox(h, sub, btn, go) {
+  openModal('<h3>' + esc(h) + '</h3><div class="sub">' + esc(sub) + '</div><div class="acts"><button class="btn" onclick="closeModal()">Скасувати</button><button class="btn pri" id="mok">' + esc(btn) + '</button></div>');
+  $('mok').onclick = () => { closeModal(); go(); };
+}
+function addGroup() {
+  ask('Нова група (рівень 3)', 'Група — що це за річ, не модель і не склад. Спершу перевірте, чи не підходить наявна.', '', v => {
+    if ([...ST.G.values()].some(g => !g.del && g.n.toLowerCase() === v.toLowerCase())) return toast('Така група вже є', true);
+    commit([{ op: { t: 'addg', id: uid('g'), n: v }, act: 'Додано групу', txt: '«' + v + '»' }]);
+  });
+}
+function renGroup(id) {
+  ask('Назва групи (рівень 3)', '', nm(id), v => { if (v === nm(id)) return; commit([{ op: { t: 'ren', id: id, n: v }, act: 'Перейменовано групу', txt: '«' + nm(id) + '» → «' + v + '»' }]); });
+}
+/** Нова уніфікована назва в групі; after — що зробити з її id одразу (перенести технічні назви) */
+function addU(gid, after, preset) {
+  openModal('<h3>Нова уніфікована назва</h3><div class="sub">Група «' + esc(nm(gid)) + '». Одна назва для однієї речі — без постачальника й складу.</div>' +
+    '<label>Назва</label><input type="text" id="an" value="' + esc(preset || '') + '"><label>Одиниця</label><input type="text" id="ae" value="шт"><label>Вид (ознака), якщо потрібно</label><input type="text" id="ak" placeholder="магніти, кріплення, провід…">' +
+    '<div class="acts"><button class="btn" onclick="closeModal()">Скасувати</button><button class="btn pri" id="mok">Додати</button></div>');
+  $('mok').onclick = () => {
+    const n = $('an').value.trim(), e = $('ae').value.trim() || 'шт', k = $('ak').value.trim();
+    if (!n) return $('an').focus();
+    const d = dupName(n); if (d) return toast('Така назва вже є в групі «' + gn(d) + '» — виберіть її', true);
+    closeModal();
+    const id = uid('u');
+    const list = [{ op: { t: 'addu', id: id, g: gid, n: n, e: e, k: k }, act: 'Додано позицію', txt: '«' + n + '» у групу «' + nm(gid) + '»' }];
+    UI.open.add(id); UI.closed.delete(gid);
+    commit(after ? list.concat(after(id, n)) : list);
+  };
+}
+function moveU(id) {
+  const u = ST.U.get(id);
+  const gs = [...ST.G.values()].filter(g => !g.del).sort((a, b) => a.o - b.o);
+  openModal('<h3>Перенести в іншу групу</h3><div class="sub">«' + esc(u.n) + '» зараз у групі «' + esc(gn(u)) + '».</div><div class="plist">' +
+    gs.map(g => '<div class="pi' + (g.id === u.g ? ' cur' : '') + '" data-g="' + g.id + '">' + esc(g.n) + (g.id === u.g ? '<small>зараз тут</small>' : '') + '</div>').join('') + '</div>' +
+    '<div class="acts"><button class="btn" onclick="closeModal()">Скасувати</button></div>');
+  $('sheet').querySelectorAll('.pi:not(.cur)').forEach(el => el.onclick = () => { closeModal(); commit([{ op: { t: 'mvu', id: id, to: el.dataset.g }, act: 'Позицію перенесено в іншу групу', txt: '«' + u.n + '»: «' + gn(u) + '» → «' + nm(el.dataset.g) + '»' }]); });
+}
+function mergeU(id) {
+  const u = ST.U.get(id);
+  picker('Обʼєднати «' + u.n + '» з…', 'Усі технічні назви цієї позиції перейдуть до вибраної, а сама позиція зникне. Для двох назв однієї речі.', [id], to =>
+    confirmBox('Обʼєднати?', '«' + u.n + '» → «' + nm(to) + '». Технічних назв: ' + u.ts.length + '.', 'Обʼєднати', () =>
+      commit([{ op: { t: 'merge', id: id, to: to }, act: 'Обʼєднано позиції', txt: '«' + u.n + '» (' + gn(u) + ') → «' + nm(to) + '» (' + gn(ST.U.get(to)) + ')' }])), false);
+}
+/** Перенесення технічних назв (рівень 1) до іншої уніфікованої (рівень 2) — у будь-якій групі */
+function pickTarget(tids) {
+  const ts = tids.map(id => ST.T.get(id));
+  const cur = [...new Set(ts.map(t => t.u))];
+  const what = ts.length === 1 ? '«' + ts[0].n + '»' : ts.length + ' технічних назв';
+  picker('Куди перенести ' + what + '?', 'Виберіть уніфіковану назву, до якої це належить, — у будь-якій групі. Немає потрібної — створіть нову внизу.', cur, to => {
+    UI.sel.clear(); UI.open.add(to);
+    commit(mvOps(ts, to, nm(to)));
+  }, true, ts);
+}
+function mvOps(ts, to, toName) {
+  return ts.filter(t => t.u !== to).map(t => ({ op: { t: 'mv', id: t.id, to: to }, act: 'Перенесено технічну назву', txt: '«' + t.n + '» (' + t.s + '): «' + nm(t.u) + '» → «' + toName + '»' }));
+}
+function picker(title, sub, exclude, onPick, allowNew, ts) {
+  const gs = [...ST.G.values()].filter(g => !g.del).sort((a, b) => a.o - b.o);
+  openModal('<h3>' + esc(title) + '</h3><div class="sub">' + esc(sub) + '</div><input type="search" id="pq" placeholder="Пошук назви або коду"><div class="plist" id="pl"></div>' +
+    (allowNew ? '<label>Або нова уніфікована назва в групі</label><div style="display:flex;gap:8px"><select id="pg" style="flex:1">' + gs.map(g => '<option value="' + g.id + '">' + esc(g.n) + '</option>').join('') + '</select><button class="btn" id="pn">+ Створити й перенести</button></div>' : '') +
+    '<div class="acts"><button class="btn" onclick="closeModal()">Скасувати</button></div>');
+  const draw = () => {
+    const q = $('pq').value.trim().toLowerCase().split(/\s+/).filter(x => x);
+    let h = '';
+    gs.forEach(g => {
+      const us = [...ST.U.values()].filter(u => !u.del && u.g === g.id && q.every(w => (u.n + ' ' + u.c + ' ' + u.k + ' ' + g.n).toLowerCase().indexOf(w) >= 0)).sort((a, b) => a.n.localeCompare(b.n, 'uk'));
+      if (!us.length) return;
+      h += '<div class="pg">' + esc(g.n) + '</div>' + us.map(u => '<div class="pi' + (exclude.indexOf(u.id) >= 0 ? ' cur' : '') + '" data-u="' + u.id + '">' + esc(u.n) + '<small>' + (exclude.indexOf(u.id) >= 0 ? 'зараз тут' : esc(u.c || u.e)) + '</small></div>').join('');
+    });
+    $('pl').innerHTML = h || '<div class="empty">Нічого не знайдено</div>';
+    $('pl').querySelectorAll('.pi:not(.cur)').forEach(el => el.onclick = () => { closeModal(); onPick(el.dataset.u); });
+  };
+  $('pq').oninput = draw; draw();
+  if (allowNew) {
+    const g0 = ts && ts[0] ? (ST.U.get(ts[0].u) || {}).g : null; if (g0) $('pg').value = g0;
+    $('pn').onclick = () => { const gid = $('pg').value; closeModal(); addU(gid, (nid, nname) => { UI.sel.clear(); return mvOps(ts, nid, nname); }, $('pq').value.trim()); };
+  }
+}
+function sel(id, on) { on ? UI.sel.add(id) : UI.sel.delete(id); drawBulk(); }
+function drawBulk() {
+  const b = $('bulk'); const n = UI.sel.size;
+  b.className = 'bulk' + (n ? ' on' : '');
+  b.innerHTML = n ? 'Позначено технічних назв: <b>' + n + '</b><button class="btn pri" onclick="pickTarget([...UI.sel])">→ Перенести</button><button class="btn" onclick="UI.sel.clear();render()">Зняти позначки</button>' : '';
+}
+
+/* ======================================================================= журнал */
+function journal() {
+  const all = OPS.slice().reverse();
+  const isUndone = n => ST.undone.has(n);
+  let h = '<h3>Журнал змін</h3><div class="sub">Кожна зміна — хто, коли, що. Свою зміну можна скасувати (скасування теж записується). Копія журналу — аркуш «Номенклатура_Журнал» у MLP_Дані.</div>';
+  if (!all.length) h += '<div class="empty">Змін ще немає.</div>';
+  h += '<div style="max-height:60vh;overflow:auto">' + all.map(o => {
+    const why = ST.res.get(o.n) || '';
+    const mine = o.em === ME.email || ME.role === ROLE_ADMIN;
+    const canUndo = CAN && mine && o.op.t !== 'undo' && !isUndone(o.n);
+    return '<div class="jr' + (why ? ' off' : '') + '"><span class="jn">№' + o.n + '</span><div><div class="jt">' + esc(jText(o)) + '</div><div class="jw">' + esc(o.who) + ' · ' + esc(o.role) + ' · ' + dt(o.at) + (why ? ' · <b>' + esc(why) + '</b>' : '') + '</div></div>' +
+      (canUndo ? '<button class="btn sm" onclick="undo(' + o.n + ')">Скасувати</button>' : '<span></span>') + '</div>';
+  }).join('') + '</div><div class="acts"><button class="btn" onclick="exportLog()">⬇ Журнал (Excel)</button><button class="btn pri" onclick="closeModal()">Закрити</button></div>';
+  openModal(h);
+}
+/** Текст запису: як зберіг сервер, а якщо немає — зі стану */
+function jText(o) {
+  const op = o.op;
+  if (op.t === 'undo') return 'Скасовано зміну №' + op.n;
+  const m = { mv: 'Перенесено технічну назву', mvu: 'Позицію перенесено в іншу групу', ren: 'Перейменовано', addg: 'Додано групу', addu: 'Додано позицію', set: 'Змінено поле', del: 'Видалено', merge: 'Обʼєднано', ok: 'Підтверджено', unok: 'Знято підтвердження', note: 'Коментар' }[op.t] || op.t;
+  const x = op.id ? nm(op.id) : '';
+  return m + (op.t === 'addg' || op.t === 'addu' ? ' «' + op.n + '»' : x !== '?' ? ' «' + x + '»' : '') + (op.t === 'ren' ? ' → «' + op.n + '»' : '') + (op.to ? ' → «' + nm(op.to) + '»' : '') + (op.t === 'set' ? ': ' + ({ e: 'одиниця', k: 'вид', c: 'код' }[op.f]) + ' = ' + (op.v || '—') : '') + (op.t === 'note' && op.v ? ': ' + op.v : '');
+}
+function undo(n) {
+  confirmBox('Скасувати зміну №' + n + '?', jText(OPS.find(o => o.n === n)), 'Скасувати зміну', () => { closeModal(); commit([{ op: { t: 'undo', n: n }, act: 'Скасовано зміну', txt: '№' + n }]); setTimeout(journal, 50); });
+}
+
+/* ======================================================================= вивантаження (CSV для Excel) */
+function csv(rows) { return '﻿' + rows.map(r => r.map(v => { v = v === null || v === undefined ? '' : String(v); return /[;"\n]/.test(v) ? '"' + v.replace(/"/g, '""') + '"' : v; }).join(';')).join('\r\n'); }
+function download(name, text) { const a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([text], { type: 'text/csv;charset=utf-8' })); a.download = name; document.body.appendChild(a); a.click(); setTimeout(() => { URL.revokeObjectURL(a.href); a.remove(); }, 500); }
+const stamp = () => new Date().toISOString().slice(0, 16).replace(/[-:]/g, '').replace('T', '_');
+function exportCsv() {
+  const rows = [['Група (рівень 3)', 'Уніфікована назва (рівень 2)', 'Код', 'Од.', 'Вид', 'Технічна назва (рівень 1)', 'Джерело', 'Од. рядка', 'Бухгалтерія', 'Вулик разом'].concat(SEED.locs.map(l => l[0])).concat(['Підтв. бухгалтерія', 'Підтв. склад', 'Змінено', 'Коментар', 'Було: уніфікована', 'Було: група'])];
+  const Gs = [...ST.G.values()].filter(g => !g.del).sort((a, b) => a.o - b.o);
+  Gs.forEach(g => [...ST.U.values()].filter(u => !u.del && u.g === g.id).sort((a, b) => a.o - b.o).forEach(u => {
+    const okc = r => { const s = okState(u, r); return s === 'y' ? 'так · ' + u.ok[r].who : s === 's' ? 'змінено після підтвердження' : ''; };
+    const base = [g.n, u.n, u.c, u.e, u.k];
+    rows.push(base.concat(['', 'разом', u.e, u.b, u.hasV ? u.v : '']).concat(u.lq.map(x => x || '')).concat([okc(ROLE_ACC), okc(ROLE_WH), changed(u) ? 'так' : '', u.note ? u.note.v : '', u.added ? 'нова' : u.seed.n !== u.n ? u.seed.n : '', u.added ? '' : u.seed.g !== u.g ? nm(u.seed.g) : '']));
+    u.ts.forEach(t => rows.push(base.concat([t.n, t.s, t.e, t.b, vulyk(t)]).concat(t.q ? t.q.map(x => x || '') : SEED.locs.map(() => '')).concat(['', '', t.u !== t.u0 ? 'перенесено' : '', t.note ? t.note.v : '', t.u !== t.u0 ? nm(t.u0) : '', ''])));
+  }));
+  download('ENEY_ODOO_Nomenklatura-perevirka_rezultat_' + stamp() + '.csv', csv(rows));
+}
+function exportLog() {
+  const rows = [['№', 'Час', 'Хто', 'Роль', 'Зміна', 'Стан']].concat(OPS.map(o => [o.n, dt(o.at), o.who, o.role, jText(o), ST.res.get(o.n) || 'застосовано']));
+  download('ENEY_ODOO_Nomenklatura-perevirka_zhurnal_' + stamp() + '.csv', csv(rows));
+}
+
+window.addEventListener('beforeunload', e => { if (PEND.length || SENDING) { e.preventDefault(); e.returnValue = ''; } });
+boot();
+</script>
+</body>
+</html>
