@@ -1,5 +1,8 @@
 <!DOCTYPE html>
-<!-- МЛП · index.html v114 · 12.11.2026 — вид — поле, не рівень (рішення 12.11): у виборі позиції лише групи, пошук і за видом, групою, кодом, типорозміром;
+<!-- МЛП · index.html v115 · 12.11.2026 — Р-15 «Що де лежить» деревом: група → уніфікована → технічна (▸ біля рядка, «Розгорнути до»); склад: «Ящики ГП чекають прийняття» і
+     «Усі записи» згорнуто (ящики — червоний «!»); вибір позиції — групи згорнуті, пошук і за технічними назвами (БАС, етикетки, журнал); після позиції —
+     необов'язкова технічна назва: що є на локації з кількістю й відомі назви (Sklad.gs v18).
+     v114 · 12.11.2026 — вид — поле, не рівень (рішення 12.11): у виборі позиції лише групи, пошук і за видом, групою, кодом, типорозміром;
      Р-15: рівень 3 — група, вид — окремий фільтр.
      v113 · 12.11.2026 — універсальні групи номенклатури (Sklad.gs v17): у виборі позиції — підзаголовки «група · вид»; Р-15, рівень 3 — «група / вид».
      v112 · 12.11.2026 — Р-15: кожна візуалка згортається (стан пам'ятає пристрій), «Згорнути / Розгорнути всі».
@@ -476,6 +479,10 @@
   .cbx.open>.cbxl{display:block}
   .cbxl div{padding:11px 12px;font-size:17px;border-top:1px solid #EEF2F5;cursor:pointer;color:#1D2B33}
   .cbxl div:first-child{border-top:0}.cbxl div.hi{background:#EAF2FC}.cbxl div.cur{font-weight:700}
+  details.skwarn{border:2px solid #C4314B}details.skwarn>summary{list-style:none;display:flex;align-items:center;gap:8px;cursor:pointer}details.skwarn>summary::-webkit-details-marker{display:none}
+  details.skwarn>summary::after{content:'▸';margin-left:auto;color:#66767F}details.skwarn[open]>summary::after{content:'▾'}
+  .skx{display:inline-flex;align-items:center;justify-content:center;width:24px;height:24px;border-radius:50%;background:#C4314B;color:#fff;font-weight:800;font-size:15px;flex:0 0 auto}
+  .cbxl div.gh{background:#F4F7F9;font-weight:700;font-size:15px;color:#33434C;letter-spacing:.02em}.cbxl div.gh span{color:#66767F;font-weight:500}
   .cbxl div.dis{color:#9AA8B0;cursor:default}.cbxl div.none{color:#66767F;cursor:default;font-size:15px}
   .cbxl b{background:#FFF1D6;font-weight:inherit}
   .zban .cbx>input.cbxi,.fl .cbx>input.cbxi{font-size:15px;padding:7px 32px 7px 9px;background-position:right 9px center}
@@ -565,6 +572,7 @@
   .r15b{display:grid;grid-template-columns:minmax(120px,38%) 1fr auto;gap:8px;align-items:center;margin:4px 0;font-size:13px}.r15b .t{background:#EEF2F5;border-radius:4px;height:12px}.r15b .t div{height:12px;border-radius:4px}
   .r15b .d{white-space:nowrap;text-align:right;font-variant-numeric:tabular-nums}.r15b .d.bad{color:#9B231A;font-weight:700}
   .r15fa{display:flex;gap:8px;justify-content:flex-end;margin:4px 12px 0}.r15fa button{background:none;border:1px solid #C5D0D7;border-radius:8px;padding:4px 10px;font-size:13px;color:#55656E;cursor:pointer}
+  .r15tg{display:inline-block;width:18px;color:#2a78d6;cursor:pointer;font-size:13px;user-select:none}.r15g td{background:#F4F7F9;border-top:1px solid #C5D0D7}.r15t1 td{font-size:12.5px;color:#55656E}.r15t1 td.v{opacity:.85}
   .r15lg{display:flex;gap:14px;font-size:13px;color:#66767F}.r15lg i{display:inline-block;width:10px;height:10px;border-radius:2px;margin-right:5px;vertical-align:middle}
   .kpi{background:#fff;border-radius:14px;padding:12px 14px;box-shadow:0 1px 3px rgba(0,0,0,.08)}
   .kpi .v{font-size:26px;font-weight:700;line-height:1.15}.kpi .v small{font-size:14px;font-weight:500;color:#66767F;margin-left:3px}
@@ -663,7 +671,7 @@
 <div class="net" id="net" role="alert" aria-live="assertive"><div class="nb"><div class="rt" id="netr"></div><div class="nt" id="nett">Зберігаю…</div><div class="ns" id="nets"></div><div class="np"><i id="netp"></i></div><div class="nh" id="neth"></div><div class="zc" id="zc"></div><button class="nx" id="netx" type="button">Не чекати</button></div></div>
 
 <script>
-const PAGE_VERSION = 'index.html v114 · 12.11.2026';   // v114: вид — поле, пошук за ключовими словами; v113: групи й види номенклатури; v112: Р-15 — блоки згортаються; v111: Р-15 «Склад: залишки й рух»; v110: дії за типом локації, переміщення, партія покупцю; v109: кілька фото, тара, перемаркування; v108: приймання від постачальника, наліпки; v107: передачі склад → цех, ящики ГП приймає склад; v106: позиції складу за групами; v105: кнопки складу «Беремо зі складу» / «Приймаємо на склад»; v104: «Історія тари» (?th=) — назва тари на сторінці тари / партії веде на неї (Reports.gs v42)
+const PAGE_VERSION = 'index.html v115 · 12.11.2026';   // v115: Р-15 деревом, згорнуті блоки складу, дерево позицій, технічна назва; v114: вид — поле, пошук за ключовими словами; v113: групи й види номенклатури; v112: Р-15 — блоки згортаються; v111: Р-15 «Склад: залишки й рух»; v110: дії за типом локації, переміщення, партія покупцю; v109: кілька фото, тара, перемаркування; v108: приймання від постачальника, наліпки; v107: передачі склад → цех, ящики ГП приймає склад; v106: позиції складу за групами; v105: кнопки складу «Беремо зі складу» / «Приймаємо на склад»; v104: «Історія тари» (?th=) — назва тари на сторінці тари / партії веде на неї (Reports.gs v42)
 // v103 (11.11): Р-9_08 «За типом», «Перевірено, все ок»
 // v102 (09.11):   // v74: в1 — і з нашої тари (ящик залишків); в2 — лише партії в2
 // v72 (26.10):   // v72: «Яку партію відкриваємо?»; розшифровка кроків на картці партії; реєстрація — повернення за посиланням з форми
@@ -1030,12 +1038,12 @@ function skPosOpts(d, sel, ph, extra) {
   // групою, кодом і типорозміром (data-k, cbxWire) — «магніт 3115», «кріплення м3», «CMP-BOLT»
   const groups = (d.groups || []).slice(), by = {};
   const put = (g, n, k) => { if (groups.indexOf(g) < 0) groups.splice(Math.max(0, groups.length - 1), 0, g); (by[g] = by[g] || []).push([n, k || '']); };
-  d.positions.forEach(p => put(p.group || d.other, p.name, [p.group, p.kind, p.code, p.typ].filter(Boolean).join(' ')));
+  d.positions.forEach(p => put(p.group || d.other, p.name, [p.group, p.kind, p.code, p.typ].concat(((d.tech || {})[p.name] || []).slice(0, 12)).filter(Boolean).join(' ')));   // v115: + технічні назви (БАС, етикетки, журнал)
   if (extra) put('Попередня назва', extra);
   put(d.other, d.other);
-  const o = x => '<option' + (x[1] ? ' data-k="' + esc(x[1]) + '"' : '') + (String(x[0]) === String(sel) ? ' selected' : '') + '>' + esc(x[0]) + '</option>';
-  return (ph ? '<option value="">' + esc(ph) + '</option>' : '') + groups.filter(g => by[g]).map(g => '<option value="" disabled>▸ ' + esc(String(g).toUpperCase()) + '</option>' +
-    by[g].sort((a, b) => a[0].localeCompare(b[0], 'uk')).map(o).join('')).join('');
+  const o = (x, g) => '<option data-g="' + esc(g) + '"' + (x[1] ? ' data-k="' + esc(x[1]) + '"' : '') + (String(x[0]) === String(sel) ? ' selected' : '') + '>' + esc(x[0]) + '</option>';
+  return (ph ? '<option value="">' + esc(ph) + '</option>' : '') + groups.filter(g => by[g]).map(g => '<option value="" disabled data-gh="' + esc(g) + '">▸ ' + esc(String(g).toUpperCase()) + '</option>' +   // v115: data-gh — групи згорнуті в cbx
+    by[g].sort((a, b) => a[0].localeCompare(b[0], 'uk')).map(x => o(x, g)).join('')).join('');
 }
 function opts(list, sel, ph) { return (ph ? '<option value="">' + esc(ph) + '</option>' : '') + list.map(x => '<option' + (String(x) === String(sel) ? ' selected' : '') + '>' + esc(x) + '</option>').join(''); }
 // =============================================================== v52: ПОШУК У ВИПАДНИХ СПИСКАХ
@@ -1065,6 +1073,26 @@ function cbxWire(sel) {
   const draw = q => {
     C.q = q; const words = cbxN(q).split(/\s+/).filter(Boolean), cur = SELI.get.call(sel);
     C.vis = []; let h = '';
+    // v115: дерево — групи (option data-gh) згорнуті, натиснули — розгорнули; з пошуком — лише збіги під назвою своєї групи
+    if (sel.querySelector('option[data-gh]')) {
+      C.og = C.og || {}; const co = sel.options[cur], cg = co && co.dataset.g; if (cg && C.og[cg] === undefined) C.og[cg] = true;
+      const opts = [...sel.options], cnt = {}; opts.forEach(o => { if (o.dataset.g) cnt[o.dataset.g] = (cnt[o.dataset.g] || 0) + 1; });
+      let lastG = null;
+      opts.forEach((o, i) => {
+        if (o.dataset.gh !== undefined) { if (!words.length) { const g = o.dataset.gh; h += '<div class="gh" data-gh="' + esc(g) + '">' + (C.og[g] ? '▾ ' : '▸ ') + esc(g) + ' <span>· ' + (cnt[g] || 0) + '</span></div>'; } return; }
+        if (cbxPh(o)) return;
+        const g = o.dataset.g || '', t = cbxN(o.text), tk = o.dataset.k ? t + ' ' + cbxN(o.dataset.k) : t;
+        if (words.length ? !words.every(x => tk.indexOf(x) >= 0) : (g && !C.og[g])) return;
+        if (words.length && g !== lastG) { h += '<div class="gh dis">' + esc(g) + '</div>'; lastG = g; }
+        C.vis.push(i);
+        let txt = esc(o.text);
+        if (words.length) { const k = t.indexOf(words[0]); if (k >= 0) txt = esc(o.text.slice(0, k)) + '<b>' + esc(o.text.slice(k, k + words[0].length)) + '</b>' + esc(o.text.slice(k + words[0].length)); }
+        h += '<div data-i="' + i + '" class="' + (i === cur ? 'cur' : '') + '" style="padding-left:22px">' + txt + '</div>';
+      });
+      ls.innerHTML = h || '<div class="none">Нічого не знайдено — спробуйте інакше (назва, код, як написано на етикетці)</div>';
+      C.hi = -1; hiTo(C.vis.findIndex(i => words.length || i === cur));
+      return;
+    }
     [...sel.options].forEach((o, i) => {
       const t = cbxN(o.text), tk = o.dataset.k ? t + ' ' + cbxN(o.dataset.k) : t;   // v114: ще й приховані ключові слова (вид, група, код, типорозмір)
       if (words.length && (cbxPh(o) || !words.every(x => tk.indexOf(x) >= 0))) return;
@@ -1102,7 +1130,8 @@ function cbxWire(sel) {
     else if (e.key === 'Escape') { close(); inp.blur(); }
   });
   ls.addEventListener('mousedown', e => e.preventDefault());   // фокус лишається в полі, поки обирають
-  ls.addEventListener('click', e => { const d = e.target.closest('div[data-i]'); if (d) pick(Number(d.dataset.i)); });
+  ls.addEventListener('click', e => { const g = e.target.closest('div[data-gh]'); if (g) { C.og = C.og || {}; C.og[g.dataset.gh] = !C.og[g.dataset.gh]; draw(C.q || ''); return; }   // v115: розгорнути / згорнути групу
+    const d = e.target.closest('div[data-i]'); if (d) pick(Number(d.dataset.i)); });
   sync();
 }
 // значення змінили кодом ($('x').value = …, без події) — поле показує його не пізніше ніж за 0,4 с
@@ -4980,36 +5009,44 @@ function r11() {
 const Z12 = { st: 'open', typ: [], under: false };   // v68: типорозмір — мультивибір
 // =============================================================== v111: Р-15 «СКЛАД: ЗАЛИШКИ Й РУХ» (Sklad.gs v16, dashSklad_)
 // Три рівні назв: 1 — технічна (що записано в «Деталях» / назва БАС), 2 — уніфікована (позиція каталогу), 3 — група. Фільтри — на сторінці.
-let Z15 = { lv: 2, locs: null, grp: '', kind: '', q: '', act: '', only: '' };
+let Z15 = { lv: 2, locs: null, grp: '', kind: '', q: '', act: '', only: '', ex: {} };   // v115: lv — до якого рівня розгорнуто (1 група, 2 + уніфіковані, 3 + технічні); ex — ▸ / ▾ окремих рядків
 const R15C = { in: '#2a78d6', out: '#d6731f' };   // прийшло / пішло (перевірено валідатором палітри, light)
 function r15() {
   const D = Z15, x = DB.sk; if (!x) return '<div class="card err">Немає даних складу</div>';
   const locs = x.locs.filter(l => l[2] !== 'virt'), it = x.items;
   if (!D.locs) D.locs = locs.map(l => l[0]);
   const nf = skNfmt, lname = c => { const l = x.locs.find(z => z[0] === c); return l ? l[1] : c; };
-  const name = (k, det) => { const i = it[k] || [k, k, '', '', '', '']; return D.lv === 3 ? (i[2] || 'Інше') : D.lv === 2 ? i[1] : (det || i[3] || i[1]); };   // v114: рівень 3 — лише група; вид — фільтр
+  const name = (k, det) => (it[k] || [k, k])[1];   // v115: уніфікована назва (рівні — деревом у «Що де лежить»)
   const unitOf = k => (it[k] || [])[4] || 'шт';
   // v112: кожна візуалка — у блоці, що згортається (стан пам'ятає пристрій, як у Р-8 / Р-10)
   const fold = (id, title, cnt, sub, body) => zFold(id, title, cnt, (sub ? '<div class="muted" style="margin-bottom:10px">' + sub + '</div>' : '') + body, true);
   const pass = (k, det) => { const i = it[k] || []; if (D.grp && (i[2] || 'Інше') !== D.grp) return false; if (D.kind && (i[5] || '') !== D.kind) return false;   // v114: вид — фільтр
     if (D.q) { const s = [i[0], i[1], i[2], i[3], i[5], det].join(' ').toLowerCase(); if (D.q.toLowerCase().split(/\s+/).some(w => w && s.indexOf(w) < 0)) return false; } return true; };
-  // матриця: рядок = назва (за рівнем) + одиниця, колонка = локація
-  const M = {}, add = (loc, k, det, q, u, extra) => { if (!pass(k, det)) return; const nm = name(k, det), key = nm + '\u0001' + u;
-    const r = M[key] = M[key] || { nm: nm, u: u, grp: (it[k] || [])[2] || 'Інше', c: {}, flag: {}, tip: {} }; r.c[loc] = (r.c[loc] || 0) + q; if (extra) { if (extra.flag) r.flag[loc] = 1; r.tip[loc] = extra.tip; } };
+  // v115: матриця деревом — група (рівень 3) → уніфікована назва (2) → технічна назва (1); ▸ біля рядка розгортає, кнопки — до рівня
+  const G = {}, add = (loc, k, det, q, u, extra) => { if (!pass(k, det)) return; const i = it[k] || [k, k, 'Інше'], g = i[2] || 'Інше';
+    const gg = G[g] = G[g] || { g: g, items: {} }, ik = k + '\u0001' + u;
+    const r = gg.items[ik] = gg.items[ik] || { id: g + '\u0002' + ik, nm: i[1], u: u, c: {}, flag: {}, tip: {}, t: {} };
+    r.c[loc] = (r.c[loc] || 0) + q; if (extra) { if (extra.flag) r.flag[loc] = 1; if (extra.tip) r.tip[loc] = extra.tip; }
+    const tn = det || (extra && extra.tn) || '(без деталей)', t = r.t[tn] = r.t[tn] || { c: {} }; t.c[loc] = (t.c[loc] || 0) + q; };
   x.bal.forEach(b => { if (D.locs.indexOf(b[0]) >= 0 && skLocOf15(x, b[0]) === 'wh') add(b[0], b[1], b[2], b[3], b[4]); });   // цехи — лише розрахунок цеху (нижче)
   const shopFlags = [];
   x.shops.forEach(s => { if (D.locs.indexOf(s.code) < 0) return; s.rows.forEach(r => { const fl = r[4] !== null && r[4] < 1;
     if (fl && pass(r[0], '')) shopFlags.push([s, r]);
-    add(s.code, r[0], '', r[1], r[2], { flag: fl, tip: 'за день ' + nf(Math.round(r[3])) + ' · на ' + (r[4] === null ? '—' : String(r[4]).replace('.', ',')) + ' дн.' + (r[5] ? ' · в дорозі ' + nf(r[5]) : '') }); }); });
+    add(s.code, r[0], '', r[1], r[2], { flag: fl, tn: 'розрахунок цеху: інвентаризація + рух − норми', tip: 'за день ' + nf(Math.round(r[3])) + ' · на ' + (r[4] === null ? '—' : String(r[4]).replace('.', ',')) + ' дн.' + (r[5] ? ' · в дорозі ' + nf(r[5]) : '') }); }); });
   if (pass('ГП', '')) x.gp.forEach(g => { if (D.locs.indexOf(g[0]) >= 0) add(g[0], 'ГП', g[1], g[4], 'шт', { tip: g[3] + ' ящ.' }); });
-  const cols = locs.filter(l => D.locs.indexOf(l[0]) >= 0);
-  const rows = Object.keys(M).map(k => M[k]).filter(r => cols.some(c => Math.abs(r.c[c[0]] || 0) > 1e-9));
+  const cols = locs.filter(l => D.locs.indexOf(l[0]) >= 0), nz = c => cols.some(l => Math.abs(c[l[0]] || 0) > 1e-9);
   const GO = (x.groups || []).concat(['Інше']).filter((g, i, a) => a.indexOf(g) === i);
   const KO = [...new Set(Object.keys(it).filter(k => !D.grp || (it[k][2] || 'Інше') === D.grp).map(k => it[k][5]).filter(Boolean))].sort((a, b) => a.localeCompare(b, 'uk'));   // v114: види — з позицій (у межах групи)
-  rows.sort((a, b) => (GO.indexOf(a.grp) - GO.indexOf(b.grp)) || a.nm.localeCompare(b.nm));
+  const tree = Object.keys(G).sort((a, b) => (GO.indexOf(a) + 1 || 99) - (GO.indexOf(b) + 1 || 99)).map(g => {
+    const items = Object.keys(G[g].items).map(k => G[g].items[k]).filter(r => nz(r.c)).sort((a, b) => a.nm.localeCompare(b.nm, 'uk') || a.u.localeCompare(b.u));
+    const us = [...new Set(items.map(r => r.u))], c = {};
+    if (us.length === 1) items.forEach(r => cols.forEach(l => { if (r.c[l[0]]) c[l[0]] = (c[l[0]] || 0) + r.c[l[0]]; }));
+    return { g: g, items: items, u: us.length === 1 ? us[0] : '', c: c };
+  }).filter(x => x.items.length);
+  const rows = [].concat(...tree.map(x => x.items));
   // фільтри
-  const seg = (k, v, t) => '<button class="' + (D[k] === v ? 'on' : '') + '" onclick="Z15.' + k + '=' + JSON.stringify(v).replace(/"/g, '&quot;') + ';renderDash()">' + t + '</button>';
-  let h = '<div class="card r15f"><div class="chips">' + seg('lv', 1, '1 · Технічна') + seg('lv', 2, '2 · Уніфікована') + seg('lv', 3, '3 · Група') + '</div>' +
+  const seg = (k, v, t) => '<button class="' + (D[k] === v ? 'on' : '') + '" onclick="Z15.' + k + '=' + JSON.stringify(v).replace(/"/g, '&quot;') + ';Z15.ex={};renderDash()">' + t + '</button>';
+  let h = '<div class="card r15f"><div class="chips"><span class="muted" style="align-self:center;margin-right:4px">Розгорнути до:</span>' + seg('lv', 1, '3 · Група') + seg('lv', 2, '2 · Уніфікована') + seg('lv', 3, '1 · Технічна') + '</div>' +
     '<div class="chips" style="margin-top:8px">' + locs.map(l => '<button class="' + (D.locs.indexOf(l[0]) >= 0 ? 'on' : '') + '" onclick="r15Loc(\'' + esc(l[0]) + '\')" title="' + esc(l[1]) + '">' + esc(l[0]) + (l[2] === 'shop' ? ' 🏭' : '') + '</button>').join('') +
       '<button onclick="Z15.locs=null;renderDash()">усі</button></div>' +
     '<div class="row" style="margin-top:8px"><select id="z15g" data-nocbx style="flex:0 0 30%">' + opts(GO, D.grp, 'усі групи') + '</select>' +
@@ -5021,16 +5058,30 @@ function r15() {
   h += '<div class="kpis" style="margin:0 12px">' + kpi('Позицій із залишком', rows.length, '', 'за фільтрами') + kpi('🚩 Цех: менше ніж на 1 день', shopFlags.length, '', shopFlags.slice(0, 3).map(f => esc((it[f[1][0]] || [])[1] || '')).join(', ')) +
     kpi('ГП на складах', nf(gpQ), ' шт', gpB + ' ящиків') + kpi('Від\'ємних залишків', neg, '', 'без інвентаризації складів — див. примітку') + '</div>';
   // 1) що де лежить
-  const showN = 250;
+  const showN = 400; let shown = 0;
+  const isOpen = (id, depth) => D.ex && D.ex[id] !== undefined ? D.ex[id] : (D.q ? true : D.lv > depth);
+  const cell = (c, u, r, bold) => { const pos = cols.reduce((a, l) => a + Math.max(0, c[l[0]] || 0), 0);
+    return cols.map(l => { const v = c[l[0]]; if (v === undefined || Math.abs(v) < 1e-9) return '<td></td>';
+      const sh = v > 0 && pos ? v / pos : 0, bg = v < 0 ? '#FDE3E1' : 'rgba(42,120,214,' + (0.08 + 0.55 * sh).toFixed(2) + ')';
+      return '<td class="v" style="background:' + bg + (sh > 0.6 ? ';color:#fff' : v < 0 ? ';color:#9B231A' : '') + (bold ? ';font-weight:700' : '') + '" title="' + esc(l[1] + ': ' + nf(v) + ' ' + u + (r && r.tip[l[0]] ? ' · ' + r.tip[l[0]] : '') + (v < 0 ? ' · від\'ємний: брали більше, ніж записано приходу' : '')) + '">' +
+        (r && r.flag[l[0]] ? '🚩 ' : '') + nf(Math.round(v * 10) / 10) + '</td>'; }).join(''); };
+  const tg = (id, open) => '<span class="r15tg" onclick="r15Tg(' + JSON.stringify(id).replace(/"/g, '&quot;') + ',' + (open ? 0 : 1) + ')">' + (open ? '▾' : '▸') + '</span>';
+  let body = '';
+  tree.forEach(T => {
+    const go = isOpen('g\u0002' + T.g, 0);
+    body += '<tr class="r15g"><td class="n">' + tg('g\u0002' + T.g, go) + '<b>' + esc(T.g) + '</b> <span class="muted">· ' + T.items.length + ' поз.</span></td>' +
+      (T.u ? cell(T.c, T.u, null, true) : cols.map(() => '<td class="muted" title="різні одиниці — сума лише в позиціях"></td>').join('')) + '<td class="muted">' + esc(T.u || 'різні') + '</td></tr>';
+    if (!go) return;
+    T.items.forEach(r => { if (shown++ >= showN) return;
+      const ts = Object.keys(r.t).filter(n => nz(r.t[n].c)).sort((a, b) => a.localeCompare(b, 'uk')), io = isOpen(r.id, 1);
+      body += '<tr><td class="n" style="padding-left:26px">' + (ts.length ? tg(r.id, io) : '<span class="r15tg"></span>') + esc(r.nm) + (ts.length > 1 ? ' <span class="muted">· ' + ts.length + '</span>' : '') + '</td>' + cell(r.c, r.u, r) + '<td class="muted">' + esc(r.u) + '</td></tr>';
+      if (io) ts.forEach(n => { body += '<tr class="r15t1"><td class="n" style="padding-left:52px">' + esc(n) + '</td>' + cell(r.t[n].c, r.u, null) + '<td class="muted">' + esc(r.u) + '</td></tr>'; });
+    });
+  });
   h += '<div class="r15fa"><button type="button" onclick="r15FoldAll(false)">▸ Згорнути всі</button><button type="button" onclick="r15FoldAll(true)">▾ Розгорнути всі</button></div>';
-  h += fold('r15map', 'Що де лежить', rows.length + ' поз.', 'Склади — прийшло − пішло за журналом з ' + esc(x.from.split('-').reverse().join('.')) + '; цехи 🏭 — інвентаризація + переміщення − витрата за нормами; ГП — ящики МЛП. Колір — частка позиції на локації.',
-    rows.length ? '<div class="r15w"><table class="r15t"><thead><tr><th>' + ['', 'Технічна назва', 'Позиція', 'Група'][D.lv] + '</th>' + cols.map(c => '<th title="' + esc(c[1]) + '">' + esc(c[0]) + (c[2] === 'shop' ? ' 🏭' : '') + '</th>').join('') + '<th>Од.</th></tr></thead><tbody>' +
-      rows.slice(0, showN).map(r => { const pos = cols.reduce((a, c) => a + Math.max(0, r.c[c[0]] || 0), 0);
-        return '<tr><td class="n">' + esc(r.nm) + '</td>' + cols.map(c => { const v = r.c[c[0]]; if (v === undefined || Math.abs(v) < 1e-9) return '<td></td>';
-          const sh = v > 0 && pos ? v / pos : 0, bg = v < 0 ? '#FDE3E1' : 'rgba(42,120,214,' + (0.08 + 0.55 * sh).toFixed(2) + ')';
-          return '<td class="v" style="background:' + bg + (sh > 0.6 ? ';color:#fff' : v < 0 ? ';color:#9B231A' : '') + '" title="' + esc(c[1] + ': ' + nf(v) + ' ' + r.u + (r.tip[c[0]] ? ' · ' + r.tip[c[0]] : '') + (v < 0 ? ' · від\'ємний: брали більше, ніж записано приходу' : '')) + '">' +
-            (r.flag[c[0]] ? '🚩 ' : '') + nf(Math.round(v * 10) / 10) + '</td>'; }).join('') + '<td class="muted">' + esc(r.u) + '</td></tr>'; }).join('') + '</tbody></table></div>' +
-      (rows.length > showN ? '<p class="muted">Показано ' + showN + ' з ' + rows.length + ' — звузьте фільтри.</p>' : '')
+  h += fold('r15map', 'Що де лежить', rows.length + ' поз.', 'Склади — прийшло − пішло за журналом з ' + esc(x.from.split('-').reverse().join('.')) + '; цехи 🏭 — інвентаризація + переміщення − витрата за нормами; ГП — ящики МЛП. ▸ — розгорнути: група → уніфікована назва → технічна назва (як записано на складі). Колір — частка позиції на локації.',
+    rows.length ? '<div class="r15w"><table class="r15t"><thead><tr><th>Група · уніфікована · технічна</th>' + cols.map(c => '<th title="' + esc(c[1]) + '">' + esc(c[0]) + (c[2] === 'shop' ? ' 🏭' : '') + '</th>').join('') + '<th>Од.</th></tr></thead><tbody>' +
+      body + '</tbody></table></div>' + (shown > showN ? '<p class="muted">Показано ' + showN + ' з ' + shown + ' позицій — звузьте фільтри.</p>' : '')
       : '<p class="muted">Нічого не знайдено за фільтрами.</p>');
   // 2) цехи: на скільки днів
   x.shops.filter(s => D.locs.indexOf(s.code) >= 0).forEach(s => {
@@ -5080,6 +5131,8 @@ function r15() {
 }
 function skLocOf15(x, c) { const l = x.locs.find(z => z[0] === c); return l ? l[2] : ''; }
 function fmtT15(t) { const d = new Date(t), p = n => String(n).padStart(2, '0'); return p(d.getDate()) + '.' + p(d.getMonth() + 1) + ' ' + p(d.getHours()) + ':' + p(d.getMinutes()); }
+/** v115: ▸ / ▾ рядка матриці Р-15 (група, позиція) */
+function r15Tg(id, open) { Z15.ex = Z15.ex || {}; Z15.ex[id] = !!open; renderDash(); }
 /** v112: згорнути / розгорнути всі блоки Р-15 (стан кожного — у пам'яті пристрою, zFoldT) */
 function r15FoldAll(op) { document.querySelectorAll('#app details.zfold[id^="zf_r15"]').forEach(d => { if (d.open !== op) d.open = op; }); }
 function r15Loc(c) { const a = Z15.locs || []; const i = a.indexOf(c); if (i >= 0) a.splice(i, 1); else a.push(c); Z15.locs = a; renderDash(); }
@@ -5357,6 +5410,7 @@ function skNum(n) { return String(n).replace('.', ','); }
 // склад: Перемістити (куди: цех / склад / віртуальна) · Прийняти (від постачальника, ГП з виробництва) · Покупцю (зібрати → відвантажити)
 // цех: Перемістити на склад (свій) або у відділ якості, РнД, Антону · Ящик ГП на склад
 let SKS = { loc: '', act: '' };
+let SKBX = false, SKREC = false;   // v115: згорнуті блоки «Ящики ГП чекають прийняття» і «Усі записи» (розгорнули — тримаємо, поки сторінка відкрита)
 const skLocOf = c => (SKD.locs || []).find(l => l.code === c) || { code: c, name: c, kind: '' };
 const skLocLab = l => l.code + (l.name && l.name !== l.code ? ' · ' + l.name : '');
 function renderSklad() {
@@ -5457,9 +5511,24 @@ function skMvLine() {
     '<div class="row" style="align-items:center;margin-top:6px"><input type="text" inputmode="decimal" id="mvQ' + n + '" placeholder="кількість" style="font-size:20px;font-weight:600;min-width:0">' +
     '<select id="mvU' + n + '" data-nocbx style="flex:0 0 26%">' + opts(d.units, 'шт') + '</select></div>' +
     '<input type="text" id="mvL' + n + '" placeholder="партія постачальника / ПП (необов\'язково)" style="margin-top:6px">' +
-    '<input type="text" id="mvD' + n + '" placeholder="деталі (необов\'язково)" style="margin-top:6px">';
+    '<input type="text" id="mvD' + n + '" placeholder="технічна назва / деталі (необов\'язково)" style="margin-top:6px">';
   $('mvLines').appendChild(div);
-  $('mvP' + n).onchange = () => { const v = $('mvP' + n).value; $('mvO' + n).style.display = v === d.other ? 'block' : 'none'; const p = d.positions.find(x => x.name === v); if (p) $('mvU' + n).value = p.unit; };
+  $('mvP' + n).onchange = () => { const v = $('mvP' + n).value; $('mvO' + n).style.display = v === d.other ? 'block' : 'none'; const p = d.positions.find(x => x.name === v); if (p) $('mvU' + n).value = p.unit; skTechWire('mv', n, SKS.loc); };
+}
+/** v115: рівень 1 — технічна назва (необов'язково) після вибору позиції: що є на цій локації (за журналом / інвентаризацією, з кількістю) і відомі назви
+ *  (БАС, етикетки постачальника, записи журналу — d.tech, d.techAt з Sklad.gs v18). Вибір пише назву в «Деталі»; «інша» — вписати вручну */
+function skTechWire(pfx, n, loc) {
+  const d = SKD, D = $(pfx + 'D' + n), P = $(pfx + 'P' + n); if (!D || !P) return;
+  const pos = P.value, at = (((d.techAt || {})[loc] || {})[pos] || []).slice().sort((a, b) => b[1] - a[1]), kn = ((d.tech || {})[pos] || []).filter(x => !at.some(a => a[0] === x));
+  let T = $(pfx + 'T' + n);
+  if (!pos || (!at.length && !kn.length)) { if (T) T.remove(); return; }
+  if (!T) { T = document.createElement('select'); T.id = pfx + 'T' + n; T.setAttribute('data-nocbx', ''); T.style.marginTop = '6px'; D.parentNode.insertBefore(T, D);
+    T.onchange = () => { const o = T.options[T.selectedIndex]; if (T.value === '__o') { D.value = ''; D.focus(); return; } if (!T.value) return; D.value = T.value;
+      const u = o && o.dataset.u, U = $(pfx + 'U' + n); if (u && U && [...U.options].some(x => x.value === u)) U.value = u; }; }
+  T.innerHTML = '<option value="">— технічна назва (необов\'язково) —</option>' +
+    (at.length ? '<optgroup label="Є на ' + esc(loc) + '">' + at.map(a => '<option value="' + esc(a[0]) + '" data-u="' + esc(a[2]) + '">' + esc(a[0]) + ' — ' + esc(skNfmt(a[1])) + ' ' + esc(a[2]) + (a[3] ? ' · ' + esc(a[3]) : '') + '</option>').join('') + '</optgroup>' : '') +
+    (kn.length ? '<optgroup label="Відомі назви (БАС, етикетки)">' + kn.map(x => '<option value="' + esc(x) + '">' + esc(x) + '</option>').join('') + '</optgroup>' : '') +
+    '<option value="__o">✎ інша — вписати нижче</option>';
 }
 /** Фото етикетки → у перший рядок без позиції (або останній) */
 function skFillMv(f) {
@@ -5717,7 +5786,7 @@ function renderSkMy() {
   const st = x => x.cancelled ? ' · <b>скасовано</b>' + (x.fixWho ? ' (' + esc(x.fixWho) + (x.reason ? ': ' + esc(x.reason) : '') + ')' : '')
     : x.fixed ? ' · <b>виправлено → ' + esc(x.ref) + '</b>' : '';
   const was = x => x.isFix ? '<br><span class="muted">✎ виправлення ' + esc(x.ref) + ' · ' + esc(x.fixWho) + (x.reason ? ': ' + esc(x.reason) : '') + '</span>' : '';
-  box.innerHTML = '<details' + (all.length ? ' open' : '') + '><summary>' + (SKD.allView ? 'Усі записи' : 'Мої записи') + ' за 30 днів (' + all.filter(x => !x.cancelled && !x.fixed).length + ')</summary>' +
+  box.innerHTML = '<details' + (SKREC ? ' open' : '') + ' ontoggle="SKREC=this.open"><summary>' + (SKD.allView ? 'Усі записи' : 'Мої записи') + ' за 30 днів (' + all.filter(x => !x.cancelled && !x.fixed).length + ')</summary>' +
     (SKD.allView ? '<input type="search" id="skQ" placeholder="пошук: ім\'я, позиція, ВД-…, партія" value="' + esc(SKQ) + '" style="margin:8px 0 0">' : '') +
     '<div class="list">' +
     (my.length ? my.map(x => '<div class="li"><div><div class="' + (x.cancelled || x.fixed ? 'x' : '') + '">' +
@@ -5769,12 +5838,12 @@ function renderSkIn() {
       '<button class="btn" onclick="skAccept(\'' + esc(t.id) + '\',this)">Прийняти</button></div>';
   });
   if (d.isWh && bxs.length) {
-    h += '<div class="card" style="border:2px solid #E0A400"><div class="mid">📦 Ящики ГП чекають прийняття' + (L ? ' на ' + esc(L) : ' складом') + ': ' + bxs.length + '</div>' +
+    h += '<details class="card skwarn"' + (SKBX ? ' open' : '') + ' ontoggle="SKBX=this.open"><summary class="mid"><span class="skx">!</span>📦 Ящики ГП чекають прийняття' + (L ? ' на ' + esc(L) : ' складом') + ': ' + bxs.length + '</summary>' +   // v115: згорнуто, червоний «!»
       '<p class="muted" style="margin:4px 0 0">Перевірте, що ящик справді на складі, і прийміть. Немає — позначте «Немає на складі»: тімлідам піде лист.</p>' +
       '<label class="opt" style="background:#F4F7F9"><input type="checkbox" id="bxAll" onchange="document.querySelectorAll(\'input[name=bxSel]\').forEach(c => c.checked = this.checked)"><b>Усі</b></label>' +
       bxs.map(b => '<label class="opt"><input type="checkbox" name="bxSel" value="' + esc(b.id) + '"><b>' + esc(b.det) + '</b> · ' + b.qty + ' шт' +
         '<br><span class="muted">' + esc(b.loc) + ' · ' + esc(b.time) + ' · ' + esc(b.auto ? 'авто після пакування · ' + b.who : b.who) + '</span></label>').join('') +
-      '<div class="grid" style="margin-top:10px"><button class="btn btn2" onclick="skBoxNone()">Немає на складі</button><button class="btn" onclick="skBoxAcc(this)">Прийняти вибрані</button></div></div>';
+      '<div class="grid" style="margin-top:10px"><button class="btn btn2" onclick="skBoxNone()">Немає на складі</button><button class="btn" onclick="skBoxAcc(this)">Прийняти вибрані</button></div></details>';
   }
   if ((x.docs || []).length) h += '<div class="card" style="border:2px solid #E0A400"><div class="mid">📄 Чекають документ: ' + x.docs.length + '</div>' +   // v108
     x.docs.map(p => '<div class="li" style="padding:8px 0"><div><b>' + esc(p.pr) + '</b> · ' + esc(p.time.slice(0, 5)) + ' · ' + esc(p.supplier) + (p.docNo ? ' · ' + esc(p.docNo) : '') +
@@ -5864,7 +5933,7 @@ function skTrLine() {
     '<input type="text" id="trD' + n + '" placeholder="деталі / партія приймання (необов\'язково)" style="margin-top:6px">';
   $('trLines').appendChild(div);
   $('trP' + n).onchange = () => { const v = $('trP' + n).value; $('trO' + n).style.display = v === d.other ? 'block' : 'none';
-    const p = d.positions.find(x => x.name === v); if (p) $('trU' + n).value = p.unit; };
+    const p = d.positions.find(x => x.name === v); if (p) $('trU' + n).value = p.unit; skTechWire('tr', n, ($('trFrom') || {}).value || SKS.loc); };
 }
 function skTrSave() {
   const b = $('trGo'); if (b.disabled) return; $('merr').textContent = '';
@@ -5950,7 +6019,7 @@ function skRcvLine() {
     '<input type="text" id="rvD' + n + '" placeholder="деталі (необов\'язково)" style="margin-top:6px">';
   $('rvLines').appendChild(div);
   $('rvP' + n).onchange = () => { const v = $('rvP' + n).value; $('rvO' + n).style.display = v === d.other ? 'block' : 'none';
-    const p = d.positions.find(x => x.name === v); if (p) $('rvU' + n).value = p.unit; skRcvHint(n); };
+    const p = d.positions.find(x => x.name === v); if (p) $('rvU' + n).value = p.unit; skRcvHint(n); skTechWire('rv', n, ''); };
   ['rvQ', 'rvB', 'rvPer', 'rvU'].forEach(k => $(k + n)[k === 'rvU' ? 'onchange' : 'oninput'] = () => skRcvHint(n));
 }
 /** Підказка під рядком: як розкладено по коробках (так буде на наліпках) */
