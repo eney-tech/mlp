@@ -1,5 +1,11 @@
 <!DOCTYPE html>
-<!-- МЛП · index.html v121 · 12.11.2026 — Р-2 (рішення 12.11, для тімліда Жулян): вкладку «Гравіювання роторів» (v120) прибрано. Р-2_05 «Готові до збирання» — колонки
+<!-- МЛП · index.html v122 · 13.11.2026 — меню й «Робота зі складом» (рішення 13.11): меню — Головна · Звіти · Помічник · Склад · Кабінет; «Склад» — усім,
+     хто бачить плитку «Робота зі складом» (було — лише зав. складу), вкладка підсвічується на сторінці складу. Індекси пунктів меню в режимі аналітика
+     (🏷 Індекси): Р-0_18.N телефон, Р-0_07.N ПК — 1 Головна, 2 Звіти / Мій виробіток, 3 Помічник, 4 Склад, 5 Кабінет, 6 Перевірка; натиснули — контекст у буфер.
+     Склад: «Прийміть на …» — один згорнутий блок з «!», як ящики ГП; «Робота зі складом» — третій зверху; під нею згорнуті «Мої переміщення»,
+     «Приходи від постачальників» (чекають документ — першими, позначка в заголовку), нове «Партії відвантаження клієнтам» (зібрані — чекають,
+     відвантажені й скасовані за 14 днів, Sklad.gs v24), далі «Усі записи».
+     index.html v121 · 12.11.2026 — Р-2 (рішення 12.11, для тімліда Жулян): вкладку «Гравіювання роторів» (v120) прибрано. Р-2_05 «Готові до збирання» — колонки
      «Статори, шт» і «Ротори, шт» замість «шт», рядок «Разом» (з них у партіях двигунів), і партії двигунів зі статорами / роторами, що чекають F1 (ротори — з гравіюванням,
      покупні — після F4п; Reports.gs cl.S / cl.R); картки «Статори / Ротори готові до збирання» — разом із деталями в партіях двигунів. Reports.gs v45.
      index.html v120 · 12.11.2026 — Р-2: вкладка «Гравіювання роторів» (прибрано у v121).
@@ -253,6 +259,8 @@
   .side a.on{background:#fff;box-shadow:0 1px 3px rgba(0,0,0,.08);font-weight:700}
   .side .sec{font-size:11px;text-transform:uppercase;letter-spacing:.06em;color:#66767F;padding:14px 12px 4px;font-weight:700}
   .side .code{font-size:11px;color:#66767F;font-weight:600;min-width:34px}
+  .nix{font:600 10px/1.5 ui-monospace,Menlo,Consolas,monospace;background:#FFF1D6;color:#8A5A00;border:1px solid #E0A400;border-radius:5px;padding:0 4px;cursor:copy;white-space:nowrap}   /* v122: індекс пункту меню */
+  .side a .nix,.side .sec .nix{margin-left:auto;text-transform:none;letter-spacing:0}.side .sec{display:flex;align-items:center}
   #app{flex:1;min-width:0;max-width:880px}
   .tabbar{display:none}
   body.nonav .side,body.nonav .tabbar{display:none!important}
@@ -264,6 +272,7 @@
     .tabbar a .i{display:block;height:24px;margin:0 auto 1px}
     .tabbar a .i svg{width:23px;height:23px;stroke:currentColor;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
     .tabbar a.on{color:#1D2B33;font-weight:700}
+    .tabbar a{position:relative}.tabbar a .nix{position:absolute;top:-9px;left:50%;transform:translateX(-50%);font-size:9px;z-index:2}   /* v122 */
     body:not(.nonav) .toast{bottom:78px}
   }
   /* v33: Головна (Р-0_05, Р-0_19, Р-0_15) */
@@ -682,7 +691,7 @@
 <div class="net" id="net" role="alert" aria-live="assertive"><div class="nb"><div class="rt" id="netr"></div><div class="nt" id="nett">Зберігаю…</div><div class="ns" id="nets"></div><div class="np"><i id="netp"></i></div><div class="nh" id="neth"></div><div class="zc" id="zc"></div><button class="nx" id="netx" type="button">Не чекати</button></div></div>
 
 <script>
-const PAGE_VERSION = 'index.html v121 · 12.11.2026';   // v121: Р-2_05 готові до збирання — статори й ротори окремо, разом, деталі в партіях двигунів; v120: (прибрано); v119: ящики ГП у «Перемістити» — за кнопкою; v118: кількість у списку, свіжі технічні назви, «Прийміть на …»; v117: вибір позиції — три рівні; v116: Р-15 цех — рівень 1; v115: Р-15 деревом, згорнуті блоки складу, дерево позицій, технічна назва; v114: вид — поле, пошук за ключовими словами; v113: групи й види номенклатури; v112: Р-15 — блоки згортаються; v111: Р-15 «Склад: залишки й рух»; v110: дії за типом локації, переміщення, партія покупцю; v109: кілька фото, тара, перемаркування; v108: приймання від постачальника, наліпки; v107: передачі склад → цех, ящики ГП приймає склад; v106: позиції складу за групами; v105: кнопки складу «Беремо зі складу» / «Приймаємо на склад»; v104: «Історія тари» (?th=) — назва тари на сторінці тари / партії веде на неї (Reports.gs v42)
+const PAGE_VERSION = 'index.html v122 · 13.11.2026';   // v122: меню — + Склад, порядок, індекси пунктів; склад — порядок блоків, «Прийміть» згорнуто, партії відвантаження; v121: Р-2_05 готові до збирання — статори й ротори окремо, разом, деталі в партіях двигунів; v120: (прибрано); v119: ящики ГП у «Перемістити» — за кнопкою; v118: кількість у списку, свіжі технічні назви, «Прийміть на …»; v117: вибір позиції — три рівні; v116: Р-15 цех — рівень 1; v115: Р-15 деревом, згорнуті блоки складу, дерево позицій, технічна назва; v114: вид — поле, пошук за ключовими словами; v113: групи й види номенклатури; v112: Р-15 — блоки згортаються; v111: Р-15 «Склад: залишки й рух»; v110: дії за типом локації, переміщення, партія покупцю; v109: кілька фото, тара, перемаркування; v108: приймання від постачальника, наліпки; v107: передачі склад → цех, ящики ГП приймає склад; v106: позиції складу за групами; v105: кнопки складу «Беремо зі складу» / «Приймаємо на склад»; v104: «Історія тари» (?th=) — назва тари на сторінці тари / партії веде на неї (Reports.gs v42)
 // v103 (11.11): Р-9_08 «За типом», «Перевірено, все ок»
 // v102 (09.11):   // v74: в1 — і з нашої тари (ящик залишків); в2 — лише партії в2
 // v72 (26.10):   // v72: «Яку партію відкриваємо?»; розшифровка кроків на картці партії; реєстрація — повернення за посиланням з форми
@@ -1374,7 +1383,7 @@ function whoHtml(me, perms, unknown) {
 // =============================================================== v33: ОБОЛОНКА — меню, шапка, Головна, сканер QR, довідка
 /** Роль і права для меню. Сторінки кабінету, звітів і складу не викликають apiPage, тож меню бере роль з пристрою (останнє відоме) */
 let NAV = (() => { try { return JSON.parse(store('mlp_nav') || '{}') || {}; } catch (e) { return {}; } })();
-const NAV_KEYS = ['step', 'separate', 'noBatch', 'sklad', 'dashStan', 'dashTare', 'dashMy', 'history', 'cabinet', 'dashOut', 'dashScrap', 'dashBatches', 'dashControl', 'retro', 'dashBoxes', 'assist', 'dashRecs', 'dashSklad'];   // v65: + assist (помічник)
+const NAV_KEYS = ['step', 'separate', 'noBatch', 'sklad', 'dashStan', 'dashTare', 'dashMy', 'history', 'cabinet', 'dashOut', 'dashScrap', 'dashBatches', 'dashControl', 'retro', 'dashBoxes', 'assist', 'dashRecs', 'dashSklad', 'baMode'];   // v65: + assist (помічник); v122: + baMode (індекси пунктів меню)
 function navSave(me, perms) {
   const n = { role: me.role, name: me.name, perms: NAV.perms || {} };
   if (perms) { n.perms = {}; NAV_KEYS.forEach(k => n.perms[k] = !!perms[k]); }
@@ -1425,24 +1434,43 @@ const NIC = {
   cab: '<svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="3.5"/><path d="M5 20c.8-3.6 3.6-5.5 7-5.5s6.2 1.9 7 5.5"/></svg>',
   ai: '<svg viewBox="0 0 24 24"><rect x="4.5" y="8" width="15" height="11" rx="3"/><path d="M12 8V5.2"/><circle cx="12" cy="4.2" r="1"/><circle cx="9.3" cy="13" r="1.1"/><circle cx="14.7" cy="13" r="1.1"/><path d="M9.8 16.2h4.4M2.5 12v3.5M21.5 12v3.5"/></svg>'   // v66: робот (було — хмаринка з іскрою)
 };
-/** Р-0_18 нижнє меню телефона і Р-0_07 ліве меню ПК — за роллю */
+/** v122: індекси пунктів меню (режим аналітика, як індекси блоків звітів): номер пункту однаковий в обох меню — Р-0_18.N телефон, Р-0_07.N ПК.
+ *  1 Головна · 2 Звіти (працівнику — Мій виробіток) · 3 Помічник · 4 Склад · 5 Кабінет · 6 Перевірка (Ретро-історія). Нові пункти — наступний номер, старі не перенумеровувати */
+const NAVIX = { home: [1, 'Головна'], rep: [2, 'Звіти'], my: [2, 'Мій виробіток'], ai: [3, 'Помічник'], sklad: [4, 'Склад'], cab: [5, 'Кабінет'], retro: [6, 'Перевірка · Ретро-історія'] };
+const navBa = () => !!(NAV.perms || {}).baMode && store('mlp_ba') === '1';
+function navIx(menu, k) { const x = NAVIX[k]; return x ? '<span class="nix" role="button" title="Натисніть — скопіювати контекст пункту для Claude" onclick="return navIxCopy(event,\'' + menu + '\',\'' + k + '\')">' + menu + '.' + x[0] + '</span>' : ''; }
+function navIxCopy(e, menu, k) {
+  e.preventDefault(); e.stopPropagation();
+  const x = NAVIX[k] || [0, k], host = menu === 'Р-0_18' ? $('tabbar') : $('side');
+  const seen = host ? [...host.querySelectorAll('a,.sec')].map(n => { const c = n.cloneNode(true); c.querySelectorAll('.nix,svg').forEach(z => z.remove()); return baTxt(c).replace(/\n/g, ' '); }).filter(Boolean).join(' · ') : '';
+  const txt = ['[МЛП · ' + menu + '.' + x[0] + '] ' + x[1] + ' — пункт ' + (menu === 'Р-0_18' ? 'нижнього меню телефона' : 'лівого меню ПК') + ' (' + menu + ')',
+    'Екран зараз: ' + ($('hdrTitle').textContent || '') + ' · ' + (location.search || '?'),
+    'Версія: ' + PAGE_VERSION, 'Роль: ' + (NAV.role || '—'), seen ? 'У меню: ' + seen : ''].filter(Boolean).join('\n');
+  baClip(txt, () => toast('Скопійовано: ' + menu + '.' + x[0] + ' — вставте в чат'));
+  return false;
+}
+/** Р-0_18 нижнє меню телефона і Р-0_07 ліве меню ПК — за роллю. v122 (рішення 13.11): порядок Головна · Звіти · Помічник · Склад · Кабінет;
+ *  «Склад» — усім, хто бачить плитку «Робота зі складом» (доступ «Склад» або тімлід / зав. виробництва / адміністратор / бухгалтер) */
 function navRender() {
   const side = $('side'), tb = $('tabbar'); if (!side || !tb) return;
-  const worker = NAV.role === 'працівник', reps = navReports(), p = NAV.perms || {};
+  const worker = NAV.role === 'працівник', reps = navReports(), p = NAV.perms || {}, ba = navBa();
+  const skOn = !!p.sklad || ['тімлід', 'зав. виробництва', 'адміністратор', 'бухгалтер'].indexOf(NAV.role) >= 0;   // v122: як плитка на головній (skRecv)
   const curD = PARAMS.d || '';
-  const a = (href, inner, on) => '<a href="' + esc(link(href)) + '" class="' + (on ? 'on' : '') + '">' + inner + '</a>';
-  let h = a('', '<span>⌂</span>Головна', VIEW === 'home') + (p.assist ? a('ai=1', '<span>🤖</span>Помічник', VIEW === 'ai') : '') + a('cab=1', '<span>☰</span>Кабінет', VIEW === 'cab');   // v65: + Помічник
-  if (worker && p.dashMy) h += '<div class="sec">Звіти</div>' + a('d=my', '<span class="code">Р-8с</span>Мій виробіток', curD === 'my') + (p.dashRecs ? a('d=recs', '<span class="code">Р-14</span>Мої записи', curD === 'recs') : '');
-  else if (reps.length) h += '<div class="sec">Звіти</div>' + reps.map((x, i) => (repGap(reps, i) ? '<div class="rgap"></div>' : '') + a(x[0], '<span class="code">' + DASHT[x[1]][0] + '</span>' + (x[3] === 0 ? '<b>' + DASHT[x[1]][1] + (x[2] || '') + '</b>' : DASHT[x[1]][1] + (x[2] || '')), curD === x[1])).join('');   // v71
-  if (p.retro) h += '<div class="sec">Перевірка</div>' + a('rh=1', '<span>📄</span>Ретро-історія', VIEW === 'retro');   // v53
+  const a = (href, inner, on, k) => '<a href="' + esc(link(href)) + '" class="' + (on ? 'on' : '') + '">' + inner + (ba && k ? navIx('Р-0_07', k) : '') + '</a>';
+  const sec = (t, k) => '<div class="sec">' + t + (ba ? navIx('Р-0_07', k) : '') + '</div>';
+  let h = a('', '<span>⌂</span>Головна', VIEW === 'home', 'home') + (p.assist ? a('ai=1', '<span>🤖</span>Помічник', VIEW === 'ai', 'ai') : '') +
+    (skOn ? a('sklad=1', '<span>▦</span>Склад', VIEW === 'sklad', 'sklad') : '') + a('cab=1', '<span>☰</span>Кабінет', VIEW === 'cab', 'cab');   // v65: + Помічник; v122: + Склад
+  if (worker && p.dashMy) h += sec('Звіти', 'my') + a('d=my', '<span class="code">Р-8с</span>Мій виробіток', curD === 'my') + (p.dashRecs ? a('d=recs', '<span class="code">Р-14</span>Мої записи', curD === 'recs') : '');
+  else if (reps.length) h += sec('Звіти', 'rep') + reps.map((x, i) => (repGap(reps, i) ? '<div class="rgap"></div>' : '') + a(x[0], '<span class="code">' + DASHT[x[1]][0] + '</span>' + (x[3] === 0 ? '<b>' + DASHT[x[1]][1] + (x[2] || '') + '</b>' : DASHT[x[1]][1] + (x[2] || '')), curD === x[1])).join('');   // v71
+  if (p.retro) h += sec('Перевірка', 'retro') + a('rh=1', '<span>📄</span>Ретро-історія', VIEW === 'retro');   // v53
   side.innerHTML = h;
-  const tabs = [['', NIC.home, 'Головна', VIEW === 'home']];
-  if (worker && p.dashMy) tabs.push(['d=my', NIC.work, 'Мій виробіток', VIEW === 'my']);
-  else if (reps.length) tabs.push(['r=1', NIC.rep, 'Звіти', VIEW === 'rep']);
-  if (p.sklad && !p.step) tabs.push(['sklad=1', NIC.sklad, 'Склад', false]);   // зав. складу; v57: і «Звіти» (Р-12)
-  if (p.assist) tabs.push(['ai=1', NIC.ai, 'Помічник', VIEW === 'ai']);   // v65
-  tabs.push(['cab=1', NIC.cab, 'Кабінет', VIEW === 'cab']);
-  tb.innerHTML = tabs.map(x => '<a href="' + esc(link(x[0])) + '" class="' + (x[3] ? 'on' : '') + '"><span class="i">' + x[1] + '</span>' + x[2] + '</a>').join('');
+  const tabs = [['', NIC.home, 'Головна', VIEW === 'home', 'home']];
+  if (worker && p.dashMy) tabs.push(['d=my', NIC.work, 'Мій виробіток', VIEW === 'my', 'my']);
+  else if (reps.length) tabs.push(['r=1', NIC.rep, 'Звіти', VIEW === 'rep', 'rep']);
+  if (p.assist) tabs.push(['ai=1', NIC.ai, 'Помічник', VIEW === 'ai', 'ai']);   // v65
+  if (skOn) tabs.push(['sklad=1', NIC.sklad, 'Склад', VIEW === 'sklad', 'sklad']);   // v122: після «Помічника», усім зі складською плиткою (було — лише зав. складу)
+  tabs.push(['cab=1', NIC.cab, 'Кабінет', VIEW === 'cab', 'cab']);
+  tb.innerHTML = tabs.map(x => '<a href="' + esc(link(x[0])) + '" class="' + (x[3] ? 'on' : '') + '">' + (ba ? navIx('Р-0_18', x[4]) : '') + '<span class="i">' + x[1] + '</span>' + x[2] + '</a>').join('');
   $('backBtn').classList.toggle('hid', VIEW === 'home' && !location.search.replace(/^\?$/, ''));
 }
 /** v33: список звітів ролі (вкладка «Звіти» на телефоні) */
@@ -5438,7 +5466,7 @@ function renderTareHist() {
 let SKD = null;                 // дані від сервера
 let SKF = { photos: [], raw: '', busy: null };   // v109: кілька фото   // фото поточного запису; busy — запит фото, що ще йде
 function loadSklad() {
-  setView('', 'Робота зі складом', 'home');
+  setView('', 'Робота зі складом', 'sklad');   // v122: активна вкладка «Склад»
   $('app').innerHTML = '<div class="center muted">Завантаження…</div>';
   google.script.run.withSuccessHandler(d => { SKD = d; renderSklad(); })
     .withFailureHandler(e => {
@@ -5458,20 +5486,20 @@ function skNum(n) { return String(n).replace('.', ','); }
 // склад: Перемістити (куди: цех / склад / віртуальна) · Прийняти (від постачальника, ГП з виробництва) · Покупцю (зібрати → відвантажити)
 // цех: Перемістити на склад (свій) або у відділ якості, РнД, Антону · Ящик ГП на склад
 let SKS = { loc: '', act: '' };
-let SKBX = false, SKREC = false;   // v115: згорнуті блоки «Ящики ГП чекають прийняття» і «Усі записи» (розгорнули — тримаємо, поки сторінка відкрита)
+let SKBX = false, SKREC = false, SKIN = false;   // v115: згорнуті блоки «Ящики ГП чекають прийняття» і «Усі записи» (розгорнули — тримаємо, поки сторінка відкрита); v122: + «Прийміть на …»
 const skLocOf = c => (SKD.locs || []).find(l => l.code === c) || { code: c, name: c, kind: '' };
 const skLocLab = l => l.code + (l.name && l.name !== l.code ? ' · ' + l.name : '');
 function renderSklad() {
   const d = SKD, me = d.me;
   $('who').innerHTML = esc(me.name) + '<br>' + esc(me.role);
-  setView(d.loc ? d.loc.code : '', 'Робота зі складом', 'home');
+  setView(d.loc ? d.loc.code : '', 'Робота зі складом', 'sklad');   // v122
   if (d.loc && !SKS.loc) SKS.loc = d.loc.code;
   const locs = (d.locs || []).filter(l => l.kind !== 'virt');
   const grp = (k, t) => { const a = locs.filter(l => l.kind === k); return a.length ? '<optgroup label="' + t + '">' + a.map(l => '<option value="' + esc(l.code) + '"' + (l.code === SKS.loc ? ' selected' : '') + '>' + esc(skLocLab(l)) + '</option>').join('') + '</optgroup>' : ''; };
   let h = '<div id="skIn"></div><div class="card"><div class="mid">Робота зі складом</div>' +
     '<label>Де я / звідки</label><select id="skLoc" data-nocbx><option value="">— оберіть локацію —</option>' + grp('wh', 'Склади') + grp('shop', 'Цехи') + '</select>' +
     '<div id="skActs"></div><div id="skPanel"></div><div class="err" id="err"></div></div>';
-  h += '<div id="skMy"></div><p class="muted" style="text-align:center">' + esc(PAGE_VERSION) + ' · ' + esc(d.version) + '</p><div style="height:20px"></div>';
+  h += '<div id="skLog"></div><div id="skMy"></div><p class="muted" style="text-align:center">' + esc(PAGE_VERSION) + ' · ' + esc(d.version) + '</p><div style="height:20px"></div>';
   $('app').innerHTML = h;
   $('skLoc').onchange = () => { SKS.loc = $('skLoc').value; SKS.act = ''; skActsDraw(); renderSkIn(); };
   renderSkMy(); renderSkIn(); skActsDraw(); skPpParam(); skVpParam();
@@ -5880,25 +5908,31 @@ function skCancel(id) {
 }
 /** v43: зав. складу — виправити запис (форма з тими самими полями; час і працівник не змінюються) */
 // =============================================================== v107: ПЕРЕДАЧІ СКЛАД → ЦЕХ, ЯЩИКИ ГП У 2 КРОКИ (Sklad.gs v11)
-/** Верх «Роботи зі складом»: вам передали (прийняти), ящики ГП до прийняття (склад), «Передати в цех», мої передачі */
+/** Верх «Роботи зі складом»: прийміть на … і ящики ГП до прийняття (згорнуті). v122 (рішення 13.11): блоки «Робота зі складом» — третій зверху;
+ *  під ним (#skLog, згорнуті): мої переміщення · приходи від постачальників (з тими, що чекають документ) · партії відвантаження клієнтам · далі «Усі записи» */
 function renderSkIn() {
   const box = $('skIn'); if (!box) return;
   const d = SKD, x = d.inbox || { inbox: [], sent: [], boxes: [] };
   const L = SKS.loc, inb = x.inbox.filter(t => !L || t.to === L), bxs = x.boxes.filter(b => !L || b.loc === L);   // v110: для обраної локації
   let h = '';
-  inb.forEach(t => {
-    const twh = (d.whLocs || []).some(l => l.code === t.to);   // v118: «Вам» — хто приймає: на склад — будь-хто зі складу, у цех — тімлід цеху
-    h += '<div class="card" style="border:2px solid #E0A400"><div class="mid">📥 Прийміть на ' + esc(t.toName || t.to) + ' · ' + esc(t.id) + '</div>' +
-      '<div class="muted" style="font-size:13px">Бачать і можуть прийняти: ' + (twh ? 'усі працівники складу' : 'тімлід цеху') + ' — приймає той, хто фізично отримав</div>' +
-      '<div class="muted">' + esc(t.who) + ' · ' + esc(t.time) + ' · ' + esc(t.fromName) + ' → <b>' + esc(t.toName) + '</b>' + (t.comment ? '<br>' + esc(t.comment) : '') + '</div>' +
-      '<div class="list" style="padding:0;margin-top:8px">' + t.lines.map(l => '<div class="li"><div><b>' + esc(l.pos) + '</b>' + (l.det ? '<br><span class="muted">' + esc(l.det) + '</span>' : '') +
-        '<br><span class="muted">передали: <b>' + esc(skNum(l.qty)) + '</b> ' + esc(l.unit) + '</span></div>' +
-        (l.box ? '<div class="r" style="flex:0 0 auto"><label style="white-space:nowrap"><input type="checkbox" id="ta_' + esc(t.id) + '_' + l.n + '" checked style="transform:scale(1.4);margin-right:6px">є</label></div></div>'   // v110: ящик — є / немає
-          : '<div class="r" style="flex:0 0 120px"><input type="text" inputmode="decimal" id="ta_' + esc(t.id) + '_' + l.n + '" placeholder="' + esc(skNum(l.qty)) + '" style="font-size:18px;text-align:right;margin:0"></div></div>')).join('') + '</div>' +
-      '<p class="muted" style="margin:6px 0 0">Порожнє поле — прийшло стільки, скільки передали. Інакше впишіть, скільки фактично (можна 0).</p>' +
-      '<label>Коментар <span class="muted">(якщо є розбіжність)</span></label><input type="text" id="tc_' + esc(t.id) + '">' +
-      '<button class="btn" onclick="skAccept(\'' + esc(t.id) + '\',this)">Прийняти</button></div>';
-  });
+  if (inb.length) {   // v122: один згорнутий блок, як «Ящики ГП чекають прийняття»
+    const tn = [...new Set(inb.map(t => t.toName || t.to))];
+    h += '<details class="card skwarn"' + (SKIN ? ' open' : '') + ' ontoggle="SKIN=this.open"><summary class="mid"><span class="skx">!</span>📥 Прийміть' + (tn.length === 1 ? ' на ' + esc(tn[0]) : '') + ': ' + inb.length + '</summary>';
+    inb.forEach(t => {
+      const twh = (d.whLocs || []).some(l => l.code === t.to);   // v118: хто приймає: на склад — будь-хто зі складу, у цех — тімлід цеху
+      h += '<div style="border:2px solid #E0A400;border-radius:12px;padding:10px 12px;margin-top:10px"><div class="mid">📥 Прийміть на ' + esc(t.toName || t.to) + ' · ' + esc(t.id) + '</div>' +
+        '<div class="muted" style="font-size:13px">Бачать і можуть прийняти: ' + (twh ? 'усі працівники складу' : 'тімлід цеху') + ' — приймає той, хто фізично отримав</div>' +
+        '<div class="muted">' + esc(t.who) + ' · ' + esc(t.time) + ' · ' + esc(t.fromName) + ' → <b>' + esc(t.toName) + '</b>' + (t.comment ? '<br>' + esc(t.comment) : '') + '</div>' +
+        '<div class="list" style="padding:0;margin-top:8px">' + t.lines.map(l => '<div class="li"><div><b>' + esc(l.pos) + '</b>' + (l.det ? '<br><span class="muted">' + esc(l.det) + '</span>' : '') +
+          '<br><span class="muted">передали: <b>' + esc(skNum(l.qty)) + '</b> ' + esc(l.unit) + '</span></div>' +
+          (l.box ? '<div class="r" style="flex:0 0 auto"><label style="white-space:nowrap"><input type="checkbox" id="ta_' + esc(t.id) + '_' + l.n + '" checked style="transform:scale(1.4);margin-right:6px">є</label></div></div>'   // v110: ящик — є / немає
+            : '<div class="r" style="flex:0 0 120px"><input type="text" inputmode="decimal" id="ta_' + esc(t.id) + '_' + l.n + '" placeholder="' + esc(skNum(l.qty)) + '" style="font-size:18px;text-align:right;margin:0"></div></div>')).join('') + '</div>' +
+        '<p class="muted" style="margin:6px 0 0">Порожнє поле — прийшло стільки, скільки передали. Інакше впишіть, скільки фактично (можна 0).</p>' +
+        '<label>Коментар <span class="muted">(якщо є розбіжність)</span></label><input type="text" id="tc_' + esc(t.id) + '">' +
+        '<button class="btn" onclick="skAccept(\'' + esc(t.id) + '\',this)">Прийняти</button></div>';
+    });
+    h += '</details>';
+  }
   if (d.isWh && bxs.length) {
     h += '<details class="card skwarn"' + (SKBX ? ' open' : '') + ' ontoggle="SKBX=this.open"><summary class="mid"><span class="skx">!</span>📦 Ящики ГП чекають прийняття' + (L ? ' на ' + esc(L) : ' складом') + ': ' + bxs.length + '</summary>' +   // v115: згорнуто, червоний «!»
       '<p class="muted" style="margin:4px 0 0">Перевірте, що ящик справді на складі, і прийміть. Немає — позначте «Немає на складі»: тімлідам піде лист.</p>' +
@@ -5907,21 +5941,36 @@ function renderSkIn() {
         '<br><span class="muted">' + esc(b.loc) + ' · ' + esc(b.time) + ' · ' + esc(b.auto ? 'авто після пакування · ' + b.who : b.who) + '</span></label>').join('') +
       '<div class="grid" style="margin-top:10px"><button class="btn btn2" onclick="skBoxNone()">Немає на складі</button><button class="btn" onclick="skBoxAcc(this)">Прийняти вибрані</button></div></details>';
   }
-  if ((x.docs || []).length) h += '<div class="card" style="border:2px solid #E0A400"><div class="mid">📄 Чекають документ: ' + x.docs.length + '</div>' +   // v108
-    x.docs.map(p => '<div class="li" style="padding:8px 0"><div><b>' + esc(p.pr) + '</b> · ' + esc(p.time.slice(0, 5)) + ' · ' + esc(p.supplier) + (p.docNo ? ' · ' + esc(p.docNo) : '') +
-      '<br><span class="muted">' + esc(p.who) + ' · ' + esc(p.lines.map(l => l.pos + ' ' + skNfmt(l.qty) + ' ' + l.unit).join('; ')) + '</span></div>' +
-      '<div class="r"><button class="ic" onclick="skDocOpen(\'' + esc(p.pr) + '\')">📄</button></div></div>').join('') + '</div>';
-  const sh = (x.ships || []).filter(s => !L || s.loc === L);   // v110: партії покупцю, що чекають відвантаження
-  if (sh.length && SKS.act !== 'ship') h += '<div class="card"><div class="mid">🚚 Зібрано, чекає відвантаження: ' + sh.length + '</div><div class="list" style="padding:0">' + sh.map(skShipLi).join('') + '</div></div>';
-  if (x.sent.length) h += '<details style="margin:0 12px"><summary>Мої переміщення (' + x.sent.length + (x.sent.some(t => t.status === 'в дорозі') ? ', в дорозі: ' + x.sent.filter(t => t.status === 'в дорозі').length : '') + ')</summary>' +
-    '<div class="list">' + x.sent.map(t => '<div class="li"><div><b>' + esc(t.id) + '</b> → ' + esc(t.toName) + ' · <span class="pill' + (t.status === 'в дорозі' ? ' warn' : t.status === 'прийнято' ? ' ok' : '') + '" style="margin:0">' + esc(t.status) + '</span>' +
+  box.innerHTML = h;
+  renderSkLog();
+}
+/** v122: під «Роботою зі складом» — мої переміщення, приходи від постачальників, партії відвантаження клієнтам (усі згорнуті; що чекає дії — помаранчева позначка в заголовку) */
+let SKLG = {};   // які з цих блоків розгорнуто (тримаємо, поки сторінка відкрита)
+function renderSkLog() {
+  const box = $('skLog'); if (!box) return;
+  const x = SKD.inbox || {}, L = SKS.loc, sent = x.sent || [], docs = x.docs || [], rcv = x.rcv || [];
+  const fold = (k, title, body) => '<details style="margin:0 12px"' + (SKLG[k] ? ' open' : '') + ' ontoggle="SKLG.' + k + '=this.open"><summary>' + title + '</summary>' + body + '</details>';
+  const warn = t => ' <span class="pill warn" style="margin:0;font-size:13px">' + t + '</span>';
+  let h = '';
+  if (sent.length) h += fold('tr', 'Мої переміщення (' + sent.length + ')' + (sent.some(t => t.status === 'в дорозі') ? warn('в дорозі: ' + sent.filter(t => t.status === 'в дорозі').length) : ''),
+    '<div class="list">' + sent.map(t => '<div class="li"><div><b>' + esc(t.id) + '</b> → ' + esc(t.toName) + ' · <span class="pill' + (t.status === 'в дорозі' ? ' warn' : t.status === 'прийнято' ? ' ok' : '') + '" style="margin:0">' + esc(t.status) + '</span>' +
       '<br><span class="muted">' + esc(t.who) + ' · ' + esc(t.time) + (t.by ? ' · прийняв(ла) ' + esc(t.by) + ' ' + esc(t.at) : '') + '</span>' +
       t.lines.map(l => '<div class="muted">' + esc(l.pos) + ' — ' + esc(skNum(l.qty)) + ' ' + esc(l.unit) + (l.got !== null && l.got !== l.qty ? ' · <b style="color:#9B231A">прийнято ' + esc(skNum(l.got)) + '</b>' : '') + (l.note ? ' · ' + esc(l.note) : '') + '</div>').join('') + '</div>' +
-      (t.canCancel ? '<div class="r"><button class="ic" onclick="skTrCancel(\'' + esc(t.id) + '\')">✖</button></div>' : '') + '</div>').join('') + '</div></details>';
-  if ((x.rcv || []).length) h += '<details style="margin:0 12px"><summary>Приходи від постачальників (' + x.rcv.length + ')</summary><div class="list">' +   // v108
-    x.rcv.map(p => '<div class="li" onclick="skPpShow(SKD.inbox.rcv.find(z => z.pr === \'' + esc(p.pr) + '\'))" style="cursor:pointer"><div><b>' + esc(p.pr) + '</b> · ' + esc(p.supplier) +
+      (t.canCancel ? '<div class="r"><button class="ic" onclick="skTrCancel(\'' + esc(t.id) + '\')">✖</button></div>' : '') + '</div>').join('') + '</div>');
+  if (docs.length || rcv.length) h += fold('pr', 'Приходи від постачальників (' + rcv.length + ')' + (docs.length ? warn('чекають документ: ' + docs.length) : ''),   // v108; v122: «Чекають документ» — тут, першими
+    (docs.length ? '<div class="list" style="border-left:3px solid #E0A400">' + docs.map(p => '<div class="li"><div><b>' + esc(p.pr) + '</b> · ' + esc(p.time.slice(0, 5)) + ' · ' + esc(p.supplier) + (p.docNo ? ' · ' + esc(p.docNo) : '') +
+      ' · <span class="pill warn" style="margin:0">чекає документ</span><br><span class="muted">' + esc(p.who) + ' · ' + esc(p.lines.map(l => l.pos + ' ' + skNfmt(l.qty) + ' ' + l.unit).join('; ')) + '</span></div>' +
+      '<div class="r"><button class="ic" title="Додати документ" onclick="skDocOpen(\'' + esc(p.pr) + '\')">📄</button></div></div>').join('') + '</div>' : '') +
+    (rcv.length ? '<div class="list">' + rcv.map(p => '<div class="li" onclick="skPpShow(SKD.inbox.rcv.find(z => z.pr === \'' + esc(p.pr) + '\'))" style="cursor:pointer"><div><b>' + esc(p.pr) + '</b> · ' + esc(p.supplier) +
       ' · <span class="pill' + (p.doc === 'очікується' ? ' warn' : '') + '" style="margin:0">док.: ' + esc(p.doc) + '</span><br><span class="muted">' + esc(p.time) + ' · ' + esc(p.who) + ' · ' +
-      esc(p.lines.map(l => l.pp + ' ' + l.pos + ' ' + skNfmt(l.qty) + ' ' + l.unit).join('; ')) + '</span></div></div>').join('') + '</div></details>';
+      esc(p.lines.map(l => l.pp + ' ' + l.pos + ' ' + skNfmt(l.qty) + ' ' + l.unit).join('; ')) + '</span></div></div>').join('') + '</div>' : ''));
+  const sh = (x.ships || []).filter(s => !L || s.loc === L), done = (x.shipped || []).filter(s => !L || s.loc === L);   // v122: зібрані (чекають) + відвантажені / скасовані за 14 днів (Sklad.gs v24)
+  if (sh.length || done.length) h += fold('vp', 'Партії відвантаження клієнтам (' + (sh.length + done.length) + ')' + (sh.length ? warn('чекають відвантаження: ' + sh.length) : ''),
+    (sh.length ? '<div class="list" style="border-left:3px solid #E0A400">' + sh.map(skShipLi).join('') + '</div>' : '') +
+    (done.length ? '<div class="list">' + done.map((s, i) => '<div class="li" style="cursor:pointer" onclick="skShipShow(SKD.inbox.shipped[' + (x.shipped || []).indexOf(s) + '])"><div style="min-width:0"><b>' + esc(s.id) + '</b> · ' + esc(s.comment) +
+      ' · <span class="pill' + (s.status === 'відвантажено' ? ' ok' : '') + '" style="margin:0">' + esc(s.status) + '</span>' +
+      '<br><span class="muted">' + (s.at ? '🚚 ' + esc(s.at) + ' · ' + esc(s.by) : esc(s.time) + ' · ' + esc(s.who)) + ' · ' + esc(s.locName || s.loc) + ' · ' + s.lines.length + ' ящ. · ' + skNfmt(s.qty) + ' шт' + (s.files && s.files.length ? ' · 📎' + s.files.length : '') + '</span>' +
+      s.totals.map(t => '<div class="muted">' + esc(t.mark) + ' — <b>' + skNfmt(t.qty) + '</b></div>').join('') + '</div></div>').join('') + '</div>' : ''));
   box.innerHTML = h;
 }
 /** v108: відкрито з QR наліпки — картка приходу */
