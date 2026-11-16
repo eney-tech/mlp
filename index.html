@@ -1,5 +1,8 @@
 <!DOCTYPE html>
-<!-- МЛП · index.html v124 · 15.11.2026 — «⏭ Пропустити крок» — і працівнику, але лише для кроків SKIP_ANY (зараз OV3 «Піч 3» у 3115; Code.gs v113):
+<!-- МЛП · index.html v125 · 16.11.2026 — переміщення: технічна назва (рівень 1) з того, що лежить на локації-джерелі (рішення 16.11; Sklad.gs v29):
+     одна назва з залишком — обрана сама; кілька — замість одного поля кількості показуємо назви з залишком і поле на кожну — розподілити
+     (кожна назва — окремий рядок переміщення). Р-15: цех без інвентаризації (П3) — залишок з переміщень (прийнято − передано), без норм.
+     index.html v124 · 15.11.2026 — «⏭ Пропустити крок» — і працівнику, але лише для кроків SKIP_ANY (зараз OV3 «Піч 3» у 3115; Code.gs v113):
      у списку — тільки такі кроки, причина необов'язкова; тімлід і вище — як раніше, будь-який крок з причиною (perms.skipAll).
      index.html v123 · 13.11.2026 — «🎨 Колір» і на картці партії двигунів (тімлід і вище; кольори роторів, Code.gs v110).
      index.html v122 · 13.11.2026 — меню й «Робота зі складом» (рішення 13.11): меню — Головна · Звіти · Помічник · Склад · Кабінет; «Склад» — усім,
@@ -694,7 +697,7 @@
 <div class="net" id="net" role="alert" aria-live="assertive"><div class="nb"><div class="rt" id="netr"></div><div class="nt" id="nett">Зберігаю…</div><div class="ns" id="nets"></div><div class="np"><i id="netp"></i></div><div class="nh" id="neth"></div><div class="zc" id="zc"></div><button class="nx" id="netx" type="button">Не чекати</button></div></div>
 
 <script>
-const PAGE_VERSION = 'index.html v124 · 15.11.2026';   // v122: меню — + Склад, порядок, індекси пунктів; склад — порядок блоків, «Прийміть» згорнуто, партії відвантаження; v121: Р-2_05 готові до збирання — статори й ротори окремо, разом, деталі в партіях двигунів; v120: (прибрано); v119: ящики ГП у «Перемістити» — за кнопкою; v118: кількість у списку, свіжі технічні назви, «Прийміть на …»; v117: вибір позиції — три рівні; v116: Р-15 цех — рівень 1; v115: Р-15 деревом, згорнуті блоки складу, дерево позицій, технічна назва; v114: вид — поле, пошук за ключовими словами; v113: групи й види номенклатури; v112: Р-15 — блоки згортаються; v111: Р-15 «Склад: залишки й рух»; v110: дії за типом локації, переміщення, партія покупцю; v109: кілька фото, тара, перемаркування; v108: приймання від постачальника, наліпки; v107: передачі склад → цех, ящики ГП приймає склад; v106: позиції складу за групами; v105: кнопки складу «Беремо зі складу» / «Приймаємо на склад»; v104: «Історія тари» (?th=) — назва тари на сторінці тари / партії веде на неї (Reports.gs v42)
+const PAGE_VERSION = 'index.html v125 · 16.11.2026';   // v122: меню — + Склад, порядок, індекси пунктів; склад — порядок блоків, «Прийміть» згорнуто, партії відвантаження; v121: Р-2_05 готові до збирання — статори й ротори окремо, разом, деталі в партіях двигунів; v120: (прибрано); v119: ящики ГП у «Перемістити» — за кнопкою; v118: кількість у списку, свіжі технічні назви, «Прийміть на …»; v117: вибір позиції — три рівні; v116: Р-15 цех — рівень 1; v115: Р-15 деревом, згорнуті блоки складу, дерево позицій, технічна назва; v114: вид — поле, пошук за ключовими словами; v113: групи й види номенклатури; v112: Р-15 — блоки згортаються; v111: Р-15 «Склад: залишки й рух»; v110: дії за типом локації, переміщення, партія покупцю; v109: кілька фото, тара, перемаркування; v108: приймання від постачальника, наліпки; v107: передачі склад → цех, ящики ГП приймає склад; v106: позиції складу за групами; v105: кнопки складу «Беремо зі складу» / «Приймаємо на склад»; v104: «Історія тари» (?th=) — назва тари на сторінці тари / партії веде на неї (Reports.gs v42)
 // v103 (11.11): Р-9_08 «За типом», «Перевірено, все ок»
 // v102 (09.11):   // v74: в1 — і з нашої тари (ящик залишків); в2 — лише партії в2
 // v72 (26.10):   // v72: «Яку партію відкриваємо?»; розшифровка кроків на картці партії; реєстрація — повернення за посиланням з форми
@@ -5107,14 +5110,16 @@ function r15() {
     r.c[loc] = (r.c[loc] || 0) + q; if (extra) { if (extra.flag) r.flag[loc] = 1; if (extra.tip) r.tip[loc] = extra.tip; }
     const tn = det || (extra && extra.tn) || '(без деталей)', t = r.t[tn] = r.t[tn] || { c: {} }; t.c[loc] = (t.c[loc] || 0) + q; };
   x.bal.forEach(b => { if (D.locs.indexOf(b[0]) >= 0 && skLocOf15(x, b[0]) === 'wh') add(b[0], b[1], b[2], b[3], b[4]); });   // цехи — лише розрахунок цеху (нижче)
-  const shopFlags = [];
+  const shopFlags = [], noInvShops = [];   // v125: цехи без інвентаризації — залишок з переміщень
   x.shops.forEach(s => { if (D.locs.indexOf(s.code) < 0) return; s.rows.forEach(r => { const fl = r[4] !== null && r[4] < 1;
     if (fl && pass(r[0], '')) shopFlags.push([s, r]);
-    const ex = { flag: fl, tip: 'за день ' + nf(Math.round(r[3])) + ' · на ' + (r[4] === null ? '—' : String(r[4]).replace('.', ',')) + ' дн.' + (r[5] ? ' · в дорозі ' + nf(r[5]) : '') };
+    const ex = { flag: fl, tip: s.noInv ? 'без інвентаризації: прийнято − передано, витрата за нормами не віднімається' + (r[5] ? ' · в дорозі ' + nf(r[5]) : '') :   // v125
+      'за день ' + nf(Math.round(r[3])) + ' · на ' + (r[4] === null ? '—' : String(r[4]).replace('.', ',')) + ' дн.' + (r[5] ? ' · в дорозі ' + nf(r[5]) : '') };
     // v116: рівень 1 — технічні назви з інвентаризації ± переміщень (Sklad.gs v20); решта (норми, рух без назви) — окремим рядком
     const ts = r[8] || []; let left = r[1];
     ts.forEach(t => { add(s.code, r[0], t[0], t[1], r[2], ex); left -= t[1]; });
     if (!ts.length || Math.abs(left) > 1e-6) add(s.code, r[0], '', Math.round(left * 1000) / 1000, r[2], Object.assign({ tn: ts.length ? 'інше: витрата за нормами, рух без технічної назви' : 'без технічної назви (інвентаризація + рух − норми)' }, ex)); }); });
+  x.shops.forEach(s => { if (s.noInv && s.rows.length && D.locs.indexOf(s.code) >= 0) noInvShops.push(s.code); });   // v125
   if (pass('ГП', '')) x.gp.forEach(g => { if (D.locs.indexOf(g[0]) >= 0) add(g[0], 'ГП', g[1], g[4], 'шт', { tip: g[3] + ' ящ.' }); });
   const cols = locs.filter(l => D.locs.indexOf(l[0]) >= 0), nz = c => cols.some(l => Math.abs(c[l[0]] || 0) > 1e-9);
   const GO = (x.groups || []).concat(['Інше']).filter((g, i, a) => a.indexOf(g) === i);
@@ -5161,13 +5166,13 @@ function r15() {
     });
   });
   h += '<div class="r15fa"><button type="button" onclick="r15FoldAll(false)">▸ Згорнути всі</button><button type="button" onclick="r15FoldAll(true)">▾ Розгорнути всі</button></div>';
-  h += fold('r15map', 'Що де лежить', rows.length + ' поз.', 'Склади — прийшло − пішло за журналом з ' + esc(x.from.split('-').reverse().join('.')) + '; цехи 🏭 — інвентаризація + переміщення − витрата за нормами; ГП — ящики МЛП. ▸ — розгорнути: група → уніфікована назва → технічна назва (як записано на складі). Колір — частка позиції на локації.',
+  h += fold('r15map', 'Що де лежить', rows.length + ' поз.', 'Склади — прийшло − пішло за журналом з ' + esc(x.from.split('-').reverse().join('.')) + '; цехи 🏭 — інвентаризація + переміщення − витрата за нормами' + (noInvShops.length ? ' (' + esc(noInvShops.join(', ')) + ' — інвентаризації немає: лише прийнято − передано, без витрати за нормами)' : '') + '; ГП — ящики МЛП. ▸ — розгорнути: група → уніфікована назва → технічна назва (як записано на складі). Колір — частка позиції на локації.',
     rows.length ? '<div class="r15w"><table class="r15t"><thead><tr><th>Група · уніфікована · технічна</th>' + cols.map(c => '<th title="' + esc(c[1]) + '">' + esc(c[0]) + (c[2] === 'shop' ? ' 🏭' : '') + '</th>').join('') + '<th>Од.</th></tr></thead><tbody>' +
       body + '</tbody></table></div>' + (shown > showN ? '<p class="muted">Показано ' + showN + ' з ' + shown + ' позицій — звузьте фільтри.</p>' : '')
       : '<p class="muted">Нічого не знайдено за фільтрами.</p>');
   // 2) цехи: на скільки днів
   x.shops.filter(s => D.locs.indexOf(s.code) >= 0).forEach(s => {
-    if (s.noInv) { h += fold('r15shop' + s.code, '🏭 ' + esc(s.name) + ': на скільки днів', 'немає інвентаризації', '', '<p class="muted">Інвентаризації цеху ще немає — залишок не рахується. Порахуйте, що лежить у цеху (як Юля в Жулянах), — і тут з\'являться дні й 🚩.</p>'); return; }
+    if (s.noInv) { h += fold('r15shop' + s.code, '🏭 ' + esc(s.name) + ': на скільки днів', 'немає інвентаризації', '', '<p class="muted">Інвентаризації цеху ще немає — у таблиці вище лише прийнято − передано (без витрати за нормами), днів і 🚩 немає. Порахуйте, що лежить у цеху (як Юля в Жулянах), — і тут з\'являться дні й 🚩.</p>'); return; }
     const rr = s.rows.filter(r => r[3] > 0 && pass(r[0], '')).sort((a, b) => (a[4] === null ? 1e9 : a[4]) - (b[4] === null ? 1e9 : b[4]));
     const cap = 30, W = 100;
     const nfl = rr.filter(r => r[4] !== null && r[4] < 1).length;
@@ -5623,6 +5628,37 @@ function skTechWire(pfx, n, loc) {
     '<option value="__o">✎ інша — вписати нижче</option>';
   const pt = P.dataset.pickTech; delete P.dataset.pickTech;   // v117: технічну назву обрали в пошуку позиції
   if (pt) { if (![...T.options].some(o => o.value === pt)) T.insertAdjacentHTML('afterbegin', '<option value="' + esc(pt) + '">' + esc(pt) + '</option>'); T.value = pt; D.value = pt; }
+  if (pfx === 'mv' || pfx === 'tr') skTechSplit(pfx, n, at.filter(a => a[1] > 1e-9), T, D);   // v125
+}
+/** v125 (рішення 16.11): переміщення — технічна назва з того, що є на локації-джерелі. Одна назва — обрана сама (сервер підставить її й так);
+ *  кілька — поле кількості й вибір назви ховаємо, натомість — назви з залишком і поле кількості на кожну («розподілити»). */
+function skTechSplit(pfx, n, have, T, D) {
+  const Q = $(pfx + 'Q' + n); let S = $(pfx + 'S' + n);
+  const show = on => { [Q, T, D].forEach(el => { if (el) el.style.display = on ? '' : 'none'; }); };
+  if (S) S.remove();
+  if (have.length <= 1) { show(true); if (have.length === 1 && !T.value) { T.value = have[0][0]; D.value = have[0][0]; }
+    if (have.length === 1) T.title = 'Уся кількість на ' + have[0][0]; return; }
+  show(false); Q.value = ''; T.value = ''; D.value = '';
+  S = document.createElement('div'); S.id = pfx + 'S' + n; S.className = 'tsplit'; S.style.cssText = 'margin-top:6px;padding:8px 10px;border:1px solid #E7EDF1;border-radius:10px;background:#F7FAFC';
+  S.innerHTML = '<div class="muted" style="margin-bottom:4px">Тут лежить під кількома технічними назвами — <b>розподіліть кількість</b>:</div>' +
+    have.map((a, i) => '<div class="row" style="align-items:center;margin-top:4px"><div style="flex:1 1 auto;min-width:0">' + esc(a[0]) + '<br><span class="muted">є ' + esc(skNfmt(a[1])) + ' ' + esc(a[2]) + '</span></div>' +
+      '<input type="text" inputmode="decimal" data-nm="' + esc(a[0]) + '" data-max="' + a[1] + '" data-u="' + esc(a[2]) + '" placeholder="0" style="flex:0 0 34%;font-size:18px;font-weight:600;min-width:0"></div>').join('') +
+    '<div class="muted" id="' + pfx + 'St' + n + '" style="margin-top:6px"></div>';
+  Q.parentNode.parentNode.insertBefore(S, Q.parentNode.nextSibling);
+  const sum = () => { let t = 0, over = []; S.querySelectorAll('input[data-nm]').forEach(i => { const v = skCalc(i.value); if (i.value.trim() && !isNaN(v)) { t += v; if (v > Number(i.dataset.max) + 1e-9) over.push(i.dataset.nm); } });
+    $(pfx + 'St' + n).innerHTML = 'Разом: <b>' + skNfmt(Math.round(t * 1000) / 1000) + '</b>' + (over.length ? ' · <span class="err" style="display:inline">більше, ніж є: ' + esc(over.join(', ')) + '</span>' : ''); };
+  S.querySelectorAll('input[data-nm]').forEach(i => i.oninput = sum); sum();
+}
+/** v125: рядки переміщення з розподілом за технічними назвами → по рядку на назву. Повертає масив рядків або рядок помилки */
+function skSplitLines(pfx, n, base) {
+  const S = $(pfx + 'S' + n); if (!S) return null;
+  const out = [];
+  for (const i of S.querySelectorAll('input[data-nm]')) {
+    const q = i.value.trim(); if (!q) continue;
+    const v = skCalc(q); if (isNaN(v) || v < 0) return 'Позиція ' + n + ': «' + i.dataset.nm + '» — кількість числом (або 1+2+5)';
+    if (v > 0) out.push(Object.assign({}, base, { qty: q, unit: i.dataset.u || base.unit, det: i.dataset.nm }));
+  }
+  return out.length ? out : 'Позиція ' + n + ': розподіліть кількість між технічними назвами';
 }
 /** Фото етикетки → у перший рядок без позиції (або останній) */
 function skFillMv(f) {
@@ -5653,9 +5689,13 @@ function skMvSave() {
     const n = el.dataset.n, pos = $('mvP' + n).value, q = $('mvQ' + n).value.trim();
     if (!pos && !q) continue;
     if (!pos) return err('Позиція ' + n + ': оберіть, що переміщуєте');
-    const v = skCalc(q); if (!q || isNaN(v) || !(v > 0)) return err('Позиція ' + n + ': вкажіть кількість (число або 1+2+5)');
     const p = d.positions.find(x => x.name === pos) || {};
-    lines.push({ pos: pos, posOther: $('mvOt' + n).value, typ: p.typ || '', qty: q, unit: $('mvU' + n).value, det: $('mvD' + n).value, lot: $('mvL' + n).value });
+    const base = { pos: pos, posOther: $('mvOt' + n).value, typ: p.typ || '', qty: q, unit: $('mvU' + n).value, det: $('mvD' + n).value, lot: $('mvL' + n).value };
+    const sp = skSplitLines('mv', n, base);   // v125: розподіл за технічними назвами
+    if (typeof sp === 'string') return err(sp);
+    if (sp) { lines.push(...sp); continue; }
+    const v = skCalc(q); if (!q || isNaN(v) || !(v > 0)) return err('Позиція ' + n + ': вкажіть кількість (число або 1+2+5)');
+    lines.push(base);
   }
   if ($('mvBoxW').style.display !== 'none' && $('mvBoxIn').style.display !== 'none') Object.keys(SKMV.sel).forEach(id => lines.push({ box: id }));
   if (!lines.length) return err('Додайте позицію або оберіть ящики');
@@ -6037,6 +6077,7 @@ function skTrOpen() {
     '<div class="grid" style="margin-top:16px"><button class="btn btn2" onclick="closeModal()">Закрити</button><button class="btn" id="trGo">Передати</button></div></div>');
   if (!curWh && $('trFrom')) { const s = String(($('trTo').value || '').charAt(0)); const o = [...$('trFrom').options].find(x => x.value.charAt(0) === s); if (o) $('trFrom').value = o.value; }   // склад тієї ж будівлі
   $('trAdd').onclick = skTrLine; skTrLine();
+  $('trFrom').onchange = () => document.querySelectorAll('.trl').forEach(el => skTechWire('tr', el.dataset.n, $('trFrom').value));   // v125: інший склад — інші назви
   $('trGo').onclick = skTrSave;
 }
 function skTrLine() {
@@ -6060,9 +6101,13 @@ function skTrSave() {
     const n = el.dataset.n, pos = $('trP' + n).value, q = $('trQ' + n).value.trim();
     if (!pos && !q) continue;
     if (!pos) { $('merr').textContent = 'Позиція ' + n + ': оберіть, що передаєте'; return; }
-    const v = skCalc(q); if (!q || isNaN(v) || !(v > 0)) { $('merr').textContent = 'Позиція ' + n + ': вкажіть кількість (число або 1+2+5)'; return; }
     const p = d.positions.find(x => x.name === pos) || {};
-    lines.push({ pos: pos, posOther: $('trOt' + n).value, typ: p.typ || '', qty: q, unit: $('trU' + n).value, det: $('trD' + n).value });
+    const base = { pos: pos, posOther: $('trOt' + n).value, typ: p.typ || '', qty: q, unit: $('trU' + n).value, det: $('trD' + n).value };
+    const sp = skSplitLines('tr', n, base);   // v125
+    if (typeof sp === 'string') { $('merr').textContent = sp; return; }
+    if (sp) { lines.push(...sp); continue; }
+    const v = skCalc(q); if (!q || isNaN(v) || !(v > 0)) { $('merr').textContent = 'Позиція ' + n + ': вкажіть кількість (число або 1+2+5)'; return; }
+    lines.push(base);
   }
   if (!lines.length) { $('merr').textContent = 'Додайте хоча б одну позицію'; return; }
   if (!$('trFrom').value) { $('merr').textContent = 'Оберіть склад, з якого передаєте'; return; }
