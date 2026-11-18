@@ -1,5 +1,6 @@
 <!DOCTYPE html>
-<!-- МЛП · index.html v125 · 16.11.2026 — переміщення: технічна назва (рівень 1) з того, що лежить на локації-джерелі (рішення 16.11; Sklad.gs v29):
+<!-- МЛП · index.html v126 · 18.11.2026 — нова партія статорів одразу готова: «Почати з кроку» → «✔ Готовий статор» (Code.gs v116); зміна типорозміру більше не скидає обраний крок (S-00772); під «Створити партію» — з чого стартує партія; колір статорів, якщо старт після бази.
+     index.html v125 · 16.11.2026 — переміщення: технічна назва (рівень 1) з того, що лежить на локації-джерелі (рішення 16.11; Sklad.gs v29):
      одна назва з залишком — обрана сама; кілька — замість одного поля кількості показуємо назви з залишком і поле на кожну — розподілити
      (кожна назва — окремий рядок переміщення). Р-15: цех без інвентаризації (П3) — залишок з переміщень (прийнято − передано), без норм.
      index.html v124 · 15.11.2026 — «⏭ Пропустити крок» — і працівнику, але лише для кроків SKIP_ANY (зараз OV3 «Піч 3» у 3115; Code.gs v113):
@@ -697,7 +698,7 @@
 <div class="net" id="net" role="alert" aria-live="assertive"><div class="nb"><div class="rt" id="netr"></div><div class="nt" id="nett">Зберігаю…</div><div class="ns" id="nets"></div><div class="np"><i id="netp"></i></div><div class="nh" id="neth"></div><div class="zc" id="zc"></div><button class="nx" id="netx" type="button">Не чекати</button></div></div>
 
 <script>
-const PAGE_VERSION = 'index.html v125 · 16.11.2026';   // v122: меню — + Склад, порядок, індекси пунктів; склад — порядок блоків, «Прийміть» згорнуто, партії відвантаження; v121: Р-2_05 готові до збирання — статори й ротори окремо, разом, деталі в партіях двигунів; v120: (прибрано); v119: ящики ГП у «Перемістити» — за кнопкою; v118: кількість у списку, свіжі технічні назви, «Прийміть на …»; v117: вибір позиції — три рівні; v116: Р-15 цех — рівень 1; v115: Р-15 деревом, згорнуті блоки складу, дерево позицій, технічна назва; v114: вид — поле, пошук за ключовими словами; v113: групи й види номенклатури; v112: Р-15 — блоки згортаються; v111: Р-15 «Склад: залишки й рух»; v110: дії за типом локації, переміщення, партія покупцю; v109: кілька фото, тара, перемаркування; v108: приймання від постачальника, наліпки; v107: передачі склад → цех, ящики ГП приймає склад; v106: позиції складу за групами; v105: кнопки складу «Беремо зі складу» / «Приймаємо на склад»; v104: «Історія тари» (?th=) — назва тари на сторінці тари / партії веде на неї (Reports.gs v42)
+const PAGE_VERSION = 'index.html v126 · 18.11.2026';   // v126: нова партія статорів — «Готовий статор» (одразу готова); зміна типорозміру не скидає «Почати з кроку», під кнопкою — з чого старт, колір статорів при старті після бази; v122: меню — + Склад, порядок, індекси пунктів; склад — порядок блоків, «Прийміть» згорнуто, партії відвантаження; v121: Р-2_05 готові до збирання — статори й ротори окремо, разом, деталі в партіях двигунів; v120: (прибрано); v119: ящики ГП у «Перемістити» — за кнопкою; v118: кількість у списку, свіжі технічні назви, «Прийміть на …»; v117: вибір позиції — три рівні; v116: Р-15 цех — рівень 1; v115: Р-15 деревом, згорнуті блоки складу, дерево позицій, технічна назва; v114: вид — поле, пошук за ключовими словами; v113: групи й види номенклатури; v112: Р-15 — блоки згортаються; v111: Р-15 «Склад: залишки й рух»; v110: дії за типом локації, переміщення, партія покупцю; v109: кілька фото, тара, перемаркування; v108: приймання від постачальника, наліпки; v107: передачі склад → цех, ящики ГП приймає склад; v106: позиції складу за групами; v105: кнопки складу «Беремо зі складу» / «Приймаємо на склад»; v104: «Історія тари» (?th=) — назва тари на сторінці тари / партії веде на неї (Reports.gs v42)
 // v103 (11.11): Р-9_08 «За типом», «Перевірено, все ок»
 // v102 (09.11):   // v74: в1 — і з нашої тари (ящик залишків); в2 — лише партії в2
 // v72 (26.10):   // v72: «Яку партію відкриваємо?»; розшифровка кроків на картці партії; реєстрація — повернення за посиланням з форми
@@ -1851,6 +1852,9 @@ function colorField(id, stream, cur) {
   if (!list.length) return '';
   return '<label>Колір ' + (stream === 'RT' ? 'роторів' : stream === 'MT' ? 'двигунів (ротора)' : 'статорів') + ' <span class="muted">(необов\'язково)</span></label><select id="' + id + '">' + opts(list, cur || '', '— не вказано —') + '</select>';
 }
+/** v126: крок старту нової партії в історії; _DONE — партія одразу готова (усі кроки пройдено) */
+const START_DONE = '_DONE';
+function startTxt(v, b) { v = String(v); return v === START_DONE ? (b ? '<b>одразу готові</b>' : 'одразу готові') : 'старт з ' + (b ? '<b>' + esc(v) + '</b>' : esc(v)); }
 function drawNew() {
   const r = document.querySelector('input[name=st]:checked'); const st = r ? r.value : '';
   if (!st) { $('nf').innerHTML = ''; return; }
@@ -1870,6 +1874,8 @@ function drawNew() {
     h += '<label id="ncmL">Коментар <span class="muted">(необов\'язково)</span></label><input type="text" id="ncm">';
   }
   if (st === 'RT') h += colorField('ncl', 'RT', '');   // v21: колір роторів — необов'язково
+  if (st === 'ST') h += '<div id="nclW" style="display:none">' + colorField('ncl', 'ST', '') + '</div>';   // v126: колір статорів — якщо старт після бази
+  if (st !== 'MT') h += '<p class="muted" id="satSum" style="margin:12px 0 0"></p>';   // v126: з якого кроку стартує партія — видно перед «Створити»
   h += '<button class="btn" id="go">Створити партію</button>';
   $('nf').innerHTML = h;
   LOTF_reset(); HP_reset();
@@ -1880,19 +1886,39 @@ function drawNew() {
   } else {
     wireLot('lot', {}); histWire();   // v42
     // v27: «Почати з кроку» — маршрут обраного типорозміру; «Покупні в1» — крок задає система
+    // v126: зміна типорозміру більше не скидає обраний крок на «з початку» (S-00772): той самий крок лишається, якщо він є в новому маршруті;
+    //       «Готовий статор» — окремий пункт (лише ST); під кнопкою — з чого стартує партія
     const satDraw = () => {
       const v1 = !!document.querySelector('input[name=org][value=v1]:checked');
       if ($('satW')) {
         const r = (S.routesNew || {})[st + '|' + $('typ').value] || [];
+        const keep = $('sat').value;
         $('satW').style.display = v1 || !r.length ? 'none' : 'block';
-        $('sat').innerHTML = r.map((x, k) => '<option value="' + (k ? esc(x[0]) : '') + '">' + esc(x[0] + ' · ' + x[1]) + (k ? '' : ' — з початку') + '</option>').join('');
+        $('sat').innerHTML = r.map((x, k) => '<option value="' + (k ? esc(x[0]) : '') + '">' + esc(x[0] + ' · ' + x[1]) + (k ? '' : ' — з початку') + '</option>').join('') +
+          (st === 'ST' && r.length ? '<option value="' + START_DONE + '">✔ Готовий статор — до збирання (усі кроки пройдено)</option>' : '');
+        const lost = keep && ![...$('sat').options].some(o => o.value === keep);
+        if (keep && !lost) $('sat').value = keep;
+        $('sat').dataset.lost = lost ? keep : '';
       }
       satHint();
     };
     const satHint = () => {
-      const need = $('sat') && $('sat').value && $('satW').style.display !== 'none';
-      if ($('hpW')) $('hpW').style.display = need ? 'block' : 'none';
-      $('ncmL').innerHTML = 'Коментар ' + (need ? '<span class="muted">(обов\'язково: чому не з першого кроку, напр. «з переробки»)</span>' : '<span class="muted">(необов\'язково)</span>');
+      const on = $('sat') && $('satW').style.display !== 'none';
+      const v = on ? $('sat').value : '';
+      const r = (S.routesNew || {})[st + '|' + $('typ').value] || [];
+      if ($('hpW')) $('hpW').style.display = v ? 'block' : 'none';
+      $('ncmL').innerHTML = 'Коментар ' + (v === START_DONE ? '<span class="muted">(обов\'язково: звідки готові статори, напр. «залишок без партії», «з переробки»)</span>'
+        : v ? '<span class="muted">(обов\'язково: чому не з першого кроку, напр. «з переробки»)</span>' : '<span class="muted">(необов\'язково)</span>');
+      if ($('nclW')) {   // колір статорів задають на базі — якщо старт після неї, колір обирають тут
+        const ci = r.findIndex(x => x[3] === 'color'), si = r.findIndex(x => x[0] === v);
+        const show = ci >= 0 && (v === START_DONE || si > ci);
+        $('nclW').style.display = show ? 'block' : 'none'; if (!show && $('ncl')) $('ncl').value = '';
+      }
+      const lost = $('sat') && $('sat').dataset.lost;
+      const what = v === START_DONE ? '<b>одразу готові</b> — у списку готових для збирання, кроки не записуються'
+        : v ? 'з кроку <b>' + esc(v) + '</b>' : r.length ? 'з першого кроку <b>' + esc(r[0][0]) + '</b>' : '';
+      if ($('satSum')) $('satSum').innerHTML = (what ? 'Партія стартує: ' + what : '') +
+        (lost ? '<br><span style="color:#B42318">Кроку ' + esc(lost) + ' немає в маршруті ' + esc($('typ').value) + ' — оберіть крок ще раз</span>' : '');
     };
     $('typ').onchange = satDraw; if ($('sat')) $('sat').onchange = satHint;
     document.querySelectorAll('input[name=org]').forEach(x => x.onchange = satDraw);
@@ -1913,7 +1939,7 @@ function drawNew() {
         if ($('sat') && !a.origin && $('sat').value) a.startAt = $('sat').value;
         if (a.startAt) { const ids = HP.filter(x => x.id).map(x => x.id); if (ids.length) a.histPhotos = ids; }   // v42
         a.comment = $('ncm').value.trim();
-        if (a.startAt && !a.comment) { $('err').textContent = 'Коментар обов\'язковий: чому партія починається з ' + a.startAt; return; }
+        if (a.startAt && !a.comment) { $('err').textContent = a.startAt === START_DONE ? 'Коментар обов\'язковий: звідки готові статори' : 'Коментар обов\'язковий: чому партія починається з ' + a.startAt; return; }
       }
       act(a, $('go'));
     });
@@ -2194,7 +2220,7 @@ function renderBatch(extra) {
       (x.step === 'K2' && x.boxes ? ' · ' + boxesLinks(x.boxes) : x.step === 'K2' && x.x1 ? ' · ящиків ' + x.x1 : '') + (x.d1 && (b.route.find(r => r.code === x.step) || {}).extra === 'color' ? ' · 🎨 ' + esc(x.d1) : '') +
       (PART_SCRAP.indexOf(x.step) >= 0 && b.comp && (x.x1 || x.x2) ? ' · з них лише статора ' + (x.x1 || 0) + ', лише ротора ' + (x.x2 || 0) : '') +   // v47
       ((b.route.find(r => r.code === x.step) || {}).extra === 'split' ? ' · на балансування <b>' + (x.x1 || 0) + '</b> · одразу на ' + esc(splitTo(b, x.step)) + ' <b>' + (x.x2 || 0) + '</b>' : '');   // v99
-    if (x.type === 'нова партія') what = 'нова партія · ' + x.qty + ' шт' + (x.d1 && !b.comp ? ' · 🎨 ' + esc(x.d1) : '') + (x.d2 && !b.comp ? ' · старт з <b>' + esc(x.d2) + '</b>' : '');   // v27
+    if (x.type === 'нова партія') what = 'нова партія · ' + x.qty + ' шт' + (x.d1 && !b.comp ? ' · 🎨 ' + esc(x.d1) : '') + (x.d2 && !b.comp ? ' · ' + startTxt(x.d2, 1) : '');   // v27; v125: _DONE — одразу готові
     if (x.type === 'пропуск') what = '⏭ пропущено <b>' + esc(x.step) + '</b> · ' + x.qty + ' шт';   // v27
     if (x.type === 'колір') what = '🎨 колір: ' + esc(x.d2 || 'не вказано') + ' → <b>' + esc(x.d1 || 'не вказано') + '</b>';   // v21
     if (x.type === 'перекладання') what = 'перекладання ' + esc(x.from || '—') + ' → ' + esc(x.to) + (x.back ? ' (назад)' : '') +
@@ -5343,7 +5369,7 @@ function histWhat(x) {
     const g = x.corrected ? x.corrected.good : x.good, s = x.corrected ? x.corrected.scrap : x.scrap;
     return '<b>' + esc(x.step) + '</b> ' + esc(x.stepName) + ' · ' + g + ' / ' + s + (x.reason ? ' · ' + esc(x.reason) : '') + (x.step === 'K2' && x.x1 ? ' · ящиків ' + esc(x.x1) : '');
   }
-  if (x.type === 'нова партія') return 'нова партія · ' + x.qty + ' шт' + (x.x2 && !/^MT/.test(x.batch) ? ' · старт з ' + esc(x.x2) : '');   // v27
+  if (x.type === 'нова партія') return 'нова партія · ' + x.qty + ' шт' + (x.x2 && !/^MT/.test(x.batch) ? ' · ' + startTxt(x.x2) : '');   // v27
   if (x.type === 'пропуск') return '⏭ пропущено <b>' + esc(x.step) + '</b> ' + esc(x.stepName) + ' · ' + x.qty + ' шт';   // v27
   if (x.type === 'перекладання') return 'перекладання ' + esc(x.tare || '—') + ' → ' + esc(x.tareTo);
   if (x.type === 'відокремлення') return (x.from === x.batch ? 'відокремлено ' + x.qty + ' → ' + bl(x.to) : 'додано ' + x.qty + ' з ' + bl(x.from)) + (x.x2 ? ' · ' + esc(x.x2) : '');
@@ -5412,7 +5438,7 @@ function thWhat(x) {
   switch (x.type) {
     case 'крок': return '<b>' + esc(x.step) + '</b> ' + esc(x.stepName) + ' · ' + g + ' / ' + s + (x.reason ? ' · ' + esc(x.reason) : '') +
       (x.step === 'K2' && x.boxes ? ' · ' + boxesLinks(x.boxes) : '');
-    case 'нова партія': return '▣ нова партія ' + bl(x.batch) + ' · ' + q + ' шт' + (x.x2 && !/^M/.test(x.batch) ? ' · старт з <b>' + esc(x.x2) + '</b>' : '');
+    case 'нова партія': return '▣ нова партія ' + bl(x.batch) + ' · ' + q + ' шт' + (x.x2 && !/^M/.test(x.batch) ? ' · ' + startTxt(x.x2, 1) : '');
     case 'пропуск': return '⏭ пропущено <b>' + esc(x.step) + '</b> ' + esc(x.stepName) + ' · ' + q + ' шт';
     case 'перекладання': return '⇄ перекладання ' + tc(x.tare) + ' → ' + tc(x.tareTo) + (x.x1 === 'назад' ? ' (назад)' : '') +
       (x.x1 === 'пара' ? ' · піддон пари' + (q ? ' · ' + q + ' шт' : '') + (x.x2 ? ' (друга: ' + tc(x.x2) + ')' : '') : x.x1 === 'обʼєднання' ? ' · пару ' + tc(x.tare) + ' + ' + tc(x.x2) + ' обʼєднано' : '');
