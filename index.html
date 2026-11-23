@@ -1,5 +1,8 @@
 <!DOCTYPE html>
-<!-- МЛП · index.html v129 · 23.11.2026 — Р-2_04 «Де зараз» (помилка, 23.11): рядок «Готово до збирання» не бачив статорів / роторів, що лежать у партіях
+<!-- МЛП · index.html v130 · 23.11.2026 — суми в ₴ за офіційними цінами (рішення Андрія 23.11, Reports.gs v51, Pay.gs v1): калькулятор і ціни в телефоні прибрано;
+     Р-8с — картка «Нараховано, ₴», стовпчик ₴ у «Роботи й записи», графік шт / ₴, лише тарифіковані кроки; Р-8 — картка «Нараховано», перемикач шт / ₴,
+     значення матриці «Сума, ₴», закладка «Відомість ЗП: працівник × крок, ₴».
+     index.html v129 · 23.11.2026 — Р-2_04 «Де зараз» (помилка, 23.11): рядок «Готово до збирання» не бачив статорів / роторів, що лежать у партіях
      двигунів і чекають пари (Жуляни: ТЧ-18, ТЧ-19, ТЧ-48 — гравійовані F4п покупні ротори 4320 · 350 без статорів; F1 там 0, бо пар немає), хоча картки
      Р-2_02 і список Р-2_05 їх рахують. Тепер у рядку — і ці деталі (кубик — партія двигунів у своїй тарі): без пари; якщо «Двигуни» не обрано — усі,
      бо пари тоді не видно на F1. Секція потоку й «Після маршруту» з'являються й тоді, коли готові лише такі деталі.
@@ -706,7 +709,7 @@
 <div class="net" id="net" role="alert" aria-live="assertive"><div class="nb"><div class="rt" id="netr"></div><div class="nt" id="nett">Зберігаю…</div><div class="ns" id="nets"></div><div class="np"><i id="netp"></i></div><div class="nh" id="neth"></div><div class="zc" id="zc"></div><button class="nx" id="netx" type="button">Не чекати</button></div></div>
 
 <script>
-const PAGE_VERSION = 'index.html v129 · 23.11.2026';   // v129: Р-2_04 «Готово до збирання» — і статори / ротори в партіях двигунів, що чекають пари; v128: екран реєстрації — тиха перевірка реєстрації більше не показує плашку «Відкриваю…» (екран «вічно вантажився» на телефоні, де сторінку вже відкривали); v127: Р-8 — колонки «Типорозмір · KV», закладка F3, посилання ?bm=f3; v126: нова партія статорів — «Готовий статор» (одразу готова); зміна типорозміру не скидає «Почати з кроку», під кнопкою — з чого старт, колір статорів при старті після бази; v122: меню — + Склад, порядок, індекси пунктів; склад — порядок блоків, «Прийміть» згорнуто, партії відвантаження; v121: Р-2_05 готові до збирання — статори й ротори окремо, разом, деталі в партіях двигунів; v120: (прибрано); v119: ящики ГП у «Перемістити» — за кнопкою; v118: кількість у списку, свіжі технічні назви, «Прийміть на …»; v117: вибір позиції — три рівні; v116: Р-15 цех — рівень 1; v115: Р-15 деревом, згорнуті блоки складу, дерево позицій, технічна назва; v114: вид — поле, пошук за ключовими словами; v113: групи й види номенклатури; v112: Р-15 — блоки згортаються; v111: Р-15 «Склад: залишки й рух»; v110: дії за типом локації, переміщення, партія покупцю; v109: кілька фото, тара, перемаркування; v108: приймання від постачальника, наліпки; v107: передачі склад → цех, ящики ГП приймає склад; v106: позиції складу за групами; v105: кнопки складу «Беремо зі складу» / «Приймаємо на склад»; v104: «Історія тари» (?th=) — назва тари на сторінці тари / партії веде на неї (Reports.gs v42)
+const PAGE_VERSION = 'index.html v130 · 23.11.2026';   // v130: суми ₴ за цінами «ЗП_Ціни», без калькулятора; v129: Р-2_04 «Готово до збирання» — і статори / ротори в партіях двигунів, що чекають пари; v128: екран реєстрації — тиха перевірка реєстрації більше не показує плашку «Відкриваю…» (екран «вічно вантажився» на телефоні, де сторінку вже відкривали); v127: Р-8 — колонки «Типорозмір · KV», закладка F3, посилання ?bm=f3; v126: нова партія статорів — «Готовий статор» (одразу готова); зміна типорозміру не скидає «Почати з кроку», під кнопкою — з чого старт, колір статорів при старті після бази; v122: меню — + Склад, порядок, індекси пунктів; склад — порядок блоків, «Прийміть» згорнуто, партії відвантаження; v121: Р-2_05 готові до збирання — статори й ротори окремо, разом, деталі в партіях двигунів; v120: (прибрано); v119: ящики ГП у «Перемістити» — за кнопкою; v118: кількість у списку, свіжі технічні назви, «Прийміть на …»; v117: вибір позиції — три рівні; v116: Р-15 цех — рівень 1; v115: Р-15 деревом, згорнуті блоки складу, дерево позицій, технічна назва; v114: вид — поле, пошук за ключовими словами; v113: групи й види номенклатури; v112: Р-15 — блоки згортаються; v111: Р-15 «Склад: залишки й рух»; v110: дії за типом локації, переміщення, партія покупцю; v109: кілька фото, тара, перемаркування; v108: приймання від постачальника, наліпки; v107: передачі склад → цех, ящики ГП приймає склад; v106: позиції складу за групами; v105: кнопки складу «Беремо зі складу» / «Приймаємо на склад»; v104: «Історія тари» (?th=) — назва тари на сторінці тари / партії веде на неї (Reports.gs v42)
 // v103 (11.11): Р-9_08 «За типом», «Перевірено, все ок»
 // v102 (09.11):   // v74: в1 — і з нашої тари (ящик залишків); в2 — лише партії в2
 // v72 (26.10):   // v72: «Яку партію відкриваємо?»; розшифровка кроків на картці партії; реєстрація — повернення за посиланням з форми
@@ -3239,38 +3242,17 @@ function z8shift(n) {
   if (a > d.today) a = d.today;
   z8go('a', a);
 }
-function zPriceKey(id) { return 'mlp_prices_' + id; }
-function zPrices(id) {
-  let p; try { p = JSON.parse(store(zPriceKey(id)) || '{}') || {}; } catch (e) { return {}; }
-  // v84: R3.1 + R3.2 → R3 (05.11) — ціна R3 = сума збережених цін R3.1 і R3.2 (за типорозміром), старі ключі прибираються
-  const old = Object.keys(p).filter(k => /^R3\.[12]\|/.test(k));
-  if (old.length) {
-    old.forEach(k => { const n = 'R3|' + k.split('|')[1]; if (!(n in p) || p[n + '#m']) { p[n] = String(zNum(p[n]) + zNum(p[k])); p[n + '#m'] = 1; } delete p[k]; });
-    Object.keys(p).filter(k => /#m$/.test(k)).forEach(k => delete p[k]);
-    try { zPriceSave(id, p); } catch (e) { }
-  }
-  return p;
-}
-function zPriceSave(id, p) { store(zPriceKey(id), JSON.stringify(p)); }
+/** v130: ціни за операції — офіційні, з сервера («ЗП_Ціни», Pay.gs): pr — ціна за 1 на дату запису, pb — база «успішні + брак».
+ *  Калькулятор і ціни в телефоні прибрано (рішення Андрія 23.11); старі ключі mlp_prices_* стираються */
+try { Object.keys(localStorage).filter(k => k.indexOf('mlp_prices_') === 0).forEach(k => localStorage.removeItem(k)); } catch (e) { }
 const zNum = v => Number(String(v || '').replace(',', '.')) || 0;
 const zPayQ = r => r.ctl ? r.good + r.scrap : r.good;   // З-05: тести й контроль — усі перевірені
-const zSid = k => 'zs_' + Array.from(k).map(c => c.charCodeAt(0).toString(36)).join('_');
-function zMoney(d, prices) {
-  let m = 0; const g = {};
-  d.recs.forEach(r => { const k = r.step + '|' + r.typ; g[k] = (g[k] || 0) + zPayQ(r); });
-  Object.keys(g).forEach(k => { m += g[k] * zNum(prices[k]); });
-  const nbk = zNbKey(d); d.noBatch.forEach(r => { m += (r.hours || r.qty) * zNum(prices[nbk(r)]); });   // v75: ключ ціни — і одиниця, якщо їх кілька
-  return m;
-}
-function zKpiMoney(m) { return zKpi('За моїми цінами', m ? fn(m) : '—', m ? '₴' : '', m ? 'неофіційний розрахунок' : 'введіть ціни в калькуляторі нижче', 'Рахується тільки на цьому телефоні з цін, які ви ввели самі. Це не відомість ЗП.'); }
-function zCalcInput(el, uid) {
-  const p = zPrices(uid); const k = el.dataset.k; const v = el.value.trim();
-  if (v) p[k] = v; else delete p[k]; zPriceSave(uid, p);
-  const c = $(zSid(k)); if (c) c.textContent = zNum(v) ? fn(Number(el.dataset.q) * zNum(v)) : '—';
-  const m = zMoney(DB, p);
-  $('zcTot').textContent = m ? fn(m) + ' ₴' : '—'; const km = $('zkMoney'); if (km) km.innerHTML = zKpiMoney(m);
-  if (Z8.cunit === 'uah') { clearTimeout(zCalcInput._t); zCalcInput._t = setTimeout(() => { const y = window.scrollY; renderDash(); window.scrollTo(0, y); }, 900); }
-}
+const zAmt = r => (r.pb ? r.good + r.scrap : r.good) * (Number(r.pr) || 0);   // v130: сума ₴ запису кроку
+const zNbAmt = r => (r.hours || r.qty) * (Number(r.pr) || 0);                    // v130: сума ₴ роботи без партії
+function zMoney(d) { return d.recs.reduce((a, r) => a + zAmt(r), 0) + d.noBatch.reduce((a, r) => a + zNbAmt(r), 0); }
+/** v130: гривні — до копійок (без зайвих нулів) */
+const fnM = n => (Math.round((Number(n) || 0) * 100) / 100).toLocaleString('uk-UA', { maximumFractionDigits: 2 });
+const ZPAYTIP = 'За затвердженими цінами за операції на дату запису (однакові для всіх). Тести й перевірки — за всі перевірені штуки (успішні + брак), решта кроків — за успішні.';
 function zFold8(key, title, cnt, body, def) {   // v68: id — для індексів аналітика; def — розгорнуто за замовчуванням
   const op = Z8.open[key] === undefined ? !!def : Z8.open[key];
   return '<details class="zfold" id="zf_' + key + '"' + (op ? ' open' : '') + ' ontoggle="Z8.open[\'' + key + '\']=this.open;if(this.open)zRedraw()"><summary>' + title + (cnt ? ' <span class="cnt">' + cnt + '</span>' : '') + '</summary><div class="zfb">' + body + '</div></details>';
@@ -3296,23 +3278,21 @@ function r8c() {
     return h + '<div class="card center muted">За ' + (d.mode === 'd' ? 'цей день' : d.mode === 'w' ? 'цей тиждень' : 'цей місяць') + ' записів немає.' +
       (d.lastDay ? '<br><button type="button" class="btn btn2" style="width:auto;display:inline-block;padding:12px 16px" onclick="PARAMS.m=\'d\';z8go(\'a\',\'' + esc(d.lastDay) + '\')">Показати останній день із записами — ' + ZDOWN[zDow(d.lastDay)] + ' ' + zDm(d.lastDay) + '</button>' : '') + '</div>';
   }
-  const prices = zPrices(uid);
   const gw = {};
   d.recs.forEach(r => { const k = r.step + '|' + r.typ; (gw[k] = gw[k] || []).push(r); });
   const ord = c => { const i = (d.order || []).indexOf(c); return i < 0 ? 999 : i; };
   const works = Object.keys(gw).sort((a, b) => ord(a.split('|')[0]) - ord(b.split('|')[0]) || a.localeCompare(b));
   const good = d.recs.reduce((a, r) => a + r.good, 0), scrap = d.recs.reduce((a, r) => a + r.scrap, 0), pay = d.recs.reduce((a, r) => a + zPayQ(r), 0);
   const nb = new Set(d.recs.map(r => r.batch)).size;
-  const money = zMoney(d, prices);
+  const money = zMoney(d);
   h += '<div class="zkpis">' + zKpi('У виробіток', fn(pay), 'шт', 'у ' + nb + ' ' + plural(nb, 'партії', 'партіях', 'партіях') + (pay !== good ? ' · успішних ' + fn(good) : ''),
-    'Тести й перевірки (контрольні кроки) рахуються за кількістю всіх перевірених — успішні + знайдений брак. Решта кроків — успішні.', 'kgood') + '<div id="zkMoney" style="display:contents">' + zKpiMoney(money) + '</div></div>';
+    'Тести й перевірки (контрольні кроки) рахуються за кількістю всіх перевірених — успішні + знайдений брак. Решта кроків — успішні.', 'kgood') + zKpi('Нараховано', money ? fnM(money) : '—', money ? '₴' : '', 'за цінами на дату запису', ZPAYTIP) + '</div>';
   // Р-8с_09 графік
-  const anyPrice = works.some(k => zNum(prices[k]) > 0);
   h += zFold8('chart', d.mode === 'd' ? 'За годинами' : 'За днями', '', '<div class="zctl"><span>Розріз:</span><select onchange="Z8.csplit=this.value;renderDash()">' +
     [['none', 'Без розрізу'], ['batch', 'Партії'], ['tk', 'Типорозмір · KV'], ['step', 'Крок']].map(x => '<option value="' + x[0] + '"' + (S8.csplit === x[0] ? ' selected' : '') + '>' + x[1] + '</option>').join('') + '</select>' +
     zChips(S8.cunit, [['qty', 'шт'], ['uah', '₴']], v => { S8.cunit = v; renderDash(); }) +
     '<label style="display:flex;gap:5px;align-items:center;margin:0;font-size:14px"><input type="checkbox"' + (S8.cline ? ' checked' : '') + ' onchange="Z8.cline=this.checked;renderDash()"> лінія % браку</label></div>' +
-    (S8.cunit === 'uah' && !anyPrice ? '<p class="muted">Введіть ціни в калькуляторі нижче — тоді графік покаже суми в ₴.</p>' : zChart('zc8', z8chart(d, prices))), true);
+    zChart('zc8', z8chart(d)), true);
   // Р-8с_03 роботи й записи
   const nm = c => (d.names || {})[c] || '';
   const GR = { step: { f: r => r.step + '|' + r.typ, l: k => '<b>' + esc(k.split('|')[0]) + '</b> ' + esc(nm(k.split('|')[0])) + ' <span class="muted">· ' + esc(k.split('|')[1]) + '</span>', o: (a, b) => ord(a.split('|')[0]) - ord(b.split('|')[0]) || a.localeCompare(b) },
@@ -3322,46 +3302,31 @@ function r8c() {
   const g1 = GR[S8.grp], g2 = GR[SUB[S8.grp]];
   const tg = (key, open) => '<button type="button" class="tg" onclick="zA(' + zAct(() => { if (S8.exp[key]) delete S8.exp[key]; else S8.exp[key] = 1; renderDash(); }) + ')">' + (open ? '▾' : '▸') + '</button>';
   const grpOf = (rs, f) => { const m = {}; rs.forEach(r => (m[f(r)] = m[f(r)] || []).push(r)); return m; };
-  const sumG = rs => rs.reduce((a, r) => a + r.good, 0), sumS = rs => rs.reduce((a, r) => a + r.scrap, 0), sumP = rs => rs.reduce((a, r) => a + zPayQ(r), 0);   // v47
+  const sumG = rs => rs.reduce((a, r) => a + r.good, 0), sumS = rs => rs.reduce((a, r) => a + r.scrap, 0), sumP = rs => rs.reduce((a, r) => a + zPayQ(r), 0), sumM = rs => rs.reduce((a, r) => a + zAmt(r), 0);   // v47; v130: ₴
   let gt = '<div class="zctl"><span>Групувати:</span>' + zChips(S8.grp, [['step', 'Кроки'], ['batch', 'Партії'], ['day', 'Дні']], v => { S8.grp = v; S8.exp = {}; renderDash(); }) + '</div>' +
-    '<div class="tw" style="max-height:560px"><table class="t zgrp"><tr><th></th><th class="r">Успішних</th><th class="r">Брак</th><th class="r">У виробіток</th></tr>';
+    '<div class="tw" style="max-height:560px"><table class="t zgrp"><tr><th></th><th class="r">Успішних</th><th class="r">Брак</th><th class="r">У виробіток</th><th class="r">₴</th></tr>';
   const m1 = grpOf(d.recs, g1.f);
   Object.keys(m1).sort(g1.o).forEach(k1 => {
     const r1 = m1[k1], key1 = S8.grp + '¦' + k1, o1 = S8.exp[key1];
-    gt += '<tr class="g1"><td>' + tg(key1, o1) + g1.l(k1) + '</td><td class="r">' + fn(sumG(r1)) + '</td><td class="r">' + (sumS(r1) ? fn(sumS(r1)) : '—') + '</td><td class="r"><b>' + fn(sumP(r1)) + '</b></td></tr>';
+    gt += '<tr class="g1"><td>' + tg(key1, o1) + g1.l(k1) + '</td><td class="r">' + fn(sumG(r1)) + '</td><td class="r">' + (sumS(r1) ? fn(sumS(r1)) : '—') + '</td><td class="r"><b>' + fn(sumP(r1)) + '</b></td><td class="r">' + fnM(sumM(r1)) + '</td></tr>';
     if (!o1) return;
     const m2 = grpOf(r1, g2.f);
     Object.keys(m2).sort(g2.o).forEach(k2 => {
       const r2 = m2[k2], key2 = key1 + '¦' + k2, o2 = S8.exp[key2];
-      gt += '<tr class="g2"><td>' + tg(key2, o2) + g2.l(k2) + '</td><td class="r">' + fn(sumG(r2)) + '</td><td class="r">' + (sumS(r2) ? fn(sumS(r2)) : '—') + '</td><td class="r">' + fn(sumP(r2)) + '</td></tr>';
+      gt += '<tr class="g2"><td>' + tg(key2, o2) + g2.l(k2) + '</td><td class="r">' + fn(sumG(r2)) + '</td><td class="r">' + (sumS(r2) ? fn(sumS(r2)) : '—') + '</td><td class="r">' + fn(sumP(r2)) + '</td><td class="r">' + fnM(sumM(r2)) + '</td></tr>';
       if (o2) r2.slice().sort((a, b) => (a.d + a.tm) < (b.d + b.tm) ? -1 : 1).forEach(r => {
-        gt += '<tr class="g3"><td>' + zDm(r.d) + ' ' + esc(r.tm) + ' · ' + (S8.grp === 'batch' ? '<b>' + esc(r.step) + '</b> ' + esc(nm(r.step)) : bl(r.batch) + (S8.grp === 'day' ? '' : ' · ' + esc(r.step))) + '</td><td class="r">' + fn(r.good) + '</td><td class="r">' + (r.scrap || '—') + '</td><td class="r">' + fn(zPayQ(r)) + '</td></tr>';
+        gt += '<tr class="g3"><td>' + zDm(r.d) + ' ' + esc(r.tm) + ' · ' + (S8.grp === 'batch' ? '<b>' + esc(r.step) + '</b> ' + esc(nm(r.step)) : bl(r.batch) + (S8.grp === 'day' ? '' : ' · ' + esc(r.step))) + '</td><td class="r">' + fn(r.good) + '</td><td class="r">' + (r.scrap || '—') + '</td><td class="r">' + fn(zPayQ(r)) + '</td><td class="r">' + fnM(zAmt(r)) + '</td></tr>';
       });
     });
   });
-  gt += '<tr class="tot"><td><b>Разом</b></td><td class="r">' + fn(good) + '</td><td class="r">' + fn(scrap) + '</td><td class="r"><b>' + fn(pay) + '</b></td></tr></table></div>' +
+  gt += '<tr class="tot"><td><b>Разом</b></td><td class="r">' + fn(good) + '</td><td class="r">' + fn(scrap) + '</td><td class="r"><b>' + fn(pay) + '</b></td><td class="r"><b>' + fnM(d.recs.reduce((a, r) => a + zAmt(r), 0)) + '</b></td></tr></table></div>' +
     '<p class="muted" style="margin:6px 0 0">▸ — розгорнути: ' + ({ step: 'крок → дні → записи', batch: 'партія → кроки → записи', day: 'день → кроки → записи' })[S8.grp] + '.</p>';
   h += zFold8('works', 'Роботи й записи', d.recs.length + ' ' + plural(d.recs.length, 'запис', 'записи', 'записів'), gt);
-  // Р-8с_05 калькулятор
-  const TESTTIP = 'Тести й перевірки рахуються за кількістю всіх перевірених — успішні + брак.';
-  let c = '<div class="zcalc"><div class="chd">шт × ціна за 1 = сума, ₴</div>';
-  works.forEach(k => { const [code, typ] = k.split('|'); const q = gw[k].reduce((a, r) => a + zPayQ(r), 0); const p = prices[k] || ''; const ctl = gw[k][0].ctl;
-    c += '<div class="crow"><div><b>' + esc(code) + '</b> ' + esc(nm(code)) + ' <span class="muted">· ' + esc(typ) + '</span>' + (ctl ? ' ' + info(TESTTIP) : '') + '</div>' +
-      '<div class="cm"><span class="cq">' + fn(q) + '</span><span class="muted">×</span><input inputmode="decimal" data-k="' + esc(k) + '" data-q="' + q + '" value="' + esc(p) + '" placeholder="ціна" oninput="zCalcInput(this,\'' + esc(uid) + '\')">' +
-      '<span class="muted">=</span><span class="cs" id="' + zSid(k) + '">' + (zNum(p) ? fn(q * zNum(p)) : '—') + '</span></div></div>'; });
-  const nbk = zNbKey(d), gnb = {}; d.noBatch.forEach(r => { const k = nbk(r); gnb[k] = gnb[k] || { q: 0, h: false, u: zNbUnit(r) }; gnb[k].q += r.hours || r.qty; if (r.hours) gnb[k].h = true; });
-  Object.keys(gnb).forEach(k => { const x = gnb[k]; const p = prices[k] || '';
-    c += '<div class="crow"><div>' + esc(k.slice(3).split('|')[0]) + ' <span class="muted">· без партії</span></div><div class="cm"><span class="cq">' + zF1(x.q) + ' ' + esc(x.u) + '</span><span class="muted">×</span>' +
-      '<input inputmode="decimal" data-k="' + esc(k) + '" data-q="' + x.q + '" value="' + esc(p) + '" placeholder="' + (x.h ? 'за год' : 'ціна') + '" oninput="zCalcInput(this,\'' + esc(uid) + '\')"><span class="muted">=</span><span class="cs" id="' + zSid(k) + '">' + (zNum(p) ? fn(x.q * zNum(p)) : '—') + '</span></div></div>'; });
-  c += '<div class="ctot"><span>Разом</span><span id="zcTot">' + (money ? fn(money) + ' ₴' : '—') + '</span></div></div>';
-  h += zFold8('calc', 'Калькулятор ₴', money ? fn(money) + ' ₴' : '', '<p class="muted" style="margin-top:0">Ціни зберігаються <b>тільки на цьому телефоні</b> і не потрапляють у базу. Це особистий підрахунок, а не відомість ЗП.' +
-    (d.viewAs ? ' У режимі 👁 видно ціни, введені на ЦЬОМУ пристрої.' : '') + '</p>' + c +
-    '<button type="button" class="ic" style="margin-top:10px" onclick="zA(' + zAct(() => confirmBox('Очистити всі введені ціни на цьому телефоні?', () => { zPriceSave(uid, {}); renderDash(); })) + ')">Очистити ціни</button>');
   // Р-8с_07 робота без партії
   const hrs = d.noBatch.reduce((a, r) => a + r.hours, 0);
   h += zFold8('nb', 'Робота без партії', d.noBatch.length ? (hrs ? zF1(hrs) + ' год' : d.noBatch.length + '') : '0',
     d.noBatch.length ? d.noBatch.slice().reverse().map(r => '<div class="li"><div>' + esc(r.work) + (r.comment ? '<br><span class="muted">' + esc(r.comment) + '</span>' : '') + '<br><span class="muted">' + ZDOWN[zDow(r.d)] + ' ' + zDm(r.d) + ' ' + esc(r.tm) + '</span></div><b class="r">' +
-      (r.hours ? zF1(r.hours) + ' год' : zF1(r.qty) + ' ' + esc(zNbUnit(r))) + '</b></div>').join('') : '<p class="muted">За цей період немає. Записати — на Головній.</p>');
+      (r.hours ? zF1(r.hours) + ' год' : zF1(r.qty) + ' ' + esc(zNbUnit(r))) + (zNbAmt(r) ? '<br><span class="muted">' + fnM(zNbAmt(r)) + ' ₴</span>' : '') + '</b></div>').join('') : '<p class="muted">За цей період немає. Записати — на Головній.</p>');
   return h;
 }
 /** v75: одиниця запису без партії (сервер v32 шле unit; старий — за годинами) */
@@ -3372,9 +3337,8 @@ function zNbKey(d) {
   return r => 'nb|' + r.work + (Object.keys(us[r.work] || {}).length > 1 ? '|' + zNbUnit(r) : '');
 }
 /** дані графіка Р-8с_09: кошики — години (день) або дні (тиждень / місяць), серії — розріз, лінія % браку */
-function z8chart(d, prices) {
-  const price = r => zNum(prices[r.step + '|' + r.typ]);
-  const val = r => Z8.cunit === 'uah' ? zPayQ(r) * price(r) : zPayQ(r);   // v47: шт — у виробіток (контроль: успішні + брак)
+function z8chart(d) {
+  const val = r => Z8.cunit === 'uah' ? zAmt(r) : zPayQ(r);   // v130: ₴ — за офіційними цінами   // v47: шт — у виробіток (контроль: успішні + брак)
   const bucket = r => d.mode === 'd' ? r.tm.slice(0, 2) : r.d;
   const cats = [];
   if (d.mode === 'd') { const hs = d.recs.map(r => Number(r.tm.slice(0, 2))); const h0 = Math.min(8, ...hs), h1 = Math.max(17, ...hs); for (let x = h0; x <= h1; x++) cats.push(String(x).padStart(2, '0')); }
@@ -3393,7 +3357,7 @@ function z8chart(d, prices) {
   d.recs.forEach(r => { const x = si[kf(r)], c = bucket(r); x.v[c] = (x.v[c] || 0) + val(r); });
   let line = null;
   if (Z8.cline) { const g = {}, t = {}; d.recs.forEach(r => { const c = bucket(r); g[c] = (g[c] || 0) + r.scrap; t[c] = (t[c] || 0) + r.good + r.scrap; }); const v = {}; Object.keys(t).forEach(c => { if (t[c]) v[c] = g[c] / t[c] * 100; }); line = { v: v, l: '% браку' }; }
-  return { cats: cats, series: series, line: line, catLabel: (c, l) => d.mode === 'd' ? c + ':00' : (l ? ZDOWN[zDow(c)] + ' ' : '') + zDm(c), fmt: Z8.cunit === 'uah' ? ((v, ax) => fn(v) + (ax ? '' : ' ₴')) : fn };
+  return { cats: cats, series: series, line: line, catLabel: (c, l) => d.mode === 'd' ? c + ':00' : (l ? ZDOWN[zDow(c)] + ' ' : '') + zDm(c), fmt: Z8.cunit === 'uah' ? ((v, ax) => (ax ? fn(v) : fnM(v) + ' ₴')) : fn };
 }
 
 // ---- Р-0_11 стовпчиковий графік (SVG): серії складаються в стовпчик, лінія — на правій осі (cfg.line)
@@ -3572,7 +3536,8 @@ function zRecs() {
   (d.rows || []).forEach(x => {
     const step = x[2], kind = x[3], typ = x[4];
     const base = { d: x[0], w: x[1], step: step, kind: kind, typ: typ, kv: x[5], ver: x[6], fl: x[7] ? x[8] + x[7] : (x[8] || '—'), loc: x[8] || '—', b: x[9], ln: x[13] || '—',
-      fin: !!(fin[kind + '|' + typ + '|' + step] || fin[kind + '|*|' + step]), ctl: (d.steps[step] || [])[1] === 'К' };
+      fin: !!(fin[kind + '|' + typ + '|' + step] || fin[kind + '|*|' + step]), ctl: (d.steps[step] || [])[1] === 'К',
+      pr: Number(x[16]) || 0, pb: !!x[17] };   // v130: ціна за 1 на дату (₴) і база «успішні + брак» (Reports.gs v51)
     let rest = x[11]; const n0 = out.length;
     String(x[12] || '').split(/;\s*/).filter(Boolean).forEach(p => { const m = p.match(/^(.*):\s*(\d+)$/); if (!m) return; const n = Number(m[2]); rest -= n; out.push(Object.assign({}, base, { g: 0, s: n, rs: zRsNorm(m[1]) })); });
     if (x[10] || rest > 0 || !x[11]) out.push(Object.assign({}, base, { g: x[10], s: Math.max(0, rest), rs: '—' }));
@@ -3606,7 +3571,7 @@ function zSortVals(dim, vals, byVal) {
   if (byVal) return v.sort((a, b) => byVal(b) - byVal(a));
   return v.sort((a, b) => String(ZDIMS[dim].lab(a)).localeCompare(String(ZDIMS[dim].lab(b)), 'uk'));
 }
-function zAgg(rs) { let g = 0, s = 0, p = 0; for (const r of rs) { g += r.g; s += r.s; p += r.ctl ? r.g + r.s : r.g; } return { g: g, s: s, p: p, ops: g + s, n: rs.length }; }
+function zAgg(rs) { let g = 0, s = 0, p = 0, m = 0; for (const r of rs) { g += r.g; s += r.s; p += r.ctl ? r.g + r.s : r.g; if (r.pr) m += (r.pb ? r.g + r.s : r.g) * r.pr; } return { g: g, s: s, p: p, m: m, ops: g + s, n: rs.length }; }   // v130: m — сума ₴
 function zGroup(rs, f) { const m = new Map(); for (const r of rs) { const k = f(r); let a = m.get(k); if (!a) m.set(k, a = []); a.push(r); } return m; }
 const zPc = (a, b) => b ? (a / b * 100).toFixed(1).replace('.', ',') + ' %' : '—';
 function zInF(r, S) { for (const k in S.F.m) { const v = S.F.m[k]; if (v && v.length && v.indexOf(ZDIMS[k].f(r)) < 0) return false; } return true; }
@@ -3797,7 +3762,8 @@ const ZVALS8 = {
   s: { l: 'Брак, шт', f: a => a.s, fmt: fn, csv: x => x },
   pct: { l: '% браку', f: a => a.ops ? a.s / a.ops * 100 : 0, fmt: v => zF1p(v) + ' %', csv: x => zF1p(x), pct: 1 },
   ops: { l: 'Оброблено (усп. + брак), шт', f: a => a.ops, fmt: fn, csv: x => x },
-  p: { l: 'До оплати, шт (З-05)', f: a => a.p, fmt: fn, csv: x => x }
+  p: { l: 'До оплати, шт (З-05)', f: a => a.p, fmt: fn, csv: x => x },
+  m: { l: 'Сума, ₴', f: a => a.m, fmt: fnM, csv: x => String(Math.round(x * 100) / 100).replace('.', ',') }   // v130: за цінами на дату запису
 };
 const ZVALS8OUT = { g: { l: 'Готових, шт', f: a => a.g, fmt: fn, csv: x => x }, s: { l: 'Брак на останньому кроці, шт', f: a => a.s, fmt: fn, csv: x => x } };
 function z8Locks() {
@@ -3838,6 +3804,13 @@ function zUrlBm() {
   if (PARAMS.bm === 'f3') z8F3(true);
   delete PARAMS.bm; delete PARAMS.day; setUrl();
 }
+/** v130: закладка «Відомість ЗП» (Р-8_11) — матриця Працівник → Крок, значення: до оплати, шт і сума, ₴; колонок немає */
+function z8Pay() {
+  const S = ZST.out; Object.keys(S.F.m).forEach(k => { if (!(S.lock || {})[k]) delete S.F.m[k]; });
+  S.metric = 'ops'; S.split = 'none'; S.unit = 'uah'; S.sel = []; S.cum = false;
+  S.mx = zMXD(['worker', 'step'], 'none', 'm'); S.mx.more = ['p']; zOpen('r8m');
+  toast('Відомість ЗП: працівник × крок'); renderDash();
+}
 /** v68: обрано причину браку (Р-8_12) — графік, рейтинг і матриця показують брак, а не успішні (інакше там нулі) */
 const zScrapM = S => S.sel.some(x => x.dim === 'reason') || ((S.F.m.reason || []).length > 0);
 function r8() {
@@ -3849,7 +3822,8 @@ function r8() {
   S.chip = out && !acc ? { t: '📊 Випуск (останній крок)', x: zAct(z8Ops) } : null;
   const bm = acc ? '' : '<details class="zbm"><summary>🔖 Закладки</summary><div><button type="button" style="font-weight:800" title="Скільки готових вийшло: успішні на останньому кроці маршруту статорів, роторів і двигунів" onclick="zA(' + zAct(() => z8Acc()) + ')">' + (out ? '✓ ' : '') + 'Випуск готових статорів, роторів і двигунів</button>' +
     '<button type="button" style="font-weight:800" title="Кроки F5 і K2: матриця Крок → Типорозмір · KV — успішних, брак, % браку від оброблених" onclick="zA(' + zAct(() => z8Fin()) + ')">Вихідний контроль і пакування: F5, K2</button>' +
-    '<button type="button" style="font-weight:800" title="Крок F3: матриця Крок → Типорозмір · KV, колонки — версія (в11, в22), значення — успішних" onclick="zA(' + zAct(() => z8F3()) + ')">F3 · Тестування: успішні за типорозміром · KV і версією</button></div></details>';   // v71, v89, v127
+    '<button type="button" style="font-weight:800" title="Крок F3: матриця Крок → Типорозмір · KV, колонки — версія (в11, в22), значення — успішних" onclick="zA(' + zAct(() => z8F3()) + ')">F3 · Тестування: успішні за типорозміром · KV і версією</button>' +
+    '<button type="button" style="font-weight:800" title="Матриця Працівник → Крок: до оплати, шт і сума, ₴ за цінами на дату запису" onclick="zA(' + zAct(() => z8Pay()) + ')">Відомість ЗП: працівник × крок, ₴</button></div></details>';   // v130   // v71, v89, v127
   let h = zFbar8('out', fields, bm);
   const kr = zSelApply(rs, S, 'kpi'), A0 = zAgg(kr);
   const fin = k => kr.filter(r => r.fin && r.kind === k).reduce((a, r) => a + r.g, 0);
@@ -3862,16 +3836,18 @@ function r8() {
     : zKpi('Виробіток', fn(A0.g), 'шт', 'успішних операцій', 'Сума успішних на всіх кроках: одна деталь рахується на кожному кроці, який пройшла', 'kgood') +
       zKpi('Брак', fn(A0.s), 'шт', zPc(A0.s, A0.ops) + ' від оброблених', '% браку = брак ÷ (успішні + брак) за всіма кроками.', A0.s ? 'kbad' : '') +
       zKpi('Готових двигунів', fn(fin('MT')), 'шт', 'статорів ' + fn(fin('ST')) + ' · роторів ' + fn(fin('RT')), 'Останній крок маршруту за період') +
+      (acc ? '' : zKpi('Нараховано', A0.m ? fnM(A0.m) : '—', A0.m ? '₴' : '', 'за цінами на дату запису', ZPAYTIP)) +   // v130
       zKpi('Працівників', fn(new Set(kr.map(r => r.w).filter(Boolean)).size), '', 'з записами') + zKpi('Партій', fn(new Set(kr.map(r => r.b)).size), '', 'з записами')) + '</div>';
   // Р-8_04 графік у часі, Р-8_08 наростаючим підсумком. v71 (рішення 24.10): один графік — у кожному періоді стовпчики статорів, роторів і двигунів
   // поруч (кроків у них різна кількість, тому в один стовпчик не складаємо); розріз — усередині стовпчика виду. Лінію % браку (Р-8_14) прибрано.
-  const cr = zSelApply(rs, S, 'chart'), scrapM = zScrapM(S), val = r => scrapM ? r.s : r.g;
+  const cr = zSelApply(rs, S, 'chart'), scrapM = zScrapM(S), uah = !out && !scrapM && !acc && S.unit === 'uah';   // v130: перемикач шт / ₴
+  const val = r => scrapM ? r.s : uah ? (r.pr ? (r.pb ? r.g + r.s : r.g) * r.pr : 0) : r.g;
   const splits = out ? [['tk', 'Типорозмір · KV'], ['typ', 'Типорозмір'], ['ver', 'Версія'], ['none', 'Без розрізу']]
     : [['none', 'Без розрізу'], ['floor', 'Поверх'], ['line', 'Лінія'], ['step', 'Крок'], ['worker', 'Працівник'], ['tk', 'Типорозмір · KV'], ['ver', 'Версія']];
   if (!splits.some(x => x[0] === S.split)) S.split = splits[0][0];
   const cats = zBucketsIn(F, cr.map(r => r.d)), kindsIn = zSortVals('kind', zUniq(cr.map(r => r.kind)));
   const sc = zSelOf(S, 'chart'), sl = zSelOf(S, 'legend'), gN = ({ d: 'днями', w: 'тижнями', m: 'місяцями' })[F.gran];
-  const allL = scrapM ? 'Брак, шт' : out ? 'Готових, шт' : 'Успішних операцій, шт';
+  const allL = scrapM ? 'Брак, шт' : out ? 'Готових, шт' : uah ? 'Сума, ₴' : 'Успішних операцій, шт';
   const tsr = zTop(cr, S.split, val, 7);
   const series = tsr.keys.map((k, i) => ({ k: k, l: k === '__oth' ? 'Інші' : k === '__all' ? allL : ZDIMS[S.split].lab(k),
     c: k === '__oth' ? '#9AA8B0' : k === '__all' ? (scrapM ? '#B3261E' : ZPAL[0]) : zColor(S.split, k, i) }));
@@ -3881,14 +3857,15 @@ function r8() {
     if (S.cum) series.forEach(x => { let a = 0; cats.forEach(c => { a += v[x.k][c] || 0; v[x.k][c] = a; }); });
     return { k: kd, l: ZKINDN[kd] || kd || allL, c: kd ? zColor('kind', kd, 0) : ZPAL[0], v: v };
   });
-  const charts = zChartG('zc8o', { cats: cats, groups: groups, series: series, split: S.split !== 'none', catLabel: (c, l) => zBkLabel(c, F.gran, l), fmt: fn,
+  const charts = zChartG('zc8o', { cats: cats, groups: groups, series: series, split: S.split !== 'none', catLabel: (c, l) => zBkLabel(c, F.gran, l), fmt: uah ? ((v, ax) => ax ? fn(v) : fnM(v) + ' ₴') : fn,
     selCat: sc && sc.val, selSer: sl && sl.val, onCat: c => zSelTog(S, 'chart', 'bucket', c, F.gran), onSer: S.split === 'none' ? null : k => zSelTog(S, 'legend', S.split, k) });
   h += zFold('r8c', (scrapM ? 'Брак' : out ? 'Випуск' : 'Проведені операції') + ' за ' + gN, '', '<div class="zctl"><span>Розріз:</span><select onchange="zA(' + zAct(v => { S.split = v; S.sel = S.sel.filter(x => x.src !== 'legend'); renderDash(); }) + ',this.value)">' +
     splits.map(x => '<option value="' + x[0] + '"' + (S.split === x[0] ? ' selected' : '') + '>' + x[1] + '</option>').join('') + '</select>' +
+    (!out && !scrapM && !acc ? zChips(S.unit || 'qty', [['qty', 'шт'], ['uah', '₴']], v => { S.unit = v; renderDash(); }) : '') +   // v130
     '<label class="zck"><input type="checkbox"' + (S.cum ? ' checked' : '') + ' onchange="zA(' + zAct(v => { S.cum = v; renderDash(); }) + ',this.checked)"> наростаючим підсумком</label></div>' +
     (cr.length ? charts : '<p class="muted">Немає даних.</p>') +
     '<p class="muted" style="margin:6px 0 0">' + (scrapM ? 'Обрано причину браку — показано брак, шт. ' : out ? 'Готові — успішні на останньому кроці маршруту. ' :
-      'Рахуємо успішні операції: одна деталь рахується на кожному кроці, який пройшла (обсяг роботи). ') +
+      uah ? 'Сума ₴ — за цінами на дату запису; тести й перевірки — за всі перевірені. ' : 'Рахуємо успішні операції: одна деталь рахується на кожному кроці, який пройшла (обсяг роботи). ') +
     (kindsIn.length > 1 ? 'Статори, ротори й двигуни — окремі стовпчики поруч: кроків у них різна кількість, тож в один стовпчик їх не складаємо. ' : '') +
     'Стовпчик — решта звіту тільки за цей період; легенда розрізу — тільки ця група.</p>', true);
   // Р-8_05 за кроками / за працівниками — один блок з перемикачем; брак — окремими колонками (шт і %), щоб рядки не зсувались
