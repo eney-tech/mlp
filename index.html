@@ -1,5 +1,7 @@
 <!DOCTYPE html>
-<!-- МЛП · index.html v131 · 23.11.2026 — суми ₴ на екрані — до цілих гривень; у CSV — з копійками.
+<!-- МЛП · index.html v132 · 23.11.2026 — премії й штрафи (Pay.gs v2): кабінет — «＋ Премія / штраф» і список з скасуванням; «Мій виробіток» — у «Нараховано»
+     і блок «Премії та штрафи»; Р-8 — у «Нараховано» і матриці (рядок «± · Премії й штрафи»).
+     index.html v131 · 23.11.2026 — суми ₴ на екрані — до цілих гривень; у CSV — з копійками.
      index.html v130 · 23.11.2026 — суми в ₴ за офіційними цінами (рішення Андрія 23.11, Reports.gs v51, Pay.gs v1): калькулятор і ціни в телефоні прибрано;
      Р-8с — картка «Нараховано, ₴», стовпчик ₴ у «Роботи й записи», графік шт / ₴, лише тарифіковані кроки; Р-8 — картка «Нараховано», перемикач шт / ₴,
      значення матриці «Сума, ₴», закладка «Відомість ЗП: працівник × крок, ₴».
@@ -710,7 +712,7 @@
 <div class="net" id="net" role="alert" aria-live="assertive"><div class="nb"><div class="rt" id="netr"></div><div class="nt" id="nett">Зберігаю…</div><div class="ns" id="nets"></div><div class="np"><i id="netp"></i></div><div class="nh" id="neth"></div><div class="zc" id="zc"></div><button class="nx" id="netx" type="button">Не чекати</button></div></div>
 
 <script>
-const PAGE_VERSION = 'index.html v131 · 23.11.2026';   // v131: ₴ на екрані — до цілих; v130: суми ₴ за цінами «ЗП_Ціни», без калькулятора; v129: Р-2_04 «Готово до збирання» — і статори / ротори в партіях двигунів, що чекають пари; v128: екран реєстрації — тиха перевірка реєстрації більше не показує плашку «Відкриваю…» (екран «вічно вантажився» на телефоні, де сторінку вже відкривали); v127: Р-8 — колонки «Типорозмір · KV», закладка F3, посилання ?bm=f3; v126: нова партія статорів — «Готовий статор» (одразу готова); зміна типорозміру не скидає «Почати з кроку», під кнопкою — з чого старт, колір статорів при старті після бази; v122: меню — + Склад, порядок, індекси пунктів; склад — порядок блоків, «Прийміть» згорнуто, партії відвантаження; v121: Р-2_05 готові до збирання — статори й ротори окремо, разом, деталі в партіях двигунів; v120: (прибрано); v119: ящики ГП у «Перемістити» — за кнопкою; v118: кількість у списку, свіжі технічні назви, «Прийміть на …»; v117: вибір позиції — три рівні; v116: Р-15 цех — рівень 1; v115: Р-15 деревом, згорнуті блоки складу, дерево позицій, технічна назва; v114: вид — поле, пошук за ключовими словами; v113: групи й види номенклатури; v112: Р-15 — блоки згортаються; v111: Р-15 «Склад: залишки й рух»; v110: дії за типом локації, переміщення, партія покупцю; v109: кілька фото, тара, перемаркування; v108: приймання від постачальника, наліпки; v107: передачі склад → цех, ящики ГП приймає склад; v106: позиції складу за групами; v105: кнопки складу «Беремо зі складу» / «Приймаємо на склад»; v104: «Історія тари» (?th=) — назва тари на сторінці тари / партії веде на неї (Reports.gs v42)
+const PAGE_VERSION = 'index.html v132 · 23.11.2026';   // v132: премії й штрафи; v131: ₴ на екрані — до цілих; v130: суми ₴ за цінами «ЗП_Ціни», без калькулятора; v129: Р-2_04 «Готово до збирання» — і статори / ротори в партіях двигунів, що чекають пари; v128: екран реєстрації — тиха перевірка реєстрації більше не показує плашку «Відкриваю…» (екран «вічно вантажився» на телефоні, де сторінку вже відкривали); v127: Р-8 — колонки «Типорозмір · KV», закладка F3, посилання ?bm=f3; v126: нова партія статорів — «Готовий статор» (одразу готова); зміна типорозміру не скидає «Почати з кроку», під кнопкою — з чого старт, колір статорів при старті після бази; v122: меню — + Склад, порядок, індекси пунктів; склад — порядок блоків, «Прийміть» згорнуто, партії відвантаження; v121: Р-2_05 готові до збирання — статори й ротори окремо, разом, деталі в партіях двигунів; v120: (прибрано); v119: ящики ГП у «Перемістити» — за кнопкою; v118: кількість у списку, свіжі технічні назви, «Прийміть на …»; v117: вибір позиції — три рівні; v116: Р-15 цех — рівень 1; v115: Р-15 деревом, згорнуті блоки складу, дерево позицій, технічна назва; v114: вид — поле, пошук за ключовими словами; v113: групи й види номенклатури; v112: Р-15 — блоки згортаються; v111: Р-15 «Склад: залишки й рух»; v110: дії за типом локації, переміщення, партія покупцю; v109: кілька фото, тара, перемаркування; v108: приймання від постачальника, наліпки; v107: передачі склад → цех, ящики ГП приймає склад; v106: позиції складу за групами; v105: кнопки складу «Беремо зі складу» / «Приймаємо на склад»; v104: «Історія тари» (?th=) — назва тари на сторінці тари / партії веде на неї (Reports.gs v42)
 // v103 (11.11): Р-9_08 «За типом», «Перевірено, все ок»
 // v102 (09.11):   // v74: в1 — і з нашої тари (ящик залишків); в2 — лише партії в2
 // v72 (26.10):   // v72: «Яку партію відкриваємо?»; розшифровка кроків на картці партії; реєстрація — повернення за посиланням з форми
@@ -3081,6 +3083,7 @@ function renderCabinet() {
     return '<div class="li"><div class="' + (on ? '' : 'x') + '"><b>' + esc(p.name || p.email) + '</b>' + (p.here ? ' <span class="pill ok" style="margin:0">мій поверх</span>' : '') + (p.skladByRole || (d.skladAttr && p.sklad) ? ' <span class="pill" style="margin:0">склад</span>' : '') + '<br><span class="muted">' + esc(p.role) + ' · ' + esc(wh) +
       (p.last ? ' · останній запис ' + esc(p.last) : '') + '</span></div><div class="r">' + ctl + '</div></div>';
   }).join('') + '</div></details>';
+  if (d.adj) h += adjCard(d.adj);   // v132: премії й штрафи
   if (d.sums) h += '<div class="card"><div class="mid">Підсумки для звітів</div><div class="muted">Рахуються щоночі о 02:30; сьогоднішні записи — одразу. Зміни за минулі дні, внесені сьогодні, — після перерахунку.</div>' +   // v37: етап 4
     '<p style="margin:10px 0 0">Останній перерахунок:<br><b>' + esc(d.sums.last || 'ще не було') + '</b></p>' +
     '<button type="button" class="btn btn2" onclick="loadCabinet(1)">Перерахувати зараз</button></div>';
@@ -3089,6 +3092,66 @@ function renderCabinet() {
   $('app').innerHTML = h + profile;
 }
 const CABO = {};   // які блоки кабінету розгорнуто (поки відкрита сторінка)
+
+// =============================================================== v132: ПРЕМІЇ Й ШТРАФИ (тімлід, зав. виробництва, зав. відділу якості, адміністратор; Pay.gs v2)
+const fnMk = n => (Math.round((Number(n) || 0) * 100) / 100).toLocaleString('uk-UA', { maximumFractionDigits: 2 });   // у формі — з копійками
+const adjSum = x => (x.sum > 0 ? '+' : '−') + fnMk(Math.abs(x.sum)) + ' ₴';
+function adjCard(A) {
+  const live = A.recent.filter(x => !x.canc);
+  const row = x => '<div class="li"><div' + (x.canc ? ' class="x"' : '') + '><b>' + esc(x.who) + '</b> · <span class="pill ' + (x.sum < 0 ? 'bad' : 'ok') + '" style="margin:0">' + esc(x.t) + '</span><br>' +
+    '<span class="muted">' + zDm(x.d) + ' · ' + esc(x.rs) + (x.step ? ' · ' + esc(x.step) : '') + (x.b ? ' · ' + esc(x.b) : '') + (x.qty ? ' · ' + fn(x.qty) + ' × ' + fnMk(x.pr) + ' ₴' : '') + '<br>' + esc(x.c) +
+    '<br>вніс: ' + esc(x.by) + (x.canc ? '<br>скасовано: ' + esc(x.canc) : '') + '</span></div><div class="r"><b style="color:' + (x.sum < 0 ? '#B3261E' : '#1F7A4D') + '">' + adjSum(x) + '</b>' +
+    (x.canc || x.w === (CAB.me && CAB.me.id) ? '' : '<br><button class="ic" style="margin-top:6px" onclick="adjCancel(\'' + esc(x.id) + '\')">Скасувати</button>') + '</div></div>';
+  return '<div class="card"><div class="mid">Премії та штрафи</div><p class="muted" style="margin:4px 0 10px">За що завгодно: з прив\'язкою до партії й кроку або без. Працівник бачить суму й причину у «Мій виробіток».</p>' +
+    '<button class="btn" onclick="adjOpen()">＋ Премія / штраф</button>' +
+    '<details' + (CABO.adj ? ' open' : '') + ' ontoggle="CABO.adj=this.open"><summary>Останні ' + A.days + ' днів (' + live.length + ')</summary><div class="list">' +
+    (A.recent.length ? A.recent.map(row).join('') : '<p class="muted">Записів немає.</p>') + '</div></details></div>';
+}
+function adjOpen() {
+  const A = CAB.adj, today = zToday(), min = zAdd(today, -(A.retroDays || 30));
+  const steps = A.steps.map(s => '<option value="' + esc(s[0]) + '" data-f="' + esc(s[2]) + '">' + esc(s[0] + ' · ' + s[1]) + '</option>').join('');
+  openModal('<div class="card"><div class="mid">Премія / штраф</div>' +
+    '<label>Працівник</label><select id="ajw"><option value="">— оберіть —</option>' + A.people.map(p => '<option value="' + esc(p.id) + '">' + esc(p.name) + '</option>').join('') + '</select>' +
+    '<div class="grid" style="margin-top:10px"><button type="button" class="btn btn2" id="ajk1" onclick="adjKind(\'премія\')">＋ Премія</button><button type="button" class="btn btn2" id="ajk2" onclick="adjKind(\'штраф\')">− Штраф</button></div>' +
+    '<label>Причина</label><select id="ajr"><option value="">— оберіть —</option>' + A.reasons.map(r => '<option>' + esc(r) + '</option>').join('') + '</select>' +
+    '<label>Коментар (обов\'язково — за що)</label><input type="text" id="ajc" placeholder="напр. 12 статорів з обірваним виводом на S2">' +
+    '<label>Партія (необов\'язково)</label><input type="text" id="ajb" placeholder="S-00123" onchange="adjQuote()">' +
+    '<label>Крок (необов\'язково)</label><select id="ajs" onchange="adjQuote()"><option value="">— без кроку —</option>' + steps + '</select>' +
+    '<div class="grid"><div><label>Кількість, шт</label><input inputmode="numeric" id="ajq" oninput="adjCalc()" placeholder="—"></div>' +
+    '<div><label>Ціна за 1, ₴</label><input inputmode="decimal" id="ajp" oninput="ADJF.pm=1;adjCalc()" placeholder="—"></div></div>' +
+    '<label>Сума, ₴</label><input inputmode="decimal" id="ajsum" oninput="adjCalc()"><div class="muted" id="ajhint"></div>' +
+    '<label>Дата</label><input type="date" id="ajd" value="' + today + '" min="' + min + '" max="' + today + '" onchange="adjQuote()">' +
+    '<div class="err" id="merr"></div><div class="grid" style="margin-top:6px"><button class="btn btn2" onclick="closeModal()">Закрити</button><button class="btn" id="mgo">Записати</button></div></div>');
+  ADJF.kind = ''; ADJF.pm = 0; ADJF.typ = '';
+  $('mgo').onclick = () => {
+    if (!ADJF.kind) { $('merr').textContent = 'Оберіть: премія чи штраф'; return; }
+    act({ action: 'payAdj', view: '', who: $('ajw').value, kind: ADJF.kind, reason: $('ajr').value, comment: $('ajc').value, adjBatch: $('ajb').value,
+      step: $('ajs').value, qty: $('ajq').value, price: $('ajp').value, sum: $('ajsum').value, at: $('ajd').value === today ? '' : $('ajd').value }, $('mgo'), () => loadCabinet());
+  };
+}
+const ADJF = { kind: '', pm: 0, typ: '' };
+function adjKind(k) { ADJF.kind = k; $('ajk1').className = 'btn ' + (k === 'премія' ? '' : 'btn2'); $('ajk2').className = 'btn ' + (k === 'штраф' ? 'btnr' : 'btn2'); }
+function adjCalc() {
+  const q = zNum($('ajq').value), p = zNum($('ajp').value);
+  if (q > 0) { $('ajsum').value = p > 0 ? String(Math.round(q * p * 100) / 100).replace('.', ',') : ''; $('ajsum').disabled = true;
+    $('ajhint').textContent = p > 0 ? fn(q) + ' × ' + fnMk(p) + ' ₴' + (ADJF.typ ? ' · ' + ADJF.typ : '') : 'Вкажіть ціну за 1 шт'; }
+  else { $('ajsum').disabled = false; $('ajhint').textContent = 'Без кількості — сума вручну'; }
+}
+function adjQuote() {
+  const b = $('ajb').value.trim(), st = $('ajs').value;
+  if (!b && !st) { ADJF.typ = ''; adjCalc(); return; }
+  google.script.run.withSuccessHandler(r => {
+    const x = r.quote || {}; ADJF.typ = x.typ || '';
+    if (x.stream && $('ajs')) Array.from($('ajs').options).forEach(o => { if (o.value) o.hidden = o.dataset.f !== x.stream; });
+    if (st && x.price !== null && x.price !== undefined && !ADJF.pm) $('ajp').value = x.price ? String(x.price).replace('.', ',') : '';
+    $('merr').textContent = ''; adjCalc();
+  }).withFailureHandler(e => { $('merr').textContent = e.message; }).apiCabinet({ code: CODE, quote: { batch: b, step: st, at: $('ajd').value } });
+}
+function adjCancel(id) {
+  openModal('<div class="card"><div class="mid">Скасувати ' + esc(id) + '?</div><label>Причина (обов\'язково)</label><input type="text" id="mcm">' +
+    '<div class="err" id="merr"></div><div class="grid" style="margin-top:6px"><button class="btn btn2" onclick="closeModal()">Ні</button><button class="btn btnr" id="mgo">Скасувати</button></div></div>');
+  $('mgo').onclick = () => act({ action: 'payAdjCancel', view: '', ref: id, comment: $('mcm').value }, $('mgo'), () => loadCabinet());
+}
 
 // =============================================================== ДАШБОРДИ: «Стан зараз» (Р-2а), «Тара» (Р-5), «Мій виробіток» (Р-3а)
 let DB = null;
@@ -3275,7 +3338,8 @@ function r8c() {
     '<div class="znav"><button type="button" class="ic" onclick="z8shift(-1)">‹</button><b>' + esc(lbl) + '</b><button type="button" class="ic"' + (d.to >= d.today ? ' disabled style="opacity:.4"' : '') + ' onclick="z8shift(1)">›</button></div>' +
     '<input type="date" class="zdate" value="' + esc(d.anchor) + '" max="' + esc(d.today) + '" onchange="if(this.value)z8go(\'a\',this.value)">' +
     (d.anchor !== d.today ? '<button type="button" class="ic" onclick="z8go(\'a\',\'\')">Сьогодні</button>' : '') + '</div></div>';
-  if (!d.recs.length && !d.noBatch.length) {
+  d.adj = d.adj || [];
+  if (!d.recs.length && !d.noBatch.length && !d.adj.length) {
     return h + '<div class="card center muted">За ' + (d.mode === 'd' ? 'цей день' : d.mode === 'w' ? 'цей тиждень' : 'цей місяць') + ' записів немає.' +
       (d.lastDay ? '<br><button type="button" class="btn btn2" style="width:auto;display:inline-block;padding:12px 16px" onclick="PARAMS.m=\'d\';z8go(\'a\',\'' + esc(d.lastDay) + '\')">Показати останній день із записами — ' + ZDOWN[zDow(d.lastDay)] + ' ' + zDm(d.lastDay) + '</button>' : '') + '</div>';
   }
@@ -3285,9 +3349,10 @@ function r8c() {
   const works = Object.keys(gw).sort((a, b) => ord(a.split('|')[0]) - ord(b.split('|')[0]) || a.localeCompare(b));
   const good = d.recs.reduce((a, r) => a + r.good, 0), scrap = d.recs.reduce((a, r) => a + r.scrap, 0), pay = d.recs.reduce((a, r) => a + zPayQ(r), 0);
   const nb = new Set(d.recs.map(r => r.batch)).size;
-  const money = zMoney(d);
+  const opsM = zMoney(d), bon = d.adj.filter(x => x.sum > 0).reduce((a, x) => a + x.sum, 0), fine = d.adj.filter(x => x.sum < 0).reduce((a, x) => a - x.sum, 0);   // v132
+  const money = opsM + bon - fine;
   h += '<div class="zkpis">' + zKpi('У виробіток', fn(pay), 'шт', 'у ' + nb + ' ' + plural(nb, 'партії', 'партіях', 'партіях') + (pay !== good ? ' · успішних ' + fn(good) : ''),
-    'Тести й перевірки (контрольні кроки) рахуються за кількістю всіх перевірених — успішні + знайдений брак. Решта кроків — успішні.', 'kgood') + zKpi('Нараховано', money ? fnM(money) : '—', money ? '₴' : '', 'за цінами на дату запису', ZPAYTIP) + '</div>';
+    'Тести й перевірки (контрольні кроки) рахуються за кількістю всіх перевірених — успішні + знайдений брак. Решта кроків — успішні.', 'kgood') + zKpi('Нараховано', money ? fnM(money) : '—', money ? '₴' : '', bon || fine ? 'операції ' + fnM(opsM) + (bon ? ' · премії +' + fnM(bon) : '') + (fine ? ' · штрафи −' + fnM(fine) : '') : 'за цінами на дату запису', ZPAYTIP + ' Премії й штрафи ставить тімлід — список нижче.') + '</div>';
   // Р-8с_09 графік
   h += zFold8('chart', d.mode === 'd' ? 'За годинами' : 'За днями', '', '<div class="zctl"><span>Розріз:</span><select onchange="Z8.csplit=this.value;renderDash()">' +
     [['none', 'Без розрізу'], ['batch', 'Партії'], ['tk', 'Типорозмір · KV'], ['step', 'Крок']].map(x => '<option value="' + x[0] + '"' + (S8.csplit === x[0] ? ' selected' : '') + '>' + x[1] + '</option>').join('') + '</select>' +
@@ -3328,6 +3393,10 @@ function r8c() {
   h += zFold8('nb', 'Робота без партії', d.noBatch.length ? (hrs ? zF1(hrs) + ' год' : d.noBatch.length + '') : '0',
     d.noBatch.length ? d.noBatch.slice().reverse().map(r => '<div class="li"><div>' + esc(r.work) + (r.comment ? '<br><span class="muted">' + esc(r.comment) + '</span>' : '') + '<br><span class="muted">' + ZDOWN[zDow(r.d)] + ' ' + zDm(r.d) + ' ' + esc(r.tm) + '</span></div><b class="r">' +
       (r.hours ? zF1(r.hours) + ' год' : zF1(r.qty) + ' ' + esc(zNbUnit(r))) + (zNbAmt(r) ? '<br><span class="muted">' + fnM(zNbAmt(r)) + ' ₴</span>' : '') + '</b></div>').join('') : '<p class="muted">За цей період немає. Записати — на Головній.</p>');
+  if (d.adj.length) h += zFold8('adj', 'Премії та штрафи', (bon ? '+' + fnM(bon) : '') + (bon && fine ? ' · ' : '') + (fine ? '−' + fnM(fine) : '') + ' ₴',   // v132
+    d.adj.slice().sort((a, b) => (b.d + b.tm).localeCompare(a.d + a.tm)).map(x => '<div class="li"><div><span class="pill ' + (x.sum < 0 ? 'bad' : 'ok') + '" style="margin:0">' + esc(x.t) + '</span> ' + esc(x.rs) +
+      '<br><span class="muted">' + esc(x.c) + '<br>' + ZDOWN[zDow(x.d)] + ' ' + zDm(x.d) + (x.step ? ' · ' + esc(x.step) : '') + (x.b ? ' · ' + esc(x.b) : '') + (x.qty ? ' · ' + fn(x.qty) + ' шт' : '') + ' · ' + esc(x.by) + '</span></div>' +
+      '<b class="r" style="color:' + (x.sum < 0 ? '#B3261E' : '#1F7A4D') + '">' + (x.sum < 0 ? '−' : '+') + fnM(Math.abs(x.sum)) + ' ₴</b></div>').join(''), true);
   return h;
 }
 /** v75: одиниця запису без партії (сервер v32 шле unit; старий — за годинами) */
@@ -3530,6 +3599,15 @@ try { ['out', 'scrap'].forEach(k => { const v = JSON.parse(store('mlp_per_' + k)
 function zOutQ() { const r = zRange(ZST[PARAMS.d].F); return { from: r[0], to: r[1] }; }
 /** Записи з рядків сервера. Брак з причинами — окремими «шматками» (успішні — у шматку без причини), суми не змінюються */
 let ZREC = null, ZRECDB = null;
+/** v132: премії й штрафи Р-8 як рядки з сумою a (₴, штраф — мінус); крок — «±», щоб у матриці був окремий рядок працівника */
+function zAdjRecs() {
+  if (ZADJDB === DB) return ZADJ;
+  if (DB.steps && !DB.steps['±']) DB.steps['±'] = ['Премії й штрафи', '', ''];
+  ZADJ = (DB.adj || []).map(x => ({ d: x[0], w: x[1], step: '±', kind: '', typ: x[8] || '', kv: '', ver: '', fl: x[7] || '—', loc: x[7] || '—', b: x[5] || '', ln: '—',
+    fin: false, ctl: false, g: 0, s: 0, rs: '—', pr: 0, a: Number(x[3]) || 0 }));
+  ZADJDB = DB; return ZADJ;
+}
+let ZADJ = [], ZADJDB = null;
 function zRecs() {
   if (ZRECDB === DB) return ZREC;
   const d = DB, fin = {}; Object.keys(d.finals || {}).forEach(k => (d.finals[k] || []).forEach(c => fin[k + '|' + c] = 1));
@@ -3572,7 +3650,7 @@ function zSortVals(dim, vals, byVal) {
   if (byVal) return v.sort((a, b) => byVal(b) - byVal(a));
   return v.sort((a, b) => String(ZDIMS[dim].lab(a)).localeCompare(String(ZDIMS[dim].lab(b)), 'uk'));
 }
-function zAgg(rs) { let g = 0, s = 0, p = 0, m = 0; for (const r of rs) { g += r.g; s += r.s; p += r.ctl ? r.g + r.s : r.g; if (r.pr) m += (r.pb ? r.g + r.s : r.g) * r.pr; } return { g: g, s: s, p: p, m: m, ops: g + s, n: rs.length }; }   // v130: m — сума ₴
+function zAgg(rs) { let g = 0, s = 0, p = 0, m = 0; for (const r of rs) { g += r.g; s += r.s; p += r.ctl ? r.g + r.s : r.g; if (r.pr) m += (r.pb ? r.g + r.s : r.g) * r.pr; if (r.a) m += r.a; } return { g: g, s: s, p: p, m: m, ops: g + s, n: rs.length }; }   // v130: m — сума ₴
 function zGroup(rs, f) { const m = new Map(); for (const r of rs) { const k = f(r); let a = m.get(k); if (!a) m.set(k, a = []); a.push(r); } return m; }
 const zPc = (a, b) => b ? (a / b * 100).toFixed(1).replace('.', ',') + ' %' : '—';
 function zInF(r, S) { for (const k in S.F.m) { const v = S.F.m[k]; if (v && v.length && v.indexOf(ZDIMS[k].f(r)) < 0) return false; } return true; }
@@ -3826,7 +3904,8 @@ function r8() {
     '<button type="button" style="font-weight:800" title="Крок F3: матриця Крок → Типорозмір · KV, колонки — версія (в11, в22), значення — успішних" onclick="zA(' + zAct(() => z8F3()) + ')">F3 · Тестування: успішні за типорозміром · KV і версією</button>' +
     '<button type="button" style="font-weight:800" title="Матриця Працівник → Крок: до оплати, шт і сума, ₴ за цінами на дату запису" onclick="zA(' + zAct(() => z8Pay()) + ')">Відомість ЗП: працівник × крок, ₴</button></div></details>';   // v130   // v71, v89, v127
   let h = zFbar8('out', fields, bm);
-  const kr = zSelApply(rs, S, 'kpi'), A0 = zAgg(kr);
+  const adjR = out || acc ? [] : zAdjRecs().filter(r => zInF(r, S));   // v132: премії й штрафи — у картку «Нараховано» і матрицю
+  const kr = zSelApply(rs, S, 'kpi'), A0 = zAgg(kr.concat(zSelApply(adjR, S, 'kpi')));
   const fin = k => kr.filter(r => r.fin && r.kind === k).reduce((a, r) => a + r.g, 0);
   const kinds = F.m.kind || [];
   h += '<div class="zkpis">' + (out
@@ -3894,7 +3973,7 @@ function r8() {
       zFold('r8f', 'Успішні операції за поверхами', '', fk.length ? zBars(fk.map(k => ({ l: '<b>' + esc(k) + '</b> <span class="muted">' + esc(zSiteN(k) === k ? '' : zSiteN(k)) + '</span>', v: zAgg(gf.get(k)).g, t: fn(zAgg(gf.get(k)).g) + ' шт', on: zAct(() => zSelTog(S, 'flr', 'floor', k)), dim: sf && sf.val !== k }))) : '<p class="muted">Записів немає.</p>');
   }
   if (!out) { if (scrapM && S.mx.val === 'g') { S.mx.val = 's'; S.mx._auto = 1; } else if (!scrapM && S.mx._auto) { S.mx.val = 'g'; delete S.mx._auto; } }
-  const mr = zSelApply(rs, S, 'mx');
+  const mr = zSelApply(rs.concat(adjR), S, 'mx');
   h += zFold('r8m', 'Матриця', '', zMatrix('out', mr, S.mx, { title: 'Р-8_06 Матриця', gran: F.gran, vals: out ? ZVALS8OUT : ZVALS8,
     dims: acc ? ['typ', 'kv', 'ver', 'tk'] : ['worker', 'step', 'kind', 'typ', 'kv', 'tk', 'ver', 'batch', 'loc', 'floor', 'line', 'reason'], colDims: acc ? ['typ', 'tk', 'ver'] : ['kind', 'floor', 'line', 'loc', 'typ', 'tk', 'ver', 'reason'] }));   // v90: + причина браку; v127: + Типорозмір · KV
   return h;
