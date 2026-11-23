@@ -1,5 +1,7 @@
 <!DOCTYPE html>
-<!-- МЛП · index.html v136 · 23.11.2026 — Р-7: ₴ на 1 готову — лише наші й закриті партії (Pay.gs v5), підказки чому «—».
+<!-- МЛП · index.html v137 · 23.11.2026 — Р-0_09 період: Сьогодні / Вчора / Тиждень / Місяць (◀ ▶, календар, «поточний, N з M роб. днів») / Останні 7·30·90 днів / Свій;
+     підпис завжди з датами; деталізація — лише доречна; крайні тижні на графіку — датами в межах періоду. Р-13 — без змін.
+     index.html v136 · 23.11.2026 — Р-7: ₴ на 1 готову — лише наші й закриті партії (Pay.gs v5), підказки чому «—».
      index.html v135 · 23.11.2026 — вартість браку й робота партії (Reports.gs v54, Pay.gs v4): Р-10 — картка «Втрачено роботи, ₴», графік «Втрати, ₴»,
      блок «Втрати роботи за кроками, ₴» (Р-10_09), значення матриці «Втрати роботи, ₴»; Р-7 — колонки «Робота, ₴» і «₴ на 1 готову», картка партії «Робота в партії».
      index.html v134 · 23.11.2026 — Р-16_08: значення «Кількість (оплачувана)» і «Ціна за од., ₴» (середня, якщо в рядку кілька цін).
@@ -343,6 +345,13 @@
   .zfr .chips{flex:1;align-items:center;min-width:0}.zfr .chips button:disabled{opacity:.75}
   .zfr .zfbtn{padding:6px 12px;border-radius:99px}
   @media (max-width:520px){.zfl{flex-basis:76px;font-size:10.5px}}
+  .zpnav{flex-basis:100%;display:flex;gap:6px;align-items:center;flex-wrap:wrap;margin-top:4px}
+  .zpnav .zarr{min-width:38px;padding:5px 10px;font-weight:700}.zpnav .zarr:disabled{opacity:.35}
+  .zplab{position:relative;display:inline-flex;min-width:0;flex:0 1 auto}.zpnav .zpl{border:0;background:#EEF3F6;border-radius:10px;padding:6px 12px;font-weight:600;color:#1D2B33;text-align:left;line-height:1.3}
+  .zpnav.nv{flex-wrap:nowrap}.zpnav .zarr,.zpnav .zcur{flex:0 0 auto}
+  @media (max-width:520px){.zpnav.nv{flex-wrap:wrap}.zpnav.nv .zplab{order:-1;flex:1 1 100%}.zpnav .zpl{width:100%}}
+  .zpick{position:absolute;left:0;bottom:0;width:1px;height:1px;opacity:0;pointer-events:none;border:0;padding:0}
+  .zpnav .zcur{border-style:dashed}.zpt{font-size:13.5px;color:#41525C;font-weight:600}
   .zkpi .d .zkx{color:#B3261E;font-weight:600;text-decoration:none}
   /* v68: Р-2 «Де зараз» — матриця специфікацій, шкали в клітинках, кубики-ящики */
   table.zm2 td,table.zm2 th{padding:5px 8px;vertical-align:middle}table.zm2 th{white-space:nowrap;line-height:1.25;text-align:center;position:sticky;top:0;z-index:2;background:#fff}
@@ -719,7 +728,7 @@
 <div class="net" id="net" role="alert" aria-live="assertive"><div class="nb"><div class="rt" id="netr"></div><div class="nt" id="nett">Зберігаю…</div><div class="ns" id="nets"></div><div class="np"><i id="netp"></i></div><div class="nh" id="neth"></div><div class="zc" id="zc"></div><button class="nx" id="netx" type="button">Не чекати</button></div></div>
 
 <script>
-const PAGE_VERSION = 'index.html v136 · 23.11.2026';   // v136: ₴ на 1 готову — наші й закриті; v135: вартість браку (Р-10), робота партії (Р-7); v134: Р-16_08 кількість і ціна за од.; v133: Р-16 «Зарплата»; v132: премії й штрафи; v131: ₴ на екрані — до цілих; v130: суми ₴ за цінами «ЗП_Ціни», без калькулятора; v129: Р-2_04 «Готово до збирання» — і статори / ротори в партіях двигунів, що чекають пари; v128: екран реєстрації — тиха перевірка реєстрації більше не показує плашку «Відкриваю…» (екран «вічно вантажився» на телефоні, де сторінку вже відкривали); v127: Р-8 — колонки «Типорозмір · KV», закладка F3, посилання ?bm=f3; v126: нова партія статорів — «Готовий статор» (одразу готова); зміна типорозміру не скидає «Почати з кроку», під кнопкою — з чого старт, колір статорів при старті після бази; v122: меню — + Склад, порядок, індекси пунктів; склад — порядок блоків, «Прийміть» згорнуто, партії відвантаження; v121: Р-2_05 готові до збирання — статори й ротори окремо, разом, деталі в партіях двигунів; v120: (прибрано); v119: ящики ГП у «Перемістити» — за кнопкою; v118: кількість у списку, свіжі технічні назви, «Прийміть на …»; v117: вибір позиції — три рівні; v116: Р-15 цех — рівень 1; v115: Р-15 деревом, згорнуті блоки складу, дерево позицій, технічна назва; v114: вид — поле, пошук за ключовими словами; v113: групи й види номенклатури; v112: Р-15 — блоки згортаються; v111: Р-15 «Склад: залишки й рух»; v110: дії за типом локації, переміщення, партія покупцю; v109: кілька фото, тара, перемаркування; v108: приймання від постачальника, наліпки; v107: передачі склад → цех, ящики ГП приймає склад; v106: позиції складу за групами; v105: кнопки складу «Беремо зі складу» / «Приймаємо на склад»; v104: «Історія тари» (?th=) — назва тари на сторінці тари / партії веде на неї (Reports.gs v42)
+const PAGE_VERSION = 'index.html v137 · 23.11.2026';   // v137: Р-0_09 період — вид + ◀ ▶, дати в підписі; v136: ₴ на 1 готову — наші й закриті; v135: вартість браку (Р-10), робота партії (Р-7); v134: Р-16_08 кількість і ціна за од.; v133: Р-16 «Зарплата»; v132: премії й штрафи; v131: ₴ на екрані — до цілих; v130: суми ₴ за цінами «ЗП_Ціни», без калькулятора; v129: Р-2_04 «Готово до збирання» — і статори / ротори в партіях двигунів, що чекають пари; v128: екран реєстрації — тиха перевірка реєстрації більше не показує плашку «Відкриваю…» (екран «вічно вантажився» на телефоні, де сторінку вже відкривали); v127: Р-8 — колонки «Типорозмір · KV», закладка F3, посилання ?bm=f3; v126: нова партія статорів — «Готовий статор» (одразу готова); зміна типорозміру не скидає «Почати з кроку», під кнопкою — з чого старт, колір статорів при старті після бази; v122: меню — + Склад, порядок, індекси пунктів; склад — порядок блоків, «Прийміть» згорнуто, партії відвантаження; v121: Р-2_05 готові до збирання — статори й ротори окремо, разом, деталі в партіях двигунів; v120: (прибрано); v119: ящики ГП у «Перемістити» — за кнопкою; v118: кількість у списку, свіжі технічні назви, «Прийміть на …»; v117: вибір позиції — три рівні; v116: Р-15 цех — рівень 1; v115: Р-15 деревом, згорнуті блоки складу, дерево позицій, технічна назва; v114: вид — поле, пошук за ключовими словами; v113: групи й види номенклатури; v112: Р-15 — блоки згортаються; v111: Р-15 «Склад: залишки й рух»; v110: дії за типом локації, переміщення, партія покупцю; v109: кілька фото, тара, перемаркування; v108: приймання від постачальника, наліпки; v107: передачі склад → цех, ящики ГП приймає склад; v106: позиції складу за групами; v105: кнопки складу «Беремо зі складу» / «Приймаємо на склад»; v104: «Історія тари» (?th=) — назва тари на сторінці тари / партії веде на неї (Reports.gs v42)
 // v103 (11.11): Р-9_08 «За типом», «Перевірено, все ок»
 // v102 (09.11):   // v74: в1 — і з нашої тари (ящик залишків); в2 — лише партії в2
 // v72 (26.10):   // v72: «Яку партію відкриваємо?»; розшифровка кроків на картці партії; реєстрація — повернення за посиланням з форми
@@ -3562,7 +3571,10 @@ function zDrawCol(id, cfg) {
 // =============================================================== v38: Р-8 «ВИРОБІТОК» І Р-10 «АНАЛІЗ БРАКУ» (етап 5, прототип звітів v19)
 // Дані — денні підсумки за період (Reports.gs v18, apiDash d=out / d=scrap); фільтри, перехресний вибір (Р-0_01), графік (Р-0_11), рейтинги,
 // матриця з рівнями (Р-0_12) і CSV (Р-0_14) — на сторінці. Період змінився — новий запит; решта — без сервера.
-const ZPERS = [['today', 'Сьогодні'], ['prev', 'Попередній роб. день'], ['week', 'Цей тиждень'], ['lweek', 'Минулий тиждень'], ['month', 'Цей місяць'], ['lmonth', 'Минулий місяць'], ['d30', 'Останні 30 днів'], ['custom', 'Свій період…']];
+// v137 (Р-0_09): період = вид + зсув. Тиждень / місяць — календарні, ◀ ▶ гортають (off: 0 — поточний, -1 — минулий…); «Останні N днів» — ковзні, до сьогодні;
+// підпис завжди з датами. Старі збережені значення (prev, lweek, lmonth, d30) переводяться в zNormF
+const ZPERS = [['today', 'Сьогодні'], ['yest', 'Вчора'], ['week', 'Тиждень'], ['month', 'Місяць'], ['roll', 'Останні N днів'], ['custom', 'Свій період']];
+const ZROLLN = [7, 30, 90];
 const ZKINDN = { ST: 'Статори (СТ)', RT: 'Ротори (РТ)', MT: 'Двигуни (ДВ)' };
 const ZMONS = ['січ.', 'лют.', 'бер.', 'квіт.', 'трав.', 'черв.', 'лип.', 'серп.', 'вер.', 'жовт.', 'лист.', 'груд.'];
 const zWk = s => zAdd(s, -zDow(s));
@@ -3570,42 +3582,97 @@ const zPrevWork = s => { let x = zAdd(s, -1); while (zDow(x) > 4) x = zAdd(x, -1
 const zAddMonth = (s, n) => { const d = zPd(s.slice(0, 8) + '01'); d.setMonth(d.getMonth() + n); return zYmd(d); };
 const zMonthEnd = s => { const d = zPd(s.slice(0, 8) + '01'); d.setMonth(d.getMonth() + 1); d.setDate(0); return zYmd(d); };
 const zToday = () => (DB && DB.today) || zYmd(new Date());
+const zMin = (a, b) => a < b ? a : b;
+/** повний календарний період (тиждень / місяць) без обрізання сьогоднішнім днем */
+function zFull(F) {
+  const t = zToday(), off = Math.min(0, Number(F.off) || 0);
+  if (F.per === 'week') { const s = zAdd(zWk(t), 7 * off); return [s, zAdd(s, 6)]; }
+  if (F.per === 'month') { const s = zAddMonth(t, off); return [s, zMonthEnd(s)]; }
+  return null;
+}
 function zRange(F) {
-  const t = zToday();
+  const t = zToday(), fl = zFull(F);
+  if (fl) return [fl[0], zMin(fl[1], t)];
   switch (F.per) {
     case 'today': return [t, t];
-    case 'prev': { const p = zPrevWork(t); return [p, p]; }
-    case 'week': return [zWk(t), t];
-    case 'lweek': { const s = zAdd(zWk(t), -7); return [s, zAdd(s, 6)]; }
-    case 'month': return [t.slice(0, 8) + '01', t];
-    case 'lmonth': { const s = zAddMonth(t, -1); return [s, zMonthEnd(s)]; }
-    case 'd30': return [zAdd(t, -29), t];
-    default: return [F.from || t.slice(0, 8) + '01', F.to || t];
+    case 'yest': { const y = zAdd(t, -1); return [y, y]; }
+    case 'roll': { const n = Number(F.n) || 30; return [zAdd(t, -(n - 1)), t]; }
+    default: { let a = F.from || t.slice(0, 8) + '01', b = F.to || t; if (b > t) b = t; if (a > b) a = b; return [a, b]; }
   }
 }
 const zDmy = s => zDm(s) + '.' + s.slice(0, 4);
-function zPerLabel(F) { const r = zRange(F); return r[0] === r[1] ? ZDOWN[zDow(r[0])] + ' ' + zDmy(r[0]) : zDmy(r[0]) + ' – ' + zDmy(r[1]); }
+const zWd = (a, b) => { let n = 0; for (let x = a; x <= b; x = zAdd(x, 1)) if (zDow(x) < 5) n++; return n; };   // робочі дні Пн–Пт
+const zDd = (a, b) => Math.round((zPd(b) - zPd(a)) / 864e5);
+/** діапазон дат коротко: 16–22.11.2026, 27.10–02.11.2026, 29.12.2025–04.01.2026 */
+function zRgTxt(a, b) {
+  if (a === b) return zDmy(a);
+  if (a.slice(0, 4) !== b.slice(0, 4)) return zDmy(a) + '–' + zDmy(b);
+  return (a.slice(5, 7) === b.slice(5, 7) ? a.slice(8, 10) : zDm(a)) + '–' + zDmy(b);
+}
+/** підпис періоду: що обрано і які це дати. long — з ознакою поточного / минулого і кількістю робочих днів */
+function zPerLabel(F, long) {
+  const r = zRange(F), fl = zFull(F), off = Math.min(0, Number(F.off) || 0), cap = s => s.charAt(0).toUpperCase() + s.slice(1);
+  const day = d => ZDOWN[zDow(d)] + ' ' + zDmy(d);
+  if (F.per === 'today') return 'Сьогодні · ' + day(r[0]);
+  if (F.per === 'yest') return 'Вчора · ' + day(r[0]) + (zDow(r[0]) > 4 ? ' · вихідний' : '');
+  if (F.per === 'roll') return 'Останні ' + (Number(F.n) || 30) + ' днів · ' + zRgTxt(r[0], r[1]);
+  if (fl) {
+    const isW = F.per === 'week', name = isW ? 'Тиждень ' + zRgTxt(fl[0], fl[1]) : cap(ZMONN[Number(fl[0].slice(5, 7)) - 1]) + ' ' + fl[0].slice(0, 4);
+    if (!long) return name + (off === 0 ? ' · поточний' : off === -1 ? (isW ? ' · минулий' : ' · минулий') : '');
+    if (off === 0) return name + ' · поточний, ' + zWd(r[0], r[1]) + ' з ' + zWd(fl[0], fl[1]) + ' роб. днів (по ' + zDm(r[1]) + ')';
+    return name + (off === -1 ? (isW ? ' · минулий тиждень' : ' · минулий місяць') : '');
+  }
+  return r[0] === r[1] ? day(r[0]) : zRgTxt(r[0], r[1]) + ' · ' + (zDd(r[0], r[1]) + 1) + ' дн.';
+}
+/** деталізація, яку має сенс показувати для періоду */
+function zGrans(F) {
+  if (F.per === 'today' || F.per === 'yest' || F.per === 'week') return ['d'];
+  if (F.per === 'month') return ['d', 'w'];
+  return ['d', 'w', 'm'];
+}
+/** v137: привести стан періоду до нового виду (старі збережені значення) і допустимої деталізації */
+function zNormF(F) {
+  const old = { prev: ['yest'], lweek: ['week', -1], lmonth: ['month', -1], d30: ['roll'] }[F.per];
+  if (old) { F.per = old[0]; F.off = 0; if (old[0] === 'roll') F.n = 30; }
+  if (!ZPERS.some(x => x[0] === F.per)) F.per = 'month';
+  if (!F.n) F.n = 30;
+  if (F.off === undefined || F.off > 0) F.off = 0;
+  const g = zGrans(F);
+  if (g.indexOf(F.gran) < 0) F.gran = g[g.length > 1 && F.gran === 'm' ? g.length - 1 : 0];
+  if (F.per === 'roll' || F.per === 'custom') { const r = zRange(F), n = zDd(r[0], r[1]) + 1; if (F.gran === 'd' && n > 92) F.gran = 'w'; if (F.gran === 'm' && n <= 31) F.gran = n > 14 ? 'w' : 'd'; }
+  return F;
+}
+function zLoadPer(rid) {
+  try { const v = JSON.parse(store('mlp_per_' + rid) || 'null'); if (v && v.per) Object.assign(ZST[rid].F, { per: v.per, off: 0, n: v.n || 30, from: v.from || '', to: v.to || '', gran: v.gran || ZST[rid].F.gran }); } catch (e) { }
+  zNormF(ZST[rid].F);
+}
 const zBk = (d, g) => g === 'w' ? zWk(d) : g === 'm' ? d.slice(0, 7) : d;
+let ZBKRG = null;   // v137: межі періоду звіту, що зараз малюється (ставить zBucketsIn) — крайні тижні підписуються датами всередині періоду
 function zBkLabel(k, g, long) {
   if (g === 'm') return (long ? ZMONN : ZMONS)[Number(k.slice(5, 7)) - 1] + ' ' + k.slice(0, 4);
-  if (g === 'w') return (long ? 'тиждень з ' : 'з ') + zDm(k);
+  if (g === 'w') {
+    let a = k, b = zAdd(k, 6), part = false;
+    if (ZBKRG) { if (a < ZBKRG[0]) { a = ZBKRG[0]; part = true; } if (b > ZBKRG[1]) { b = ZBKRG[1]; part = true; } if (a > b) { a = k; b = zAdd(k, 6); part = false; } }
+    const t = a === b ? zDm(a) : (a.slice(5, 7) === b.slice(5, 7) ? a.slice(8, 10) : zDm(a)) + '–' + zDm(b);
+    return long ? 'тиждень ' + t + (part ? ' (частина)' : '') : t;
+  }
   return (long ? ZDOWN[zDow(k)] + ' ' : '') + zDm(k);
 }
 function zBucketsIn(F, dates) {
-  const rg = zRange(F), g = F.gran, out = [], has = new Set(dates);
+  const rg = zRange(F), g = F.gran, out = [], has = new Set(dates); ZBKRG = rg;
   if (g === 'd') { for (let x = rg[0]; x <= rg[1]; x = zAdd(x, 1)) if (zDow(x) < 5 || has.has(x)) out.push(x); }
   else if (g === 'w') { for (let x = zWk(rg[0]); x <= rg[1]; x = zAdd(x, 7)) out.push(x); }
   else { for (let x = rg[0].slice(0, 8) + '01'; x <= rg[1]; x = zAddMonth(x, 1)) out.push(x.slice(0, 7)); }
   return out;
 }
-const zMkF = (per, gran) => ({ per: per, from: '', to: '', gran: gran, m: {} });
+const zMkF = (per, gran) => ({ per: per, off: 0, n: 30, from: '', to: '', gran: gran, m: {} });
 const zMXD = (rows, cols, val) => ({ rows: rows, cols: cols, val: val, exp: {}, all: false });
 const ZST = {
   out: { F: zMkF('month', 'd'), sel: [], split: 'none', cum: false, cline: false, metric: 'ops', rankBy: 'step', wmore: false, mx: zMXD(['worker', 'step'], 'none', 'g') },
   pay: { F: zMkF('month', 'd'), sel: [], split: 'pt', rankBy: 'worker', wmore: false, mx: zMXD(['worker', 'pt'], 'none', 'm') },   // v133: Р-16
   scrap: { F: zMkF('month', 'w'), sel: [], ymode: 'qty', split: 'step', exp: {}, expBy: 'batch', dBy: 'batch', dExp: {}, det: null, mx: zMXD(['step', 'worker'], 'bucket', 's') }
 };
-try { ['out', 'scrap', 'pay'].forEach(k => { const v = JSON.parse(store('mlp_per_' + k) || 'null'); if (v && v.per) Object.assign(ZST[k].F, { per: v.per, from: v.from || '', to: v.to || '', gran: v.gran || ZST[k].F.gran }); }); } catch (e) { }
+['out', 'scrap', 'pay'].forEach(zLoadPer);
 function zOutQ() { const r = zRange(ZST[PARAMS.d].F); return { from: r[0], to: r[1] }; }
 /** Записи з рядків сервера. Брак з причинами — окремими «шматками» (успішні — у шматку без причини), суми не змінюються */
 let ZREC = null, ZRECDB = null;
@@ -3691,14 +3758,44 @@ function zTop(rs, dim, valF, n) {
   return { keys: ord(keys), f: f };
 }
 // ---- Р-0_09 фільтри: період, деталізація, мультивибір з пошуком, чипи обраного
+function zPerGo(rid) { const S = ZST[rid]; zNormF(S.F); S.sel = S.sel.filter(x => x.dim !== 'bucket'); zPerSave(rid); loadDash(); }
 function zSetPer(rid, v) {
-  const F = ZST[rid].F; F.per = v;
-  if (v === 'custom' && !F.from) { const r = zRange(zMkF('month')); F.from = r[0]; F.to = r[1]; }
-  if (v === 'today' || v === 'prev') F.gran = 'd';
-  ZST[rid].sel = ZST[rid].sel.filter(x => x.dim !== 'bucket'); zPerSave(rid); loadDash();
+  const F = ZST[rid].F;
+  if (v === 'custom' && F.per !== 'custom') { const r = zRange(F); F.from = r[0]; F.to = r[1]; }   // «Свій» починається з того, що було обрано
+  F.per = v; F.off = 0; zPerGo(rid);
 }
-function zPerSave(rid) { const F = ZST[rid].F; store('mlp_per_' + rid, JSON.stringify({ per: F.per, from: F.from, to: F.to, gran: F.gran })); }
-function zSetCustom(rid, k, v) { if (!v) return; ZST[rid].F[k] = v; zPerSave(rid); loadDash(); }
+function zPerShift(rid, d) { const F = ZST[rid].F; F.off = Math.min(0, (Number(F.off) || 0) + d); zPerGo(rid); }
+function zSetRoll(rid, n) { ZST[rid].F.n = n; zPerGo(rid); }
+/** календар: обрали дату (або місяць) — тиждень / місяць, у який вона потрапляє */
+function zPerJump(rid, v) {
+  if (!v) return; const F = ZST[rid].F, t = zToday();
+  if (F.per === 'week') { const d = /^\d{4}-\d\d-\d\d$/.test(v) ? v : ''; if (!d) return; F.off = Math.min(0, Math.round(zDd(zWk(t), zWk(d)) / 7)); }
+  else { const m = v.slice(0, 7); F.off = Math.min(0, (Number(m.slice(0, 4)) - Number(t.slice(0, 4))) * 12 + Number(m.slice(5, 7)) - Number(t.slice(5, 7))); }
+  zPerGo(rid);
+}
+function zPerPick(el) { const i = el.parentNode.querySelector('input'); if (!i) return; try { i.showPicker(); } catch (e) { i.focus(); i.click(); } }
+function zPerSave(rid) { const F = ZST[rid].F; store('mlp_per_' + rid, JSON.stringify({ per: F.per, n: F.n, from: F.from, to: F.to, gran: F.gran })); }
+function zSetCustom(rid, k, v) { if (!v) return; const F = ZST[rid].F; F[k] = v; if (F.from > F.to) { if (k === 'from') F.to = v; else F.from = v; } zPerGo(rid); }
+/** v137: рядок «Період» — вид періоду, під ним навігатор: ◀ підпис ▶ (тиждень / місяць), 7 / 30 / 90 (ковзний), дати (свій) */
+function zPerRow(rid) {
+  const F = ZST[rid].F, t = zToday(), off = Math.min(0, Number(F.off) || 0), r = zRange(F), q = '\'' + rid + '\'';
+  let nav = '';
+  if (F.per === 'week' || F.per === 'month') {
+    const fl = zFull(F), inp = F.per === 'week' ? '<input type="date" class="zpick" value="' + fl[0] + '" max="' + t + '" onchange="zPerJump(' + q + ',this.value)">'
+      : '<input type="month" class="zpick" value="' + fl[0].slice(0, 7) + '" max="' + t.slice(0, 7) + '" onchange="zPerJump(' + q + ',this.value)">';
+    nav = '<button type="button" class="zarr" title="Попередній" onclick="zPerShift(' + q + ',-1)">◀</button>' +
+      '<span class="zplab"><button type="button" class="zpl" title="Обрати в календарі" onclick="zPerPick(this)">' + esc(zPerLabel(F, true)) + ' 📅</button>' + inp + '</span>' +
+      '<button type="button" class="zarr" title="Наступний"' + (off >= 0 ? ' disabled' : '') + ' onclick="zPerShift(' + q + ',1)">▶</button>' +
+      (off < 0 ? '<button type="button" class="zcur" onclick="zPerShift(' + q + ',' + (-off) + ')">↺ Поточний</button>' : '');
+  } else if (F.per === 'roll') {
+    nav = ZROLLN.map(n => '<button type="button" class="zarr' + (Number(F.n) === n ? ' on' : '') + '" onclick="zSetRoll(' + q + ',' + n + ')">' + n + '</button>').join('') +
+      '<span class="zpt">днів · ' + esc(zRgTxt(r[0], r[1])) + ' (по сьогодні включно)</span>';
+  } else if (F.per === 'custom') {
+    nav = '<input type="date" class="zdate" value="' + r[0] + '" max="' + t + '" onchange="zSetCustom(' + q + ',\'from\',this.value)"><span class="muted">–</span>' +
+      '<input type="date" class="zdate" value="' + r[1] + '" max="' + t + '" onchange="zSetCustom(' + q + ',\'to\',this.value)"><span class="zpt">' + esc(zPerLabel(F)) + '</span>';
+  } else nav = '<span class="zpt">' + esc(zPerLabel(F)) + '</span>';
+  return zFrow('Період', ZPERS, F.per, v => zSetPer(rid, v), '<div class="zpnav' + (F.per === 'week' || F.per === 'month' ? ' nv' : '') + '">' + nav + '</div>');
+}
 function zSetGran(rid, g) { ZST[rid].F.gran = g; ZST[rid].sel = ZST[rid].sel.filter(x => x.dim !== 'bucket'); zPerSave(rid); renderDash(); }
 /** v68: фільтри періодних звітів — один рядок на фільтр: період, деталізація, далі поля. Короткий перелік (до ZCHIPMAX) — кнопки з мультивибором,
  *  довгий (працівники, партії, кроки) — кнопка зі списком і пошуком; обране в списку — чипами в тому самому рядку */
@@ -3707,9 +3804,8 @@ function zFbar8(rid, fields, extra) {
   const S = ZST[rid], F = S.F, lock = S.lock || {}, D = S.D || ZDIMS;
   const nAct = Object.keys(F.m).filter(k => F.m[k] && F.m[k].length).length + S.sel.length;
   const set = k => a => { if (a.length) F.m[k] = a; else delete F.m[k]; renderDash(); };
-  let dates = '';
-  if (F.per === 'custom') { const rg = zRange(F); dates = '<input type="date" class="zdate" value="' + rg[0] + '" max="' + zToday() + '" onchange="zSetCustom(\'' + rid + '\',\'from\',this.value)"><span class="muted">–</span><input type="date" class="zdate" value="' + rg[1] + '" max="' + zToday() + '" onchange="zSetCustom(\'' + rid + '\',\'to\',this.value)">'; }
-  let h = zFrow('Період', ZPERS, F.per, v => zSetPer(rid, v), dates) + (S.noGran ? '' : zFrow('Деталізація', [['d', 'Дні'], ['w', 'Тижні'], ['m', 'Місяці']], F.gran, v => zSetGran(rid, v)));   // v78: noGran — списки (Р-14) без деталізації
+  zNormF(F); const gs = zGrans(F);
+  let h = zPerRow(rid) + (S.noGran || gs.length < 2 ? '' : zFrow('Деталізація', [['d', 'Дні'], ['w', 'Тижні'], ['m', 'Місяці']].filter(x => gs.indexOf(x[0]) >= 0), F.gran, v => zSetGran(rid, v)));   // v78: noGran — списки (Р-14) без деталізації; v137 — лише доречні варіанти
   fields.forEach(k => {
     const v = F.m[k] || [];
     if (lock[k]) { h += '<div class="zfr"><span class="zfl">' + esc(D[k].l) + '</span><div class="chips">' + (v.length ? v.map(x => '<button type="button" class="on" disabled>' + esc(D[k].lab(x)) + ' 🔒</button>').join('') : '<button type="button" disabled>усі 🔒</button>') + '</div></div>'; return; }
@@ -3894,7 +3990,7 @@ function z8F3(silent) {
 function zUrlBm() {
   if (PARAMS.d !== 'out' || !PARAMS.bm) return;
   const F = ZST.out.F, day = /^\d{4}-\d\d-\d\d$/.test(PARAMS.day || '') ? PARAMS.day : '';
-  if (day) Object.assign(F, { per: 'custom', from: day, to: day, gran: 'd' }); else F.per = 'prev';
+  const d1 = day || zPrevWork(zToday()); Object.assign(F, { per: 'custom', off: 0, from: d1, to: d1, gran: 'd' });   // v137: без дня — попередній робочий день як «Свій»
   if (PARAMS.bm === 'f3') z8F3(true);
   delete PARAMS.bm; delete PARAMS.day; setUrl();
 }
@@ -4251,7 +4347,7 @@ const ZBDIMS = {
 };
 const zBSort = (dim, vals) => dim === 'kind' ? vals.sort((a, b) => ['ST', 'RT', 'MT'].indexOf(a) - ['ST', 'RT', 'MT'].indexOf(b)) : dim === 'kv' ? vals.sort(zKvSort) : vals.sort();
 ZST.batches = { F: zMkF('month', 'w'), sel: [], sort: { k: 'idle', dir: -1 }, more: false, D: ZBDIMS, sortV: zBSort };
-try { const v = JSON.parse(store('mlp_per_batches') || 'null'); if (v && v.per) Object.assign(ZST.batches.F, { per: v.per, from: v.from || '', to: v.to || '', gran: v.gran || 'w' }); } catch (e) { }
+zLoadPer('batches');
 const ZKS = { ST: 'СТ', RT: 'РТ', MT: 'ДВ' };
 const zStatusPill = st => '<span class="pill ' + (st === 'в роботі' ? '' : st === 'видано частково' || st === 'поза маршрутом' ? 'warn' : 'ok') + '" style="margin:0">' + esc(st) + '</span>';
 const zSN = c => ((DB.steps || {})[c] || [''])[0];
@@ -4350,7 +4446,7 @@ const ZCDIMS = {
 };
 ZST.control = { F: zMkF('month', 'w'), sel: [], more: false, rw: '', rday: '', rv: 'type', unk: false, only2: false, open: {}, raw: {}, rawDB: null, D: ZCDIMS,
   sortV: (k, vals) => vals.sort((a, b) => k === 't' ? ZEVT.indexOf(a) - ZEVT.indexOf(b) : String(ZCDIMS[k].lab(a)).localeCompare(String(ZCDIMS[k].lab(b)), 'uk')) };
-try { const v = JSON.parse(store('mlp_per_control') || 'null'); if (v && v.per) Object.assign(ZST.control.F, { per: v.per, from: v.from || '', to: v.to || '', gran: v.gran || 'w' }); } catch (e) { }
+zLoadPer('control');
 function r9() {
   const S = ZST.control, F = S.F;
   S.base = DB.events || [];
@@ -4578,7 +4674,7 @@ ZPOPDIMS.push('tare');
 ZST.recs = { F: zMkF('week', 'd'), sel: [], noGran: true, more: false, D: ZRDIMS,
   sortV: (k, vals) => vals.sort((a, b) => k === 't' ? (Object.keys(ZRT).indexOf(a) + 1 || 99) - (Object.keys(ZRT).indexOf(b) + 1 || 99) : k === 'kind' ? ['ST', 'RT', 'MT', '—'].indexOf(a) - ['ST', 'RT', 'MT', '—'].indexOf(b)
     : k === 'status' ? ['діє', 'виправлено', 'скасовано'].indexOf(a) - ['діє', 'виправлено', 'скасовано'].indexOf(b) : String(a).localeCompare(String(b), 'uk', { numeric: true })) };
-try { const v = JSON.parse(store('mlp_per_recs') || 'null'); if (v && v.per) Object.assign(ZST.recs.F, { per: v.per, from: v.from || '', to: v.to || '' }); } catch (e) { }
+zLoadPer('recs');
 function z14row(r) {
   const dead = r.status === 'скасовано', was = r.status === 'виправлено';
   const qty = r.t === 'крок' ? fn(r.g) + ' / ' + fn(r.s) + (was ? ' <span class="muted">(було ' + fn(r.wg) + ' / ' + fn(r.ws) + ')</span>' : '')
