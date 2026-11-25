@@ -1,5 +1,8 @@
 <!DOCTYPE html>
-<!-- МЛП · index.html v142 · 25.11.2026 — огляд кроків: R5 дає «Готовий ротор без гравіювання» (одразу на F4) і «Ротор, що потребує балансування» (на R6); R2 4320 — ще
+<!-- МЛП · index.html v143 · 25.11.2026 — Р-15_03 «Що де лежить» (рішення Андрія 25.11): над таблицею — рівні для всіх рядків одразу:
+     «− рівень» / «+ рівень», «Згорнути все» / «Розгорнути все» (Група → Уніфікована → Технічна); заливка цифр — як у Power BI: лише на рядках,
+     що зараз не розгорнуті (розгорнута група чи позиція — без заливки, цифри є). Кнопки блоків — «Згорнути / Розгорнути всі блоки».
+     index.html v142 · 25.11.2026 — огляд кроків: R5 дає «Готовий ротор без гравіювання» (одразу на F4) і «Ротор, що потребує балансування» (на R6); R2 4320 — ще
      «Ротортоп із запресованим валом, що потребує допресування» (на R1.1). Назви в «Що в тарі зараз» — із сервера (Code.gs v140).
      index.html v141 · 25.11.2026 — ротор 4320: R2 «8-ка» ділить партію (Code.gs v139, рішення 25.11): форма R2 — «Готові → R3», «На допресування (R1.1)»
      і брак, «Перевірено» — їх сума (рахується саме); написи поділу беруться з маршруту (splitA / splitB / splitTo), R5 — як було.
@@ -657,6 +660,8 @@
   .r15t td{padding:5px 8px;border-bottom:1px solid #EEF2F5;vertical-align:top}.r15t td.v{text-align:right;white-space:nowrap;font-variant-numeric:tabular-nums}.r15t td.n{min-width:150px}
   .r15b{display:grid;grid-template-columns:minmax(120px,38%) 1fr auto;gap:8px;align-items:center;margin:4px 0;font-size:13px}.r15b .t{background:#EEF2F5;border-radius:4px;height:12px}.r15b .t div{height:12px;border-radius:4px}
   .r15b .d{white-space:nowrap;text-align:right;font-variant-numeric:tabular-nums}.r15b .d.bad{color:#9B231A;font-weight:700}
+  .r15lv{display:flex;flex-wrap:wrap;align-items:center;gap:6px;margin:0 0 8px}.r15lv button{background:#fff;border:1px solid #C5D0D7;border-radius:8px;padding:4px 10px;font-size:13px;color:#1D2B33;cursor:pointer}
+  .r15lv button:disabled{opacity:.4;cursor:default}.r15lvc{font-size:13px;padding:0 4px;min-width:118px;text-align:center}
   .r15fa{display:flex;gap:8px;justify-content:flex-end;margin:4px 12px 0}.r15fa button{background:none;border:1px solid #C5D0D7;border-radius:8px;padding:4px 10px;font-size:13px;color:#55656E;cursor:pointer}
   .r15tg{display:inline-block;width:18px;color:#2a78d6;cursor:pointer;font-size:13px;user-select:none}.r15g td{background:#F4F7F9;border-top:1px solid #C5D0D7}.r15t1 td{font-size:12.5px;color:#55656E}.r15t1 td.v{opacity:.85}
   .r15lg{display:flex;gap:14px;font-size:13px;color:#66767F}.r15lg i{display:inline-block;width:10px;height:10px;border-radius:2px;margin-right:5px;vertical-align:middle}
@@ -757,7 +762,7 @@
 <div class="net" id="net" role="alert" aria-live="assertive"><div class="nb"><div class="rt" id="netr"></div><div class="nt" id="nett">Зберігаю…</div><div class="ns" id="nets"></div><div class="np"><i id="netp"></i></div><div class="nh" id="neth"></div><div class="zc" id="zc"></div><button class="nx" id="netx" type="button">Не чекати</button></div></div>
 
 <script>
-const PAGE_VERSION = 'index.html v142 · 25.11.2026';   // v142: огляд кроків — два напівфабрикати R2 (4320) і R5; v141: R2 4320 ділить партію — готові → R3, на допресування (R1.1), брак; v140: Р-8с — неоплачувані операції знову в «Роботи й записи», ₴ — «без оплати» (Reports.gs v58); v139: фільтри згортаються і на ПК; v138: Р-0_09 — Весь період, дерево дат з мультивибором; v137: Р-0_09 період — вид + ◀ ▶, дати в підписі; v136: ₴ на 1 готову — наші й закриті; v135: вартість браку (Р-10), робота партії (Р-7); v134: Р-16_08 кількість і ціна за од.; v133: Р-16 «Зарплата»; v132: премії й штрафи; v131: ₴ на екрані — до цілих; v130: суми ₴ за цінами «ЗП_Ціни», без калькулятора; v129: Р-2_04 «Готово до збирання» — і статори / ротори в партіях двигунів, що чекають пари; v128: екран реєстрації — тиха перевірка реєстрації більше не показує плашку «Відкриваю…» (екран «вічно вантажився» на телефоні, де сторінку вже відкривали); v127: Р-8 — колонки «Типорозмір · KV», закладка F3, посилання ?bm=f3; v126: нова партія статорів — «Готовий статор» (одразу готова); зміна типорозміру не скидає «Почати з кроку», під кнопкою — з чого старт, колір статорів при старті після бази; v122: меню — + Склад, порядок, індекси пунктів; склад — порядок блоків, «Прийміть» згорнуто, партії відвантаження; v121: Р-2_05 готові до збирання — статори й ротори окремо, разом, деталі в партіях двигунів; v120: (прибрано); v119: ящики ГП у «Перемістити» — за кнопкою; v118: кількість у списку, свіжі технічні назви, «Прийміть на …»; v117: вибір позиції — три рівні; v116: Р-15 цех — рівень 1; v115: Р-15 деревом, згорнуті блоки складу, дерево позицій, технічна назва; v114: вид — поле, пошук за ключовими словами; v113: групи й види номенклатури; v112: Р-15 — блоки згортаються; v111: Р-15 «Склад: залишки й рух»; v110: дії за типом локації, переміщення, партія покупцю; v109: кілька фото, тара, перемаркування; v108: приймання від постачальника, наліпки; v107: передачі склад → цех, ящики ГП приймає склад; v106: позиції складу за групами; v105: кнопки складу «Беремо зі складу» / «Приймаємо на склад»; v104: «Історія тари» (?th=) — назва тари на сторінці тари / партії веде на неї (Reports.gs v42)
+const PAGE_VERSION = 'index.html v143 · 25.11.2026';   // v143: Р-15_03 — рівні для всіх рядків, заливка лише на нерозгорнутих рядках; v142: огляд кроків — два напівфабрикати R2 (4320) і R5; v141: R2 4320 ділить партію — готові → R3, на допресування (R1.1), брак; v140: Р-8с — неоплачувані операції знову в «Роботи й записи», ₴ — «без оплати» (Reports.gs v58); v139: фільтри згортаються і на ПК; v138: Р-0_09 — Весь період, дерево дат з мультивибором; v137: Р-0_09 період — вид + ◀ ▶, дати в підписі; v136: ₴ на 1 готову — наші й закриті; v135: вартість браку (Р-10), робота партії (Р-7); v134: Р-16_08 кількість і ціна за од.; v133: Р-16 «Зарплата»; v132: премії й штрафи; v131: ₴ на екрані — до цілих; v130: суми ₴ за цінами «ЗП_Ціни», без калькулятора; v129: Р-2_04 «Готово до збирання» — і статори / ротори в партіях двигунів, що чекають пари; v128: екран реєстрації — тиха перевірка реєстрації більше не показує плашку «Відкриваю…» (екран «вічно вантажився» на телефоні, де сторінку вже відкривали); v127: Р-8 — колонки «Типорозмір · KV», закладка F3, посилання ?bm=f3; v126: нова партія статорів — «Готовий статор» (одразу готова); зміна типорозміру не скидає «Почати з кроку», під кнопкою — з чого старт, колір статорів при старті після бази; v122: меню — + Склад, порядок, індекси пунктів; склад — порядок блоків, «Прийміть» згорнуто, партії відвантаження; v121: Р-2_05 готові до збирання — статори й ротори окремо, разом, деталі в партіях двигунів; v120: (прибрано); v119: ящики ГП у «Перемістити» — за кнопкою; v118: кількість у списку, свіжі технічні назви, «Прийміть на …»; v117: вибір позиції — три рівні; v116: Р-15 цех — рівень 1; v115: Р-15 деревом, згорнуті блоки складу, дерево позицій, технічна назва; v114: вид — поле, пошук за ключовими словами; v113: групи й види номенклатури; v112: Р-15 — блоки згортаються; v111: Р-15 «Склад: залишки й рух»; v110: дії за типом локації, переміщення, партія покупцю; v109: кілька фото, тара, перемаркування; v108: приймання від постачальника, наліпки; v107: передачі склад → цех, ящики ГП приймає склад; v106: позиції складу за групами; v105: кнопки складу «Беремо зі складу» / «Приймаємо на склад»; v104: «Історія тари» (?th=) — назва тари на сторінці тари / партії веде на неї (Reports.gs v42)
 // v103 (11.11): Р-9_08 «За типом», «Перевірено, все ок»
 // v102 (09.11):   // v74: в1 — і з нашої тари (ящик залишків); в2 — лише партії в2
 // v72 (26.10):   // v72: «Яку партію відкриваємо?»; розшифровка кроків на картці партії; реєстрація — повернення за посиланням з форми
@@ -5632,8 +5637,8 @@ function r15() {
   const rows = [].concat(...tree.map(x => x.items));
   // фільтри
   const seg = (k, v, t) => '<button class="' + (D[k] === v ? 'on' : '') + '" onclick="Z15.' + k + '=' + JSON.stringify(v).replace(/"/g, '&quot;') + ';Z15.ex={};renderDash()">' + t + '</button>';
-  let h = '<div class="card r15f"><div class="chips"><span class="muted" style="align-self:center;margin-right:4px">Розгорнути до:</span>' + seg('lv', 1, '3 · Група') + seg('lv', 2, '2 · Уніфікована') + seg('lv', 3, '1 · Технічна') + '</div>' +
-    '<div class="chips" style="margin-top:8px">' + locs.map(l => '<button class="' + (D.locs.indexOf(l[0]) >= 0 ? 'on' : '') + '" onclick="r15Loc(\'' + esc(l[0]) + '\')" title="' + esc(l[1]) + '">' + esc(l[0]) + (l[2] === 'shop' ? ' 🏭' : '') + '</button>').join('') +
+  let h = '<div class="card r15f">' +   // v143: «Розгорнути до» — кнопками рівнів над таблицею «Що де лежить»
+    '<div class="chips">' + locs.map(l => '<button class="' + (D.locs.indexOf(l[0]) >= 0 ? 'on' : '') + '" onclick="r15Loc(\'' + esc(l[0]) + '\')" title="' + esc(l[1]) + '">' + esc(l[0]) + (l[2] === 'shop' ? ' 🏭' : '') + '</button>').join('') +
       '<button onclick="Z15.locs=null;renderDash()">усі</button></div>' +
     '<div class="row" style="margin-top:8px"><select id="z15g" data-nocbx style="flex:0 0 30%">' + opts(GO, D.grp, 'усі групи') + '</select>' +
     '<select id="z15k" data-nocbx style="flex:0 0 30%">' + opts(KO, D.kind, 'усі види') + '</select>' +
@@ -5645,28 +5650,37 @@ function r15() {
     kpi('ГП на складах', nf(gpQ), ' шт', gpB + ' ящиків') + kpi('Від\'ємних залишків', neg, '', 'без інвентаризації складів — див. примітку') + '</div>';
   // 1) що де лежить
   const showN = 400; let shown = 0;
-  const isOpen = (id, depth) => D.ex && D.ex[id] !== undefined ? D.ex[id] : (D.q ? true : D.lv > depth);
-  const cell = (c, u, r, bold) => { const pos = cols.reduce((a, l) => a + Math.max(0, c[l[0]] || 0), 0);
+  const isOpen = (id, depth) => D.ex && D.ex[id] !== undefined ? D.ex[id] : (D.q ? true : D.lv > depth + 1);   // v143: lv — найглибший видимий рівень (1 — лише групи, 2 — + уніфіковані, 3 — + технічні)
+  // v143: заливка — як у Power BI: розгорнутий рядок (група / позиція з відкритими нижчими рівнями) — без заливки, лише цифри
+  const cell = (c, u, r, bold, open) => { const pos = cols.reduce((a, l) => a + Math.max(0, c[l[0]] || 0), 0);
     return cols.map(l => { const v = c[l[0]]; if (v === undefined || Math.abs(v) < 1e-9) return '<td></td>';
-      const sh = v > 0 && pos ? v / pos : 0, bg = v < 0 ? '#FDE3E1' : 'rgba(42,120,214,' + (0.08 + 0.55 * sh).toFixed(2) + ')';
-      return '<td class="v" style="background:' + bg + (sh > 0.6 ? ';color:#fff' : v < 0 ? ';color:#9B231A' : '') + (bold ? ';font-weight:700' : '') + '" title="' + esc(l[1] + ': ' + nf(v) + ' ' + u + (r && r.tip[l[0]] ? ' · ' + r.tip[l[0]] : '') + (v < 0 ? ' · від\'ємний: брали більше, ніж записано приходу' : '')) + '">' +
+      const sh = v > 0 && pos ? v / pos : 0, bg = open ? 'transparent' : v < 0 ? '#FDE3E1' : 'rgba(42,120,214,' + (0.08 + 0.55 * sh).toFixed(2) + ')';
+      return '<td class="v" style="background:' + bg + (sh > 0.6 && !open ? ';color:#fff' : v < 0 ? ';color:#9B231A' : '') + (bold ? ';font-weight:700' : '') + '" title="' + esc(l[1] + ': ' + nf(v) + ' ' + u + (r && r.tip[l[0]] ? ' · ' + r.tip[l[0]] : '') + (v < 0 ? ' · від\'ємний: брали більше, ніж записано приходу' : '')) + '">' +
         (r && r.flag[l[0]] ? '🚩 ' : '') + nf(Math.round(v * 10) / 10) + '</td>'; }).join(''); };
   const tg = (id, open) => '<span class="r15tg" onclick="r15Tg(' + JSON.stringify(id).replace(/"/g, '&quot;') + ',' + (open ? 0 : 1) + ')">' + (open ? '▾' : '▸') + '</span>';
   let body = '';
   tree.forEach(T => {
     const go = isOpen('g\u0002' + T.g, 0);
     body += '<tr class="r15g"><td class="n">' + tg('g\u0002' + T.g, go) + '<b>' + esc(T.g) + '</b> <span class="muted">· ' + T.items.length + ' поз.</span></td>' +
-      (T.u ? cell(T.c, T.u, null, true) : cols.map(() => '<td class="muted" title="різні одиниці — сума лише в позиціях"></td>').join('')) + '<td class="muted">' + esc(T.u || 'різні') + '</td></tr>';
+      (T.u ? cell(T.c, T.u, null, true, go) : cols.map(() => '<td class="muted" title="різні одиниці — сума лише в позиціях"></td>').join('')) + '<td class="muted">' + esc(T.u || 'різні') + '</td></tr>';
     if (!go) return;
     T.items.forEach(r => { if (shown++ >= showN) return;
       const lst = n => /^(інше:|без технічної|\(без деталей)/.test(n) ? 1 : 0, ts = Object.keys(r.t).filter(n => nz(r.t[n].c)).sort((a, b) => lst(a) - lst(b) || a.localeCompare(b, 'uk')), io = isOpen(r.id, 1);   // v116: «інше» — останнім
-      body += '<tr><td class="n" style="padding-left:26px">' + (ts.length ? tg(r.id, io) : '<span class="r15tg"></span>') + esc(r.nm) + (ts.length > 1 ? ' <span class="muted">· ' + ts.length + '</span>' : '') + '</td>' + cell(r.c, r.u, r) + '<td class="muted">' + esc(r.u) + '</td></tr>';
+      body += '<tr><td class="n" style="padding-left:26px">' + (ts.length ? tg(r.id, io) : '<span class="r15tg"></span>') + esc(r.nm) + (ts.length > 1 ? ' <span class="muted">· ' + ts.length + '</span>' : '') + '</td>' + cell(r.c, r.u, r, false, io && ts.length > 0) + '<td class="muted">' + esc(r.u) + '</td></tr>';
       if (io) ts.forEach(n => { body += '<tr class="r15t1"><td class="n" style="padding-left:52px">' + esc(n) + '</td>' + cell(r.t[n].c, r.u, null) + '<td class="muted">' + esc(r.u) + '</td></tr>'; });
     });
   });
-  h += '<div class="r15fa"><button type="button" onclick="r15FoldAll(false)">▸ Згорнути всі</button><button type="button" onclick="r15FoldAll(true)">▾ Розгорнути всі</button></div>';
+  h += '<div class="r15fa"><button type="button" onclick="r15FoldAll(false)">▸ Згорнути всі блоки</button><button type="button" onclick="r15FoldAll(true)">▾ Розгорнути всі блоки</button></div>';
+  // v143: рівні для всіх рядків одразу (як у Power BI): − / + рівень, усе згорнути / розгорнути; поточний — підсвічено
+  const LVN = ['', 'Група', 'Уніфікована', 'Технічна'];
+  const lvBar = '<div class="r15lv"><span class="muted">Рівні для всіх рядків:</span>' +
+    '<button type="button" onclick="r15Lv(1)"' + (D.lv <= 1 && !Object.keys(D.ex || {}).length ? ' disabled' : '') + ' title="Згорнути все до груп">⊟ Згорнути все</button>' +
+    '<button type="button" onclick="r15Lv(-1,1)"' + (D.lv <= 1 ? ' disabled' : '') + ' title="На рівень вище для всіх рядків">− рівень</button>' +
+    '<b class="r15lvc">' + (4 - D.lv) + ' · ' + LVN[D.lv] + '</b>' +
+    '<button type="button" onclick="r15Lv(1,1)"' + (D.lv >= 3 ? ' disabled' : '') + ' title="На рівень нижче для всіх рядків">+ рівень</button>' +
+    '<button type="button" onclick="r15Lv(3)"' + (D.lv >= 3 && !Object.keys(D.ex || {}).length ? ' disabled' : '') + ' title="Розгорнути все до технічних назв">⊞ Розгорнути все</button></div>';
   h += fold('r15map', 'Що де лежить', rows.length + ' поз.', 'Склади — прийшло − пішло за журналом з ' + esc(x.from.split('-').reverse().join('.')) + '; цехи 🏭 — інвентаризація + переміщення − витрата за нормами' + (noInvShops.length ? ' (' + esc(noInvShops.join(', ')) + ' — інвентаризації немає: лише прийнято − передано, без витрати за нормами)' : '') + '; ГП — ящики МЛП. ▸ — розгорнути: група → уніфікована назва → технічна назва (як записано на складі). Колір — частка позиції на локації.',
-    rows.length ? '<div class="r15w"><table class="r15t"><thead><tr><th>Група · уніфікована · технічна</th>' + cols.map(c => '<th title="' + esc(c[1]) + '">' + esc(c[0]) + (c[2] === 'shop' ? ' 🏭' : '') + '</th>').join('') + '<th>Од.</th></tr></thead><tbody>' +
+    rows.length ? lvBar + '<div class="r15w"><table class="r15t"><thead><tr><th>Група · уніфікована · технічна</th>' + cols.map(c => '<th title="' + esc(c[1]) + '">' + esc(c[0]) + (c[2] === 'shop' ? ' 🏭' : '') + '</th>').join('') + '<th>Од.</th></tr></thead><tbody>' +
       body + '</tbody></table></div>' + (shown > showN ? '<p class="muted">Показано ' + showN + ' з ' + shown + ' позицій — звузьте фільтри.</p>' : '')
       : '<p class="muted">Нічого не знайдено за фільтрами.</p>');
   // 2) цехи: на скільки днів
@@ -5719,6 +5733,8 @@ function skLocOf15(x, c) { const l = x.locs.find(z => z[0] === c); return l ? l[
 function fmtT15(t) { const d = new Date(t), p = n => String(n).padStart(2, '0'); return p(d.getDate()) + '.' + p(d.getMonth() + 1) + ' ' + p(d.getHours()) + ':' + p(d.getMinutes()); }
 /** v115: ▸ / ▾ рядка матриці Р-15 (група, позиція) */
 function r15Tg(id, open) { Z15.ex = Z15.ex || {}; Z15.ex[id] = !!open; renderDash(); }
+/** v143: рівень для всіх рядків «Що де лежить»: step — на рівень нижче (1) / вище (−1), інакше v — рівень (1 — групи, 3 — технічні); ▸ / ▾ окремих рядків скидаються */
+function r15Lv(v, step) { Z15.lv = Math.max(1, Math.min(3, step ? (Z15.lv || 2) + v : v)); Z15.ex = {}; renderDash(); }
 /** v112: згорнути / розгорнути всі блоки Р-15 (стан кожного — у пам'яті пристрою, zFoldT) */
 function r15FoldAll(op) { document.querySelectorAll('#app details.zfold[id^="zf_r15"]').forEach(d => { if (d.open !== op) d.open = op; }); }
 function r15Loc(c) { const a = Z15.locs || []; const i = a.indexOf(c); if (i >= 0) a.splice(i, 1); else a.push(c); Z15.locs = a; renderDash(); }
