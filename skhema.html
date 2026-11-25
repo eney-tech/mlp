@@ -81,7 +81,7 @@ button:focus-visible{outline:2px solid var(--acc);outline-offset:2px}
 <script>
 {
 /* skhema.html — схема виробничих кроків МЛП. Дані наживо з сервера МЛП (Schema.gs, запит schema), лише для зареєстрованих працівників. */
-const PAGE_VERSION = 'skhema.html v5 · 25.11.2026';   // v5: поділ партії (R2 4320 → R1.1, R5 → R6) — у кроці поділу дві зони напівфабрикатів, крок гілки вузький під лівою зоною, лінії: ліва → гілка → крок, де сходяться; права — одразу туди, повз гілку; v4: крок поділу (R2 4320, R5) — два напівфабрикати: одразу далі і в гілку (Schema.gs v3, semiBr); v3:   // v3: ротор 4320 — R1.1 «Допресування вала» після R2 (Schema.gs v2, DATA.RT4320), поділ R2: готові → R3 / на допресування → R1.1
+const PAGE_VERSION = 'skhema.html v6 · 25.11.2026';   // v6: крок гілки поділу ширший — до правої лінії (¾ колонки); v5: поділ партії (R2 4320 → R1.1, R5 → R6) — у кроці поділу дві зони напівфабрикатів, крок гілки вузький під лівою зоною, лінії: ліва → гілка → крок, де сходяться; права — одразу туди, повз гілку; v4: крок поділу (R2 4320, R5) — два напівфабрикати: одразу далі і в гілку (Schema.gs v3, semiBr); v3:   // v3: ротор 4320 — R1.1 «Допресування вала» після R2 (Schema.gs v2, DATA.RT4320), поділ R2: готові → R3 / на допресування → R1.1
 const API = 'https://script.google.com/macros/s/AKfycbx-JUajnAtVsxaLHDgwRpfzE12g4LUtlf6JnWYAQScAVZ5FCpxzGHSrA5PDESqP80KD/exec';
 const MLP_URL = location.origin + location.pathname.replace(/[^/]*$/, '');
 function store(k) { try { return localStorage.getItem(k) || ''; } catch (e) { return ''; } }
@@ -100,7 +100,7 @@ const num = x => String(x).replace('.', ',');
 /* Палітра: тип кроку — заливка шапки; зелений — гроші й готове; фіолетовий — напівфабрикат; теракота — робота без партії й шлях S11.2; синій — шлях S11.1 */
 const FILL = {'В': '#FFFFFF', 'К': '#FAEEDA', 'П': '#F3EFEA', 'КМ': '#E1F5EE', 'Р': '#FAECE7'};
 const GR = '#0F6E56', TERRA = '#993C1D', BLUE = '#185FA5', EDGE = '#8C8A83', FRAME = '#AFA9EC';
-const COLW = 300, GAP = 22, WIDE = COLW * 2 + GAP, PW = 78;
+const COLW = 300, GAP = 22, WIDE = COLW * 2 + GAP, PW = 78, NARROW_W = Math.floor(COLW * 0.75) - 22;   /* v6: крок гілки поділу — до правої лінії */
 const typsOn = () => S.typ === 'both' ? ['3115', '4320'] : [S.typ];
 const has = t => S.typ === 'both' || S.typ === t;
 
@@ -147,12 +147,12 @@ function label(o) {
   const R = [], row = (html, bg) => R.push('<TR><TD COLSPAN="2" ALIGN="LEFT" BALIGN="LEFT"' + (bg ? ' BGCOLOR="' + bg + '"' : '') + '>' + html + '</TD></TR>');
   const p = S.price && o.priceKey ? price(o.priceKey, tl) : '';
   const mark = d ? '<FONT COLOR="#888780">  ' + (open ? '▾' : '▸') + '</FONT>' : '';
-  const nn = (o.wide ? WIDE_N : o.narrow ? 14 : NAME_N) - (o.code && !o.narrow ? o.code.length + 2 : 0), nm = WL(o.name, nn);
-  const name = (o.code ? '<B>' + esc(o.code) + '</B>' + (o.narrow ? '<BR ALIGN="LEFT"/>' : '&#160;&#160;&#160;') : '') + (o.bold ? '<B>' + nm + '</B>' : nm) + mark;
+  const nn = o.narrow ? 19 : (o.wide ? WIDE_N : NAME_N) - (o.code ? o.code.length + 2 : 0), nm = WL(o.name, nn);
+  const name = (o.code ? '<B>' + esc(o.code) + '</B>' + '&#160;&#160;&#160;' : '') + (o.bold ? '<B>' + nm + '</B>' : nm) + mark;
   R.push('<TR><TD COLSPAN="2" CELLPADDING="0" BGCOLOR="' + fill + '"><TABLE BORDER="0" CELLBORDER="0" CELLSPACING="0" CELLPADDING="6"><TR><TD ALIGN="LEFT" BALIGN="LEFT" WIDTH="' + (W - PWo) + '">' + name + '</TD><TD ALIGN="RIGHT" VALIGN="TOP" WIDTH="' + PWo + '">' +
     (p ? '<FONT COLOR="' + GR + '"><B>' + esc(p) + '</B></FONT>' : '') + '</TD></TR></TABLE></TD></TR>');
-  if (open) row('<FONT POINT-SIZE="9.5" COLOR="#2C2C2A">' + wrap(d, o.wide ? 110 : o.narrow ? 24 : 56).map(esc).join('<BR ALIGN="LEFT"/>') + '<BR ALIGN="LEFT"/></FONT>', '#F6F5F1');
-  const RN = o.wide ? WIDE_N + 20 : o.narrow ? 24 : ROW_N;
+  if (open) row('<FONT POINT-SIZE="9.5" COLOR="#2C2C2A">' + wrap(d, o.wide ? 110 : o.narrow ? 38 : 56).map(esc).join('<BR ALIGN="LEFT"/>') + '<BR ALIGN="LEFT"/></FONT>', '#F6F5F1');
+  const RN = o.wide ? WIDE_N + 20 : o.narrow ? 36 : ROW_N;
   if (S.comps && o.ins && !o.lanes) o.ins.forEach(c => row('<FONT POINT-SIZE="9.5">• ' + WL(c, RN - 4) + '</FONT>'));
   if (S.comps && o.comps) {
     const two = tl.length > 1 && tl.filter(t => (o.comps[t] || []).length).length > 1;
@@ -281,7 +281,7 @@ function graphRT() {
     if (s.split) notes.push((tl.length > 1 && s.code === 'R2' ? 'на 4320 ' : '') + 'партія ділиться: ' + lc1(s.split.b) + ' / ' + lc1(s.split.a));
     if (only4) notes.push(tl.length > 1 ? 'лише 4320' : 'з R2 — те, що не пройшло «8-ку»');
     g.N(R(s.code), {key: 'R|' + s.code + (only4 ? '|4320' : ''), descKey: s.code, code: s.code, name: s.name, type: s.type, semi: s.semi, semiAlt: s.semiAlt, semiBr: s.semiBr, split: s.split, ins: s.ins, comps: s.comps,
-      tl: only4 ? ['4320'] : tl, priceKey: s.code, notes, dashed: only4, narrow: !!narrow[s.code], w: narrow[s.code] ? Math.floor(COLW / 2) - 4 : 0});
+      tl: only4 ? ['4320'] : tl, priceKey: s.code, notes, dashed: only4, narrow: !!narrow[s.code], w: narrow[s.code] ? NARROW_W : 0});
   });
   g.L.push(fin('finrt', 'Готовий ротор із гравіюванням', tl.join(' / ')));
   g.L.push('}');
@@ -405,9 +405,9 @@ function links() {
   // v5: поділ партії — ліва зона кроку поділу → гілка → крок, де сходяться; права зона — одразу туди, повз гілку
   SPLITS.forEach(x => {
     const s = box(x.sp), f = box(x.first), l = box(x.last), m = box(x.to); if (!s || !f || !l || !m) return;
-    const flow = d => line(d, EDGE, false, 1.3), xr = s.l + (s.r - s.l) * 0.75, xl = f.cx;
+    const flow = d => line(d, EDGE, false, 1.3), xr = s.l + (s.r - s.l) * 0.75, xl = s.l + (s.r - s.l) * 0.25;   /* v6: ліва лінія — по центру лівої зони */
     flow('M' + xl + ' ' + s.b + ' V' + (f.t - 5));
-    flow('M' + l.cx + ' ' + l.b + ' V' + (m.t - 5));
+    flow('M' + xl + ' ' + l.b + ' V' + (m.t - 5));
     flow('M' + xr + ' ' + s.b + ' V' + (m.t - 5));
   });
   // РБП → S11.2: одна горизонталь (або коліно, якщо блоки на різній висоті)
