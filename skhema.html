@@ -81,7 +81,7 @@ button:focus-visible{outline:2px solid var(--acc);outline-offset:2px}
 <script>
 {
 /* skhema.html — схема виробничих кроків МЛП. Дані наживо з сервера МЛП (Schema.gs, запит schema), лише для зареєстрованих працівників. */
-const PAGE_VERSION = 'skhema.html v2 · 25.11.2026';
+const PAGE_VERSION = 'skhema.html v3 · 25.11.2026';   // v3: ротор 4320 — R1.1 «Допресування вала» після R2 (Schema.gs v2, DATA.RT4320), поділ R2: готові → R3 / на допресування → R1.1
 const API = 'https://script.google.com/macros/s/AKfycbx-JUajnAtVsxaLHDgwRpfzE12g4LUtlf6JnWYAQScAVZ5FCpxzGHSrA5PDESqP80KD/exec';
 const MLP_URL = location.origin + location.pathname.replace(/[^/]*$/, '');
 function store(k) { try { return localStorage.getItem(k) || ''; } catch (e) { return ''; } }
@@ -257,17 +257,24 @@ function graphST4320() {
 }
 function graphRT() {
   const g = G(), R = c => id('r', c), tl = typsOn();
-  g.cl('r', 'Ротор', tl.length > 1 ? 'маршрут спільний для 3115 і 4320' : 'типорозмір ' + tl[0]);
-  DATA.RT.forEach(s => {
-    const notes = [];
+  /* v3: 4320 — свій маршрут (R1.1 «Допресування вала» після R2); обидва типорозміри — маршрут 4320, R1.1 позначено «лише 4320» */
+  const own = tl.indexOf('4320') >= 0 && DATA.RT4320 && DATA.RT4320.length, RTs = own ? DATA.RT4320 : DATA.RT, base = {};
+  (DATA.RT || []).forEach(s => base[s.code] = 1);
+  g.cl('r', 'Ротор', tl.length > 1 ? (own ? 'маршрут спільний для 3115 і 4320; R1.1 — лише 4320' : 'маршрут спільний для 3115 і 4320') : 'типорозмір ' + tl[0]);
+  RTs.forEach(s => {
+    const notes = [], only4 = own && !base[s.code];
     if (s.code === 'R1') notes.push('перевірка: висота штифта');
     if (s.code === 'R4') notes.push('перевірка: полярність');
-    if (s.code === 'R5') notes.push('партія може розділитись: годні / на переробку');
-    g.N(R(s.code), {key: 'R|' + s.code, descKey: s.code, code: s.code, name: s.name, type: s.type, semi: s.semi, semiAlt: s.semiAlt, ins: s.ins, comps: s.comps, tl, priceKey: s.code, notes});
+    if (s.code === 'R5') notes.push('партія ділиться: на балансування (R6) / одразу на F4');
+    if (s.split) notes.push((tl.length > 1 ? 'на 4320 ' : '') + 'партія ділиться: ' + s.split.b.toLowerCase() + ' / ' + s.split.a.toLowerCase());
+    if (only4) notes.push(tl.length > 1 ? 'лише 4320' : 'з R2 — те, що не пройшло «8-ку»');
+    g.N(R(s.code), {key: 'R|' + s.code + (only4 ? '|4320' : ''), descKey: s.code, code: s.code, name: s.name, type: s.type, semi: s.semi, semiAlt: s.semiAlt, ins: s.ins, comps: s.comps,
+      tl: only4 ? ['4320'] : tl, priceKey: s.code, notes, dashed: only4});
   });
   g.L.push(fin('finrt', 'Готовий ротор із гравіюванням', tl.join(' / ')));
   g.L.push('}');
-  g.chain(DATA.RT.map(s => R(s.code)).concat('finrt'));
+  g.chain(RTs.map(s => R(s.code)).concat('finrt'));
+  RTs.forEach(s => { if (s.split) g.E(R(s.code), R(s.split.to)); });   // v3: готові — одразу на крок, де гілки сходяться (R2 → R3)
   return g.end();
 }
 function graphMT() {
