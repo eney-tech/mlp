@@ -1,0 +1,451 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Схема кроків МЛП</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+/* VOICE: робоча технологічна карта цеху — спокійно, точно, без прикрас.
+   IDEA: маршрутна карта на кресленні: білий аркуш-схема, над ним пульт перемикачів.
+   PICTURE: сама блок-схема кроків, рівні колонки потоків з однієї стартової лінії.
+   COLOUR and TYPE: білий аркуш, графіт, фіолетовий акцент МЛП #534AB7, зелений — гроші й готове; IBM Plex Sans / Arial.
+   LAYOUT: липка панель фільтрів і легенда, під ними аркуш на всю ширину (прокрутка, масштаб, перетягування). */
+:root{color-scheme:light dark;--bg:light-dark(#f4f3ef,#16161a);--ink:light-dark(#22211f,#e9e7e1);--mute:light-dark(#6b6a64,#a6a49c);--line:light-dark(#d8d6ce,#34333a);--acc:#534AB7;--chip:light-dark(#ffffff,#202027)}
+:root[data-theme=light]{color-scheme:light}:root[data-theme=dark]{color-scheme:dark}
+*{box-sizing:border-box;min-width:0}
+body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.5 "IBM Plex Sans",Arial,sans-serif;overflow-x:clip}
+header{padding:18px max(3vw,16px) 4px}
+h1{font-size:26px;line-height:1.1;font-weight:600;margin:0 0 4px}
+.sub{color:var(--mute);font-size:13px;margin:0;max-width:90ch}
+.top{position:sticky;top:0;z-index:5;background:var(--bg);border-bottom:1px solid var(--line)}
+.bar{padding:10px max(3vw,16px) 6px;display:flex;flex-wrap:wrap;gap:8px 20px;align-items:center}
+.grp{display:flex;align-items:center;gap:6px;flex-wrap:wrap}
+.grp>span{font-size:12px;color:var(--mute);margin-right:2px}
+.seg{display:inline-flex;border:1px solid var(--line);border-radius:8px;overflow:hidden;background:var(--chip)}
+.seg button,.tg{font:inherit;font-size:14px;border:0;background:transparent;color:var(--ink);padding:6px 12px;min-height:36px;cursor:pointer}
+.seg button+button{border-left:1px solid var(--line)}
+.seg button[aria-pressed=true]{background:var(--acc);color:#fff}
+.tg{border:1px solid var(--line);border-radius:8px;background:var(--chip)}
+.tg.ic{min-width:36px;padding:6px 0}
+button:focus-visible{outline:2px solid var(--acc);outline-offset:2px}
+.legend{display:flex;flex-wrap:wrap;gap:4px 18px;padding:2px max(3vw,16px) 9px;font-size:12px;color:var(--mute)}
+.legend span{white-space:nowrap;display:inline-flex;align-items:center;gap:6px}
+.sw{width:14px;height:11px;border:1px solid #888780;border-radius:2px;display:inline-block}
+.ln{width:18px;height:0;border-top:2px solid;display:inline-block}
+.sheet{margin:10px max(3vw,16px) 12px;background:#fff;border:1px solid var(--line);border-radius:10px;overflow:auto;height:calc(100vh - 190px);min-height:420px;cursor:grab}
+.sheet.drag{cursor:grabbing;user-select:none}
+#chart{padding:18px;width:max-content;position:relative}
+.cols{display:flex;gap:56px;align-items:flex-start}
+.motor{display:flex;justify-content:center;margin-top:96px}
+.col.rbp{position:relative;align-self:stretch}
+.rbpbox{position:absolute;left:0}
+#chart svg.ov{position:absolute;left:0;top:0;pointer-events:none;overflow:visible}
+#chart svg{display:block}
+#chart svg text{font-family:Arial,"Liberation Sans",Helvetica,sans-serif}
+#chart g.node.click{cursor:pointer}
+#chart g.node.click:hover polygon:first-of-type{stroke:#534AB7;stroke-width:1.5}
+.zoom output{font-size:13px;min-width:46px;text-align:center;color:var(--mute)}
+.note{color:var(--mute);font-size:12px;padding:0 max(3vw,16px) 24px;max-width:120ch}
+.msg{padding:40px;color:#6b6a64}
+@media(max-width:600px){h1{font-size:21px}.sheet{height:72vh}.legend{display:none}}
+</style>
+</head>
+<body>
+<header>
+  <h1>Схема виробничих кроків МЛП</h1>
+  <p class="sub"><a href="./">← МЛП</a> · Як статор, ротор і двигун проходять цех: кроки та їх варіанти, робота без партії, компоненти з нормами, напівфабрикати й ціни. Натисніть на крок, щоб прочитати, що на ньому роблять.</p>
+</header>
+
+<div class="top">
+  <div class="bar" role="toolbar" aria-label="Фільтри схеми">
+    <div class="grp"><span>Типорозмір</span>
+      <div class="seg" id="typ"><button data-v="both">обидва</button><button data-v="3115">3115</button><button data-v="4320">4320</button></div></div>
+    <div class="grp"><span>Продукція</span>
+      <div class="seg"><button data-prod="ST">Статор</button><button data-prod="RT">Ротор</button><button data-prod="MT">Двигун</button></div></div>
+    <div class="grp"><span>Показати</span>
+      <div class="seg"><button id="tSemi">Напівфабрикати</button><button id="tComps">Компоненти</button><button id="tPrice">Ціни</button><button id="tDesc">Усі описи</button></div></div>
+    <div class="grp"><span>Варіанти</span>
+      <div class="seg"><button id="tOld">Старий маршрут 3115</button></div></div>
+    <div class="grp zoom"><span>Масштаб</span>
+      <button class="tg ic" id="zOut" aria-label="Зменшити">−</button><output id="zVal">100%</output><button class="tg ic" id="zIn" aria-label="Збільшити">+</button><button class="tg" id="zFit">По ширині</button></div>
+  </div>
+  <div class="legend" id="legend"></div>
+</div>
+
+<div class="sheet" id="sheet"><div id="chart"><p class="msg">Завантаження схеми…</p></div></div>
+<p class="note"><span id="upd"></span> Джерело: MLP_Дані («Маршрути», «ЗП_Ціни»), Склад_Журнал («Норми» — що діють сьогодні) (норми — з 25.11: S11.2 списує базу із запресованими підшипниками, провід 0,38 для 3115 — усі KV, крім 900, прокладка 3115). Статор 3115 — маршрут «Б» (діє з 15.11); старий маршрут (база до термоусадки) — перемикачем «Старий маршрут 3115», для партій, що в «Б» не вкладаються. Ціни показано лише для оплачуваних кроків. На S11.2 показано пропоноване списання: база із запресованими підшипниками приходить напівфабрикатом із роботи без партії. Описи кроків — чернетка, звірити з Антоном Пустоваловим.</p>
+
+<script src="https://cdn.jsdelivr.net/npm/@viz-js/viz@3.31.0/dist/viz-global.js"></script>
+<script>
+{
+/* skhema.html — схема виробничих кроків МЛП. Дані наживо з сервера МЛП (Schema.gs, запит schema), лише для зареєстрованих працівників. */
+const PAGE_VERSION = 'skhema.html v1 · 25.11.2026';
+const API = 'https://script.google.com/macros/s/AKfycbx-JUajnAtVsxaLHDgwRpfzE12g4LUtlf6JnWYAQScAVZ5FCpxzGHSrA5PDESqP80KD/exec';
+const MLP_URL = location.origin + location.pathname.replace(/[^/]*$/, '');
+function store(k) { try { return localStorage.getItem(k) || ''; } catch (e) { return ''; } }
+const CODE = store('mlp_code');
+function apiGet(api, q) {
+  return fetch(API + '?api=' + api + '&q=' + encodeURIComponent(JSON.stringify(Object.assign({ code: CODE }, q))), { credentials: 'omit', redirect: 'follow' })
+    .then(r => r.json(), () => { throw new Error('Немає зв\'язку з сервером. Перевірте інтернет'); }).then(j => { if (!j.ok) throw new Error(j.error); return j.data; });
+}
+let DATA = null;
+const S = {typ: 'both', prod: {ST: 1, RT: 1, MT: 1}, semi: 1, comps: 1, price: 1, old: 0, all: 0, open: new Set(), zoom: 0};
+try { const s = JSON.parse(localStorage.getItem('mlp-schema2') || '{}'); ['typ', 'semi', 'comps', 'price', 'old', 'zoom'].forEach(k => { if (k in s) S[k] = s[k]; }); if (s.prod) Object.assign(S.prod, s.prod); } catch (e) {}
+const save = () => { try { localStorage.setItem('mlp-schema2', JSON.stringify({typ: S.typ, prod: S.prod, semi: S.semi, comps: S.comps, price: S.price, old: S.old, zoom: S.zoom})); } catch (e) {} };
+
+const esc = s => String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+const num = x => String(x).replace('.', ',');
+/* Палітра: тип кроку — заливка шапки; зелений — гроші й готове; фіолетовий — напівфабрикат; теракота — робота без партії й шлях S11.2; синій — шлях S11.1 */
+const FILL = {'В': '#FFFFFF', 'К': '#FAEEDA', 'П': '#F3EFEA', 'КМ': '#E1F5EE', 'Р': '#FAECE7'};
+const GR = '#0F6E56', TERRA = '#993C1D', BLUE = '#185FA5', EDGE = '#8C8A83', FRAME = '#AFA9EC';
+const COLW = 300, GAP = 22, WIDE = COLW * 2 + GAP, PW = 78;
+const typsOn = () => S.typ === 'both' ? ['3115', '4320'] : [S.typ];
+const has = t => S.typ === 'both' || S.typ === t;
+
+function wrap(t, n) {
+  const out = []; let line = '';
+  t.split(' ').forEach(w => { if ((line + ' ' + w).trim().length > n) { out.push(line); line = w; } else line = (line + ' ' + w).trim(); });
+  if (line) out.push(line); return out;
+}
+const WL = (t, n) => wrap(String(t), n).map(esc).join('<BR ALIGN="LEFT"/>');
+const NAME_N = 30, ROW_N = 52, WIDE_N = 118;
+/* Ціна: '' — не показувати (нуль або немає); інакше коротко «3,5 грн»; різні за типорозміром — «1 / 2,5 грн» (3115 / 4320) */
+function price(code, tl) {
+  const rows = DATA.prices[code]; if (!rows) return '';
+  if (rows.some(r => r.st === 'чекає')) return '? грн';
+  const pick = t => rows.filter(r => r.loc === '*' && (r.t === t || r.t === '*')).sort((a, b) => (a.t === '*') - (b.t === '*'))[0];
+  const v = tl.map(t => [t, pick(t)]).filter(x => x[1] && x[1].p > 0);
+  if (!v.length) return '';
+  const uniq = [...new Set(v.map(x => x[1].p))];
+  const s = uniq.length === 1 ? num(uniq[0]) : v.map(x => num(x[1].p)).join(' / ');
+  return s + ' грн' + (locRows(code, tl).length ? '*' : '');
+}
+const locRows = (code, tl) => (DATA.prices[code] || []).filter(r => r.loc !== '*' && r.p > 0 && (r.t === '*' || tl.includes(r.t)));
+const locNote = (code, tl) => locRows(code, tl).map(r => '* ' + r.t + ', ' + r.loc + ': ' + num(r.p) + ' грн');
+function descOf(key, tl) { return (tl.length === 1 && DATA.desc[key + '|' + tl[0]]) || DATA.desc[key] || ''; }
+
+/* Вузол: шапка (код, назва, ▸ | ціна праворуч), опис, вхідний напівфабрикат, компоненти, примітки, напівфабрикат після кроку */
+function label(o) {
+  const tl = o.tl, d = descOf(o.descKey || o.code, tl), open = d && (S.all || S.open.has(o.key));
+  const fill = o.fill || FILL[o.type] || '#FFFFFF', W = o.w || (o.wide ? WIDE : COLW);
+  const R = [], row = (html, bg) => R.push('<TR><TD COLSPAN="2" ALIGN="LEFT" BALIGN="LEFT"' + (bg ? ' BGCOLOR="' + bg + '"' : '') + '>' + html + '</TD></TR>');
+  const p = S.price && o.priceKey ? price(o.priceKey, tl) : '';
+  const mark = d ? '<FONT COLOR="#888780">  ' + (open ? '▾' : '▸') + '</FONT>' : '';
+  const nn = (o.wide ? WIDE_N : NAME_N) - (o.code ? o.code.length + 2 : 0), nm = WL(o.name, nn);
+  const name = (o.code ? '<B>' + esc(o.code) + '</B>&#160;&#160;&#160;' : '') + (o.bold ? '<B>' + nm + '</B>' : nm) + mark;
+  R.push('<TR><TD COLSPAN="2" CELLPADDING="0" BGCOLOR="' + fill + '"><TABLE BORDER="0" CELLBORDER="0" CELLSPACING="0" CELLPADDING="6"><TR><TD ALIGN="LEFT" BALIGN="LEFT" WIDTH="' + (W - PW) + '">' + name + '</TD><TD ALIGN="RIGHT" WIDTH="' + PW + '">' +
+    (p ? '<FONT COLOR="' + GR + '"><B>' + esc(p) + '</B></FONT>' : '') + '</TD></TR></TABLE></TD></TR>');
+  if (open) row('<FONT POINT-SIZE="9.5" COLOR="#2C2C2A">' + wrap(d, o.wide ? 110 : 56).map(esc).join('<BR ALIGN="LEFT"/>') + '<BR ALIGN="LEFT"/></FONT>', '#F6F5F1');
+  const RN = o.wide ? WIDE_N + 20 : ROW_N;
+  if (S.comps && o.ins) o.ins.forEach(c => row('<FONT POINT-SIZE="9.5">• ' + WL(c, RN - 4) + '</FONT>'));
+  if (S.comps && o.comps) {
+    const two = tl.length > 1 && tl.filter(t => (o.comps[t] || []).length).length > 1;
+    tl.forEach(t => (o.comps[t] || []).forEach(c => row('<FONT POINT-SIZE="9.5">' + (two ? '<FONT COLOR="#888780">' + t + '</FONT>  ' : '• ') + WL(c, RN - 6) + '</FONT>')));
+  }
+  const notes = (o.notes || []).concat(p ? locNote(o.priceKey, tl) : []);
+  notes.forEach(n => row('<FONT POINT-SIZE="9.5" COLOR="#854F0B"><I>' + WL(n, RN - 4) + '</I></FONT>'));
+  const alt = o.semiAlt && Object.keys(o.semiAlt).length ? o.semiAlt : null;
+  if (o.semi && S.semi && !alt) row('<FONT POINT-SIZE="9.5" COLOR="#3C3489">⇢ ' + WL(o.semi, RN) + '</FONT>', '#EEEDFE');
+  if (o.semi && S.semi && alt) {
+    row('<FONT POINT-SIZE="9.5" COLOR="#3C3489">⇢ шлях S11.1: ' + WL(o.semi, RN - 12) + '</FONT>', '#EEEDFE');
+    Object.keys(alt).forEach(k => row('<FONT POINT-SIZE="9.5" COLOR="#3C3489">⇢ шлях ' + esc(k) + ': ' + WL(alt[k], RN - 12) + '</FONT>', '#EEEDFE'));
+  }
+  const t = '<TABLE BORDER="1" CELLBORDER="0" CELLSPACING="0" CELLPADDING="4" WIDTH="' + W + '" COLOR="' + (o.color || '#5F5E5A') + '"' + (o.dashed ? ' STYLE="DASHED"' : '') + '>' + R.join('') + '</TABLE>';
+  return o.wide ? ports(t, true) : t;
+}
+function ports(t, bottom) {
+  return '<TABLE BORDER="0" CELLBORDER="0" CELLSPACING="0" CELLPADDING="0"><TR><TD PORT="tl" HEIGHT="1"></TD><TD PORT="tr" HEIGHT="1"></TD></TR><TR><TD COLSPAN="2">' + t + '</TD></TR>' +
+    (bottom ? '<TR><TD PORT="bl" HEIGHT="1"></TD><TD PORT="br" HEIGHT="1"></TD></TR>' : '') + '</TABLE>';
+}
+/* Готовий напівфабрикат (кінець потоку) — зелена плашка на ширину колонки */
+function fin(id, title, sub, wide) {
+  const t = '<TABLE BORDER="1" COLOR="' + GR + '" CELLBORDER="0" STYLE="ROUNDED" BGCOLOR="#E1F5EE" CELLPADDING="7" WIDTH="' + (wide ? WIDE : COLW) + '"><TR><TD><FONT COLOR="#085041"><B>' + esc(title) + '</B></FONT>' +
+    (sub ? '<BR/><FONT POINT-SIZE="9" COLOR="#0F6E56">' + esc(sub) + '</FONT>' : '') + '</TD></TR></TABLE>';
+  return id + ' [label=<' + (wide ? ports(t, false) : t) + '>];';
+}
+
+const KEYS = {}, CLICK = {};
+const id = (p, c) => p + '_' + c.replace(/\./g, '_').replace('п', 'p').replace(/\s/g, '');
+function G() {
+  const L = ['digraph G {', 'graph [rankdir=TB, fontname="Arial", fontsize=16, nodesep=' + (GAP / 72) + ', ranksep=0.32, newrank=true, pad=0.05, bgcolor="transparent", labeljust=l, splines=ortho];',
+    'node [shape=plaintext, fontname="Arial", fontsize=11];', 'edge [color="' + EDGE + '", arrowsize=0.65, fontname="Arial", fontsize=10, fontcolor="#6b6a64"];'];
+  const g = {L,
+    N: (nid, o) => { KEYS[nid] = o.key; CLICK[nid] = !!descOf(o.descKey || o.code, o.tl); L.push(nid + ' [label=<' + label(o) + '>];'); },
+    E: (a, b, at) => L.push(a + ' -> ' + b + (at ? ' [' + at + ']' : '') + ';'),
+    chain: ids => ids.slice(1).forEach((x, i) => L.push(ids[i] + ' -> ' + x + ';')),
+    cl: (n, title, sub, dashed) => L.push('subgraph cluster_' + n + ' { label=<<B>' + esc(title) + '</B>' + (sub ? '<BR ALIGN="LEFT"/><FONT POINT-SIZE="10" COLOR="#6b6a64">' + esc(sub) + '</FONT>' : '') + '<BR ALIGN="LEFT"/>>; style="rounded' + (dashed ? ',dashed' : '') + '"; color="' + (dashed ? '#F0997B' : FRAME) + '"; penwidth=1.2; margin=' + (dashed ? 8 : 14) + ';'),
+    end: () => L.concat('}').join('\n')};
+  return g;
+}
+function graphRBP(t) {
+  const g = G(), r = DATA.RBP.find(x => x.code.endsWith(t));
+  g.cl('w' + t, 'Робота без партії', 'для статора ' + t, true);
+  g.N('w' + t, {key: r.code, code: 'РБП', descKey: r.name, name: 'Підшипник у базу ' + t, type: 'Р', semi: r.semi, comps: r.comps, tl: [t], priceKey: r.price, notes: ['облік: шт / год'], dashed: true});
+  g.L.push('}');
+  return g.end();
+}
+function graphST3115() {
+  const g = G(), A = c => id('a', c);
+  g.cl('a', 'Статор 3115', 'маршрут «Б», діє з 15.11');
+  DATA.ST3115.forEach(s => {
+    const notes = [];
+    if (s.code === 'S9.3' || s.code === 'OV2') notes.push('на вибір: S9.3 або OV2');
+    if (s.code === 'OV3') notes.push('можна пропустити');
+    if (s.code === 'S13') notes.push('лише для статорів після S11.1');
+    g.N(A(s.code), {key: 'S|' + s.code + '|3115', descKey: s.code, code: s.code, name: s.name, type: s.type, semi: s.semi, semiAlt: s.semiAlt, ins: s.ins, comps: s.comps, tl: ['3115'], priceKey: s.code,
+      notes, dashed: s.code === 'OV3', wide: s.code === 'OV3' || s.code === 'S12'});
+  });
+  g.L.push('j3115 [shape=diamond, style=filled, fillcolor="#F1EFE8", color="#5F5E5A", label="вибір бази", fontsize=10, width=1.5, height=0.7];');
+  g.L.push(fin('fin3115', 'Готовий статор 3115', '', true));
+  g.L.push('{rank=same; ' + A('S9.3') + '; ' + A('OV2') + ';}', '{rank=same; ' + A('S11.2') + '; ' + A('S11.1') + ';}');
+  g.E(A('S9.3'), A('OV2'), 'style=invis'); g.E(A('S11.2'), A('S11.1'), 'style=invis');
+  g.L.push('}');
+  g.chain(['S1', 'S2', 'S3', 'S4', 'S5', 'S7', 'S6', 'S8', 'OV1', 'S9.1', 'S10', 'S9.2'].map(A));
+  /* розгалуження й дві лінії шляхів малює накладка (links): тут — лише невидимі зв'язки для розкладки */
+  const inv = 'style=invis';
+  ['S9.3', 'OV2'].forEach(x => { g.E(A('S9.2'), A(x), inv); g.E(A(x), 'j3115', inv); });
+  g.E('j3115', A('S11.2'), inv); g.E('j3115', A('S11.1'), inv);
+  g.E(A('S11.2'), A('OV3'), inv); g.E(A('S11.1'), A('OV3'), inv); g.E(A('OV3'), A('S12'), inv);
+  g.E(A('S12'), A('S13'), inv); g.E(A('S13'), 'fin3115', inv); g.E(A('S12'), 'fin3115', inv);
+  /* порожнє місце під лінією S11.2 на рівні S13 — щоб S13 стояв під S11.1, а лінія S11.2 йшла вільно */
+  g.L.push('gap3115 [shape=box, style=invis, width=' + (COLW / 72) + ', height=0.3, label=""];');
+  g.L.push('{rank=same; gap3115; ' + A('S13') + ';}'); g.E('gap3115', A('S13'), inv); g.E(A('S12'), 'gap3115', inv); g.E('gap3115', 'fin3115', inv);
+  return g.end();
+}
+function graphST3115old() {
+  const g = G(), O = c => id('o', c);
+  g.cl('o', 'Статор 3115 — старий маршрут', 'до 15.11: спершу база, потім термоусадка; діє для партій, що в «Б» не вкладаються');
+  DATA.ST3115old.forEach(s => {
+    const notes = [];
+    if (s.code === 'S9.3' || s.code === 'OV2') notes.push('на вибір: S9.3 або OV2');
+    if (s.code === 'OV3') notes.push('можна пропустити');
+    g.N(O(s.code), {key: 'O|' + s.code, descKey: s.code, code: s.code, name: s.name, type: s.type, semi: s.semi, semiAlt: s.semiAlt, ins: s.ins, comps: s.comps, tl: ['3115'], priceKey: s.code, notes, dashed: s.code === 'OV3'});
+  });
+  g.L.push(fin('fin3115o', 'Готовий статор 3115', 'старий маршрут'));
+  g.L.push('{rank=same; ' + O('S9.3') + '; ' + O('OV2') + ';}'); g.E(O('S9.3'), O('OV2'), 'style=invis');
+  g.L.push('}');
+  g.chain(['S1', 'S2', 'S3', 'S4', 'S5', 'S7', 'S6', 'S8', 'OV1', 'S9.1', 'S10', 'S11.1', 'OV3', 'S9.2'].map(O));
+  ['S9.3', 'OV2'].forEach(x => { g.E(O('S9.2'), O(x)); g.E(O(x), O('S12')); });
+  g.chain([O('S12'), O('S13'), 'fin3115o']);
+  return g.end();
+}
+function graphST4320() {
+  const g = G(), B = c => id('b', c);
+  g.cl('b', 'Статор 4320', 'один маршрут');
+  DATA.ST4320.forEach(s => g.N(B(s.code), {key: 'S|' + s.code + '|4320', descKey: s.code, code: s.code, name: s.name, type: s.type, semi: s.semi, semiAlt: s.semiAlt, ins: s.ins, comps: s.comps, tl: ['4320'], priceKey: s.code}));
+  g.L.push(fin('fin4320', 'Готовий статор 4320'));
+  g.L.push('}');
+  g.chain(DATA.ST4320.map(s => B(s.code)).concat('fin4320'));
+  return g.end();
+}
+function graphRT() {
+  const g = G(), R = c => id('r', c), tl = typsOn();
+  g.cl('r', 'Ротор', tl.length > 1 ? 'маршрут спільний для 3115 і 4320' : 'типорозмір ' + tl[0]);
+  DATA.RT.forEach(s => {
+    const notes = [];
+    if (s.code === 'R1') notes.push('перевірка: висота штифта');
+    if (s.code === 'R4') notes.push('перевірка: полярність');
+    if (s.code === 'R5') notes.push('партія може розділитись: годні / на переробку');
+    g.N(R(s.code), {key: 'R|' + s.code, descKey: s.code, code: s.code, name: s.name, type: s.type, semi: s.semi, semiAlt: s.semiAlt, ins: s.ins, comps: s.comps, tl, priceKey: s.code, notes});
+  });
+  g.L.push(fin('finrt', 'Готовий ротор із гравіюванням', tl.join(' / ')));
+  g.L.push('}');
+  g.chain(DATA.RT.map(s => R(s.code)).concat('finrt'));
+  return g.end();
+}
+function graphMT() {
+  const g = G(), M = c => id('m', c), tl = typsOn();
+  g.cl('m', 'Двигун', tl.length > 1 ? '3115 і 4320' : 'типорозмір ' + tl[0]);
+  if (S.prod.ST || true) g.N('addS', {key: 'addS', descKey: 'addS', name: '+ Статори', bold: 1, fill: '#E1F5EE', color: GR, semi: 'Статори в партії двигунів', tl});
+  g.N('addR', {key: 'addR', descKey: 'addR', name: '+ Ротори (наші)', bold: 1, fill: '#E1F5EE', color: GR, semi: 'Ротори з гравіюванням у партії двигунів', tl});
+  g.N('addRp', {key: 'addRp', descKey: 'addRp', name: '+ Ротори покупні (в1)', bold: 1, fill: '#F1EFE8', dashed: true, semi: 'Покупний ротор без гравіювання', tl});
+  DATA.MT.forEach(s => g.N(M(s.code), {key: 'M|' + s.code, descKey: s.code, code: s.code, name: s.name, type: s.type, semi: s.semi, semiAlt: s.semiAlt, ins: s.ins, comps: s.comps, tl, priceKey: s.code,
+    notes: s.code === 'F1' ? ['вхід: 1 статор + 1 ротор із гравіюванням'] : [], dashed: s.code === 'F4п'}));
+  g.L.push('{rank=same; addS; addR; addRp;}'); g.E('addS', 'addR', 'style=invis'); g.E('addR', 'addRp', 'style=invis');
+  g.L.push('}');
+  g.E('addS', M('F1')); g.E('addR', M('F1')); g.E('addRp', M('F4п'), 'style=dashed'); g.E(M('F4п'), M('F1'), 'style=dashed');
+  g.chain(['F1', 'F2', 'F3', 'F5', 'K2'].map(M));
+  return g.end();
+}
+function graphs() {
+  for (const k in KEYS) delete KEYS[k];
+  const top = [], st = S.prod.ST;
+  /* порядок: 4320 | робота без партії | 3115 «Б» | 3115 старий | ротор — так стрілки РБП → S11.2 короткі й нічого не перетинають */
+  if (st && has('4320')) top.push(['st4320', graphST4320()]);
+  if (st) top.push(['rbp', typsOn().map(t => [t, graphRBP(t)])]);
+  if (st && has('3115')) top.push(['st3115', graphST3115()]);
+  if (st && has('3115') && S.old) top.push(['st3115o', graphST3115old()]);
+  if (S.prod.RT) top.push(['rt', graphRT()]);
+  return {top, mt: S.prod.MT ? graphMT() : null};
+}
+
+function legend() {
+  const it = ['<i class="sw" style="background:#fff"></i>виробничий крок — оплата за успішні',
+    '<i class="sw" style="background:#FAEEDA"></i>контроль — оплата за всі перевірені',
+    '<i class="sw" style="background:#F3EFEA"></i>піч',
+    '<i class="sw" style="background:#FAECE7;border-style:dashed"></i>робота без партії',
+    '<i class="sw" style="background:#E1F5EE;border-color:#0F6E56"></i>готовий статор / ротор, додавання в двигуни',
+    '<i class="ln" style="border-color:#0F6E56"></i>передача в партію двигунів'];
+  if (S.semi) it.push('<i class="sw" style="background:#EEEDFE"></i>напівфабрикат після кроку');
+  if (S.prod.ST && has('3115')) it.push('<i class="ln" style="border-color:#993C1D"></i>3115: шлях через S11.2', '<i class="ln" style="border-color:#185FA5"></i>3115: шлях через S11.1 (з S13)');
+  if (S.price && S.typ === 'both' && (S.prod.RT || S.prod.MT)) it.push('<b style="color:#0F6E56">1 / 2,5 грн</b> — ціна для 3115 / 4320');
+  it.push('<b style="color:#888780">▸</b> натисніть — опис кроку');
+  document.getElementById('legend').innerHTML = it.map(x => '<span>' + x + '</span>').join('');
+}
+
+const chart = document.getElementById('chart'), sheet = document.getElementById('sheet');
+let viz = null, natW = 0;
+function applyZoom() {
+  chart.style.zoom = S.zoom;
+  document.getElementById('zVal').textContent = Math.round(S.zoom * 100) + '%';
+}
+const fitZoom = () => Math.min(1.2, Math.max(0.3, (sheet.clientWidth - 24) / natW));
+function findNode(nid) { return [...chart.querySelectorAll('g.node')].find(g => g.querySelector('title')?.textContent === nid); }
+function svgOf(dot) { const s = viz.renderSVGElement(dot); s.querySelectorAll('g.node').forEach(g => { const t = g.querySelector('title'); if (t && CLICK[t.textContent]) g.classList.add('click'); }); return s; }
+/* Статор 3115: блоки ліній по краях широких OV3 / S12 — S11.2 і лівий край, S11.1 і S13 — правий */
+function alignLanes() {
+  const g = nid => findNode(nid), ov = g('a_OV3'); if (!ov) return;
+  const o = ov.getBBox();
+  [['a_S9_3', 'l'], ['a_OV2', 'r'], ['a_S11_2', 'l'], ['a_S11_1', 'r'], ['a_S13', 'r']].forEach(([n, side]) => {
+    const e = g(n); if (!e) return; const b = e.getBBox();
+    const dx = side === 'l' ? o.x - b.x : (o.x + o.width) - (b.x + b.width);
+    e.setAttribute('transform', 'translate(' + dx + ',0)');
+  });
+}
+/* Робота без партії: блок РБП — на висоті свого S11.2 (статор 4320 — ліворуч, 3115 — праворуч від колонки РБП) */
+function placeRBP() {
+  const col = chart.querySelector('.col.rbp'); if (!col) return;
+  chart.style.zoom = 1;
+  const cr = col.getBoundingClientRect(); let lastBottom = -1e9, maxB = 0;
+  [...col.querySelectorAll('.rbpbox')].map(b => ({b, g: findNode(b.dataset.t === '3115' ? 'a_S11_2' : 'b_S11_2')}))
+    .map(x => ({...x, y: x.g ? x.g.getBoundingClientRect() : null}))
+    .sort((p, q) => (p.y ? p.y.top : 0) - (q.y ? q.y.top : 0))
+    .forEach(({b, y}) => {
+      const h = b.offsetHeight; b.style.top = '0px';
+      const nd = b.querySelector('g.node'), nr = nd ? nd.getBoundingClientRect() : b.getBoundingClientRect();
+      let top = y ? (y.top + y.height / 2) - (nr.top + nr.height / 2) : 0;
+      top = Math.max(top, lastBottom + 16); b.style.top = top + 'px'; lastBottom = top + h; maxB = Math.max(maxB, lastBottom);
+    });
+  col.style.height = maxB + 'px';
+  col.style.width = Math.max(0, ...[...col.querySelectorAll('.rbpbox')].map(b => b.offsetWidth)) + 'px';
+}
+/* Стрілки між окремими схемами — лише прямі кути: РБП → S11.2 (пунктир), готовий статор / ротор → «+ Статори» / «+ Ротори» */
+function links() {
+  const ov = chart.querySelector('svg.ov'); if (!ov) return;
+  const base = chart.getBoundingClientRect(), z = base.width / chart.offsetWidth || 1;
+  const box = nid => { const g = findNode(nid); if (!g) return null; const r = g.getBoundingClientRect();
+    return {l: (r.left - base.left) / z, r: (r.right - base.left) / z, t: (r.top - base.top) / z, b: (r.bottom - base.top) / z, cx: (r.left + r.width / 2 - base.left) / z, cy: (r.top + r.height / 2 - base.top) / z}; };
+  ov.setAttribute('width', chart.offsetWidth); ov.setAttribute('height', chart.offsetHeight);
+  const MK = {}, P = [], line = (d, c, dash, w) => { MK[c] = 1; P.push('<path d="' + d + '" fill="none" stroke="' + c + '" stroke-width="' + (w || (dash ? 1.6 : 2.2)) + '"' + (dash ? ' stroke-dasharray="6 4"' : '') + ' marker-end="url(#m' + c.slice(1) + ')"/>'); };
+  // статор 3115: розгалуження S9.2 → S9.3 / OV2 → «вибір бази» → S11.2 / S11.1 і дві лінії шляхів до готового статора
+  const A = c => 'a_' + c.replace('.', '_');
+  const n = {}; ['S9.2', 'S9.3', 'OV2', 'S11.2', 'S11.1', 'OV3', 'S12', 'S13'].forEach(c => n[c] = box(A(c))); n.j = box('j3115'); n.fin = box('fin3115');
+  if (n.j && n['S9.2']) {
+    const flow = d => line(d, EDGE, false, 1.3), lane = (d, c) => line(d, c, false, 1.8);
+    const yf = (n['S9.2'].b + Math.min(n['S9.3'].t, n.OV2.t)) / 2;
+    ['S9.3', 'OV2'].forEach(c => flow('M' + n['S9.2'].cx + ' ' + n['S9.2'].b + ' V' + yf + ' H' + n[c].cx + ' V' + (n[c].t - 5)));
+    const ym = (Math.max(n['S9.3'].b, n.OV2.b) + n.j.t) / 2;
+    ['S9.3', 'OV2'].forEach(c => P.push('<path d="M' + n[c].cx + ' ' + n[c].b + ' V' + ym + ' H' + n.j.cx + '" fill="none" stroke="' + EDGE + '" stroke-width="1.3"/>'));
+    flow('M' + n.j.cx + ' ' + ym + ' V' + (n.j.t - 5));
+    const x2 = n['S11.2'].cx, x1 = n['S11.1'].cx;
+    lane('M' + n.j.l + ' ' + n.j.cy + ' H' + x2 + ' V' + (n['S11.2'].t - 5), TERRA);
+    lane('M' + n.j.r + ' ' + n.j.cy + ' H' + x1 + ' V' + (n['S11.1'].t - 5), BLUE);
+    P.push('<text x="' + (n.j.l - 8) + '" y="' + (n.j.cy - 6) + '" text-anchor="end" font-size="12" font-family="Arial" fill="' + TERRA + '">S11.2</text>');
+    P.push('<text x="' + (n.j.r + 8) + '" y="' + (n.j.cy - 6) + '" font-size="12" font-family="Arial" fill="' + BLUE + '">S11.1</text>');
+    const seg = (x, a, b, c) => lane('M' + x + ' ' + a.b + ' V' + (b.t - 5), c);
+    seg(x2, n['S11.2'], n.OV3, TERRA); seg(x2, n.OV3, n.S12, TERRA); seg(x2, n.S12, n.fin, TERRA);
+    const x1b = Math.min(Math.max(x1, n.S13.l + 20), n.S13.r - 20);
+    seg(x1, n['S11.1'], n.OV3, BLUE); seg(x1, n.OV3, n.S12, BLUE); seg(x1b, n.S12, n.S13, BLUE); seg(x1b, n.S13, n.fin, BLUE);
+  }
+  // РБП → S11.2: одна горизонталь (або коліно, якщо блоки на різній висоті)
+  [['w3115', 'a_S11_2'], ['w4320', 'b_S11_2']].forEach(([a, b]) => {
+    const p = box(a), q = box(b); if (!p || !q) return;
+    const right = q.l > p.r, x1 = right ? p.r : p.l, x2 = right ? q.l - 4 : q.r + 4, y1 = p.cy, y2 = q.cy;
+    const mx = (x1 + x2) / 2;
+    line(Math.abs(y1 - y2) < 2 ? 'M' + x1 + ' ' + y1 + ' H' + x2 : 'M' + x1 + ' ' + y1 + ' H' + mx + ' V' + y2 + ' H' + x2, TERRA, true);
+  });
+  // готові → двигун: вниз до спільної лінії, вздовж неї, вниз до входу
+  const cols = chart.querySelector('.cols'), mot = chart.querySelector('.motor');
+  if (cols && mot) {
+    const busY = (cols.getBoundingClientRect().bottom - base.top) / z + 24;
+    const ins = {};
+    [['fin4320', 'addS'], ['fin3115', 'addS'], ['fin3115o', 'addS'], ['finrt', 'addR']].forEach(([a, b], i) => {
+      const p = box(a), q = box(b); if (!p || !q) return;
+      const k = ins[b] = (ins[b] || 0) + 1, dx = b === 'addS' ? (k - 2) * 12 : 0, y = busY + (b === 'addR' ? 16 : 0);
+      line('M' + p.cx + ' ' + p.b + ' V' + y + ' H' + (q.cx + dx) + ' V' + (q.t - 5), GR, false);
+    });
+  }
+  const mk = c => '<marker id="m' + c.slice(1) + '" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" markerUnits="userSpaceOnUse" orient="auto"><path d="M0 0 L10 5 L0 10 z" fill="' + c + '"/></marker>';
+  ov.innerHTML = '<defs>' + Object.keys(MK).map(mk).join('') + '</defs>' + P.join('');
+}
+function render(anchor) {
+  if (!viz) return;
+  let before = null;
+  if (anchor) { const g = findNode(anchor); if (g) before = g.getBoundingClientRect(); }
+  const G2 = graphs();
+  try {
+    const wrap = document.createElement('div'); wrap.className = 'cols';
+    G2.top.forEach(([n, dot]) => {
+      const c = document.createElement('div'); c.className = 'col ' + n;
+      if (n === 'rbp') dot.forEach(([t, d]) => { const x = document.createElement('div'); x.className = 'rbpbox'; x.dataset.t = t; x.append(svgOf(d)); c.append(x); });
+      else c.append(svgOf(dot));
+      wrap.append(c);
+    });
+    const parts = [wrap];
+    if (G2.mt) { const m = document.createElement('div'); m.className = 'motor'; m.append(svgOf(G2.mt)); parts.push(m); }
+    const ov = document.createElementNS('http://www.w3.org/2000/svg', 'svg'); ov.setAttribute('class', 'ov'); parts.push(ov);
+    chart.replaceChildren(...parts);
+  } catch (e) { chart.innerHTML = '<p class="msg">Помилка побудови схеми: ' + esc(e.message) + '</p>'; return; }
+  chart.style.zoom = 1; natW = chart.offsetWidth;
+  if (!S.zoom) S.zoom = sheet.clientWidth < 700 ? Math.round(fitZoom() * 100) / 100 : Math.max(0.75, Math.round(fitZoom() * 100) / 100);
+  alignLanes(); placeRBP(); applyZoom(); links();
+  if (before) { const g = findNode(anchor); if (g) { const a = g.getBoundingClientRect(); sheet.scrollTop += a.top - before.top; sheet.scrollLeft += a.left - before.left; } }
+  syncUI(); legend(); save();
+}
+function syncUI() {
+  document.querySelectorAll('#typ button').forEach(b => b.setAttribute('aria-pressed', b.dataset.v === S.typ));
+  document.querySelectorAll('[data-prod]').forEach(b => b.setAttribute('aria-pressed', !!S.prod[b.dataset.prod]));
+  [['tSemi', 'semi'], ['tComps', 'comps'], ['tPrice', 'price'], ['tDesc', 'all'], ['tOld', 'old']].forEach(([i, k]) => document.getElementById(i).setAttribute('aria-pressed', !!S[k]));
+}
+document.querySelectorAll('#typ button').forEach(b => b.onclick = () => { S.typ = b.dataset.v; render(); });
+document.querySelectorAll('[data-prod]').forEach(b => b.onclick = () => {
+  const k = b.dataset.prod; S.prod[k] = S.prod[k] ? 0 : 1;
+  if (!S.prod.ST && !S.prod.RT && !S.prod.MT) S.prod[k] = 1;
+  render();
+});
+[['tSemi', 'semi'], ['tComps', 'comps'], ['tPrice', 'price'], ['tOld', 'old']].forEach(([i, k]) => document.getElementById(i).onclick = () => { S[k] = S[k] ? 0 : 1; render(); });
+document.getElementById('tDesc').onclick = () => { S.all = S.all ? 0 : 1; S.open.clear(); render(); };
+const setZoom = z => { S.zoom = Math.min(2, Math.max(0.25, Math.round(z * 100) / 100)); applyZoom(); links(); save(); };
+document.getElementById('zIn').onclick = () => setZoom(S.zoom + 0.1);
+document.getElementById('zOut').onclick = () => setZoom(S.zoom - 0.1);
+document.getElementById('zFit').onclick = () => setZoom(fitZoom());
+
+let drag = null;
+sheet.addEventListener('pointerdown', e => { if (e.button !== 0) return; drag = {x: e.clientX, y: e.clientY, l: sheet.scrollLeft, t: sheet.scrollTop, moved: false}; });
+window.addEventListener('pointermove', e => {
+  if (!drag) return; const dx = e.clientX - drag.x, dy = e.clientY - drag.y;
+  if (!drag.moved && Math.hypot(dx, dy) > 5) { drag.moved = true; sheet.classList.add('drag'); }
+  if (drag.moved) { sheet.scrollLeft = drag.l - dx; sheet.scrollTop = drag.t - dy; }
+});
+window.addEventListener('pointerup', e => {
+  if (!drag) return; const moved = drag.moved; drag = null; sheet.classList.remove('drag');
+  if (moved) return;
+  const g = e.target.closest && e.target.closest('g.node.click'); if (!g) return;
+  const nid = g.querySelector('title').textContent, k = KEYS[nid];
+  if (S.all) { S.all = 0; Object.values(KEYS).forEach(x => S.open.add(x)); }
+  S.open.has(k) ? S.open.delete(k) : S.open.add(k);
+  render(nid);
+});
+
+syncUI(); legend();
+if (!CODE) chart.innerHTML = '<p class="msg">Цей браузер не зареєстровано в МЛП. Відкрийте <a href="' + MLP_URL + '">МЛП</a> у цьому ж браузері, зареєструйтесь і поверніться сюди.</p>';
+else Promise.all([apiGet('schema', {}), Viz.instance()]).then(([d, v]) => {
+  DATA = d; viz = v; render();
+  const n = document.getElementById('upd'); if (n) n.textContent = 'Дані наживо з МЛП, оновлено ' + d.at + '.';
+}).catch(e => { chart.innerHTML = '<p class="msg">' + esc(e.message || 'Не вдалося завантажити схему') + '</p>'; });
+}
+</script>
+</body>
+</html>
