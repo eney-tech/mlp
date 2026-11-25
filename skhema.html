@@ -81,7 +81,7 @@ button:focus-visible{outline:2px solid var(--acc);outline-offset:2px}
 <script>
 {
 /* skhema.html — схема виробничих кроків МЛП. Дані наживо з сервера МЛП (Schema.gs, запит schema), лише для зареєстрованих працівників. */
-const PAGE_VERSION = 'skhema.html v1 · 25.11.2026';
+const PAGE_VERSION = 'skhema.html v2 · 25.11.2026';
 const API = 'https://script.google.com/macros/s/AKfycbx-JUajnAtVsxaLHDgwRpfzE12g4LUtlf6JnWYAQScAVZ5FCpxzGHSrA5PDESqP80KD/exec';
 const MLP_URL = location.origin + location.pathname.replace(/[^/]*$/, '');
 function store(k) { try { return localStorage.getItem(k) || ''; } catch (e) { return ''; } }
@@ -127,6 +127,20 @@ const locNote = (code, tl) => locRows(code, tl).map(r => '* ' + r.t + ', ' + r.l
 function descOf(key, tl) { return (tl.length === 1 && DATA.desc[key + '|' + tl[0]]) || DATA.desc[key] || ''; }
 
 /* Вузол: шапка (код, назва, ▸ | ціна праворуч), опис, вхідний напівфабрикат, компоненти, примітки, напівфабрикат після кроку */
+/* Широкий крок двох шляхів (OV3, S12 у 3115 «Б»): одна шапка, під нею дві зони — ліва S11.2, права S11.1 */
+function laneZones(o, RN) {
+  const L = {'S11.2': {ins: [], out: ''}, 'S11.1': {ins: [], out: o.semi}}, common = [];
+  Object.keys(o.semiAlt || {}).forEach(k => { L[k] = L[k] || {ins: []}; L[k].out = o.semiAlt[k]; });
+  (o.ins || []).forEach(x => { const m = /^шлях ([^:]+):\s*(.*)$/.exec(x); if (m && L[m[1]]) L[m[1]].ins.push(m[2]); else common.push(x); });
+  const ZW = Math.floor(WIDE / 2) - 10, TD = '<TR><TD ALIGN="LEFT" BALIGN="LEFT" WIDTH="' + ZW + '"';
+  const zone = (code, color, sideR) => {
+    const z = L[code], R = [TD + '><FONT POINT-SIZE="9" COLOR="' + color + '"><B>шлях ' + code + '</B></FONT></TD></TR>'];
+    if (S.comps) z.ins.concat(common).forEach(c => R.push(TD + '><FONT POINT-SIZE="9.5">• ' + WL(c, RN) + '</FONT></TD></TR>'));
+    if (S.semi && z.out) R.push(TD + ' BGCOLOR="#EEEDFE"><FONT POINT-SIZE="9.5" COLOR="#3C3489">⇢ ' + WL(z.out, RN) + '</FONT></TD></TR>');
+    return '<TD VALIGN="TOP" WIDTH="' + Math.floor(WIDE / 2) + '"' + (sideR ? ' BORDER="1" SIDES="R" COLOR="#B4B2A9"' : '') + '><TABLE BORDER="0" CELLBORDER="0" CELLSPACING="0" CELLPADDING="4" WIDTH="' + (Math.floor(WIDE / 2) - 2) + '">' + R.join('') + '</TABLE></TD>';
+  };
+  return '<TR><TD COLSPAN="2" CELLPADDING="0"><TABLE BORDER="0" CELLBORDER="0" CELLSPACING="0" CELLPADDING="0"><TR>' + zone('S11.2', TERRA, true) + zone('S11.1', BLUE, false) + '</TR></TABLE></TD></TR>';
+}
 function label(o) {
   const tl = o.tl, d = descOf(o.descKey || o.code, tl), open = d && (S.all || S.open.has(o.key));
   const fill = o.fill || FILL[o.type] || '#FFFFFF', W = o.w || (o.wide ? WIDE : COLW);
@@ -139,7 +153,7 @@ function label(o) {
     (p ? '<FONT COLOR="' + GR + '"><B>' + esc(p) + '</B></FONT>' : '') + '</TD></TR></TABLE></TD></TR>');
   if (open) row('<FONT POINT-SIZE="9.5" COLOR="#2C2C2A">' + wrap(d, o.wide ? 110 : 56).map(esc).join('<BR ALIGN="LEFT"/>') + '<BR ALIGN="LEFT"/></FONT>', '#F6F5F1');
   const RN = o.wide ? WIDE_N + 20 : ROW_N;
-  if (S.comps && o.ins) o.ins.forEach(c => row('<FONT POINT-SIZE="9.5">• ' + WL(c, RN - 4) + '</FONT>'));
+  if (S.comps && o.ins && !o.lanes) o.ins.forEach(c => row('<FONT POINT-SIZE="9.5">• ' + WL(c, RN - 4) + '</FONT>'));
   if (S.comps && o.comps) {
     const two = tl.length > 1 && tl.filter(t => (o.comps[t] || []).length).length > 1;
     tl.forEach(t => (o.comps[t] || []).forEach(c => row('<FONT POINT-SIZE="9.5">' + (two ? '<FONT COLOR="#888780">' + t + '</FONT>  ' : '• ') + WL(c, RN - 6) + '</FONT>')));
@@ -147,12 +161,13 @@ function label(o) {
   const notes = (o.notes || []).concat(p ? locNote(o.priceKey, tl) : []);
   notes.forEach(n => row('<FONT POINT-SIZE="9.5" COLOR="#854F0B"><I>' + WL(n, RN - 4) + '</I></FONT>'));
   const alt = o.semiAlt && Object.keys(o.semiAlt).length ? o.semiAlt : null;
-  if (o.semi && S.semi && !alt) row('<FONT POINT-SIZE="9.5" COLOR="#3C3489">⇢ ' + WL(o.semi, RN) + '</FONT>', '#EEEDFE');
-  if (o.semi && S.semi && alt) {
+  if (o.lanes) R.push(laneZones(o, 54));
+  else if (o.semi && S.semi && !alt) row('<FONT POINT-SIZE="9.5" COLOR="#3C3489">⇢ ' + WL(o.semi, RN) + '</FONT>', '#EEEDFE');
+  else if (o.semi && S.semi && alt) {
     row('<FONT POINT-SIZE="9.5" COLOR="#3C3489">⇢ шлях S11.1: ' + WL(o.semi, RN - 12) + '</FONT>', '#EEEDFE');
     Object.keys(alt).forEach(k => row('<FONT POINT-SIZE="9.5" COLOR="#3C3489">⇢ шлях ' + esc(k) + ': ' + WL(alt[k], RN - 12) + '</FONT>', '#EEEDFE'));
   }
-  const t = '<TABLE BORDER="1" CELLBORDER="0" CELLSPACING="0" CELLPADDING="4" WIDTH="' + W + '" COLOR="' + (o.color || '#5F5E5A') + '"' + (o.dashed ? ' STYLE="DASHED"' : '') + '>' + R.join('') + '</TABLE>';
+  const t = '<TABLE BORDER="1" CELLBORDER="0" CELLSPACING="0" CELLPADDING="4" BGCOLOR="#FFFFFF" WIDTH="' + W + '" COLOR="' + (o.color || '#5F5E5A') + '"' + (o.dashed ? ' STYLE="DASHED"' : '') + '>' + R.join('') + '</TABLE>';
   return o.wide ? ports(t, true) : t;
 }
 function ports(t, bottom) {
@@ -195,7 +210,7 @@ function graphST3115() {
     if (s.code === 'OV3') notes.push('можна пропустити');
     if (s.code === 'S13') notes.push('лише для статорів після S11.1');
     g.N(A(s.code), {key: 'S|' + s.code + '|3115', descKey: s.code, code: s.code, name: s.name, type: s.type, semi: s.semi, semiAlt: s.semiAlt, ins: s.ins, comps: s.comps, tl: ['3115'], priceKey: s.code,
-      notes, dashed: s.code === 'OV3', wide: s.code === 'OV3' || s.code === 'S12'});
+      notes, dashed: s.code === 'OV3', wide: s.code === 'OV3' || s.code === 'S12', lanes: s.code === 'OV3' || s.code === 'S12'});
   });
   g.L.push('j3115 [shape=diamond, style=filled, fillcolor="#F1EFE8", color="#5F5E5A", label="вибір бази", fontsize=10, width=1.5, height=0.7];');
   g.L.push(fin('fin3115', 'Готовий статор 3115', '', true));
