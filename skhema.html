@@ -81,7 +81,7 @@ button:focus-visible{outline:2px solid var(--acc);outline-offset:2px}
 <script>
 {
 /* skhema.html — схема виробничих кроків МЛП. Дані наживо з сервера МЛП (Schema.gs, запит schema), лише для зареєстрованих працівників. */
-const PAGE_VERSION = 'skhema.html v4 · 25.11.2026';   // v4: крок поділу (R2 4320, R5) — два напівфабрикати: одразу далі і в гілку (Schema.gs v3, semiBr); v3:   // v3: ротор 4320 — R1.1 «Допресування вала» після R2 (Schema.gs v2, DATA.RT4320), поділ R2: готові → R3 / на допресування → R1.1
+const PAGE_VERSION = 'skhema.html v5 · 25.11.2026';   // v5: поділ партії (R2 4320 → R1.1, R5 → R6) — у кроці поділу дві зони напівфабрикатів, крок гілки вузький під лівою зоною, лінії: ліва → гілка → крок, де сходяться; права — одразу туди, повз гілку; v4: крок поділу (R2 4320, R5) — два напівфабрикати: одразу далі і в гілку (Schema.gs v3, semiBr); v3:   // v3: ротор 4320 — R1.1 «Допресування вала» після R2 (Schema.gs v2, DATA.RT4320), поділ R2: готові → R3 / на допресування → R1.1
 const API = 'https://script.google.com/macros/s/AKfycbx-JUajnAtVsxaLHDgwRpfzE12g4LUtlf6JnWYAQScAVZ5FCpxzGHSrA5PDESqP80KD/exec';
 const MLP_URL = location.origin + location.pathname.replace(/[^/]*$/, '');
 function store(k) { try { return localStorage.getItem(k) || ''; } catch (e) { return ''; } }
@@ -143,16 +143,16 @@ function laneZones(o, RN) {
 }
 function label(o) {
   const tl = o.tl, d = descOf(o.descKey || o.code, tl), open = d && (S.all || S.open.has(o.key));
-  const fill = o.fill || FILL[o.type] || '#FFFFFF', W = o.w || (o.wide ? WIDE : COLW);
+  const fill = o.fill || FILL[o.type] || '#FFFFFF', W = o.w || (o.wide ? WIDE : COLW), PWo = o.narrow ? 46 : PW;   /* v5: вузький крок гілки поділу */
   const R = [], row = (html, bg) => R.push('<TR><TD COLSPAN="2" ALIGN="LEFT" BALIGN="LEFT"' + (bg ? ' BGCOLOR="' + bg + '"' : '') + '>' + html + '</TD></TR>');
   const p = S.price && o.priceKey ? price(o.priceKey, tl) : '';
   const mark = d ? '<FONT COLOR="#888780">  ' + (open ? '▾' : '▸') + '</FONT>' : '';
-  const nn = (o.wide ? WIDE_N : NAME_N) - (o.code ? o.code.length + 2 : 0), nm = WL(o.name, nn);
-  const name = (o.code ? '<B>' + esc(o.code) + '</B>&#160;&#160;&#160;' : '') + (o.bold ? '<B>' + nm + '</B>' : nm) + mark;
-  R.push('<TR><TD COLSPAN="2" CELLPADDING="0" BGCOLOR="' + fill + '"><TABLE BORDER="0" CELLBORDER="0" CELLSPACING="0" CELLPADDING="6"><TR><TD ALIGN="LEFT" BALIGN="LEFT" WIDTH="' + (W - PW) + '">' + name + '</TD><TD ALIGN="RIGHT" WIDTH="' + PW + '">' +
+  const nn = (o.wide ? WIDE_N : o.narrow ? 14 : NAME_N) - (o.code && !o.narrow ? o.code.length + 2 : 0), nm = WL(o.name, nn);
+  const name = (o.code ? '<B>' + esc(o.code) + '</B>' + (o.narrow ? '<BR ALIGN="LEFT"/>' : '&#160;&#160;&#160;') : '') + (o.bold ? '<B>' + nm + '</B>' : nm) + mark;
+  R.push('<TR><TD COLSPAN="2" CELLPADDING="0" BGCOLOR="' + fill + '"><TABLE BORDER="0" CELLBORDER="0" CELLSPACING="0" CELLPADDING="6"><TR><TD ALIGN="LEFT" BALIGN="LEFT" WIDTH="' + (W - PWo) + '">' + name + '</TD><TD ALIGN="RIGHT" VALIGN="TOP" WIDTH="' + PWo + '">' +
     (p ? '<FONT COLOR="' + GR + '"><B>' + esc(p) + '</B></FONT>' : '') + '</TD></TR></TABLE></TD></TR>');
-  if (open) row('<FONT POINT-SIZE="9.5" COLOR="#2C2C2A">' + wrap(d, o.wide ? 110 : 56).map(esc).join('<BR ALIGN="LEFT"/>') + '<BR ALIGN="LEFT"/></FONT>', '#F6F5F1');
-  const RN = o.wide ? WIDE_N + 20 : ROW_N;
+  if (open) row('<FONT POINT-SIZE="9.5" COLOR="#2C2C2A">' + wrap(d, o.wide ? 110 : o.narrow ? 24 : 56).map(esc).join('<BR ALIGN="LEFT"/>') + '<BR ALIGN="LEFT"/></FONT>', '#F6F5F1');
+  const RN = o.wide ? WIDE_N + 20 : o.narrow ? 24 : ROW_N;
   if (S.comps && o.ins && !o.lanes) o.ins.forEach(c => row('<FONT POINT-SIZE="9.5">• ' + WL(c, RN - 4) + '</FONT>'));
   if (S.comps && o.comps) {
     const two = tl.length > 1 && tl.filter(t => (o.comps[t] || []).length).length > 1;
@@ -163,9 +163,11 @@ function label(o) {
   const alt = o.semiAlt && Object.keys(o.semiAlt).length ? o.semiAlt : null;
   const lc1 = t => t.charAt(0).toLowerCase() + t.slice(1);
   if (o.lanes) R.push(laneZones(o, 54));
-  else if (o.semi && S.semi && o.semiBr && o.split) {   /* v4: крок поділу — два напівфабрикати */
-    row('<FONT POINT-SIZE="9.5" COLOR="#3C3489">⇢ ' + esc(lc1(o.split.b)) + ': ' + WL(o.semi, RN - 18) + '</FONT>', '#EEEDFE');
-    row('<FONT POINT-SIZE="9.5" COLOR="#3C3489">⇢ ' + esc(lc1(o.split.a)) + ': ' + WL(o.semiBr.name, RN - 22) + '</FONT>', '#EEEDFE');
+  else if (o.semi && S.semi && o.semiBr && o.split) {   /* v4 / v5: крок поділу — дві зони: ліва — у гілку (під нею вузький крок гілки), права — одразу далі */
+    const ZW = Math.floor(W / 2), zt = (h, t, side) => '<TD VALIGN="TOP" ALIGN="LEFT" BALIGN="LEFT" WIDTH="' + ZW + '" BGCOLOR="#EEEDFE"' + (side ? ' BORDER="1" SIDES="R" COLOR="#FFFFFF"' : '') +
+      '><FONT POINT-SIZE="9.5" COLOR="#3C3489"><B>' + esc(h) + '</B><BR ALIGN="LEFT"/>⇢ ' + WL(t, 24) + '</FONT></TD>';
+    R.push('<TR><TD COLSPAN="2" CELLPADDING="0"><TABLE BORDER="0" CELLBORDER="0" CELLSPACING="0" CELLPADDING="5"><TR>' +
+      zt(lc1(o.split.a), o.semiBr.name, true) + zt(lc1(o.split.b), o.semi, false) + '</TR></TABLE></TD></TR>');
   }
   else if (o.semi && S.semi && !alt) row('<FONT POINT-SIZE="9.5" COLOR="#3C3489">⇢ ' + WL(o.semi, RN) + '</FONT>', '#EEEDFE');
   else if (o.semi && S.semi && alt) {
@@ -266,6 +268,11 @@ function graphRT() {
   const own = tl.indexOf('4320') >= 0 && DATA.RT4320 && DATA.RT4320.length, RTs = own ? DATA.RT4320 : DATA.RT, base = {};
   (DATA.RT || []).forEach(s => base[s.code] = 1);
   g.cl('r', 'Ротор', tl.length > 1 ? (own ? 'маршрут спільний для 3115 і 4320; R1.1 — лише 4320' : 'маршрут спільний для 3115 і 4320') : 'типорозмір ' + tl[0]);
+  /* v5: поділи — крок поділу, перший і останній крок гілки, крок, де гілки сходяться (лінії малює links) */
+  const idx = {}; RTs.forEach((s, i) => idx[s.code] = i);
+  const SP = RTs.filter(s => s.split && idx[s.split.br] !== undefined && idx[s.split.to] !== undefined).map(s => ({code: s.code, first: s.split.br, last: RTs[idx[s.split.to] - 1].code, to: s.split.to}));
+  SPLITS.length = 0; SP.forEach(x => SPLITS.push({sp: R(x.code), first: R(x.first), last: R(x.last), to: R(x.to)}));
+  const narrow = {}; SP.forEach(x => { for (let k = idx[x.first]; k < idx[x.to]; k++) narrow[RTs[k].code] = 1; });
   RTs.forEach(s => {
     const notes = [], only4 = own && !base[s.code];
     if (s.code === 'R1') notes.push('перевірка: висота штифта');
@@ -274,12 +281,15 @@ function graphRT() {
     if (s.split) notes.push((tl.length > 1 && s.code === 'R2' ? 'на 4320 ' : '') + 'партія ділиться: ' + lc1(s.split.b) + ' / ' + lc1(s.split.a));
     if (only4) notes.push(tl.length > 1 ? 'лише 4320' : 'з R2 — те, що не пройшло «8-ку»');
     g.N(R(s.code), {key: 'R|' + s.code + (only4 ? '|4320' : ''), descKey: s.code, code: s.code, name: s.name, type: s.type, semi: s.semi, semiAlt: s.semiAlt, semiBr: s.semiBr, split: s.split, ins: s.ins, comps: s.comps,
-      tl: only4 ? ['4320'] : tl, priceKey: s.code, notes, dashed: only4});
+      tl: only4 ? ['4320'] : tl, priceKey: s.code, notes, dashed: only4, narrow: !!narrow[s.code], w: narrow[s.code] ? Math.floor(COLW / 2) - 4 : 0});
   });
   g.L.push(fin('finrt', 'Готовий ротор із гравіюванням', tl.join(' / ')));
   g.L.push('}');
-  g.chain(RTs.map(s => R(s.code)).concat('finrt'));
-  RTs.forEach(s => { if (s.split) g.E(R(s.code), R(s.split.to)); });   // v3: готові — одразу на крок, де гілки сходяться (R2 → R3)
+  /* v5: у межах поділу стрілки Graphviz невидимі (лише розкладка) — лінії від зон кроку поділу малює links */
+  const inv = {}; SP.forEach(x => { for (let k = idx[x.code]; k < idx[x.to]; k++) inv[RTs[k].code] = 1; });
+  const ids = RTs.map(s => R(s.code)).concat('finrt');
+  ids.slice(1).forEach((b, i) => g.E(ids[i], b, inv[RTs[i].code] ? 'style=invis' : ''));
+  SP.forEach(x => g.E(R(x.code), R(x.to), 'style=invis'));
   return g.end();
 }
 function graphMT() {
@@ -332,6 +342,12 @@ const fitZoom = () => Math.min(1.2, Math.max(0.3, (sheet.clientWidth - 24) / nat
 function findNode(nid) { return [...chart.querySelectorAll('g.node')].find(g => g.querySelector('title')?.textContent === nid); }
 function svgOf(dot) { const s = viz.renderSVGElement(dot); s.querySelectorAll('g.node').forEach(g => { const t = g.querySelector('title'); if (t && CLICK[t.textContent]) g.classList.add('click'); }); return s; }
 /* Статор 3115: блоки ліній по краях широких OV3 / S12 — S11.2 і лівий край, S11.1 і S13 — правий */
+/* v5: поділ партії — крок гілки вузький, лівим краєм під лівою зоною кроку поділу */
+const SPLITS = [];
+function alignSplits() {
+  SPLITS.forEach(x => { const sp = findNode(x.sp); if (!sp) return; const o = sp.getBBox();
+    [x.first, x.last].filter((v, i, a) => a.indexOf(v) === i).forEach(n => { const e = findNode(n); if (!e) return; const b = e.getBBox(); e.setAttribute('transform', 'translate(' + (o.x - b.x) + ',0)'); }); });
+}
 function alignLanes() {
   const g = nid => findNode(nid), ov = g('a_OV3'); if (!ov) return;
   const o = ov.getBBox();
@@ -386,6 +402,14 @@ function links() {
     const x1b = Math.min(Math.max(x1, n.S13.l + 20), n.S13.r - 20);
     seg(x1, n['S11.1'], n.OV3, BLUE); seg(x1, n.OV3, n.S12, BLUE); seg(x1b, n.S12, n.S13, BLUE); seg(x1b, n.S13, n.fin, BLUE);
   }
+  // v5: поділ партії — ліва зона кроку поділу → гілка → крок, де сходяться; права зона — одразу туди, повз гілку
+  SPLITS.forEach(x => {
+    const s = box(x.sp), f = box(x.first), l = box(x.last), m = box(x.to); if (!s || !f || !l || !m) return;
+    const flow = d => line(d, EDGE, false, 1.3), xr = s.l + (s.r - s.l) * 0.75, xl = f.cx;
+    flow('M' + xl + ' ' + s.b + ' V' + (f.t - 5));
+    flow('M' + l.cx + ' ' + l.b + ' V' + (m.t - 5));
+    flow('M' + xr + ' ' + s.b + ' V' + (m.t - 5));
+  });
   // РБП → S11.2: одна горизонталь (або коліно, якщо блоки на різній висоті)
   [['w3115', 'a_S11_2'], ['w4320', 'b_S11_2']].forEach(([a, b]) => {
     const p = box(a), q = box(b); if (!p || !q) return;
@@ -427,7 +451,7 @@ function render(anchor) {
   } catch (e) { chart.innerHTML = '<p class="msg">Помилка побудови схеми: ' + esc(e.message) + '</p>'; return; }
   chart.style.zoom = 1; natW = chart.offsetWidth;
   if (!S.zoom) S.zoom = sheet.clientWidth < 700 ? Math.round(fitZoom() * 100) / 100 : Math.max(0.75, Math.round(fitZoom() * 100) / 100);
-  alignLanes(); placeRBP(); applyZoom(); links();
+  alignLanes(); alignSplits(); placeRBP(); applyZoom(); links();
   if (before) { const g = findNode(anchor); if (g) { const a = g.getBoundingClientRect(); sheet.scrollTop += a.top - before.top; sheet.scrollLeft += a.left - before.left; } }
   syncUI(); legend(); save();
 }
