@@ -81,7 +81,7 @@ button:focus-visible{outline:2px solid var(--acc);outline-offset:2px}
 <script>
 {
 /* skhema.html — схема виробничих кроків МЛП. Дані наживо з сервера МЛП (Schema.gs, запит schema), лише для зареєстрованих працівників. */
-const PAGE_VERSION = 'skhema.html v3 · 25.11.2026';   // v3: ротор 4320 — R1.1 «Допресування вала» після R2 (Schema.gs v2, DATA.RT4320), поділ R2: готові → R3 / на допресування → R1.1
+const PAGE_VERSION = 'skhema.html v4 · 25.11.2026';   // v4: крок поділу (R2 4320, R5) — два напівфабрикати: одразу далі і в гілку (Schema.gs v3, semiBr); v3:   // v3: ротор 4320 — R1.1 «Допресування вала» після R2 (Schema.gs v2, DATA.RT4320), поділ R2: готові → R3 / на допресування → R1.1
 const API = 'https://script.google.com/macros/s/AKfycbx-JUajnAtVsxaLHDgwRpfzE12g4LUtlf6JnWYAQScAVZ5FCpxzGHSrA5PDESqP80KD/exec';
 const MLP_URL = location.origin + location.pathname.replace(/[^/]*$/, '');
 function store(k) { try { return localStorage.getItem(k) || ''; } catch (e) { return ''; } }
@@ -161,7 +161,12 @@ function label(o) {
   const notes = (o.notes || []).concat(p ? locNote(o.priceKey, tl) : []);
   notes.forEach(n => row('<FONT POINT-SIZE="9.5" COLOR="#854F0B"><I>' + WL(n, RN - 4) + '</I></FONT>'));
   const alt = o.semiAlt && Object.keys(o.semiAlt).length ? o.semiAlt : null;
+  const lc1 = t => t.charAt(0).toLowerCase() + t.slice(1);
   if (o.lanes) R.push(laneZones(o, 54));
+  else if (o.semi && S.semi && o.semiBr && o.split) {   /* v4: крок поділу — два напівфабрикати */
+    row('<FONT POINT-SIZE="9.5" COLOR="#3C3489">⇢ ' + esc(lc1(o.split.b)) + ': ' + WL(o.semi, RN - 18) + '</FONT>', '#EEEDFE');
+    row('<FONT POINT-SIZE="9.5" COLOR="#3C3489">⇢ ' + esc(lc1(o.split.a)) + ': ' + WL(o.semiBr.name, RN - 22) + '</FONT>', '#EEEDFE');
+  }
   else if (o.semi && S.semi && !alt) row('<FONT POINT-SIZE="9.5" COLOR="#3C3489">⇢ ' + WL(o.semi, RN) + '</FONT>', '#EEEDFE');
   else if (o.semi && S.semi && alt) {
     row('<FONT POINT-SIZE="9.5" COLOR="#3C3489">⇢ шлях S11.1: ' + WL(o.semi, RN - 12) + '</FONT>', '#EEEDFE');
@@ -265,10 +270,10 @@ function graphRT() {
     const notes = [], only4 = own && !base[s.code];
     if (s.code === 'R1') notes.push('перевірка: висота штифта');
     if (s.code === 'R4') notes.push('перевірка: полярність');
-    if (s.code === 'R5') notes.push('партія ділиться: на балансування (R6) / одразу на F4');
-    if (s.split) notes.push((tl.length > 1 ? 'на 4320 ' : '') + 'партія ділиться: ' + s.split.b.toLowerCase() + ' / ' + s.split.a.toLowerCase());
+    const lc1 = t => t.charAt(0).toLowerCase() + t.slice(1);
+    if (s.split) notes.push((tl.length > 1 && s.code === 'R2' ? 'на 4320 ' : '') + 'партія ділиться: ' + lc1(s.split.b) + ' / ' + lc1(s.split.a));
     if (only4) notes.push(tl.length > 1 ? 'лише 4320' : 'з R2 — те, що не пройшло «8-ку»');
-    g.N(R(s.code), {key: 'R|' + s.code + (only4 ? '|4320' : ''), descKey: s.code, code: s.code, name: s.name, type: s.type, semi: s.semi, semiAlt: s.semiAlt, ins: s.ins, comps: s.comps,
+    g.N(R(s.code), {key: 'R|' + s.code + (only4 ? '|4320' : ''), descKey: s.code, code: s.code, name: s.name, type: s.type, semi: s.semi, semiAlt: s.semiAlt, semiBr: s.semiBr, split: s.split, ins: s.ins, comps: s.comps,
       tl: only4 ? ['4320'] : tl, priceKey: s.code, notes, dashed: only4});
   });
   g.L.push(fin('finrt', 'Готовий ротор із гравіюванням', tl.join(' / ')));
