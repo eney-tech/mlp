@@ -777,7 +777,8 @@
 <div class="net" id="net" role="alert" aria-live="assertive"><div class="nb"><div class="rt" id="netr"></div><div class="nt" id="nett">Зберігаю…</div><div class="ns" id="nets"></div><div class="np"><i id="netp"></i></div><div class="nh" id="neth"></div><div class="zc" id="zc"></div><button class="nx" id="netx" type="button">Не чекати</button></div></div>
 
 <script>
-const PAGE_VERSION = 'index.html v152 · 26.11.2026';   // v152: склад — «Прийняти» → «ГП з цеху» / «Від постачальника»; фільтри (типорозмір, KV, колір, мої / усі); «Залишки» згортаються; «Записи переміщення» локації; у цехах без «Приходів» і «Усіх записів за 30 днів»
+const PAGE_VERSION = 'index.html v153 · 26.11.2026';   // v153: «Залишки» чистіше — «ящиків N» і дата ящика в колонці коментаря, без другого рядка й без повтору маркування
+//    // v152: склад — «Прийняти» → «ГП з цеху» / «Від постачальника»; фільтри (типорозмір, KV, колір, мої / усі); «Залишки» згортаються; «Записи переміщення» локації; у цехах без «Приходів» і «Усіх записів за 30 днів»
 //    // v151: сторінка складу — Де я → згорнута «Робота зі складом» (склади, віртуальні крім ВЯ) → «Залишки» з режимами «Змінити залишок» / «Перемістити», ящики ГП 3-м рівнем, історія руху за обраною позицією
 //    // v150: локація тари Ж2.1 / Ж2.2 — «Жуляни · В1 / В2», не «Печерськ»
 //   // v149: залишки — три рівні, згортаються (група → позиція → технічна), «− рівень» / «+ рівень»
@@ -6135,7 +6136,7 @@ function skBalTDraw() {
   const names = Object.keys(bal).filter(n => (Math.abs(bal[n][0]) > 1e-9 || bal[n][2] > 1e-9) && (byU[n] ? byU[n].some(skFOk) : skFOk(skAttr(n))));   // v152: фильтри
   const groups = ['Двигуни'].concat((d.groups || []).filter(g => g !== 'Двигуни')); names.forEach(n => { const g = grpOf[n] || d.other; if (groups.indexOf(g) < 0) groups.push(g); });
   const by = {}; names.forEach(n => (by[grpOf[n] || d.other] = by[grpOf[n] || d.other] || []).push(n));
-  const cols = 3 + (ed ? 1 : 0) + (ed && !mv ? 1 : 0);
+  const cols = 3 + (ed && !mv ? 2 : 1);   // v153: у режимі перегляду — колонка приміток (ящики ГП)
   const th = s => '<th style="text-align:left;padding:6px 6px 6px 0;font-size:12px;color:#66767F;border-bottom:1px solid #C5D0D7">' + s + '</th>';
   const td = (s, st) => '<td style="padding:5px 6px 5px 0;border-bottom:1px solid #EEF2F5;vertical-align:middle;' + (st || '') + '">' + s + '</td>';
   const inp = (cls, ph, w, extra) => '<input type="text" class="' + cls + '" placeholder="' + ph + '"' + (extra || '') + ' style="margin:0;padding:6px 8px;font-size:15px;width:' + w + '">';
@@ -6151,23 +6152,25 @@ function skBalTDraw() {
       const kids = tech.concat(Math.abs(rest) > 1e-9 ? [['технічна не вказана', rest, b[1], '', 1]] : []);
       const split = mv && tech.length > 1, sel = SKBT.sel === n;
       let cell = '';
-      if (ed && mv) cell = td(boxes.length ? '<span class="muted" style="font-size:12px">ящики ↓</span>' : split ? '<span class="muted" style="font-size:12px">за технічними ↓</span>' : inp('btM', 'скільки', '80px', ' data-max="' + b[0] + '"'));
-      else if (ed) cell = td(boxes.length ? '' : inp('btD', '±', '72px')) + td(boxes.length ? '' : inp('btC', 'коментар', '100%'), 'min-width:120px');
+      const bN = boxes.length ? '<span class="muted" style="font-size:12px">ящиків ' + boxes.length + '</span>' : '';   // v153: «ящиків N» — у колонку коментаря, не другим рядком
+      if (!ed) cell = td(bN);
+      else if (mv) cell = td(boxes.length ? bN : split ? '<span class="muted" style="font-size:12px">за технічними ↓</span>' : inp('btM', 'скільки', '80px', ' data-max="' + b[0] + '"'));
+      else cell = td(boxes.length ? '' : inp('btD', '±', '72px')) + td(boxes.length ? bN : inp('btC', 'коментар', '100%'), 'min-width:120px');
       rows += '<tr class="btr" data-g="' + gi + '" data-pos="' + esc(n) + '" data-u="' + esc(b[1]) + '" data-k="' + esc((n + ' ' + g + ' ' + kids.map(a => a[0]).join(' ') + ' ' + boxes.map(x => x.name).join(' ')).toLowerCase()) + '"' +
         (sel ? ' style="background:#EAF2FC"' : '') + '>' +
         td(((kids.length || boxes.length) ? '<span class="btui" style="cursor:pointer;color:#2A78D6">' + (uOpen ? '▾' : '▸') + '</span> ' : '<span style="display:inline-block;width:12px"></span> ') +
           '<span class="btn2l" style="cursor:pointer;text-decoration:underline dotted #9DB0BC" title="Історія руху">' + esc(n) + '</span>' +
-          (b[2] ? '<br><span class="muted" style="font-size:12px">в дорозі ' + esc(skNfmt(b[2])) + '</span>' : '') + (boxes.length ? '<br><span class="muted" style="font-size:12px">ящиків ' + boxes.length + '</span>' : ''), 'padding-left:10px') +
+          (b[2] ? '<br><span class="muted" style="font-size:12px">в дорозі ' + esc(skNfmt(b[2])) + '</span>' : ''), 'padding-left:10px') +
         td('<b>' + esc(skNfmt(b[0])) + '</b>', 'text-align:right;white-space:nowrap' + (b[0] < 0 ? ';color:#9B231A' : '')) + td(esc(b[1]), 'color:#66767F') + cell + '</tr>';
       kids.forEach(a => {
         rows += '<tr class="btt" data-g="' + gi + '" data-p="' + esc(n) + '"' + (gOpen && uOpen ? '' : ' style="display:none"') + '>' +
           td('<span class="muted" style="font-size:13px">' + esc(a[0]) + '</span>', 'padding-left:34px') + td(esc(skNfmt(a[1])), 'text-align:right;white-space:nowrap;font-size:13px;color:#66767F') +
-          td(esc(a[2]), 'color:#66767F;font-size:13px') + (ed ? (split && !a[4] ? td(inp('btTq', 'скільки', '80px', ' data-pos="' + esc(n) + '" data-nm="' + esc(a[0]) + '" data-u="' + esc(a[2]) + '" data-max="' + a[1] + '"')) : td('')) + (mv ? '' : td('')) : '') + '</tr>'; });
+          td(esc(a[2]), 'color:#66767F;font-size:13px') + (ed ? (split && !a[4] ? td(inp('btTq', 'скільки', '80px', ' data-pos="' + esc(n) + '" data-nm="' + esc(a[0]) + '" data-u="' + esc(a[2]) + '" data-max="' + a[1] + '"')) : td('')) + (mv ? '' : td('')) : td('')) + '</tr>'; });
       boxes.forEach(x => {
         rows += '<tr class="btt" data-g="' + gi + '" data-p="' + esc(n) + '"' + (gOpen && uOpen ? '' : ' style="display:none"') + '>' +
-          td('<span style="font-size:13px">📦 ' + esc(x.name) + '</span>' + (x.total < x.per ? ' <span class="muted" style="font-size:12px">неповний</span>' : '') + '<br><span class="muted" style="font-size:12px">' + esc(x.mark) + ' · ' + esc(x.last) + '</span>', 'padding-left:34px') +
+          td('<span style="font-size:13px">📦 ' + esc(x.name) + '</span>' + (x.total < x.per ? ' <span class="muted" style="font-size:12px">неповний</span>' : ''), 'padding-left:34px') +   // v153: маркування не дублюємо (воно в назві рядка вище), дата — у колонку коментаря
           td(esc(skNfmt(x.total)), 'text-align:right;white-space:nowrap;font-size:13px') + td('шт', 'color:#66767F;font-size:13px') +
-          (ed ? (mv ? td('<input type="checkbox" class="btX" data-box="' + esc(x.id) + '" data-n="' + esc(x.name) + '" data-q="' + x.total + '" style="transform:scale(1.4)">') : td('') + td('')) : '') + '</tr>'; });
+          (ed ? (mv ? td('<input type="checkbox" class="btX" data-box="' + esc(x.id) + '" data-n="' + esc(x.name) + '" data-q="' + x.total + '" style="transform:scale(1.4)"> <span class="muted" style="font-size:12px;margin-left:6px">' + esc(x.last) + '</span>', 'white-space:nowrap') : td('') + td('<span class="muted" style="font-size:12px">' + esc(x.last) + '</span>')) : td('<span class="muted" style="font-size:12px">' + esc(x.last) + '</span>')) + '</tr>'; });
     });
   });
   const tgts = ((d.targets || {})[loc] || []).map(skLocOf), tg = (k, t) => { const a = tgts.filter(l => l.kind === k); return a.length ? '<optgroup label="' + t + '">' + a.map(l => '<option value="' + esc(l.code) + '">' + esc(skLocLab(l)) + '</option>').join('') + '</optgroup>' : ''; };
@@ -6182,7 +6185,7 @@ function skBalTDraw() {
     '<button type="button" class="btn btn2" id="btLvM" style="flex:0 0 auto;width:auto;margin:0;padding:8px 10px">− рівень</button>' +
     '<button type="button" class="btn btn2" id="btLvP" style="flex:0 0 auto;width:auto;margin:0;padding:8px 10px">+ рівень</button></div>' +
     (names.length ? '<div style="overflow-x:auto"><table style="border-collapse:collapse;width:100%;margin-top:6px"><tr>' + th('Група · позиція · технічна / ящик') + th('Є') + th('Од.') +
-      (ed ? (mv ? th('Скільки') : th('±') + th('Коментар')) : '') + '</tr>' + rows + '</table></div>' : '<p class="muted">На цій локації в обліку нічого немає.</p>') +
+      (ed ? (mv ? th('Скільки') : th('±') + th('Коментар')) : th('')) + '</tr>' + rows + '</table></div>' : '<p class="muted">На цій локації в обліку нічого немає.</p>') +
     (SKBT.boxes[loc] === null ? '<p class="muted" style="font-size:13px">Завантажую ящики ГП…</p>' : '') +
     (ed && !mv ? '<div id="btAdd"></div><button type="button" class="btn btn2" id="btAddB" style="margin-top:8px">+ Позиція, якої немає в таблиці</button>' +
       '<button class="btn" id="btGo">Записати</button><div id="ajRecent" style="margin-top:12px"></div>' : '') +
