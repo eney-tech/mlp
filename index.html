@@ -1,5 +1,7 @@
 <!DOCTYPE html>
-<!-- МЛП · index.html v149 · 26.11.2026 — «Залишки» локації: три рівні, що згортаються — група (клік по рядку) → уніфікована назва (▸ — технічні назви
+<!-- МЛП · index.html v150 · 26.11.2026 — тара Жулян (Ж2.1 / Ж2.2, з upgrade100) на формі «Нова партія» й в «Історії тари» показувалась як «Печерськ»:
+     назва локації тари — tareLocName(): Ж2.1 → «Жуляни · В1», Ж2.2 → «Жуляни · В2», Ж… → «Жуляни», П… → «Печерськ».
+     index.html v149 · 26.11.2026 — «Залишки» локації: три рівні, що згортаються — група (клік по рядку) → уніфікована назва (▸ — технічні назви
      з залишком, «технічна не вказана» — решта) → технічна; «− рівень» / «+ рівень»; пошук розгортає й шукає і за технічними назвами.
      index.html v148 · 26.11.2026 — «Змінити залишок» простіше (рішення Андрія 26.11): кнопки дії немає — під «Роботою зі складом» одразу таблиця
      залишків обраної локації (група → позиція, є, в дорозі, од.); відповідальний бачить колонки «±» і «Коментар», «+ Позиція, якої немає в таблиці» і одну кнопку «Записати».
@@ -775,7 +777,8 @@
 <div class="net" id="net" role="alert" aria-live="assertive"><div class="nb"><div class="rt" id="netr"></div><div class="nt" id="nett">Зберігаю…</div><div class="ns" id="nets"></div><div class="np"><i id="netp"></i></div><div class="nh" id="neth"></div><div class="zc" id="zc"></div><button class="nx" id="netx" type="button">Не чекати</button></div></div>
 
 <script>
-const PAGE_VERSION = 'index.html v149 · 26.11.2026';   // v149: залишки — три рівні, згортаються (група → позиція → технічна), «− рівень» / «+ рівень»
+const PAGE_VERSION = 'index.html v150 · 26.11.2026';   // v150: локація тари Ж2.1 / Ж2.2 — «Жуляни · В1 / В2», не «Печерськ»
+//   // v149: залишки — три рівні, згортаються (група → позиція → технічна), «− рівень» / «+ рівень»
 //   // v148: залишки локації таблицею з «±» і коментарем замість дії «Змінити залишок» (Sklad.gs v48)
 //   // v147: склад, реліз 3 — дія «Змінити залишок» (Sklad.gs v47)
 //   // v146: «Приймання» — усі локації бачить лише адміністратор (Sklad.gs v44)
@@ -1984,7 +1987,7 @@ function renderNew() {
   if (!p.newBatch) { $('app').innerHTML = '<div class="card"><div class="big">' + thl(t.code) + '</div><div class="pill ok">вільна</div></div>'; return; }
   const def = t.type === 'ТЧ' ? 'MT' : '';
   $('app').innerHTML = '<div class="card"><div class="muted">Тара</div><div class="big">' + thl(t.code, t.code + ' 🕘') + '</div><span class="pill ok">вільна</span>' +
-    '<span class="pill">' + (t.loc === 'Ж' ? 'Жуляни' : 'Печерськ') + '</span></div>' +
+    '<span class="pill">' + esc(tareLocName(t.loc) || '—') + '</span></div>' +
     '<div class="card"><div class="mid">Нова партія</div>' +
     '<label>Яку партію відкриваємо?</label><div class="seg">' + ['ST', 'RT', 'MT'].map(s => '<label><input type="radio" name="st" value="' + s + '"' + (s === def ? ' checked' : '') + '><span>' +
       ({ ST: 'Партія статорів', RT: 'Партія роторів', MT: 'Партія двигунів' })[s] + '</span></label>').join('') + '</div>' +   // v72: не «Що кладете» — для двигунів кладуть і статори, і ротори
@@ -3318,6 +3321,8 @@ function floorOf(loc, code, typ) { const m = DB && DB.floors && DB.floors[loc] &
 function floorsAt(loc) { const m = (DB && DB.floors && DB.floors[loc]) || {}; const o = {}; Object.keys(m).forEach(c => Object.keys(m[c]).forEach(t => o[m[c][t]] = 1)); return Object.keys(o).sort(); }
 const FLOWN = { ST: ['Статори', 'статорів'], RT: ['Ротори', 'роторів'], MT: ['Двигуни', 'двигунів'], all: ['Усі', 'деталей і двигунів'] };   // v25: all — усі потоки
 const LOCN = { 'П': 'Печерськ', 'Ж': 'Жуляни' };
+/** v150: назва локації тари — «Ж2.1» / «Ж2.2» (upgrade100) і «Ж» — Жуляни, «П…» — Печерськ */
+function tareLocName(v) { const s = String(v || '').trim(); if (!s) return ''; const z = { 'Ж2.1': ' · В1', 'Ж2.2': ' · В2' }[s] || ''; return (LOCN[s.charAt(0)] || s) + z; }
 function fn(n) { return Math.round(Number(n) || 0).toLocaleString('uk-UA'); }
 function pct(a, b) { return b ? (a / b * 100).toFixed(1).replace('.', ',') + ' %' : ''; }
 function loadDash(fresh) {
@@ -6031,7 +6036,7 @@ function renderTareHist() {
   $('who').innerHTML = whoHtml(d.me, d.perms);
   setView('Історія тари', t.code, 'home');
   const busy = t.state === 'зайнята';
-  let h = '<div class="card"><div class="muted">Історія тари' + (t.typeName ? ' · ' + esc(t.typeName) : '') + ' · ' + esc(LOCN[t.loc] || t.loc || '') + '</div>' +
+  let h = '<div class="card"><div class="muted">Історія тари' + (t.typeName ? ' · ' + esc(t.typeName) : '') + ' · ' + esc(tareLocName(t.loc)) + '</div>' +
     '<div class="big">' + esc(t.code) + '</div>' +
     '<span class="pill ' + (busy ? '' : 'ok') + '">' + esc(t.state || '—') + '</span>' + (busy && t.batch ? '<span class="pill">партія ' + bl(t.batch) + '</span>' : '') +
     (t.pair ? '<span class="pill">пара з ' + thl(t.pair) + '</span>' : '') + (t.qty ? '<span class="pill">' + esc(t.qty) + ' шт</span>' : '') +
