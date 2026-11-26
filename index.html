@@ -777,7 +777,8 @@
 <div class="net" id="net" role="alert" aria-live="assertive"><div class="nb"><div class="rt" id="netr"></div><div class="nt" id="nett">Зберігаю…</div><div class="ns" id="nets"></div><div class="np"><i id="netp"></i></div><div class="nh" id="neth"></div><div class="zc" id="zc"></div><button class="nx" id="netx" type="button">Не чекати</button></div></div>
 
 <script>
-const PAGE_VERSION = 'index.html v151 · 26.11.2026';   // v151: сторінка складу — Де я → згорнута «Робота зі складом» (склади, віртуальні крім ВЯ) → «Залишки» з режимами «Змінити залишок» / «Перемістити», ящики ГП 3-м рівнем, історія руху за обраною позицією
+const PAGE_VERSION = 'index.html v152 · 26.11.2026';   // v152: склад — «Прийняти» → «ГП з цеху» / «Від постачальника»; фільтри (типорозмір, KV, колір, мої / усі); «Залишки» згортаються; «Записи переміщення» локації; у цехах без «Приходів» і «Усіх записів за 30 днів»
+//    // v151: сторінка складу — Де я → згорнута «Робота зі складом» (склади, віртуальні крім ВЯ) → «Залишки» з режимами «Змінити залишок» / «Перемістити», ящики ГП 3-м рівнем, історія руху за обраною позицією
 //    // v150: локація тари Ж2.1 / Ж2.2 — «Жуляни · В1 / В2», не «Печерськ»
 //   // v149: залишки — три рівні, згортаються (група → позиція → технічна), «− рівень» / «+ рівень»
 //   // v148: залишки локації таблицею з «±» і коментарем замість дії «Змінити залишок» (Sklad.gs v48)
@@ -6110,11 +6111,11 @@ function renderSklad() {
   let h = '<div id="skIn"></div><div class="card">' +   // v151: Приймання → Де я → (згорнуто) Робота зі складом → Залишки → Історія → записи
     '<label style="margin-top:0">Де я / звідки</label><select id="skLoc" data-nocbx><option value="">— оберіть локацію —</option>' + grp('wh', 'Склади') + grp('shop', 'Цехи') + grp('virt', 'Віртуальні') + '</select><div class="err" id="err"></div></div>' +
     '<details class="card" id="skWork" style="display:none"><summary class="mid" style="cursor:pointer">Робота зі складом</summary><div id="skActs"></div><div id="skPanel"></div></details>';
-  h += '<div id="skBalT"></div><div id="skHist"></div>';   // v148: залишки локації з «±»
+  h += '<div id="skFlt"></div><div id="skBalT"></div><div id="skHist"></div>';   // v152: фільтри   // v148: залишки локації з «±»
   h += '<div id="skLog"></div><div id="skMy"></div><p class="muted" style="text-align:center">' + esc(PAGE_VERSION) + ' · ' + esc(d.version) + '</p><div style="height:20px"></div>';
   $('app').innerHTML = h;
-  $('skLoc').onchange = () => { SKS.loc = $('skLoc').value; SKS.act = ''; SKBT.sel = ''; SKBT.hist = null; skActsDraw(); renderSkIn(); };
-  renderSkMy(); renderSkIn(); skActsDraw(); skPpParam(); skVpParam();
+  $('skLoc').onchange = () => { SKS.loc = $('skLoc').value; SKS.act = ''; SKS.rcv = ''; SKBT.sel = ''; SKBT.hist = null; skActsDraw(); renderSkIn(); skMovesLoad(); renderSkMy(); };
+  renderSkMy(); renderSkIn(); skActsDraw(); skPpParam(); skVpParam(); skMovesLoad();
 }
 // ---- v148 (Sklad.gs v48, рішення 26.11): залишки локації — таблиця одразу під «Робота зі складом»; хто відповідальний — колонка «±» і коментар, одна кнопка «Записати»
 let SKBT = { q: '', add: 0, og: {}, ou: {}, mode: 'adj', sel: '', boxes: {}, hist: null };   // v151: mode — adj (змінити залишок) | mv (перемістити); sel — позиція для історії; boxes — ящики ГП за локацією
@@ -6125,13 +6126,13 @@ function skBalTDraw() {
   if (SKBT.mode === 'mv' && !canMv) SKBT.mode = 'adj'; if (SKBT.mode === 'adj' && !canAdj && canMv) SKBT.mode = 'mv';
   const mv = SKBT.mode === 'mv' && canMv, ed = mv || (SKBT.mode === 'adj' && canAdj);
   if ((kind === 'wh' || kind === 'shop') && SKBT.boxes[loc] === undefined) {   // ящики ГП — окремим запитом (поки вантажаться — таблиця без них)
-    SKBT.boxes[loc] = null; post('skladLocBoxes', { code: CODE, loc: loc }).then(r => { SKBT.boxes[loc] = r.boxes || []; if (SKS.loc === loc) skBalTDraw(); }).catch(() => { SKBT.boxes[loc] = []; });
+    SKBT.boxes[loc] = null; post('skladLocBoxes', { code: CODE, loc: loc }).then(r => { SKBT.boxes[loc] = r.boxes || []; if (SKS.loc === loc) { skFltDraw(); skBalTDraw(); } }).catch(() => { SKBT.boxes[loc] = []; });
   }
   const bal = Object.assign({}, ((d.bal || {})[loc]) || {}), tat = ((d.techAt || {})[loc]) || {}, bx = SKBT.boxes[loc] || [];
   const grpOf = {}; (d.positions || []).forEach(p => grpOf[p.name] = p.group || d.other);
-  const byU = {}; bx.forEach(b => (byU[b.unified] = byU[b.unified] || []).push(b));
+  const byU = {}; bx.filter(skFOk).forEach(b => (byU[b.unified] = byU[b.unified] || []).push(b));   // v152: ящики — за фільтрами
   Object.keys(byU).forEach(u => { if (!bal[u]) bal[u] = [byU[u].reduce((s, b) => s + b.total, 0), 'шт', 0]; if (!grpOf[u]) grpOf[u] = 'Двигуни'; });
-  const names = Object.keys(bal).filter(n => Math.abs(bal[n][0]) > 1e-9 || bal[n][2] > 1e-9);
+  const names = Object.keys(bal).filter(n => (Math.abs(bal[n][0]) > 1e-9 || bal[n][2] > 1e-9) && (byU[n] ? byU[n].some(skFOk) : skFOk(skAttr(n))));   // v152: фильтри
   const groups = ['Двигуни'].concat((d.groups || []).filter(g => g !== 'Двигуни')); names.forEach(n => { const g = grpOf[n] || d.other; if (groups.indexOf(g) < 0) groups.push(g); });
   const by = {}; names.forEach(n => (by[grpOf[n] || d.other] = by[grpOf[n] || d.other] || []).push(n));
   const cols = 3 + (ed ? 1 : 0) + (ed && !mv ? 1 : 0);
@@ -6171,7 +6172,7 @@ function skBalTDraw() {
   });
   const tgts = ((d.targets || {})[loc] || []).map(skLocOf), tg = (k, t) => { const a = tgts.filter(l => l.kind === k); return a.length ? '<optgroup label="' + t + '">' + a.map(l => '<option value="' + esc(l.code) + '">' + esc(skLocLab(l)) + '</option>').join('') + '</optgroup>' : ''; };
   const modes = (canAdj ? [['adj', 'Змінити залишок']] : []).concat(canMv ? [['mv', 'Перемістити']] : []);
-  box.innerHTML = '<div class="card"><div class="mid">Залишки: ' + esc((skLocOf(loc).name || loc)) + ' <span class="muted" style="font-weight:400">· позицій ' + names.length + '</span></div>' +
+  box.innerHTML = '<details class="card"' + (SKBT.closed ? '' : ' open') + ' ontoggle="SKBT.closed=!this.open"><summary class="mid" style="cursor:pointer">Залишки: ' + esc((skLocOf(loc).name || loc)) + ' <span class="muted" style="font-weight:400">· позицій ' + names.length + (skFOn() ? ' (за фільтрами)' : '') + '</span></summary>' +   // v152: згортається
     (modes.length > 1 ? '<div class="seg" style="margin-top:8px">' + modes.map(m => '<label><input type="radio" name="btMode" value="' + m[0] + '"' + (m[0] === SKBT.mode ? ' checked' : '') + '><span>' + m[1] + '</span></label>').join('') + '</div>' : '') +
     (mv ? '<label>Куди</label><select id="btTo" data-nocbx><option value="">— оберіть —</option>' + tg('shop', 'Цехи') + tg('wh', 'Склади') + tg('virt', 'Без приймання') + '</select>' +
       '<p class="muted" style="margin:4px 0 0">Впишіть, скільки перемістити (не більше, ніж є). Лежить під кількома технічними назвами — по рядку на назву. Ящики ГП — галочкою.</p>'
@@ -6185,7 +6186,8 @@ function skBalTDraw() {
     (SKBT.boxes[loc] === null ? '<p class="muted" style="font-size:13px">Завантажую ящики ГП…</p>' : '') +
     (ed && !mv ? '<div id="btAdd"></div><button type="button" class="btn btn2" id="btAddB" style="margin-top:8px">+ Позиція, якої немає в таблиці</button>' +
       '<button class="btn" id="btGo">Записати</button><div id="ajRecent" style="margin-top:12px"></div>' : '') +
-    (mv ? '<label>Коментар</label><input type="text" id="btMc"><button class="btn" id="btMv">Перемістити</button>' : '') + '</div>';
+    (mv && !(d.ctrl || {})[loc] ? '<div id="btAddM"></div><button type="button" class="btn btn2" id="btAddMB" style="margin-top:8px">+ Позиція, якої немає в таблиці</button>' : '') +   // v152: локація без контролю балансу (напр. Ж2.2)
+    (mv ? '<label>Коментар</label><input type="text" id="btMc"><button class="btn" id="btMv">Перемістити</button>' : '') + '</details>';
   const vis = () => { const w = SKBT.q.toLowerCase().trim().split(/\s+/).filter(Boolean), srch = w.length > 0;
     box.querySelectorAll('tr.btg').forEach(gr => { const g = gr.dataset.g, gn = gr.dataset.gn, gOpen = srch || SKBT.og[gn] !== false; let any = false;
       gr.querySelector('.btgi').textContent = gOpen ? '▾' : '▸';
@@ -6205,7 +6207,7 @@ function skBalTDraw() {
   document.querySelectorAll('input[name=btMode]').forEach(r => r.onchange = () => { SKBT.mode = r.value; skBalTDraw(); });
   box.querySelectorAll('.btX').forEach(c => c.onchange = vis);
   if (SKBT.sel && SKBT.hist && SKBT.hist.loc !== loc) skHistLoad(); else skHistDraw();
-  if (mv) { $('btMv').onclick = skBalTMove; return; }
+  if (mv) { $('btMv').onclick = skBalTMove; if ($('btAddMB')) $('btAddMB').onclick = skBalTAddMv; return; }
   if (!ed) return;
   SKBT.add = 0;
   $('btAddB').onclick = skBalTAdd; $('btGo').onclick = skBalTSave;
@@ -6221,6 +6223,9 @@ function skBalTMove() {
   document.querySelectorAll('#skBalT .btM').forEach(i => { const r = i.closest('tr'), q = chk(i.value, i.dataset.max, r.dataset.pos); if (q) lines.push({ pos: r.dataset.pos, qty: q, unit: r.dataset.u }); });
   document.querySelectorAll('#skBalT .btTq').forEach(i => { const q = chk(i.value, i.dataset.max, i.dataset.pos + ' · ' + i.dataset.nm); if (q) lines.push({ pos: i.dataset.pos, qty: q, unit: i.dataset.u, det: i.dataset.nm }); });
   document.querySelectorAll('#skBalT .btX').forEach(c => { if (c.checked) bxs.push({ id: c.dataset.box, name: c.dataset.n, q: Number(c.dataset.q) }); });
+  document.querySelectorAll('#skBalT .btaM').forEach(div => { const n = div.dataset.n, pos = $('btmP' + n).value, qs = String($('btmQ' + n).value || '').trim(); if (!pos && !qs) return;   // v152
+    if (!pos) return bad.push('оберіть позицію для «' + qs + '»'); const v = skCalc(qs); if (!qs || isNaN(v) || !(v > 0)) return bad.push('«' + pos + '»: кількість числом');
+    lines.push(Object.assign({ pos: pos, qty: qs, unit: $('btmU' + n).value }, pos === SKD.other ? { posOther: $('btmOt' + n).value } : {})); });
   if (bad.length) { $('err').textContent = bad.join('; '); return toast(bad[0], true); }
   if (!lines.length && !bxs.length) return toast('Впишіть кількість або позначте ящики', true);
   if (bxs.length && tk !== 'wh') return toast('Ящики ГП переміщуються лише на склад', true);
@@ -6255,6 +6260,15 @@ function skHistDraw() {
         (x.q > 0 ? '+' : '') + esc(skNfmt(x.q)) + '</b> ' + esc(x.unit) + '</div></div>').join('') + '</div>') +
     '<p class="muted" style="font-size:12px">Витрата цеху за нормами (кроки Вулика) тут не показана — вона в «Залишках цехів».</p></div>';
 }
+function skBalTAddMv() {   // v152: рядок переміщення позиції, якої немає в залишку (локація без контролю балансу)
+  const d = SKD, n = ++SKBT.add, div = document.createElement('div');
+  div.className = 'btaM'; div.dataset.n = n; div.style.cssText = 'border-top:1px solid #E7EDF1;margin-top:8px;padding-top:4px';
+  div.innerHTML = '<select id="btmP' + n + '">' + skPosOpts(d, '', '— позиція —') + '</select><div id="btmO' + n + '" style="display:none"><input type="text" id="btmOt' + n + '" placeholder="що саме"></div>' +
+    '<div class="row" style="align-items:center;margin-top:6px"><input type="text" id="btmQ' + n + '" placeholder="скільки" style="flex:0 0 40%;min-width:0;font-size:17px">' +
+    '<select id="btmU' + n + '" data-nocbx style="flex:0 0 30%">' + opts(d.units, 'шт') + '</select></div>';
+  $('btAddM').appendChild(div);
+  $('btmP' + n).onchange = () => { const v = $('btmP' + n).value; $('btmO' + n).style.display = v === d.other ? 'block' : 'none'; const p = d.positions.find(x => x.name === v); if (p) $('btmU' + n).value = p.unit; };
+}
 function skBalTAdd() {
   const d = SKD, n = ++SKBT.add, div = document.createElement('div');
   div.className = 'bta'; div.dataset.n = n; div.style.cssText = 'border-top:1px solid #E7EDF1;margin-top:8px;padding-top:4px';
@@ -6285,7 +6299,7 @@ function skBalTSave() {
       .catch(e => skErr(e, b));
   });
 }
-function skActsDraw() { skActsDraw0(); skBalTDraw(); }
+function skActsDraw() { skActsDraw0(); skFltDraw(); skBalTDraw(); }
 function skActsDraw0() {   // v151: «Робота зі складом» — згорнутий блок лише для складів і віртуальних (крім ВЯ): прийняти від постачальника, покупцю; переміщення і зміна залишку — у таблиці «Залишки»
   const d = SKD, loc = SKS.loc, k = skLocOf(loc).kind, wrap = $('skWork');
   $('err').textContent = '';
@@ -6308,10 +6322,9 @@ function skPanelDraw() {
   if (a === 'adj') return skAdjDraw();   // v147
   if (a === 'rcv') {
     if (skLocOf(SKS.loc).kind === 'virt') { p.innerHTML = '<button type="button" class="btn" style="margin-top:12px" onclick="skRcvOpen()">📦 Від постачальника</button><p class="muted">Прихід одразу на ' + esc(skLocLab(skLocOf(SKS.loc))) + ': документ, кількість по тарах і наліпки.</p>'; return; }   // v151
-    p.innerHTML = '<button type="button" class="btn" style="margin-top:12px" onclick="skRcvOpen()">📦 Від постачальника</button>' +
-      '<p class="muted">Документ (фото, PDF або «прийде пізніше»), кількість по тарах і наліпки на кожну тару.</p>' + skGpHtml('ГП з виробництва (неповні ящики свого корпусу)') +
-      '<p class="muted">Повні ящики після пакування МЛП кладе на склад сам — їх треба лише підтвердити (блок «Ящики ГП чекають прийняття» вгорі). Переміщення з інших складів і цехів — «Прийміть на …» вгорі.</p>';
-    return skGpWire();
+    p.innerHTML = '<label>Що приймаємо</label><div class="seg">' + [['gp', 'ГП з цеху'], ['sup', 'Від постачальника']].map(x => '<label><input type="radio" name="skRcv" value="' + x[0] + '"' + (SKS.rcv === x[0] ? ' checked' : '') + '><span>' + x[1] + '</span></label>').join('') + '</div><div id="skRcvP"></div>';   // v152: другий рівень
+    document.querySelectorAll('input[name=skRcv]').forEach(r => r.onchange = () => { SKS.rcv = r.value; skRcvDraw(); });
+    return skRcvDraw();
   }
   if (a === 'gp') {
     const wh = ((SKD.targets || {})[SKS.loc] || []).find(c => skLocOf(c).kind === 'wh') || '';
@@ -6321,6 +6334,15 @@ function skPanelDraw() {
   if (a === 'ship') return skShipDraw();
 }
 // ---- ГП з виробництва (ящики свого корпусу)
+function skRcvDraw() {   // v152
+  const p = $('skRcvP'); if (!p) return;
+  if (SKS.rcv === 'sup') { p.innerHTML = '<button type="button" class="btn" style="margin-top:12px" onclick="skRcvOpen()">📦 Від постачальника</button>' +
+    '<p class="muted">Документ (фото, PDF або «прийде пізніше»), кількість по тарах і наліпки на кожну тару.</p>'; return; }
+  if (SKS.rcv === 'gp') { p.innerHTML = skGpHtml('Ящик ГП з цеху (неповні ящики свого корпусу)') +
+    '<p class="muted">Повні ящики після пакування Вулик кладе на склад сам — їх треба лише підтвердити (блок «Ящики ГП чекають прийняття» вгорі). Переміщення з інших складів і цехів — «Прийміть на …» вгорі.</p>';
+    return skGpWire(); }
+  p.innerHTML = '';
+}
 function skGpHtml(title) {
   return '<label>' + title + '</label><div class="row" style="align-items:center"><input type="text" id="skBox" placeholder="скан або M-00008 №2" autocapitalize="characters" style="min-width:0">' +
     '<button type="button" class="ic" id="skBoxScan" style="flex:0 0 58px;font-size:22px;padding:10px 0;margin:0">📷</button></div>' +
@@ -6757,6 +6779,7 @@ let SKQ = '';   // v43: пошук у списку записів
 function renderSkMy() {
   const all = SKD.my || [];
   const box = $('skMy'); if (!box) return;
+  if (skLocOf(SKS.loc).kind === 'shop') { box.innerHTML = ''; return; }   // v152: у цехах — лише «Записи переміщення»
   const q = SKQ.trim().toLowerCase();
   const my = q ? all.filter(x => [x.id, x.who, x.pos, x.typ, x.det, x.lot, x.mlp, x.loc, x.comment].join(' ').toLowerCase().indexOf(q) >= 0) : all;
   const st = x => x.cancelled ? ' · <b>скасовано</b>' + (x.fixWho ? ' (' + esc(x.fixWho) + (x.reason ? ': ' + esc(x.reason) : '') + ')' : '')
@@ -6865,18 +6888,53 @@ function skAcceptNone(id) {
 }
 /** v122: під «Роботою зі складом» — мої переміщення, приходи від постачальників, партії відвантаження клієнтам (усі згорнуті; що чекає дії — помаранчева позначка в заголовку) */
 let SKLG = {};   // які з цих блоків розгорнуто (тримаємо, поки сторінка відкрита)
+// ---- v152: фільтри сторінки складу (типорозмір, KV, колір — для «Залишків» і «Записів переміщення»; мої / усі — для записів)
+let SKFL = { typ: [], kv: [], color: [], mine: false }, SKLM = { loc: '', rows: [], load: false };
+const SKF_DIM = [['typ', 'Типорозмір'], ['kv', 'KV'], ['color', 'Колір']];
+function skAttr(name, typ) { const p = (SKD.positions || []).find(x => x.name === name) || {}; return { typ: p.typ || typ || '', kv: p.kv || '', color: p.color || '' }; }
+function skFOn() { return SKF_DIM.some(d => SKFL[d[0]].length); }
+/** запис проходить фільтри: «*» — для всіх; порожньо (не виробнича позиція) — ні, коли фільтр увімкнено */
+function skFOk(a) { a = a || {}; return SKF_DIM.every(d => { const f = SKFL[d[0]]; if (!f.length) return true; const v = String(a[d[0]] || '').trim().toLowerCase(); return v === '*' || f.indexOf(v) >= 0; }); }
+function skFltDraw() {
+  const box = $('skFlt'); if (!box) return; const loc = SKS.loc; if (!loc) { box.innerHTML = ''; return; }
+  const vals = { typ: {}, kv: {}, color: {} }, add = a => SKF_DIM.forEach(d => { const v = String(a[d[0]] || '').trim().toLowerCase(); if (v && v !== '*') vals[d[0]][v] = 1; });
+  Object.keys(((SKD.bal || {})[loc]) || {}).forEach(n => add(skAttr(n))); (SKBT.boxes[loc] || []).forEach(add);
+  (SKLM.loc === loc ? SKLM.rows : []).forEach(t => t.lines.forEach(l => add(l.box ? { typ: l.typ } : skAttr(l.pos, l.typ))));
+  SKF_DIM.forEach(d => SKFL[d[0]].forEach(v => vals[d[0]][v] = 1));
+  const chip = (k, v, lab, on) => '<button type="button" class="ic" data-fk="' + k + '" data-fv="' + esc(v) + '" style="flex:0 0 auto;width:auto;margin:0;padding:6px 10px;font-size:14px' + (on ? ';background:#2E4756;color:#fff;border-color:#2E4756' : '') + '">' + esc(lab) + '</button>';
+  const row = (t, html) => '<div class="row" style="flex-wrap:wrap;gap:6px;align-items:center;margin-top:8px"><span class="muted" style="flex:0 0 84px;font-size:13px">' + t + '</span>' + html + '</div>';
+  const sortV = (k, a) => a.sort((x, y) => k === 'color' ? x.localeCompare(y, 'uk') : (Number(x) || 0) - (Number(y) || 0) || x.localeCompare(y));
+  box.innerHTML = '<details class="card"' + (SKFL.open || skFOn() || SKFL.mine ? ' open' : '') + ' ontoggle="SKFL.open=this.open"><summary class="mid" style="cursor:pointer">Фільтри' + (skFOn() || SKFL.mine ? ' <span class="pill warn" style="margin:0;font-size:13px">увімкнено</span>' : '') + '</summary>' +
+    SKF_DIM.map(d => { const o = sortV(d[0], Object.keys(vals[d[0]])); return o.length ? row(d[1], chip(d[0], '', 'Усі', !SKFL[d[0]].length) + o.map(v => chip(d[0], v, d[0] === 'kv' ? 'KV' + v : v, SKFL[d[0]].indexOf(v) >= 0)).join('')) : ''; }).join('') +
+    row('Записи', chip('mine', '0', 'Усі', !SKFL.mine) + chip('mine', '1', 'Мої', SKFL.mine)) +
+    '<p class="muted" style="font-size:12px;margin:6px 0 0">Мої — переміщення, які ви передали або прийняли. Позиції «для всіх» (кріплення, клей тощо) лишаються в будь-якому фільтрі.</p></details>';
+  box.querySelectorAll('button[data-fk]').forEach(b => b.onclick = () => { const k = b.dataset.fk, v = b.dataset.fv;
+    if (k === 'mine') SKFL.mine = v === '1'; else if (!v) SKFL[k] = []; else { const i = SKFL[k].indexOf(v); if (i >= 0) SKFL[k].splice(i, 1); else SKFL[k].push(v); }
+    SKFL.open = true; skFltDraw(); skBalTDraw(); renderSkLog(); });
+}
+function skMovesLoad() {
+  const loc = SKS.loc; if (!loc) { SKLM = { loc: '', rows: [], load: false }; return renderSkLog(); }
+  if (SKLM.loc !== loc) SKLM = { loc: loc, rows: [], load: true }; else SKLM.load = !SKLM.rows.length;
+  renderSkLog();
+  post('skladLocMoves', { code: CODE, loc: loc }).then(r => { if (SKS.loc !== loc) return; SKLM = { loc: loc, rows: r.rows || [], load: false }; renderSkLog(); skFltDraw(); })
+    .catch(() => { if (SKS.loc === loc) { SKLM.load = false; renderSkLog(); } });
+}
 function renderSkLog() {
   const box = $('skLog'); if (!box) return;
   const x = SKD.inbox || {}, L = SKS.loc, sent = x.sent || [], docs = x.docs || [], rcv = x.rcv || [];
   const fold = (k, title, body) => '<details style="margin:0 12px"' + (SKLG[k] ? ' open' : '') + ' ontoggle="SKLG.' + k + '=this.open"><summary>' + title + '</summary>' + body + '</details>';
   const warn = t => ' <span class="pill warn" style="margin:0;font-size:13px">' + t + '</span>';
   let h = '';
-  if (sent.length) h += fold('tr', 'Мої переміщення (' + sent.length + ')' + (sent.some(t => t.status === 'в дорозі') ? warn('в дорозі: ' + sent.filter(t => t.status === 'в дорозі').length) : ''),
-    '<div class="list">' + sent.map(t => '<div class="li"><div><b>' + esc(t.id) + '</b> → ' + esc(t.toName) + ' · <span class="pill' + (t.status === 'в дорозі' ? ' warn' : t.status === 'прийнято' ? ' ok' : '') + '" style="margin:0">' + esc(t.status) + '</span>' +
-      '<br><span class="muted">' + esc(t.who) + ' · ' + esc(t.time) + (t.by ? ' · прийняв(ла) ' + esc(t.by) + ' ' + esc(t.at) : '') + '</span>' +
-      t.lines.map(l => '<div class="muted">' + esc(l.pos) + ' — ' + esc(skNum(l.qty)) + ' ' + esc(l.unit) + (l.got !== null && l.got !== l.qty ? ' · <b style="color:#9B231A">прийнято ' + esc(skNum(l.got)) + '</b>' : '') + (l.note ? ' · ' + esc(l.note) : '') + '</div>').join('') + '</div>' +
+  const mvAll = SKLM.loc === L && L ? SKLM.rows : null;   // v152: «Записи переміщення» локації (усі / мої); без локації — мої відправлені
+  const mvs = mvAll ? mvAll.filter(t => !SKFL.mine || t.mine).map(t => Object.assign({}, t, { lines: t.lines.filter(l => skFOk(l.box ? { typ: l.typ, kv: '*', color: '*' } : skAttr(l.pos, l.typ))) })).filter(t => t.lines.length) : sent;
+  const inWay = mvs.filter(t => t.status === 'в дорозі').length;
+  h += fold('tr', 'Записи переміщення (' + (mvAll && SKLM.load ? '…' : mvs.length) + ')' + (mvAll && (SKFL.mine || skFOn()) ? ' <span class="muted" style="font-weight:400">' + (SKFL.mine ? 'мої' : '') + (skFOn() ? (SKFL.mine ? ', ' : '') + 'за фільтрами' : '') + '</span>' : '') + (inWay ? warn('в дорозі: ' + inWay) : ''),
+    !mvs.length ? '<p class="muted">' + (mvAll && SKLM.load ? 'Завантажую…' : 'Записів немає.') + '</p>' :
+    '<div class="list">' + mvs.map(t => '<div class="li"><div><b>' + esc(t.id) + '</b> ' + (t.dir === 'in' ? '← ' + esc(t.fromName) : '→ ' + esc(t.toName)) + ' · <span class="pill' + (t.status === 'в дорозі' ? ' warn' : t.status === 'прийнято' ? ' ok' : '') + '" style="margin:0">' + esc(t.status) + '</span>' +
+      '<br><span class="muted">' + esc(t.who) + ' · ' + esc(t.time) + (t.by ? ' · прийняв(ла) ' + esc(t.by) + ' ' + esc(t.at) : '') + (t.comment ? ' · ' + esc(t.comment) : '') + '</span>' +
+      t.lines.map(l => '<div class="muted">' + esc(l.pos) + (l.det ? ' (' + esc(l.det) + ')' : '') + ' — ' + esc(skNum(l.qty)) + ' ' + esc(l.unit) + (l.got !== null && l.got !== l.qty ? ' · <b style="color:#9B231A">прийнято ' + esc(skNum(l.got)) + '</b>' : '') + (l.note ? ' · ' + esc(l.note) : '') + '</div>').join('') + '</div>' +
       (t.canCancel ? '<div class="r"><button class="ic" onclick="skTrCancel(\'' + esc(t.id) + '\')">✖</button></div>' : '') + '</div>').join('') + '</div>');
-  if (docs.length || rcv.length) h += fold('pr', 'Приходи від постачальників (' + rcv.length + ')' + (docs.length ? warn('чекають документ: ' + docs.length) : ''),   // v108; v122: «Чекають документ» — тут, першими
+  if ((docs.length || rcv.length) && skLocOf(L).kind !== 'shop') h += fold('pr', 'Приходи від постачальників (' + rcv.length + ')' + (docs.length ? warn('чекають документ: ' + docs.length) : ''),   // v108; v122: «Чекають документ» — тут, першими
     (docs.length ? '<div class="list" style="border-left:3px solid #E0A400">' + docs.map(p => '<div class="li"><div><b>' + esc(p.pr) + '</b> · ' + esc(p.time.slice(0, 5)) + ' · ' + esc(p.supplier) + (p.docNo ? ' · ' + esc(p.docNo) : '') +
       ' · <span class="pill warn" style="margin:0">чекає документ</span><br><span class="muted">' + esc(p.who) + ' · ' + esc(p.lines.map(l => l.pos + ' ' + skNfmt(l.qty) + ' ' + l.unit).join('; ')) + '</span></div>' +
       '<div class="r"><button class="ic" title="Додати документ" onclick="skDocOpen(\'' + esc(p.pr) + '\')">📄</button></div></div>').join('') + '</div>' : '') +
@@ -6894,7 +6952,7 @@ function renderSkLog() {
 }
 /** v108: відкрито з QR наліпки — картка приходу */
 function skPpParam() { if (PARAMS.pp || PARAMS.pr) { const q = { pp: PARAMS.pp || '', pr: PARAMS.pr || '' }; delete PARAMS.pp; delete PARAMS.pr; setUrl(); skPpOpen(q); } }
-function skIn(r) { if (r && r.inbox) SKD.inbox = r.inbox; if (r && r.my) SKD.my = r.my; renderSkIn(); renderSkMy(); }
+function skIn(r) { if (r && r.inbox) SKD.inbox = r.inbox; if (r && r.my) SKD.my = r.my; renderSkIn(); renderSkMy(); if (SKS.loc && r && r.inbox) skMovesLoad(); }   // v152: + записи переміщення локації
 function skErr(e, btn) { if (btn) { btn.disabled = false; btn.textContent = btn._t || btn.textContent; } const m = String(e.message || e).replace(/^Error:\s*/, ''); if ($('merr')) $('merr').textContent = m; toast(m, true); }
 function skAccept(id, btn) {
   const t = ((SKD.inbox || {}).inbox || []).find(x => x.id === id); if (!t) return;
