@@ -777,7 +777,8 @@
 <div class="net" id="net" role="alert" aria-live="assertive"><div class="nb"><div class="rt" id="netr"></div><div class="nt" id="nett">Зберігаю…</div><div class="ns" id="nets"></div><div class="np"><i id="netp"></i></div><div class="nh" id="neth"></div><div class="zc" id="zc"></div><button class="nx" id="netx" type="button">Не чекати</button></div></div>
 
 <script>
-const PAGE_VERSION = 'index.html v157 · 26.11.2026';   // v157: «Робота зі складом» складу — Прийняти · Запакувати палету ГП · Зібрати партію покупцю · Інше (розпакувати палету, наліпка ще раз); партія покупцю — палети, ящики й позиції складу (метизи); «Залишки» — групи «Палети ГП» і «Зібрано для покупців» (Sklad.gs v59)
+const PAGE_VERSION = 'index.html v158 · 26.11.2026';   // v158: «Залишки» цеху — і напівфабрикати / власні вузли в партіях МЛП (Sklad.gs v60): додаються до залишку, рядки лише для перегляду, партії — третім рівнем
+//   // v157: «Робота зі складом» складу — Прийняти · Запакувати палету ГП · Зібрати партію покупцю · Інше (розпакувати палету, наліпка ще раз); партія покупцю — палети, ящики й позиції складу (метизи); «Залишки» — групи «Палети ГП» і «Зібрано для покупців» (Sklad.gs v59)
 //   // v156: Головна — «ⓘ Довідник»: схема процесів, доступ до запасів (dostup.html), «Етапи виробництва»
 //    // v155: локації — «КОД — назва» (Ж2.1 — Цех Жуляни В1)
 //    // v154: дата ящика ГП — знову біля назви ящика (в одному рядку)
@@ -6128,7 +6129,7 @@ function renderSklad() {
   renderSkMy(); renderSkIn(); skActsDraw(); skPpParam(); skVpParam(); skPlParam(); skMovesLoad();
 }
 // ---- v148 (Sklad.gs v48, рішення 26.11): залишки локації — таблиця одразу під «Робота зі складом»; хто відповідальний — колонка «±» і коментар, одна кнопка «Записати»
-let SKBT = { q: '', add: 0, og: {}, ou: {}, mode: 'adj', sel: '', boxes: {}, pals: {}, ships: {}, hist: null };   // v157: pals, ships — палети й зібрані партії складу
+let SKBT = { q: '', add: 0, og: {}, ou: {}, mode: 'adj', sel: '', boxes: {}, pals: {}, ships: {}, semi: {}, hist: null };   // v158: semi — напівфабрикати в партіях МЛП цеху   // v157: pals, ships — палети й зібрані партії складу
 //   // v151: mode — adj (змінити залишок) | mv (перемістити); sel — позиція для історії; boxes — ящики ГП за локацією
 function skBalTDraw() {
   const box = $('skBalT'); if (!box) return;
@@ -6137,13 +6138,16 @@ function skBalTDraw() {
   if (SKBT.mode === 'mv' && !canMv) SKBT.mode = 'adj'; if (SKBT.mode === 'adj' && !canAdj && canMv) SKBT.mode = 'mv';
   const mv = SKBT.mode === 'mv' && canMv, ed = mv || (SKBT.mode === 'adj' && canAdj);
   if ((kind === 'wh' || kind === 'shop') && SKBT.boxes[loc] === undefined) {   // ящики ГП — окремим запитом (поки вантажаться — таблиця без них)
-    SKBT.boxes[loc] = null; post('skladLocBoxes', { code: CODE, loc: loc }).then(r => { SKBT.boxes[loc] = r.boxes || []; SKBT.pals[loc] = r.pals || []; SKBT.ships[loc] = r.ships || []; if (SKS.loc === loc) { skFltDraw(); skBalTDraw(); } }).catch(() => { SKBT.boxes[loc] = []; });
+    SKBT.boxes[loc] = null; post('skladLocBoxes', { code: CODE, loc: loc }).then(r => { SKBT.boxes[loc] = r.boxes || []; SKBT.pals[loc] = r.pals || []; SKBT.ships[loc] = r.ships || []; SKBT.semi[loc] = r.semi || []; if (SKS.loc === loc) { skFltDraw(); skBalTDraw(); } }).catch(() => { SKBT.boxes[loc] = []; });
   }
   const bal = Object.assign({}, ((d.bal || {})[loc]) || {}), tat = ((d.techAt || {})[loc]) || {}, bx = SKBT.boxes[loc] || [];
   const grpOf = {}; (d.positions || []).forEach(p => grpOf[p.name] = p.group || d.other);
   const byU = {}; bx.filter(skFOk).forEach(b => (byU[b.unified] = byU[b.unified] || []).push(b));   // v152: ящики — за фільтрами
   Object.keys(byU).forEach(u => { if (!bal[u]) bal[u] = [byU[u].reduce((s, b) => s + b.total, 0), 'шт', 0]; if (!grpOf[u]) grpOf[u] = 'Двигуни'; });
-  const names = Object.keys(bal).filter(n => (Math.abs(bal[n][0]) > 1e-9 || bal[n][2] > 1e-9) && (byU[n] ? byU[n].some(skFOk) : skFOk(skAttr(n))));   // v152: фильтри
+  const sm = {}, bal0 = ((d.bal || {})[loc]) || {};   // v158: напівфабрикати й власні вузли в партіях МЛП цеху — додаються до залишку, лише перегляд
+  (SKBT.semi[loc] || []).forEach(x => { const a = { typ: x.typ || (String(x.name).match(/\b(\d{4})\b/) || [])[1] || '', kv: x.kv || (String(x.name).match(/KV(\d+)/) || [])[1] || '', color: x.color || '' };
+    if (!skFOk(a) || !x.qty) return; sm[x.name] = x; const b = bal[x.name] || [0, 'шт', 0]; bal[x.name] = [Math.round((b[0] + x.qty) * 1000) / 1000, b[1], b[2]]; if (!grpOf[x.name]) grpOf[x.name] = x.group; });
+  const names = Object.keys(bal).filter(n => (Math.abs(bal[n][0]) > 1e-9 || bal[n][2] > 1e-9) && (byU[n] ? byU[n].some(skFOk) : sm[n] ? true : skFOk(skAttr(n))));   // v152: фильтри
   const groups = ['Двигуни'].concat((d.groups || []).filter(g => g !== 'Двигуни')); names.forEach(n => { const g = grpOf[n] || d.other; if (groups.indexOf(g) < 0) groups.push(g); });
   const by = {}; names.forEach(n => (by[grpOf[n] || d.other] = by[grpOf[n] || d.other] || []).push(n));
   const cols = 3 + (ed && !mv ? 2 : 1);   // v153: у режимі перегляду — колонка приміток (ящики ГП)
@@ -6179,14 +6183,16 @@ function skBalTDraw() {
       '<span class="btgi">' + (gOpen ? '▾' : '▸') + '</span> ' + esc(g) + ' <span class="muted" style="font-weight:400">· ' + list.length + '</span></td></tr>';
     list.forEach(n => { const b = bal[n], boxes = byU[n] || [];
       const tech = boxes.length ? [] : (tat[n] || []).filter(a => a[0] && Math.abs(a[1]) > 1e-9).sort((x, y) => y[1] - x[1]), uOpen = !!SKBT.ou[n];
-      const rest = tech.length ? Math.round((b[0] - sumU(tech, b[1])) * 1000) / 1000 : 0;
-      const kids = tech.concat(Math.abs(rest) > 1e-9 ? [['технічна не вказана', rest, b[1], '', 1]] : []);
+      const sq = sm[n] ? sm[n].qty : 0, ro = boxes.length || (sm[n] && !bal0[n]);   // v158: ro — лише перегляд (ящики / тільки в партіях)
+      const rest = tech.length ? Math.round((b[0] - sq - sumU(tech, b[1])) * 1000) / 1000 : 0;
+      const kids = tech.concat(Math.abs(rest) > 1e-9 ? [['технічна не вказана', rest, b[1], '', 1]] : [])
+        .concat(sm[n] ? sm[n].batches.map(x => ['у партії МЛП ' + x[0], x[1], 'шт', '', 1]) : []);
       const split = mv && tech.length > 1, sel = SKBT.sel === n;
       let cell = '';
-      const bN = boxes.length ? '<span class="muted" style="font-size:12px">ящиків ' + boxes.length + '</span>' : '';   // v153: «ящиків N» — у колонку коментаря, не другим рядком
+      const bN = [boxes.length ? 'ящиків ' + boxes.length : '', sq ? 'у партіях МЛП ' + skNfmt(sq) : ''].filter(Boolean).map(t => '<span class="muted" style="font-size:12px">' + t + '</span>').join('<br>');   // v153: «ящиків N» — у колонку коментаря; v158: + у партіях
       if (!ed) cell = td(bN);
-      else if (mv) cell = td(boxes.length ? bN : split ? '<span class="muted" style="font-size:12px">за технічними ↓</span>' : inp('btM', 'скільки', '80px', ' data-max="' + b[0] + '"'));
-      else cell = td(boxes.length ? '' : inp('btD', '±', '72px')) + td(boxes.length ? bN : inp('btC', 'коментар', '100%'), 'min-width:120px');
+      else if (mv) cell = td(ro ? bN : split ? '<span class="muted" style="font-size:12px">за технічними ↓</span>' : inp('btM', 'скільки', '80px', ' data-max="' + Math.round((b[0] - sq) * 1000) / 1000 + '"'));
+      else cell = td(ro ? '' : inp('btD', '±', '72px')) + td(ro ? bN : inp('btC', 'коментар', '100%'), 'min-width:120px');
       rows += '<tr class="btr" data-g="' + gi + '" data-pos="' + esc(n) + '" data-u="' + esc(b[1]) + '" data-k="' + esc((n + ' ' + g + ' ' + kids.map(a => a[0]).join(' ') + ' ' + boxes.map(x => x.name).join(' ')).toLowerCase()) + '"' +
         (sel ? ' style="background:#EAF2FC"' : '') + '>' +
         td(((kids.length || boxes.length) ? '<span class="btui" style="cursor:pointer;color:#2A78D6">' + (uOpen ? '▾' : '▸') + '</span> ' : '<span style="display:inline-block;width:12px"></span> ') +
