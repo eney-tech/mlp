@@ -777,7 +777,8 @@
 <div class="net" id="net" role="alert" aria-live="assertive"><div class="nb"><div class="rt" id="netr"></div><div class="nt" id="nett">Зберігаю…</div><div class="ns" id="nets"></div><div class="np"><i id="netp"></i></div><div class="nh" id="neth"></div><div class="zc" id="zc"></div><button class="nx" id="netx" type="button">Не чекати</button></div></div>
 
 <script>
-const PAGE_VERSION = 'index.html v159 · 26.11.2026';   // v159 (рішення 26.11): «Залишки» — лише уніфіковані назви (технічних рівнів і розподілу за технічними немає); «Змінити залишок» — і ящики ГП складу (±, Sklad.gs v61 skladBoxAdjust); «Прийняти» на віртуальній — лише відповідальні (canAcc)
+const PAGE_VERSION = 'index.html v160 · 26.11.2026';   // v160 (рішення 26.11): ГП на складі — за назвою: «Зібрати партію покупцю» — назва × (палет, ящиків, шт), ящики бере сервер (найстаріші); у «Залишках» ГП складу без списку ящиків, ± і переміщення — кількістю; «Запакувати палету ГП» й «Інше» прибрано.
+// v159   // v159 (рішення 26.11): «Залишки» — лише уніфіковані назви (технічних рівнів і розподілу за технічними немає); «Змінити залишок» — і ящики ГП складу (±, Sklad.gs v61 skladBoxAdjust); «Прийняти» на віртуальній — лише відповідальні (canAcc)
 //   // v158: «Залишки» цеху — і напівфабрикати / власні вузли в партіях МЛП (Sklad.gs v60): додаються до залишку, рядки лише для перегляду, партії — третім рівнем
 //   // v157: «Робота зі складом» складу — Прийняти · Запакувати палету ГП · Зібрати партію покупцю · Інше (розпакувати палету, наліпка ще раз); партія покупцю — палети, ящики й позиції складу (метизи); «Залишки» — групи «Палети ГП» і «Зібрано для покупців» (Sklad.gs v59)
 //   // v156: Головна — «ⓘ Довідник»: схема процесів, доступ до запасів (dostup.html), «Етапи виробництва»
@@ -6176,7 +6177,8 @@ function skBalTDraw() {
   xGroup('Зібрано для покупців', ships, v => ({ key: '🚚' + v.id, name: '🚚 ' + esc(v.id), open: 'skShipOpenT(\'' + esc(v.id) + '\')', qty: v.qty, note: 'чекає «Відвантажити»',
     sub: esc(v.comment) + ' · ' + skShipSum(v), k: v.id + ' ' + v.comment + ' ' + v.totals.map(t => t.mark).join(' ') + ' ' + (v.items || []).map(i => i.pos).join(' '),
     kids: (v.pals || []).map(p => ['🧱 ' + esc(p.id) + ' <span class="muted" style="font-size:12px">ящ. ' + p.boxes + '</span>', p.qty, 'шт'])
-      .concat(v.lines.filter(l => !l.pal).map(l => ['📦 ' + esc(l.name) + ' <span class="muted" style="font-size:12px">' + esc(l.mark) + '</span>', l.qty, 'шт']))
+      .concat(v.lines.filter(l => !l.pal && !l.auto).map(l => ['📦 ' + esc(l.name) + ' <span class="muted" style="font-size:12px">' + esc(l.mark) + '</span>', l.qty, 'шт']))
+      .concat(v.lines.some(l => l.auto) ? v.totals.filter(t => v.lines.some(l => l.auto && l.mark === t.mark)).map(t => [esc(t.mark), t.qty, 'шт']) : [])
       .concat((v.items || []).map(i => [esc(i.pos), i.qty, i.unit])) }));
   groups.filter(g => by[g]).forEach(g => { gi++;
     const gOpen = SKBT.og[g] !== false, list = by[g].sort((a, b) => a.localeCompare(b, 'uk'));
@@ -6184,19 +6186,23 @@ function skBalTDraw() {
       '<span class="btgi">' + (gOpen ? '▾' : '▸') + '</span> ' + esc(g) + ' <span class="muted" style="font-weight:400">· ' + list.length + '</span></td></tr>';
     list.forEach(n => { const b = bal[n], boxes = byU[n] || [];
       const tech = [], uOpen = !!SKBT.ou[n];   // v159: після першого приймання — лише уніфікована назва (технічні — тільки в приході)
-      const sq = sm[n] ? sm[n].qty : 0, ro = boxes.length || (sm[n] && !bal0[n]);   // v158: ro — лише перегляд (ящики / тільки в партіях)
+      const gpW = kind === 'wh' && boxes.length > 0;   // v160: ГП складу — за назвою (без ящиків)
+      const sq = sm[n] ? sm[n].qty : 0, ro = !gpW && (boxes.length || (sm[n] && !bal0[n]));   // v158: ro — лише перегляд (ящики / тільки в партіях)
       const rest = tech.length ? Math.round((b[0] - sq - sumU(tech, b[1])) * 1000) / 1000 : 0;
       const kids = tech.concat(Math.abs(rest) > 1e-9 ? [['технічна не вказана', rest, b[1], '', 1]] : [])
-        .concat(sm[n] ? sm[n].batches.map(x => ['у партії МЛП ' + x[0], x[1], 'шт', '', 1]) : []);
+        .concat(sm[n] ? sm[n].batches.map(x => ['у партії МЛП ' + x[0], x[1], 'шт', '', 1]) : [])
+        .concat(gpW ? skGpRows(boxes) : []);   // v160: ГП складу — палети · ящики · штуки (замість списку ящиків)
       const split = mv && tech.length > 1, sel = SKBT.sel === n;
       let cell = '';
       const bN = [boxes.length ? 'ящиків ' + boxes.length : '', sq ? 'у партіях МЛП ' + skNfmt(sq) : ''].filter(Boolean).map(t => '<span class="muted" style="font-size:12px">' + t + '</span>').join('<br>');   // v153: «ящиків N» — у колонку коментаря; v158: + у партіях
       if (!ed) cell = td(bN);
+      else if (gpW && mv) cell = td(inp('btGm', 'скільки', '80px', ' data-max="' + b[0] + '"'));
+      else if (gpW) cell = td(inp('btGd', '±', '72px')) + td(inp('btGc', 'коментар', '100%'), 'min-width:120px');
       else if (mv) cell = td(ro ? bN : split ? '<span class="muted" style="font-size:12px">за технічними ↓</span>' : inp('btM', 'скільки', '80px', ' data-max="' + Math.round((b[0] - sq) * 1000) / 1000 + '"'));
       else cell = td(ro ? '' : inp('btD', '±', '72px')) + td(ro ? bN : inp('btC', 'коментар', '100%'), 'min-width:120px');
       rows += '<tr class="btr" data-g="' + gi + '" data-pos="' + esc(n) + '" data-u="' + esc(b[1]) + '" data-k="' + esc((n + ' ' + g + ' ' + kids.map(a => a[0]).join(' ') + ' ' + boxes.map(x => x.name).join(' ')).toLowerCase()) + '"' +
         (sel ? ' style="background:#EAF2FC"' : '') + '>' +
-        td(((kids.length || boxes.length) ? '<span class="btui" style="cursor:pointer;color:#2A78D6">' + (uOpen ? '▾' : '▸') + '</span> ' : '<span style="display:inline-block;width:12px"></span> ') +
+        td(((kids.length || (boxes.length && !gpW)) ? '<span class="btui" style="cursor:pointer;color:#2A78D6">' + (uOpen ? '▾' : '▸') + '</span> ' : '<span style="display:inline-block;width:12px"></span> ') +
           '<span class="btn2l" style="cursor:pointer;text-decoration:underline dotted #9DB0BC" title="Історія руху">' + esc(n) + '</span>' +
           (b[2] ? '<br><span class="muted" style="font-size:12px">в дорозі ' + esc(skNfmt(b[2])) + '</span>' : ''), 'padding-left:10px') +
         td('<b>' + esc(skNfmt(b[0])) + '</b>', 'text-align:right;white-space:nowrap' + (b[0] < 0 ? ';color:#9B231A' : '')) + td(esc(b[1]), 'color:#66767F') + cell + '</tr>';
@@ -6204,7 +6210,7 @@ function skBalTDraw() {
         rows += '<tr class="btt" data-g="' + gi + '" data-p="' + esc(n) + '"' + (gOpen && uOpen ? '' : ' style="display:none"') + '>' +
           td('<span class="muted" style="font-size:13px">' + esc(a[0]) + '</span>', 'padding-left:34px') + td(esc(skNfmt(a[1])), 'text-align:right;white-space:nowrap;font-size:13px;color:#66767F') +
           td(esc(a[2]), 'color:#66767F;font-size:13px') + (ed ? (split && !a[4] ? td(inp('btTq', 'скільки', '80px', ' data-pos="' + esc(n) + '" data-nm="' + esc(a[0]) + '" data-u="' + esc(a[2]) + '" data-max="' + a[1] + '"')) : td('')) + (mv ? '' : td('')) : td('')) + '</tr>'; });
-      boxes.forEach(x => {
+      if (!gpW) boxes.forEach(x => {
         rows += '<tr class="btt" data-g="' + gi + '" data-p="' + esc(n) + '"' + (gOpen && uOpen ? '' : ' style="display:none"') + '>' +
           td('<span style="font-size:13px">📦 ' + esc(x.name) + '</span>' + (x.total < x.per ? ' <span class="muted" style="font-size:12px">неповний</span>' : '') + ' <span class="muted" style="font-size:12px;margin-left:6px">' + esc(x.last) + '</span>', 'padding-left:34px') +   // v154: дата — у тому ж рядку після назви ящика; v153: маркування не дублюємо
           td(esc(skNfmt(x.total)), 'text-align:right;white-space:nowrap;font-size:13px') + td('шт', 'color:#66767F;font-size:13px') +
@@ -6217,8 +6223,8 @@ function skBalTDraw() {
   box.innerHTML = '<details class="card"' + (SKBT.closed ? '' : ' open') + ' ontoggle="SKBT.closed=!this.open"><summary class="mid" style="cursor:pointer">Залишки: ' + esc((skLocOf(loc).name || loc)) + ' <span class="muted" style="font-weight:400">· позицій ' + names.length + (skFOn() ? ' (за фільтрами)' : '') + '</span></summary>' +   // v152: згортається
     (modes.length > 1 ? '<div class="seg" style="margin-top:8px">' + modes.map(m => '<label><input type="radio" name="btMode" value="' + m[0] + '"' + (m[0] === SKBT.mode ? ' checked' : '') + '><span>' + m[1] + '</span></label>').join('') + '</div>' : '') +
     (mv ? '<label>Куди</label><select id="btTo" data-nocbx><option value="">— оберіть —</option>' + tg('shop', 'Цехи') + tg('wh', 'Склади') + tg('virt', 'Без приймання') + '</select>' +
-      '<p class="muted" style="margin:4px 0 0">Впишіть, скільки перемістити (не більше, ніж є). Ящики ГП — галочкою.</p>'
-      : ed ? '<p class="muted" style="margin:4px 0 0">Змінити залишок: у «±» — скільки додати (12) або списати (−5), поруч коментар — чому (ящики ГП — у рядку ящика). Потім «Записати».</p>' : '') +
+      '<p class="muted" style="margin:4px 0 0">Впишіть, скільки перемістити (не більше, ніж є). ГП складу — кількістю, цілими ящиками (беремо найстаріші); ГП цеху — галочкою.</p>'
+      : ed ? '<p class="muted" style="margin:4px 0 0">Змінити залишок: у «±» — скільки додати (12) або списати (−5), поруч коментар — чому. Потім «Записати».</p>' : '') +
     '<p class="muted" style="margin:4px 0 0;font-size:13px">Натисніть на назву — нижче з\'явиться історія її руху тут.</p>' +
     '<div class="row" style="align-items:center;margin-top:8px;gap:6px"><input type="text" id="btQ" placeholder="пошук: назва, група, технічна, ящик" value="' + esc(SKBT.q) + '" style="min-width:0;margin:0">' +
     '<button type="button" class="btn btn2" id="btLvM" style="flex:0 0 auto;width:auto;margin:0;padding:8px 10px">− рівень</button>' +
@@ -6265,14 +6271,25 @@ function skBalTMove() {
   document.querySelectorAll('#skBalT .btM').forEach(i => { const r = i.closest('tr'), q = chk(i.value, i.dataset.max, r.dataset.pos); if (q) lines.push({ pos: r.dataset.pos, qty: q, unit: r.dataset.u }); });
   document.querySelectorAll('#skBalT .btTq').forEach(i => { const q = chk(i.value, i.dataset.max, i.dataset.pos + ' · ' + i.dataset.nm); if (q) lines.push({ pos: i.dataset.pos, qty: q, unit: i.dataset.u, det: i.dataset.nm }); });
   document.querySelectorAll('#skBalT .btX').forEach(c => { if (c.checked) bxs.push({ id: c.dataset.box, name: c.dataset.n, q: Number(c.dataset.q) }); });
+  const gpm = [];   // v160: ГП складу — кількістю (сервер підбирає цілі найстаріші ящики)
+  document.querySelectorAll('#skBalT .btGm').forEach(i => { const r = i.closest('tr'), s = String(i.value || '').trim(); if (!s) return; const v = skCalc(s);
+    if (isNaN(v) || !(v > 0) || Math.round(v) !== v) return bad.push('«' + r.dataset.pos + '»: ціле число'); if (v > Number(i.dataset.max)) return bad.push('«' + r.dataset.pos + '»: є лише ' + skNfmt(Number(i.dataset.max)));
+    gpm.push({ name: r.dataset.pos, qty: v }); });
   document.querySelectorAll('#skBalT .btaM').forEach(div => { const n = div.dataset.n, pos = $('btmP' + n).value, qs = String($('btmQ' + n).value || '').trim(); if (!pos && !qs) return;   // v152
     if (!pos) return bad.push('оберіть позицію для «' + qs + '»'); const v = skCalc(qs); if (!qs || isNaN(v) || !(v > 0)) return bad.push('«' + pos + '»: кількість числом');
     lines.push(Object.assign({ pos: pos, qty: qs, unit: $('btmU' + n).value }, pos === SKD.other ? { posOther: $('btmOt' + n).value } : {})); });
   if (bad.length) { $('err').textContent = bad.join('; '); return toast(bad[0], true); }
-  if (!lines.length && !bxs.length) return toast('Впишіть кількість або позначте ящики', true);
-  if (bxs.length && tk !== 'wh') return toast('Ящики ГП переміщуються лише на склад', true);
-  const cm = $('btMc').value;
-  const txt = lines.map(l => l.pos + (l.det ? ' (' + l.det + ')' : '') + ' ' + l.qty + ' ' + l.unit).concat(bxs.map(x => 'ящик ' + x.name + ' (' + x.q + ' шт)')).join('; ');
+  if (!lines.length && !bxs.length && !gpm.length) return toast('Впишіть кількість або позначте ящики', true);
+  if ((bxs.length || gpm.length) && tk !== 'wh') return toast('ГП переміщується лише на склад', true);
+  if (gpm.length) { b.disabled = true;
+    return gpm.reduce((p, g) => p.then(() => post('skladGpPick', { code: CODE, loc: from, name: g.name, qty: g.qty }).then(r => r.boxes.forEach(x => bxs.push(x)))), Promise.resolve())
+      .then(() => { b.disabled = false; skBalTMove2(from, to, fk, tk, lines, bxs, gpm); }).catch(e => skErr(e, b)); }
+  skBalTMove2(from, to, fk, tk, lines, bxs, []);
+}
+function skBalTMove2(from, to, fk, tk, lines, bxs, gpm) {
+  const b = $('btMv'), cm = $('btMc').value;
+  const txt = lines.map(l => l.pos + (l.det ? ' (' + l.det + ')' : '') + ' ' + l.qty + ' ' + l.unit).concat(gpm.length ? gpm.map(g => g.name + ' ' + skNfmt(g.qty) + ' шт') : bxs.map(x => 'ящик ' + x.name + ' (' + x.q + ' шт)')).join('; ') +
+    (gpm.length ? ' (ящиків ' + bxs.length + ', найстаріші)' : '');
   confirmBox('Перемістити з ' + (skLocOf(from).name || from) + ' → ' + (skLocOf(to).name || to) + ': ' + txt + '?', () => {
     b.disabled = true; b._t = b.textContent; b.textContent = 'Переміщую…';
     const jobs = [], msgs = [];
@@ -6323,7 +6340,10 @@ function skBalTAdd() {
 function skBalTSave() {
   const b = $('btGo'); if (b.disabled) return; $('err').textContent = '';
   const lines = [], bad = [], num = s => { s = String(s || '').trim().replace(/\s+/g, ''); if (!s) return null; const neg = /^[-−–]/.test(s), v = skCalc(s.replace(/^[-−–+]/, '')); return isNaN(v) || !(v > 0) ? NaN : (neg ? -v : v); };
-  const bxl = [];   // v159: ящики ГП складу
+  const bxl = [], gpl = [];   // v159: ящики ГП складу; v160: ГП складу за назвою
+  document.querySelectorAll('#skBalT .btGd').forEach(i => { const s = i.value, v = num(s); if (v === null) return; const r = i.closest('tr'), cm = r.querySelector('.btGc').value.trim();
+    if (isNaN(v) || Math.round(v) !== v) return bad.push('«' + r.dataset.pos + '»: ціле число зі знаком'); if (!cm) return bad.push('«' + r.dataset.pos + '»: коментар — чому');
+    gpl.push({ name: r.dataset.pos, delta: s, cm: cm }); });
   document.querySelectorAll('#skBalT .btBd').forEach(i => { const s = i.value, v = num(s); if (v === null) return; const cm = i.closest('tr').querySelector('.btBc').value.trim();
     if (isNaN(v) || Math.round(v) !== v) return bad.push('ящик ' + i.dataset.n + ': ціле число зі знаком'); if (Number(i.dataset.q) + v < 0) return bad.push('ящик ' + i.dataset.n + ': є лише ' + i.dataset.q);
     if (!cm) return bad.push('ящик ' + i.dataset.n + ': коментар — чому'); bxl.push({ box: i.dataset.box, n: i.dataset.n, delta: s, cm: cm }); });
@@ -6337,13 +6357,14 @@ function skBalTSave() {
     if (v === null || isNaN(v)) return bad.push('«' + pos + '»: кількість числом зі знаком'); if (!cm) return bad.push('«' + pos + '»: коментар — чому');
     lines.push({ pos: pos, posOther: $('btOt' + n).value, unit: $('btU' + n).value, delta: s, cm: cm }); });
   if (bad.length) { $('err').textContent = bad.join('; '); return toast(bad[0], true); }
-  if (!lines.length && !bxl.length) return toast('Впишіть «±» хоча б в одному рядку', true);
+  if (!lines.length && !bxl.length && !gpl.length) return toast('Впишіть «±» хоча б в одному рядку', true);
   const sg = x => (/^[-−–]/.test(String(x).trim()) ? '' : '+') + String(x).trim();
-  confirmBox('Змінити залишок на ' + (skLocOf(SKS.loc).name || SKS.loc) + ': ' + lines.map(l => l.pos + ' ' + sg(l.delta) + ' ' + l.unit).concat(bxl.map(l => 'ящик ' + l.n + ' ' + sg(l.delta) + ' шт')).join('; ') + '?', () => {
+  confirmBox('Змінити залишок на ' + (skLocOf(SKS.loc).name || SKS.loc) + ': ' + lines.map(l => l.pos + ' ' + sg(l.delta) + ' ' + l.unit).concat(gpl.map(l => l.name + ' ' + sg(l.delta) + ' шт'), bxl.map(l => 'ящик ' + l.n + ' ' + sg(l.delta) + ' шт')).join('; ') + '?', () => {
     b.disabled = true; b._t = b.textContent; b.textContent = 'Записую…';
     const p1 = lines.length ? post('skladAdjust', { code: CODE, loc: SKS.loc, reason: 'Зміна залишку', lines: lines }) : Promise.resolve(null);
     p1.then(r => { if (r) { toast(r.msg); if (r.adjRecent) SKD.adjRecent = r.adjRecent; if (r.bal) SKD.bal = Object.assign({}, SKD.bal || {}, r.bal); skIn(r); }
         return bxl.length ? post('skladBoxAdjust', { code: CODE, loc: SKS.loc, lines: bxl }).then(r2 => { toast(r2.msg); delete SKBT.boxes[SKS.loc]; }) : null; })
+      .then(() => gpl.length ? post('skladGpAdjust', { code: CODE, loc: SKS.loc, lines: gpl }).then(r3 => { toast(r3.msg); delete SKBT.boxes[SKS.loc]; }) : null)
       .then(() => skBalTDraw()).catch(e => skErr(e, b));
   });
 }
@@ -6354,7 +6375,7 @@ function skActsDraw0() {   // v151: «Робота зі складом» — з�
   let acts = [];
   if (k === 'wh') {
     if (d.canWrite !== false) acts.push(['rcv', 'Прийняти']);
-    if ((d.canShip || {})[loc]) acts.push(['pal', 'Запакувати палету ГП'], ['ship', 'Зібрати партію покупцю'], ['other', 'Інше']);   // v157
+    if ((d.canShip || {})[loc]) acts.push(['ship', 'Зібрати партію покупцю']);   // v160: палети й «Інше» прибрано
   } else if (k === 'virt' && (d.canAcc || {})[loc] && d.canWrite !== false) acts.push(['rcv', 'Прийняти']);   // v159: віртуальна — лише відповідальні
   if (!loc) { $('skActs').innerHTML = '<p class="muted">Оберіть склад або цех — нижче будуть його залишки.</p>'; $('skPanel').innerHTML = ''; if (wrap) wrap.style.display = 'none'; return; }
   if (wrap) wrap.style.display = acts.length ? '' : 'none';
@@ -6627,9 +6648,9 @@ function skShipDraw() {
   const ships = ((SKD.inbox || {}).ships || []).filter(s => s.loc === SKS.loc);
   $('skPanel').innerHTML = (ships.length ? '<label>Зібрано, чекає відвантаження</label><div class="list" style="padding:0">' + ships.map(skShipLi).join('') + '</div>' : '') +
     '<button type="button" class="btn" style="margin-top:12px" onclick="skShipNew()">+ Зібрати партію покупцю</button>' +
-    '<p class="muted">Палети, ящики й інші позиції складу (болти, гайки…) резервуються за партією. «Відвантажити» — коли поїхало: усе списується з балансу складу, неповним ящикам — нова етикетка.</p>';
+    '<p class="muted">ГП (за назвою й кількістю) та інші позиції складу (болти, гайки…) резервуються за партією. «Відвантажити» — коли поїхало: усе списується з балансу складу.</p>';
 }
-function skShipSum(s) { const np = (s.pals || []).length, nb = s.lines.filter(l => !l.pal).length, ni = (s.items || []).length;   // v157
+function skShipSum(s) { const np = (s.pals || []).length, nb = s.lines.filter(l => !l.pal && !l.auto).length, ni = (s.items || []).length;   // v157; v160: авто-підбір — без «ящ.»
   return [np ? 'палет ' + np : '', nb ? 'ящ. ' + nb : '', s.lines.length ? skNfmt(s.qty) + ' шт ГП' : '', ni ? 'інше ' + ni + ' поз.' : ''].filter(Boolean).join(' · '); }
 function skShipLi(s) {
   return '<div class="li"><div style="min-width:0"><b>' + esc(s.id) + '</b> · ' + esc(s.comment) + '<br><span class="muted">' + esc(s.time) + ' · ' + esc(s.who) + ' · ' + skShipSum(s) + '</span>' +
@@ -6637,23 +6658,65 @@ function skShipLi(s) {
     (s.items || []).map(t => '<div class="muted">' + esc(t.pos) + ' — <b>' + skNfmt(t.qty) + '</b> ' + esc(t.unit) + '</div>').join('') + '</div>' +
     '<div class="r" style="flex:0 0 auto"><button class="ic" title="Відвантажити" onclick="skShipDoneOpen(\'' + esc(s.id) + '\')">🚚</button><br><button class="ic" title="Скасувати" onclick="skShipCancel(\'' + esc(s.id) + '\')">✖</button></div></div>';
 }
-function skShipNew() {   // v157: палети, ящики, інші позиції складу
-  SKSH = { boxes: null, pals: null, sel: {}, psel: {}, items: [] };
+function skShipNew() {   // v160: ГП — за назвою × (палет, ящиків, шт); ящики бере сервер (найстаріші); інші позиції складу — як були
+  SKSH = { gp: null, gpl: [{ name: '', p: '', b: '', q: '' }], palBoxes: SKD.palBoxes || 32, items: [] };
   $('skPanel').innerHTML = '<label>Для кого</label><input type="text" id="shCm" placeholder="покупець, замовлення — як передав відділ продажів">' +
     '<div id="shSum" style="margin-top:8px"></div>' +
-    '<label>Палети на ' + esc(skLocOf(SKS.loc).name) + '</label><div id="shPals" class="list" style="padding:0;margin-top:6px"><p class="muted">Завантажую…</p></div>' +
-    '<label>Окремі ящики</label><input type="text" id="shQ" placeholder="пошук: 3115 900 Чорні, M-00087">' +
-    '<div id="shBoxes" class="list" style="padding:0;margin-top:6px"><p class="muted">Завантажую ящики складу…</p></div>' +
-    '<p class="muted">Галочка — палета або ящик іде в партію. Палета — цілою (частину — спершу «Інше» → розпакувати). Кількість ящика менша за повну — решта лишається на складі.</p>' +
+    '<label>Готова продукція на ' + esc(skLocOf(SKS.loc).name) + '</label><div id="shGp"><p class="muted">Завантажую…</p></div>' +
+    '<button type="button" class="btn btn2" id="shGpAdd" style="margin-top:6px">+ Ще ГП</button>' +
+    '<p class="muted">Кількість — палетами, ящиками й штуками (додаються). Які саме ящики — не вибираємо: зі складу спишуться найстаріші.</p>' +
     '<label>Інше зі складу <span class="muted">(болти, гайки, метизи…)</span></label><div id="shItems"></div>' +
     '<button type="button" class="btn btn2" id="shItAdd" style="margin-top:6px">+ Позиція</button>' +
     '<div class="grid" style="margin-top:12px"><button class="btn btn2" onclick="skShipDraw()">Назад</button><button class="btn" id="shGo">Зібрати</button></div>';
-  $('shQ').oninput = skShipBoxesDraw;
   $('shGo').onclick = skShipSave;
+  $('shGpAdd').onclick = () => { SKSH.gpl.push({ name: '', p: '', b: '', q: '' }); skShipGpDraw(); };
   $('shItAdd').onclick = () => { SKSH.items.push({ pos: '', qty: '' }); skShipItemsDraw(); };
   skShipItemsDraw();
-  post('skladShipBoxes', { code: CODE, loc: SKS.loc }).then(r => { SKSH.boxes = r.boxes || []; SKSH.pals = r.pals || []; skShipBoxesDraw(); })
-    .catch(e => { $('shBoxes').innerHTML = '<p class="err">' + esc(e.message) + '</p>'; $('shPals').innerHTML = ''; });
+  post('skladShipBoxes', { code: CODE, loc: SKS.loc }).then(r => { SKSH.gp = r.gp || []; if (r.palBoxes) SKSH.palBoxes = r.palBoxes; skShipGpDraw(); })
+    .catch(e => { $('shGp').innerHTML = '<p class="err">' + esc(e.message) + '</p>'; });
+}
+/** v160: рядки розкриття ГП складу: палети (по PAL_BOXES повних ящиків), решта повних ящиків, штуки в неповних ящиках */
+function skGpRows(boxes) {
+  const pb = SKD.palBoxes || 32, per = (boxes[0] || {}).per || 0; let full = 0, loose = 0, nl = 0;
+  boxes.forEach(x => { if (x.total >= per) { full++; loose += x.total - per; } else { loose += x.total; nl++; } });
+  const pl = Math.floor(full / pb), rb = full - pl * pb;
+  return [pl ? ['палети: ' + pl + ' × ' + pb + ' ящ.', pl * pb * per, 'шт', '', 1] : null, rb ? ['ящики: ' + rb, rb * per, 'шт', '', 1] : null,
+    loose ? ['штуки' + (nl ? ' (неповних ящиків ' + nl + ')' : ''), loose, 'шт', '', 1] : null].filter(Boolean);
+}
+/** v160: «23 пал. + 31 ящ. + 20 шт» — кількість у палетах і ящиках (палета = PAL_BOXES ящиків) */
+function skGpPack(q, per, pb) {
+  pb = pb || SKD.palBoxes || 32; per = Number(per) || 0; q = Math.round(Number(q) || 0); if (!per) return '';
+  const bx = Math.floor(q / per), pc = q - bx * per, pl = Math.floor(bx / pb), rb = bx - pl * pb;
+  return [pl ? pl + ' пал.' : '', rb ? rb + ' ящ.' : '', pc ? pc + ' шт' : ''].filter(Boolean).join(' + ') || '0';
+}
+function skGpPackFL(g) { const pb = SKSH.palBoxes || 32, f = g.full || 0, pl = Math.floor(f / pb), rb = f - pl * pb;
+  return [pl ? pl + ' пал.' : '', rb ? rb + ' ящ.' : '', g.loose ? g.loose + ' шт у неповних' : ''].filter(Boolean).join(' + ') || '0'; }
+function skShipGpQty(l, g) { const n = s => { s = String(s || '').trim(); if (!s) return 0; const v = skCalc(s); return isNaN(v) || v < 0 || Math.round(v) !== v ? NaN : v; };
+  const per = g ? Number(g.per) || 0 : 0, pb = SKSH.palBoxes || 32; return n(l.p) * pb * per + n(l.b) * per + n(l.q); }
+function skShipGpDraw() {
+  const box = $('shGp'); if (!box || SKSH.gp === null) return;
+  const gp = SKSH.gp, by = {}; gp.forEach(g => by[g.name] = g);
+  if (!gp.length) { box.innerHTML = '<p class="muted">Вільної ГП на складі немає.</p>'; $('shGpAdd').style.display = 'none'; skShipSumDraw(); return; }
+  box.innerHTML = SKSH.gpl.map((l, k) => { const g = by[l.name], tot = skShipGpQty(l, g);
+    return '<div style="border-top:1px solid #E7EDF1;margin-top:6px;padding-top:6px"><div class="row" style="align-items:center;gap:6px"><select class="shGn" data-k="' + k + '" data-nocbx style="min-width:0;margin:0"><option value="">— що відвантажуємо —</option>' +
+      gp.map(x => '<option value="' + esc(x.name) + '"' + (x.name === l.name ? ' selected' : '') + '>' + esc(x.name) + ' (є ' + esc(skNfmt(x.qty)) + ')</option>').join('') + '</select>' +
+      '<button type="button" class="ic shGx" data-k="' + k + '" style="flex:0 0 auto">✖</button></div>' +
+      (g ? '<div class="muted" style="font-size:12px;margin-top:2px">є ' + esc(skNfmt(g.qty)) + ' шт: ' + esc(skGpPackFL(g)) + ' · ящик ' + g.per + ' шт · палета ' + SKSH.palBoxes + ' ящ.</div>' : '') +
+      '<div class="row" style="align-items:center;gap:6px;margin-top:6px">' +
+      ['p', 'b', 'q'].map(f => '<input type="text" inputmode="numeric" class="shGq" data-k="' + k + '" data-f="' + f + '" value="' + esc(l[f]) + '" placeholder="' + { p: 'палет', b: 'ящиків', q: 'шт' }[f] + '" style="min-width:0;margin:0;text-align:right">').join('') +
+      '<span style="flex:0 0 auto;min-width:90px;text-align:right"><b class="shGt" data-k="' + k + '">' + (isNaN(tot) ? '?' : tot ? skNfmt(tot) + ' шт' : '') + '</b></span></div></div>'; }).join('');
+  box.querySelectorAll('.shGn').forEach(e => e.onchange = () => { SKSH.gpl[+e.dataset.k].name = e.value; skShipGpDraw(); });
+  box.querySelectorAll('.shGq').forEach(e => e.oninput = () => { const l = SKSH.gpl[+e.dataset.k]; l[e.dataset.f] = e.value; const t = skShipGpQty(l, by[l.name]);
+    box.querySelector('.shGt[data-k="' + e.dataset.k + '"]').textContent = isNaN(t) ? '?' : t ? skNfmt(t) + ' шт' : ''; skShipSumDraw(); });
+  box.querySelectorAll('.shGx').forEach(e => e.onclick = () => { SKSH.gpl.splice(+e.dataset.k, 1); if (!SKSH.gpl.length) SKSH.gpl.push({ name: '', p: '', b: '', q: '' }); skShipGpDraw(); });
+  skShipSumDraw();
+}
+function skShipSumDraw() {
+  if (!$('shSum')) return; const by = {}; (SKSH.gp || []).forEach(g => by[g.name] = g);
+  const t = {}; SKSH.gpl.forEach(l => { const q = skShipGpQty(l, by[l.name]); if (l.name && q > 0) t[l.name] = (t[l.name] || 0) + q; });
+  const ni = SKSH.items.filter(i => i.pos).length, q = Object.keys(t).reduce((a, k) => a + t[k], 0);
+  $('shSum').innerHTML = (q || ni) ? '<b>У партії: ' + [q ? skNfmt(q) + ' шт ГП' : '', ni ? 'інше ' + ni + ' поз.' : ''].filter(Boolean).join(' · ') + '</b>' +
+    Object.keys(t).map(k => '<div class="muted">' + esc(k) + ' — ' + skNfmt(t[k]) + (by[k] ? ' (' + esc(skGpPack(t[k], by[k].per, SKSH.palBoxes)) + ')' : '') + '</div>').join('') : '';
 }
 function skShipItemOpts() {   // позиції з балансом на складі, крім ГП
   const b = ((SKD.bal || {})[SKS.loc]) || {};
@@ -6668,9 +6731,9 @@ function skShipItemsDraw() {
     '<span class="muted" style="flex:0 0 auto">' + esc(it.pos && b[it.pos] ? b[it.pos][1] : '') + '</span>' +
     '<button type="button" class="ic" data-k="' + k + '" style="flex:0 0 auto">✖</button></div>').join('') +
     (!opts.length ? '<p class="muted">На складі немає позицій із залишком (крім ГП).</p>' : '');
-  box.querySelectorAll('.shIp').forEach(e => e.onchange = () => { SKSH.items[+e.dataset.k].pos = e.value; skShipItemsDraw(); skShipBoxesDraw(); });
+  box.querySelectorAll('.shIp').forEach(e => e.onchange = () => { SKSH.items[+e.dataset.k].pos = e.value; skShipItemsDraw(); skShipSumDraw(); });
   box.querySelectorAll('.shIq').forEach(e => e.oninput = () => { SKSH.items[+e.dataset.k].qty = e.value; });
-  box.querySelectorAll('button.ic').forEach(e => e.onclick = () => { SKSH.items.splice(+e.dataset.k, 1); skShipItemsDraw(); skShipBoxesDraw(); });
+  box.querySelectorAll('button.ic').forEach(e => e.onclick = () => { SKSH.items.splice(+e.dataset.k, 1); skShipItemsDraw(); skShipSumDraw(); });
 }
 function skShipBoxesDraw() {
   if (!$('shBoxes')) return;
@@ -6695,15 +6758,20 @@ function skShipQty(id, v) { const b = SKSH.boxes.find(x => x.id === id), q = Mat
 function skShipSave() {
   const b = $('shGo'); if (b.disabled) return; $('err').textContent = '';
   if (!$('shCm').value.trim()) { $('err').textContent = 'Напишіть, для кого партія (покупець, замовлення)'; return; }
-  const lines = Object.keys(SKSH.sel).map(id => ({ box: id, qty: SKSH.sel[id].q })), pals = Object.keys(SKSH.psel).filter(k => SKSH.psel[k]), bad = [];
+  const bad = [], gby = {}; (SKSH.gp || []).forEach(g => gby[g.name] = g);
+  const gpm = {}; SKSH.gpl.forEach(l => { const q = skShipGpQty(l, gby[l.name]); if (!l.name && !(q > 0) && !String(l.p + l.b + l.q).trim()) return;
+    if (!l.name) return bad.push('ГП: оберіть, що відвантажуємо'); if (isNaN(q) || !(q > 0)) return bad.push('«' + l.name + '»: кількість — цілими (палет, ящиків, шт)');
+    gpm[l.name] = (gpm[l.name] || 0) + q; });
+  Object.keys(gpm).forEach(n => { if (gby[n] && gpm[n] > gby[n].qty) bad.push('«' + n + '»: є лише ' + skNfmt(gby[n].qty) + ' шт'); });
+  const gp = Object.keys(gpm).map(n => ({ name: n, qty: gpm[n] }));
   const bl = ((SKD.bal || {})[SKS.loc]) || {};
   const items = SKSH.items.filter(i => i.pos || String(i.qty).trim()).map(i => { const q = Number(String(i.qty).replace(',', '.'));
     if (!i.pos) bad.push('оберіть позицію'); else if (!(q > 0)) bad.push('«' + i.pos + '»: кількість'); else if (bl[i.pos] && q > bl[i.pos][0] + 1e-9) bad.push('«' + i.pos + '»: є лише ' + skNfmt(bl[i.pos][0]));
     return { pos: i.pos, qty: i.qty, unit: bl[i.pos] ? bl[i.pos][1] : '' }; });
   if (bad.length) { $('err').textContent = bad.join('; '); return; }
-  if (!lines.length && !pals.length && !items.length) { $('err').textContent = 'Оберіть палети, ящики або позиції'; return; }
+  if (!gp.length && !items.length) { $('err').textContent = 'Вкажіть ГП або позиції'; return; }
   b.disabled = true; b._t = b.textContent; b.textContent = 'Збираю…';
-  post('skladShip', { code: CODE, loc: SKS.loc, comment: $('shCm').value, lines: lines, pals: pals, items: items }).then(r => {
+  post('skladShip', { code: CODE, loc: SKS.loc, comment: $('shCm').value, gp: gp, items: items }).then(r => {
     toast(r.msg); skIn(r); delete SKBT.boxes[SKS.loc]; skShipDraw(); skBalTDraw(); if (r.pdf) skPdfGet(r); skShipShow(r.ship, r.msg);
   }).catch(e => skErr(e, b));
 }
@@ -6713,7 +6781,9 @@ function skShipShow(s, msg) {
     (s.at ? '<div>Відвантажено ' + esc(s.at) + ' · ' + esc(s.by) + (s.note ? ' · ' + esc(s.note) : '') + '</div>' : '') +
     (s.files.length ? '<div>' + s.files.map((u, i) => '<a href="' + esc(u) + '" target="_blank">фото ' + (i + 1) + '</a>').join(' · ') + '</div>' : '') +
     s.totals.map(t => '<div>' + esc(t.mark) + ' — <b>' + skNfmt(t.qty) + '</b> шт</div>').join('') +
-    '<div class="list" style="padding:0;margin-top:8px">' + s.lines.map(l => '<div class="li"><div>' + (l.pal ? '<span class="muted">🧱 ' + esc(l.pal) + '</span> · ' : '') + esc(l.name) + ' · ' + esc(l.mark) + '</div><div class="r"><b>' + l.qty + '</b></div></div>').join('') +
+    (s.lines.some(l => l.auto) ? '<details style="margin-top:6px"><summary class="muted">Ящики (сервер узяв найстаріші): ' + s.lines.filter(l => l.auto).length + '</summary><div class="muted" style="font-size:12px">' +
+      s.lines.filter(l => l.auto).map(l => esc(l.name) + ' — ' + l.qty).join(' · ') + '</div></details>' : '') +
+    '<div class="list" style="padding:0;margin-top:8px">' + s.lines.filter(l => !l.auto).map(l => '<div class="li"><div>' + (l.pal ? '<span class="muted">🧱 ' + esc(l.pal) + '</span> · ' : '') + esc(l.name) + ' · ' + esc(l.mark) + '</div><div class="r"><b>' + l.qty + '</b></div></div>').join('') +
     (s.items || []).map(t => '<div class="li"><div>' + esc(t.pos) + '</div><div class="r"><b>' + skNfmt(t.qty) + '</b> ' + esc(t.unit) + '</div></div>').join('') + '</div>' +
     '<div class="grid" style="margin-top:12px">' + (s.status === 'зібрано' && ((SKD.canShip || {})[s.loc] || SKD.isWh || SKD.isHead) ? '<button class="btn" onclick="skShipDoneOpen(\'' + esc(s.id) + '\')">🚚 Відвантажити</button>' : '<span></span>') +
     '<button class="btn btn2" onclick="closeModal()">Закрити</button></div></div>');
