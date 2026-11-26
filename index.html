@@ -777,7 +777,8 @@
 <div class="net" id="net" role="alert" aria-live="assertive"><div class="nb"><div class="rt" id="netr"></div><div class="nt" id="nett">Зберігаю…</div><div class="ns" id="nets"></div><div class="np"><i id="netp"></i></div><div class="nh" id="neth"></div><div class="zc" id="zc"></div><button class="nx" id="netx" type="button">Не чекати</button></div></div>
 
 <script>
-const PAGE_VERSION = 'index.html v153 · 26.11.2026';   // v153: «Залишки» чистіше — «ящиків N» і дата ящика в колонці коментаря, без другого рядка й без повтору маркування
+const PAGE_VERSION = 'index.html v154 · 26.11.2026';   // v154: дата ящика ГП — знову біля назви ящика (в одному рядку)
+//    // v153: «Залишки» чистіше — «ящиків N» і дата ящика в колонці коментаря, без другого рядка й без повтору маркування
 //    // v152: склад — «Прийняти» → «ГП з цеху» / «Від постачальника»; фільтри (типорозмір, KV, колір, мої / усі); «Залишки» згортаються; «Записи переміщення» локації; у цехах без «Приходів» і «Усіх записів за 30 днів»
 //    // v151: сторінка складу — Де я → згорнута «Робота зі складом» (склади, віртуальні крім ВЯ) → «Залишки» з режимами «Змінити залишок» / «Перемістити», ящики ГП 3-м рівнем, історія руху за обраною позицією
 //    // v150: локація тари Ж2.1 / Ж2.2 — «Жуляни · В1 / В2», не «Печерськ»
@@ -6168,9 +6169,9 @@ function skBalTDraw() {
           td(esc(a[2]), 'color:#66767F;font-size:13px') + (ed ? (split && !a[4] ? td(inp('btTq', 'скільки', '80px', ' data-pos="' + esc(n) + '" data-nm="' + esc(a[0]) + '" data-u="' + esc(a[2]) + '" data-max="' + a[1] + '"')) : td('')) + (mv ? '' : td('')) : td('')) + '</tr>'; });
       boxes.forEach(x => {
         rows += '<tr class="btt" data-g="' + gi + '" data-p="' + esc(n) + '"' + (gOpen && uOpen ? '' : ' style="display:none"') + '>' +
-          td('<span style="font-size:13px">📦 ' + esc(x.name) + '</span>' + (x.total < x.per ? ' <span class="muted" style="font-size:12px">неповний</span>' : ''), 'padding-left:34px') +   // v153: маркування не дублюємо (воно в назві рядка вище), дата — у колонку коментаря
+          td('<span style="font-size:13px">📦 ' + esc(x.name) + '</span>' + (x.total < x.per ? ' <span class="muted" style="font-size:12px">неповний</span>' : '') + ' <span class="muted" style="font-size:12px;margin-left:6px">' + esc(x.last) + '</span>', 'padding-left:34px') +   // v154: дата — у тому ж рядку після назви ящика; v153: маркування не дублюємо
           td(esc(skNfmt(x.total)), 'text-align:right;white-space:nowrap;font-size:13px') + td('шт', 'color:#66767F;font-size:13px') +
-          (ed ? (mv ? td('<input type="checkbox" class="btX" data-box="' + esc(x.id) + '" data-n="' + esc(x.name) + '" data-q="' + x.total + '" style="transform:scale(1.4)"> <span class="muted" style="font-size:12px;margin-left:6px">' + esc(x.last) + '</span>', 'white-space:nowrap') : td('') + td('<span class="muted" style="font-size:12px">' + esc(x.last) + '</span>')) : td('<span class="muted" style="font-size:12px">' + esc(x.last) + '</span>')) + '</tr>'; });
+          (ed ? (mv ? td('<input type="checkbox" class="btX" data-box="' + esc(x.id) + '" data-n="' + esc(x.name) + '" data-q="' + x.total + '" style="transform:scale(1.4)">') : td('') + td('')) : td('')) + '</tr>'; });
     });
   });
   const tgts = ((d.targets || {})[loc] || []).map(skLocOf), tg = (k, t) => { const a = tgts.filter(l => l.kind === k); return a.length ? '<optgroup label="' + t + '">' + a.map(l => '<option value="' + esc(l.code) + '">' + esc(skLocLab(l)) + '</option>').join('') + '</optgroup>' : ''; };
