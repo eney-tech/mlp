@@ -1,5 +1,7 @@
 <!DOCTYPE html>
-<!-- МЛП · index.html v148 · 26.11.2026 — «Змінити залишок» простіше (рішення Андрія 26.11): кнопки дії немає — під «Роботою зі складом» одразу таблиця
+<!-- МЛП · index.html v149 · 26.11.2026 — «Залишки» локації: три рівні, що згортаються — група (клік по рядку) → уніфікована назва (▸ — технічні назви
+     з залишком, «технічна не вказана» — решта) → технічна; «− рівень» / «+ рівень»; пошук розгортає й шукає і за технічними назвами.
+     index.html v148 · 26.11.2026 — «Змінити залишок» простіше (рішення Андрія 26.11): кнопки дії немає — під «Роботою зі складом» одразу таблиця
      залишків обраної локації (група → позиція, є, в дорозі, од.); відповідальний бачить колонки «±» і «Коментар», «+ Позиція, якої немає в таблиці» і одну кнопку «Записати».
      Пошук у таблиці. Нижче — зміни залишку за 30 днів.
      index.html v147 · 26.11.2026 — склад, реліз 3 (Sklad.gs v47): дія «Змінити залишок» на локаціях, де я відповідальний (або адміністратор):
@@ -773,7 +775,8 @@
 <div class="net" id="net" role="alert" aria-live="assertive"><div class="nb"><div class="rt" id="netr"></div><div class="nt" id="nett">Зберігаю…</div><div class="ns" id="nets"></div><div class="np"><i id="netp"></i></div><div class="nh" id="neth"></div><div class="zc" id="zc"></div><button class="nx" id="netx" type="button">Не чекати</button></div></div>
 
 <script>
-const PAGE_VERSION = 'index.html v148 · 26.11.2026';   // v148: залишки локації таблицею з «±» і коментарем замість дії «Змінити залишок» (Sklad.gs v48)
+const PAGE_VERSION = 'index.html v149 · 26.11.2026';   // v149: залишки — три рівні, згортаються (група → позиція → технічна), «− рівень» / «+ рівень»
+//   // v148: залишки локації таблицею з «±» і коментарем замість дії «Змінити залишок» (Sklad.gs v48)
 //   // v147: склад, реліз 3 — дія «Змінити залишок» (Sklad.gs v47)
 //   // v146: «Приймання» — усі локації бачить лише адміністратор (Sklad.gs v44)
 //   // v145: склад, реліз 2 (Sklad.gs v43) — «Приймання» блоками за локаціями; переміщення з віртуальних; «є N» — з балансу
@@ -6108,37 +6111,61 @@ function renderSklad() {
   renderSkMy(); renderSkIn(); skActsDraw(); skPpParam(); skVpParam();
 }
 // ---- v148 (Sklad.gs v48, рішення 26.11): залишки локації — таблиця одразу під «Робота зі складом»; хто відповідальний — колонка «±» і коментар, одна кнопка «Записати»
-let SKBT = { q: '', add: 0 };
+let SKBT = { q: '', add: 0, og: {}, ou: {} };   // v149: og — розгорнуті групи (за замовч. розгорнуті), ou — розгорнуті позиції (технічні назви)
 function skBalTDraw() {
   const box = $('skBalT'); if (!box) return;
   const d = SKD, loc = SKS.loc; if (!loc) { box.innerHTML = ''; return; }
-  const can = !!(d.canAdj || {})[loc], bal = ((d.bal || {})[loc]) || {};
+  const can = !!(d.canAdj || {})[loc], bal = ((d.bal || {})[loc]) || {}, tat = ((d.techAt || {})[loc]) || {};
   const grpOf = {}; (d.positions || []).forEach(p => grpOf[p.name] = p.group || d.other);
   const names = Object.keys(bal).filter(n => Math.abs(bal[n][0]) > 1e-9 || bal[n][2] > 1e-9);
   const groups = (d.groups || []).slice(); names.forEach(n => { const g = grpOf[n] || d.other; if (groups.indexOf(g) < 0) groups.push(g); });
   const by = {}; names.forEach(n => (by[grpOf[n] || d.other] = by[grpOf[n] || d.other] || []).push(n));
+  const cols = can ? 5 : 3;
   const th = s => '<th style="text-align:left;padding:6px 6px 6px 0;font-size:12px;color:#66767F;border-bottom:1px solid #C5D0D7">' + s + '</th>';
   const td = (s, st) => '<td style="padding:5px 6px 5px 0;border-bottom:1px solid #EEF2F5;vertical-align:middle;' + (st || '') + '">' + s + '</td>';
-  const inp = (cls, ph, w) => '<input type="text" class="' + cls + '"' + (cls === 'btD' ? ' inputmode="text"' : '') + ' placeholder="' + ph + '" style="margin:0;padding:6px 8px;font-size:15px;width:' + w + '">';
-  let rows = '', i = 0;
-  groups.filter(g => by[g]).forEach(g => {
-    rows += '<tr class="btg"><td colspan="' + (can ? 5 : 3) + '" style="padding:10px 0 4px;font-weight:bold;color:#2A78D6">' + esc(g) + '</td></tr>';
-    by[g].sort((a, b) => a.localeCompare(b, 'uk')).forEach(n => { const b = bal[n]; i++;
-      rows += '<tr class="btr" data-pos="' + esc(n) + '" data-u="' + esc(b[1]) + '" data-k="' + esc((n + ' ' + g).toLowerCase()) + '">' + td(esc(n) + (b[2] ? '<br><span class="muted" style="font-size:12px">в дорозі ' + esc(skNfmt(b[2])) + '</span>' : '')) +
+  const inp = (cls, ph, w) => '<input type="text" class="' + cls + '" placeholder="' + ph + '" style="margin:0;padding:6px 8px;font-size:15px;width:' + w + '">';
+  const sumU = (arr, u) => arr.filter(x => x[2] === u).reduce((s, x) => s + x[1], 0);
+  let rows = '', gi = 0;
+  groups.filter(g => by[g]).forEach(g => { gi++;
+    const gOpen = SKBT.og[g] !== false, list = by[g].sort((a, b) => a.localeCompare(b, 'uk'));
+    rows += '<tr class="btg" data-g="' + gi + '" data-gn="' + esc(g) + '" style="cursor:pointer"><td colspan="' + cols + '" style="padding:10px 0 4px;font-weight:bold;color:#2A78D6">' +
+      '<span class="btgi">' + (gOpen ? '▾' : '▸') + '</span> ' + esc(g) + ' <span class="muted" style="font-weight:400">· ' + list.length + '</span></td></tr>';
+    list.forEach(n => { const b = bal[n], tech = (tat[n] || []).filter(a => a[0] && Math.abs(a[1]) > 1e-9).sort((x, y) => y[1] - x[1]), uOpen = !!SKBT.ou[n];
+      const rest = tech.length ? Math.round((b[0] - sumU(tech, b[1])) * 1000) / 1000 : 0;
+      rows += '<tr class="btr" data-g="' + gi + '" data-pos="' + esc(n) + '" data-u="' + esc(b[1]) + '" data-k="' + esc((n + ' ' + g + ' ' + tech.map(a => a[0]).join(' ')).toLowerCase()) + '"' + (gOpen ? '' : ' style="display:none"') + '>' +
+        td((tech.length ? '<span class="btui" style="cursor:pointer;color:#2A78D6">' + (uOpen ? '▾' : '▸') + '</span> ' : '<span style="display:inline-block;width:12px"></span> ') + esc(n) +
+          (b[2] ? '<br><span class="muted" style="font-size:12px">в дорозі ' + esc(skNfmt(b[2])) + '</span>' : ''), 'padding-left:10px') +
         td('<b>' + esc(skNfmt(b[0])) + '</b>', 'text-align:right;white-space:nowrap' + (b[0] < 0 ? ';color:#9B231A' : '')) + td(esc(b[1]), 'color:#66767F') +
-        (can ? td(inp('btD', '±', '72px')) + td(inp('btC', 'коментар', '100%'), 'min-width:120px') : '') + '</tr>'; });
+        (can ? td(inp('btD', '±', '72px')) + td(inp('btC', 'коментар', '100%'), 'min-width:120px') : '') + '</tr>';
+      tech.concat(Math.abs(rest) > 1e-9 ? [['технічна не вказана', rest, b[1], '']] : []).forEach(a => {
+        rows += '<tr class="btt" data-g="' + gi + '" data-p="' + esc(n) + '"' + (gOpen && uOpen ? '' : ' style="display:none"') + '>' +
+          td('<span class="muted" style="font-size:13px">' + esc(a[0]) + '</span>', 'padding-left:34px') + td(esc(skNfmt(a[1])), 'text-align:right;white-space:nowrap;font-size:13px;color:#66767F') +
+          td(esc(a[2]), 'color:#66767F;font-size:13px') + (can ? td('') + td('') : '') + '</tr>'; });
+    });
   });
   box.innerHTML = '<div class="card"><div class="mid">Залишки: ' + esc((skLocOf(loc).name || loc)) + ' <span class="muted" style="font-weight:400">· позицій ' + names.length + '</span></div>' +
     (can ? '<p class="muted" style="margin:4px 0 0">Щоб змінити залишок — у колонці «±» впишіть, скільки додати (12) або списати (−5), поруч коментар — чому. Потім «Записати».</p>' : '') +
-    '<input type="text" id="btQ" placeholder="пошук: назва або група" value="' + esc(SKBT.q) + '" style="margin-top:8px">' +
-    (names.length ? '<div style="overflow-x:auto"><table style="border-collapse:collapse;width:100%;margin-top:6px"><tr>' + th('Позиція') + th('Є') + th('Од.') + (can ? th('±') + th('Коментар') : '') + '</tr>' + rows + '</table></div>'
+    '<div class="row" style="align-items:center;margin-top:8px;gap:6px"><input type="text" id="btQ" placeholder="пошук: назва, група, технічна" value="' + esc(SKBT.q) + '" style="min-width:0;margin:0">' +
+    '<button type="button" class="btn btn2" id="btLvM" style="flex:0 0 auto;width:auto;margin:0;padding:8px 10px" title="Згорнути рівень">− рівень</button>' +
+    '<button type="button" class="btn btn2" id="btLvP" style="flex:0 0 auto;width:auto;margin:0;padding:8px 10px" title="Розгорнути рівень">+ рівень</button></div>' +
+    (names.length ? '<div style="overflow-x:auto"><table style="border-collapse:collapse;width:100%;margin-top:6px"><tr>' + th('Група · позиція · технічна') + th('Є') + th('Од.') + (can ? th('±') + th('Коментар') : '') + '</tr>' + rows + '</table></div>'
       : '<p class="muted">На цій локації в обліку нічого немає.</p>') +
     (can ? '<div id="btAdd"></div><button type="button" class="btn btn2" id="btAddB" style="margin-top:8px">+ Позиція, якої немає в таблиці</button>' +
       '<button class="btn" id="btGo">Записати</button><div id="ajRecent" style="margin-top:12px"></div>' : '') + '</div>';
-  const filt = () => { SKBT.q = $('btQ').value; const w = SKBT.q.toLowerCase().trim().split(/\s+/).filter(Boolean);
-    box.querySelectorAll('tr.btr').forEach(r => r.style.display = !w.length || w.every(x => r.dataset.k.indexOf(x) >= 0) || (r.querySelector('.btD') || {}).value ? '' : 'none');
-    box.querySelectorAll('tr.btg').forEach(r => { let n = r.nextElementSibling, vis = false; while (n && n.classList.contains('btr')) { if (n.style.display !== 'none') vis = true; n = n.nextElementSibling; } r.style.display = vis ? '' : 'none'; }); };
-  $('btQ').oninput = filt; filt();
+  const vis = () => { const w = SKBT.q.toLowerCase().trim().split(/\s+/).filter(Boolean), srch = w.length > 0;
+    box.querySelectorAll('tr.btg').forEach(gr => { const g = gr.dataset.g, gn = gr.dataset.gn, gOpen = srch || SKBT.og[gn] !== false; let any = false;
+      gr.querySelector('.btgi').textContent = gOpen ? '▾' : '▸';
+      box.querySelectorAll('tr.btr[data-g="' + g + '"]').forEach(r => { const typed = !!(r.querySelector('.btD') || {}).value, hit = !srch || w.every(x => r.dataset.k.indexOf(x) >= 0);
+        const show = (gOpen && hit) || typed; r.style.display = show ? '' : 'none'; if (hit || typed) any = true;
+        const uOpen = !!SKBT.ou[r.dataset.pos], ui = r.querySelector('.btui'); if (ui) ui.textContent = uOpen ? '▾' : '▸';
+        box.querySelectorAll('tr.btt[data-g="' + g + '"]').forEach(t => { if (t.dataset.p === r.dataset.pos) t.style.display = show && uOpen ? '' : 'none'; }); });
+      gr.style.display = any ? '' : 'none'; }); };
+  box.querySelectorAll('tr.btg').forEach(gr => gr.onclick = () => { SKBT.og[gr.dataset.gn] = SKBT.og[gr.dataset.gn] === false; vis(); });
+  box.querySelectorAll('.btui').forEach(u => u.onclick = e => { e.stopPropagation(); const p = u.closest('tr').dataset.pos; SKBT.ou[p] = !SKBT.ou[p]; vis(); });
+  const gns = [...box.querySelectorAll('tr.btg')].map(r => r.dataset.gn), pss = [...box.querySelectorAll('.btui')].map(u => u.closest('tr').dataset.pos);
+  $('btLvM').onclick = () => { if (pss.some(p => SKBT.ou[p])) pss.forEach(p => SKBT.ou[p] = false); else gns.forEach(g => SKBT.og[g] = false); vis(); };   // спершу технічні, потім групи
+  $('btLvP').onclick = () => { if (gns.some(g => SKBT.og[g] === false)) gns.forEach(g => SKBT.og[g] = true); else pss.forEach(p => SKBT.ou[p] = true); vis(); };     // спершу групи, потім технічні
+  $('btQ').oninput = () => { SKBT.q = $('btQ').value; vis(); }; vis();
   if (!can) return;
   SKBT.add = 0;
   $('btAddB').onclick = skBalTAdd; $('btGo').onclick = skBalTSave;
