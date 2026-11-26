@@ -777,7 +777,8 @@
 <div class="net" id="net" role="alert" aria-live="assertive"><div class="nb"><div class="rt" id="netr"></div><div class="nt" id="nett">Зберігаю…</div><div class="ns" id="nets"></div><div class="np"><i id="netp"></i></div><div class="nh" id="neth"></div><div class="zc" id="zc"></div><button class="nx" id="netx" type="button">Не чекати</button></div></div>
 
 <script>
-const PAGE_VERSION = 'index.html v154 · 26.11.2026';   // v154: дата ящика ГП — знову біля назви ящика (в одному рядку)
+const PAGE_VERSION = 'index.html v155 · 26.11.2026';   // v155: локації — «КОД — назва» (Ж2.1 — Цех Жуляни В1)
+//    // v154: дата ящика ГП — знову біля назви ящика (в одному рядку)
 //    // v153: «Залишки» чистіше — «ящиків N» і дата ящика в колонці коментаря, без другого рядка й без повтору маркування
 //    // v152: склад — «Прийняти» → «ГП з цеху» / «Від постачальника»; фільтри (типорозмір, KV, колір, мої / усі); «Залишки» згортаються; «Записи переміщення» локації; у цехах без «Приходів» і «Усіх записів за 30 днів»
 //    // v151: сторінка складу — Де я → згорнута «Робота зі складом» (склади, віртуальні крім ВЯ) → «Залишки» з режимами «Змінити залишок» / «Перемістити», ящики ГП 3-м рівнем, історія руху за обраною позицією
@@ -6102,7 +6103,7 @@ function skNum(n) { return String(n).replace('.', ','); }
 let SKS = { loc: '', act: '' };
 let SKBX = false, SKREC = false, SKIN = false;   // v115: згорнуті блоки «Ящики ГП чекають прийняття» і «Усі записи» (розгорнули — тримаємо, поки сторінка відкрита); v122: + «Прийміть на …»
 const skLocOf = c => (SKD.locs || []).find(l => l.code === c) || { code: c, name: c, kind: '' };
-const skLocLab = l => l.code + (l.name && l.name !== l.code ? ' · ' + l.name : '');
+const skLocLab = l => l.code + (l.name && l.name !== l.code ? ' — ' + l.name : '');   // v155: «КОД — назва», як у Вулику скрізь
 function renderSklad() {
   const d = SKD, me = d.me;
   $('who').innerHTML = esc(me.name) + '<br>' + esc(me.role);
