@@ -55,7 +55,7 @@ footer{padding:0 max(3vw,16px) 24px;font-size:12px;color:var(--mute)}
 </header>
 <div class="bar">
   <div class="seg" id="who">
-    <button data-v="all" aria-pressed="true">Усі</button><button data-v="lead" aria-pressed="false">Тімліди</button><button data-v="other" aria-pressed="false">Склад і керівництво</button>
+    <button data-v="all" aria-pressed="true">Усі</button><button data-v="lead" aria-pressed="false">Тімліди</button><button data-v="other" aria-pressed="false">Інші підрозділи</button>
   </div>
   <input type="search" id="q" placeholder="пошук: ім'я">
 </div>
@@ -69,7 +69,7 @@ footer{padding:0 max(3vw,16px) 24px;font-size:12px;color:var(--mute)}
 <ul class="notes" id="notes"></ul>
 <footer id="ver"></footer>
 <script>
-const PAGE_VERSION = 'dostup.html v1 · 26.11.2026';   // v1: матриця доступу до запасів (рішення Андрія 26.11), дані наживо з Вулика (Sklad.gs skAccessData_)
+const PAGE_VERSION = 'dostup.html v2 · 26.11.2026';   // v2: фільтр «Склад і керівництво» → «Інші підрозділи» (рішення Андрія 26.11)   // v1: матриця доступу до запасів (рішення Андрія 26.11), дані наживо з Вулика (Sklad.gs skAccessData_)
 const API = 'https://script.google.com/macros/s/AKfycbx-JUajnAtVsxaLHDgwRpfzE12g4LUtlf6JnWYAQScAVZ5FCpxzGHSrA5PDESqP80KD/exec';
 const MLP_URL = location.origin + location.pathname.replace(/[^/]*$/, '');
 function store(k) { try { return localStorage.getItem(k) || ''; } catch (e) { return ''; } }
