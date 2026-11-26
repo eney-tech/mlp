@@ -1,5 +1,8 @@
 <!DOCTYPE html>
-<!-- МЛП · index.html v147 · 26.11.2026 — склад, реліз 3 (Sklad.gs v47): дія «Змінити залишок» на локаціях, де я відповідальний (або адміністратор):
+<!-- МЛП · index.html v148 · 26.11.2026 — «Змінити залишок» простіше (рішення Андрія 26.11): кнопки дії немає — під «Роботою зі складом» одразу таблиця
+     залишків обраної локації (група → позиція, є, в дорозі, од.); відповідальний бачить колонки «±» і «Коментар», «+ Позиція, якої немає в таблиці» і одну кнопку «Записати».
+     Пошук у таблиці. Нижче — зміни залишку за 30 днів.
+     index.html v147 · 26.11.2026 — склад, реліз 3 (Sklad.gs v47): дія «Змінити залишок» на локаціях, де я відповідальний (або адміністратор):
      причина (−/+/±), позиції (для списання — лише ті, що є в обліку), кількість або «фактично є», технічна назва, коментар, номер «Розбирання»;
      під формою — зміни залишку на цій локації за 30 днів.
      index.html v146 · 25.11.2026 — «Приймання»: зав. складу бачить лише свої локації (Sklad.gs v44), підказку виправлено.
@@ -770,7 +773,8 @@
 <div class="net" id="net" role="alert" aria-live="assertive"><div class="nb"><div class="rt" id="netr"></div><div class="nt" id="nett">Зберігаю…</div><div class="ns" id="nets"></div><div class="np"><i id="netp"></i></div><div class="nh" id="neth"></div><div class="zc" id="zc"></div><button class="nx" id="netx" type="button">Не чекати</button></div></div>
 
 <script>
-const PAGE_VERSION = 'index.html v147 · 26.11.2026';   // v147: склад, реліз 3 — дія «Змінити залишок» (Sklad.gs v47)
+const PAGE_VERSION = 'index.html v148 · 26.11.2026';   // v148: залишки локації таблицею з «±» і коментарем замість дії «Змінити залишок» (Sklad.gs v48)
+//   // v147: склад, реліз 3 — дія «Змінити залишок» (Sklad.gs v47)
 //   // v146: «Приймання» — усі локації бачить лише адміністратор (Sklad.gs v44)
 //   // v145: склад, реліз 2 (Sklad.gs v43) — «Приймання» блоками за локаціями; переміщення з віртуальних; «є N» — з балансу
 //   // v144: «Робота без партії» — розділ «Крок без партії»: статор / ротор / двигун → крок, типорозмір, KV, колір, шлях, успішні, брак з причинами, поділ (Code.gs v142); Р-14 — тип «Крок без партії»; v143: Р-15_03 — рівні для всіх рядків, заливка лише на нерозгорнутих рядках; v142: огляд кроків — два напівфабрикати R2 (4320) і R5; v141: R2 4320 ділить партію — готові → R3, на допресування (R1.1), брак; v140: Р-8с — неоплачувані операції знову в «Роботи й записи», ₴ — «без оплати» (Reports.gs v58); v139: фільтри згортаються і на ПК; v138: Р-0_09 — Весь період, дерево дат з мультивибором; v137: Р-0_09 період — вид + ◀ ▶, дати в підписі; v136: ₴ на 1 готову — наші й закриті; v135: вартість браку (Р-10), робота партії (Р-7); v134: Р-16_08 кількість і ціна за од.; v133: Р-16 «Зарплата»; v132: премії й штрафи; v131: ₴ на екрані — до цілих; v130: суми ₴ за цінами «ЗП_Ціни», без калькулятора; v129: Р-2_04 «Готово до збирання» — і статори / ротори в партіях двигунів, що чекають пари; v128: екран реєстрації — тиха перевірка реєстрації більше не показує плашку «Відкриваю…» (екран «вічно вантажився» на телефоні, де сторінку вже відкривали); v127: Р-8 — колонки «Типорозмір · KV», закладка F3, посилання ?bm=f3; v126: нова партія статорів — «Готовий статор» (одразу готова); зміна типорозміру не скидає «Почати з кроку», під кнопкою — з чого старт, колір статорів при старті після бази; v122: меню — + Склад, порядок, індекси пунктів; склад — порядок блоків, «Прийміть» згорнуто, партії відвантаження; v121: Р-2_05 готові до збирання — статори й ротори окремо, разом, деталі в партіях двигунів; v120: (прибрано); v119: ящики ГП у «Перемістити» — за кнопкою; v118: кількість у списку, свіжі технічні назви, «Прийміть на …»; v117: вибір позиції — три рівні; v116: Р-15 цех — рівень 1; v115: Р-15 деревом, згорнуті блоки складу, дерево позицій, технічна назва; v114: вид — поле, пошук за ключовими словами; v113: групи й види номенклатури; v112: Р-15 — блоки згортаються; v111: Р-15 «Склад: залишки й рух»; v110: дії за типом локації, переміщення, партія покупцю; v109: кілька фото, тара, перемаркування; v108: приймання від постачальника, наліпки; v107: передачі склад → цех, ящики ГП приймає склад; v106: позиції складу за групами; v105: кнопки складу «Беремо зі складу» / «Приймаємо на склад»; v104: «Історія тари» (?th=) — назва тари на сторінці тари / партії веде на неї (Reports.gs v42)
@@ -6097,12 +6101,81 @@ function renderSklad() {
   let h = '<div id="skIn"></div><div class="card"><div class="mid">Робота зі складом</div>' +
     '<label>Де я / звідки</label><select id="skLoc" data-nocbx><option value="">— оберіть локацію —</option>' + grp('wh', 'Склади') + grp('shop', 'Цехи') + grp('virt', 'Віртуальні') + '</select>' +
     '<div id="skActs"></div><div id="skPanel"></div><div class="err" id="err"></div></div>';
+  h += '<div id="skBalT"></div>';   // v148: залишки локації з «±»
   h += '<div id="skLog"></div><div id="skMy"></div><p class="muted" style="text-align:center">' + esc(PAGE_VERSION) + ' · ' + esc(d.version) + '</p><div style="height:20px"></div>';
   $('app').innerHTML = h;
   $('skLoc').onchange = () => { SKS.loc = $('skLoc').value; SKS.act = ''; skActsDraw(); renderSkIn(); };
   renderSkMy(); renderSkIn(); skActsDraw(); skPpParam(); skVpParam();
 }
-function skActsDraw() {
+// ---- v148 (Sklad.gs v48, рішення 26.11): залишки локації — таблиця одразу під «Робота зі складом»; хто відповідальний — колонка «±» і коментар, одна кнопка «Записати»
+let SKBT = { q: '', add: 0 };
+function skBalTDraw() {
+  const box = $('skBalT'); if (!box) return;
+  const d = SKD, loc = SKS.loc; if (!loc) { box.innerHTML = ''; return; }
+  const can = !!(d.canAdj || {})[loc], bal = ((d.bal || {})[loc]) || {};
+  const grpOf = {}; (d.positions || []).forEach(p => grpOf[p.name] = p.group || d.other);
+  const names = Object.keys(bal).filter(n => Math.abs(bal[n][0]) > 1e-9 || bal[n][2] > 1e-9);
+  const groups = (d.groups || []).slice(); names.forEach(n => { const g = grpOf[n] || d.other; if (groups.indexOf(g) < 0) groups.push(g); });
+  const by = {}; names.forEach(n => (by[grpOf[n] || d.other] = by[grpOf[n] || d.other] || []).push(n));
+  const th = s => '<th style="text-align:left;padding:6px 6px 6px 0;font-size:12px;color:#66767F;border-bottom:1px solid #C5D0D7">' + s + '</th>';
+  const td = (s, st) => '<td style="padding:5px 6px 5px 0;border-bottom:1px solid #EEF2F5;vertical-align:middle;' + (st || '') + '">' + s + '</td>';
+  const inp = (cls, ph, w) => '<input type="text" class="' + cls + '"' + (cls === 'btD' ? ' inputmode="text"' : '') + ' placeholder="' + ph + '" style="margin:0;padding:6px 8px;font-size:15px;width:' + w + '">';
+  let rows = '', i = 0;
+  groups.filter(g => by[g]).forEach(g => {
+    rows += '<tr class="btg"><td colspan="' + (can ? 5 : 3) + '" style="padding:10px 0 4px;font-weight:bold;color:#2A78D6">' + esc(g) + '</td></tr>';
+    by[g].sort((a, b) => a.localeCompare(b, 'uk')).forEach(n => { const b = bal[n]; i++;
+      rows += '<tr class="btr" data-pos="' + esc(n) + '" data-u="' + esc(b[1]) + '" data-k="' + esc((n + ' ' + g).toLowerCase()) + '">' + td(esc(n) + (b[2] ? '<br><span class="muted" style="font-size:12px">в дорозі ' + esc(skNfmt(b[2])) + '</span>' : '')) +
+        td('<b>' + esc(skNfmt(b[0])) + '</b>', 'text-align:right;white-space:nowrap' + (b[0] < 0 ? ';color:#9B231A' : '')) + td(esc(b[1]), 'color:#66767F') +
+        (can ? td(inp('btD', '±', '72px')) + td(inp('btC', 'коментар', '100%'), 'min-width:120px') : '') + '</tr>'; });
+  });
+  box.innerHTML = '<div class="card"><div class="mid">Залишки: ' + esc((skLocOf(loc).name || loc)) + ' <span class="muted" style="font-weight:400">· позицій ' + names.length + '</span></div>' +
+    (can ? '<p class="muted" style="margin:4px 0 0">Щоб змінити залишок — у колонці «±» впишіть, скільки додати (12) або списати (−5), поруч коментар — чому. Потім «Записати».</p>' : '') +
+    '<input type="text" id="btQ" placeholder="пошук: назва або група" value="' + esc(SKBT.q) + '" style="margin-top:8px">' +
+    (names.length ? '<div style="overflow-x:auto"><table style="border-collapse:collapse;width:100%;margin-top:6px"><tr>' + th('Позиція') + th('Є') + th('Од.') + (can ? th('±') + th('Коментар') : '') + '</tr>' + rows + '</table></div>'
+      : '<p class="muted">На цій локації в обліку нічого немає.</p>') +
+    (can ? '<div id="btAdd"></div><button type="button" class="btn btn2" id="btAddB" style="margin-top:8px">+ Позиція, якої немає в таблиці</button>' +
+      '<button class="btn" id="btGo">Записати</button><div id="ajRecent" style="margin-top:12px"></div>' : '') + '</div>';
+  const filt = () => { SKBT.q = $('btQ').value; const w = SKBT.q.toLowerCase().trim().split(/\s+/).filter(Boolean);
+    box.querySelectorAll('tr.btr').forEach(r => r.style.display = !w.length || w.every(x => r.dataset.k.indexOf(x) >= 0) || (r.querySelector('.btD') || {}).value ? '' : 'none');
+    box.querySelectorAll('tr.btg').forEach(r => { let n = r.nextElementSibling, vis = false; while (n && n.classList.contains('btr')) { if (n.style.display !== 'none') vis = true; n = n.nextElementSibling; } r.style.display = vis ? '' : 'none'; }); };
+  $('btQ').oninput = filt; filt();
+  if (!can) return;
+  SKBT.add = 0;
+  $('btAddB').onclick = skBalTAdd; $('btGo').onclick = skBalTSave;
+  skAdjRecentDraw();
+}
+function skBalTAdd() {
+  const d = SKD, n = ++SKBT.add, div = document.createElement('div');
+  div.className = 'bta'; div.dataset.n = n; div.style.cssText = 'border-top:1px solid #E7EDF1;margin-top:8px;padding-top:4px';
+  div.innerHTML = '<select id="btP' + n + '">' + skPosOpts(d, '', '— позиція —') + '</select><div id="btO' + n + '" style="display:none"><input type="text" id="btOt' + n + '" placeholder="що саме"></div>' +
+    '<div class="row" style="align-items:center;margin-top:6px"><input type="text" id="btQ' + n + '" placeholder="± кількість" style="flex:0 0 30%;min-width:0;font-size:17px">' +
+    '<select id="btU' + n + '" data-nocbx style="flex:0 0 22%">' + opts(d.units, 'шт') + '</select><input type="text" id="btC' + n + '" placeholder="коментар" style="min-width:0"></div>';
+  $('btAdd').appendChild(div);
+  $('btP' + n).onchange = () => { const v = $('btP' + n).value; $('btO' + n).style.display = v === d.other ? 'block' : 'none'; const p = d.positions.find(x => x.name === v); if (p) $('btU' + n).value = p.unit; };
+}
+function skBalTSave() {
+  const b = $('btGo'); if (b.disabled) return; $('err').textContent = '';
+  const lines = [], bad = [], num = s => { s = String(s || '').trim().replace(/\s+/g, ''); if (!s) return null; const neg = /^[-−–]/.test(s), v = skCalc(s.replace(/^[-−–+]/, '')); return isNaN(v) || !(v > 0) ? NaN : (neg ? -v : v); };
+  document.querySelectorAll('#skBalT tr.btr').forEach(r => { const s = r.querySelector('.btD').value, v = num(s); if (v === null) return;
+    const cm = r.querySelector('.btC').value.trim();
+    if (isNaN(v)) return bad.push('«' + r.dataset.pos + '»: кількість числом зі знаком (−5 або 12)');
+    if (!cm) return bad.push('«' + r.dataset.pos + '»: коментар — чому');
+    lines.push({ pos: r.dataset.pos, unit: r.dataset.u, delta: s, cm: cm }); });
+  document.querySelectorAll('#skBalT .bta').forEach(el => { const n = el.dataset.n, pos = $('btP' + n).value, s = $('btQ' + n).value, v = num(s), cm = $('btC' + n).value.trim();
+    if (!pos && v === null) return; if (!pos) return bad.push('нова позиція: оберіть, що саме');
+    if (v === null || isNaN(v)) return bad.push('«' + pos + '»: кількість числом зі знаком'); if (!cm) return bad.push('«' + pos + '»: коментар — чому');
+    lines.push({ pos: pos, posOther: $('btOt' + n).value, unit: $('btU' + n).value, delta: s, cm: cm }); });
+  if (bad.length) { $('err').textContent = bad.join('; '); return toast(bad[0], true); }
+  if (!lines.length) return toast('Впишіть «±» хоча б в одному рядку', true);
+  confirmBox('Змінити залишок на ' + (skLocOf(SKS.loc).name || SKS.loc) + ': ' + lines.map(l => l.pos + ' ' + (/^[-−–]/.test(l.delta.trim()) ? '' : '+') + l.delta.trim() + ' ' + l.unit).join('; ') + '?', () => {
+    b.disabled = true; b._t = b.textContent; b.textContent = 'Записую…';
+    post('skladAdjust', { code: CODE, loc: SKS.loc, reason: 'Зміна залишку', lines: lines })
+      .then(r => { toast(r.msg); if (r.adjRecent) SKD.adjRecent = r.adjRecent; if (r.bal) SKD.bal = Object.assign({}, SKD.bal || {}, r.bal); skIn(r); skBalTDraw(); })
+      .catch(e => skErr(e, b));
+  });
+}
+function skActsDraw() { skActsDraw0(); skBalTDraw(); }
+function skActsDraw0() {
   const d = SKD, loc = SKS.loc, k = skLocOf(loc).kind, can = (d.canSend || {})[loc];
   $('err').textContent = '';
   if (!loc) { $('skActs').innerHTML = '<p class="muted">Оберіть склад або цех — покажемо, що тут можна зробити.</p>'; $('skPanel').innerHTML = ''; return; }
@@ -6113,7 +6186,7 @@ function skActsDraw() {
     if (d.isWh || d.isHead) acts.push(['ship', 'Покупцю']);
   } else if (k === 'shop' && can) acts = [['move', 'Перемістити'], ['gp', 'Ящик ГП<br>на склад']];
   else if (k === 'virt' && can) acts = [['move', 'Перемістити<br>на склад / у цех']];   // v145
-  if ((d.canAdj || {})[loc]) acts.push(['adj', 'Змінити<br>залишок']);   // v147
+  if (!acts.length && (d.canAdj || {})[loc]) { $('skActs').innerHTML = ''; $('skPanel').innerHTML = ''; return; }   // v148: лише таблиця залишків з «±»
   if (!acts.length) { $('skActs').innerHTML = '<p class="muted">Тут для вас дій немає' + (k === 'shop' ? ' — переміщувати з цеху може тімлід цієї будівлі.' : ' — потрібен доступ «Склад».') + '</p>'; $('skPanel').innerHTML = ''; return; }
   if (!acts.some(a => a[0] === SKS.act)) SKS.act = acts[0][0];
   $('skActs').innerHTML = '<label>Що робимо</label><div class="seg">' + acts.map(a => '<label><input type="radio" name="skAct" value="' + a[0] + '"' + (a[0] === SKS.act ? ' checked' : '') + '><span>' + a[1] + '</span></label>').join('') + '</div>';
