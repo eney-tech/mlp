@@ -777,7 +777,8 @@
 <div class="net" id="net" role="alert" aria-live="assertive"><div class="nb"><div class="rt" id="netr"></div><div class="nt" id="nett">Зберігаю…</div><div class="ns" id="nets"></div><div class="np"><i id="netp"></i></div><div class="nh" id="neth"></div><div class="zc" id="zc"></div><button class="nx" id="netx" type="button">Не чекати</button></div></div>
 
 <script>
-const PAGE_VERSION = 'index.html v160 · 26.11.2026';   // v160 (рішення 26.11): ГП на складі — за назвою: «Зібрати партію покупцю» — назва × (палет, ящиків, шт), ящики бере сервер (найстаріші); у «Залишках» ГП складу без списку ящиків, ± і переміщення — кількістю; «Запакувати палету ГП» й «Інше» прибрано.
+const PAGE_VERSION = 'index.html v161 · 26.11.2026';   // v161 (Андрій 26.11): «↩ Розібрати» зібрану партію покупцю — у картці партії (і з «Залишків»): ГП й позиції повертаються в залишок.
+// v160   // v160 (рішення 26.11): ГП на складі — за назвою: «Зібрати партію покупцю» — назва × (палет, ящиків, шт), ящики бере сервер (найстаріші); у «Залишках» ГП складу без списку ящиків, ± і переміщення — кількістю; «Запакувати палету ГП» й «Інше» прибрано.
 // v159   // v159 (рішення 26.11): «Залишки» — лише уніфіковані назви (технічних рівнів і розподілу за технічними немає); «Змінити залишок» — і ящики ГП складу (±, Sklad.gs v61 skladBoxAdjust); «Прийняти» на віртуальній — лише відповідальні (canAcc)
 //   // v158: «Залишки» цеху — і напівфабрикати / власні вузли в партіях МЛП (Sklad.gs v60): додаються до залишку, рядки лише для перегляду, партії — третім рівнем
 //   // v157: «Робота зі складом» складу — Прийняти · Запакувати палету ГП · Зібрати партію покупцю · Інше (розпакувати палету, наліпка ще раз); партія покупцю — палети, ящики й позиції складу (метизи); «Залишки» — групи «Палети ГП» і «Зібрано для покупців» (Sklad.gs v59)
@@ -6656,7 +6657,7 @@ function skShipLi(s) {
   return '<div class="li"><div style="min-width:0"><b>' + esc(s.id) + '</b> · ' + esc(s.comment) + '<br><span class="muted">' + esc(s.time) + ' · ' + esc(s.who) + ' · ' + skShipSum(s) + '</span>' +
     s.totals.map(t => '<div class="muted">' + esc(t.mark) + ' — <b>' + skNfmt(t.qty) + '</b></div>').join('') +
     (s.items || []).map(t => '<div class="muted">' + esc(t.pos) + ' — <b>' + skNfmt(t.qty) + '</b> ' + esc(t.unit) + '</div>').join('') + '</div>' +
-    '<div class="r" style="flex:0 0 auto"><button class="ic" title="Відвантажити" onclick="skShipDoneOpen(\'' + esc(s.id) + '\')">🚚</button><br><button class="ic" title="Скасувати" onclick="skShipCancel(\'' + esc(s.id) + '\')">✖</button></div></div>';
+    '<div class="r" style="flex:0 0 auto"><button class="ic" title="Відвантажити" onclick="skShipDoneOpen(\'' + esc(s.id) + '\')">🚚</button><br><button class="ic" title="Розібрати — ГП й позиції повернуться в залишок" onclick="skShipCancel(\'' + esc(s.id) + '\')">✖</button></div></div>';
 }
 function skShipNew() {   // v160: ГП — за назвою × (палет, ящиків, шт); ящики бере сервер (найстаріші); інші позиції складу — як були
   SKSH = { gp: null, gpl: [{ name: '', p: '', b: '', q: '' }], palBoxes: SKD.palBoxes || 32, items: [] };
@@ -6785,8 +6786,9 @@ function skShipShow(s, msg) {
       s.lines.filter(l => l.auto).map(l => esc(l.name) + ' — ' + l.qty).join(' · ') + '</div></details>' : '') +
     '<div class="list" style="padding:0;margin-top:8px">' + s.lines.filter(l => !l.auto).map(l => '<div class="li"><div>' + (l.pal ? '<span class="muted">🧱 ' + esc(l.pal) + '</span> · ' : '') + esc(l.name) + ' · ' + esc(l.mark) + '</div><div class="r"><b>' + l.qty + '</b></div></div>').join('') +
     (s.items || []).map(t => '<div class="li"><div>' + esc(t.pos) + '</div><div class="r"><b>' + skNfmt(t.qty) + '</b> ' + esc(t.unit) + '</div></div>').join('') + '</div>' +
-    '<div class="grid" style="margin-top:12px">' + (s.status === 'зібрано' && ((SKD.canShip || {})[s.loc] || SKD.isWh || SKD.isHead) ? '<button class="btn" onclick="skShipDoneOpen(\'' + esc(s.id) + '\')">🚚 Відвантажити</button>' : '<span></span>') +
-    '<button class="btn btn2" onclick="closeModal()">Закрити</button></div></div>');
+    (s.status === 'зібрано' && ((SKD.canShip || {})[s.loc] || SKD.isWh || SKD.isHead) ? '<div class="grid" style="margin-top:12px"><button class="btn" onclick="skShipDoneOpen(\'' + esc(s.id) + '\')">🚚 Відвантажити</button>' +
+      '<button class="btn btn2" onclick="closeModal();skShipCancel(\'' + esc(s.id) + '\')">↩ Розібрати</button></div>' : '') +
+    '<div class="grid" style="margin-top:8px"><span></span><button class="btn btn2" onclick="closeModal()">Закрити</button></div></div>');
 }
 let SHU = { files: [], up: 0 };
 function skShipDoneOpen(id) {
@@ -6813,7 +6815,7 @@ function skShipDoneOpen(id) {
   };
 }
 function skShipCancel(id) {
-  confirmBox('Скасувати зібрану партію ' + id + '? Палети, ящики й позиції знову стануть вільними.', () => post('skladShipCancel', { code: CODE, id: id })
+  confirmBox('Розібрати зібрану партію ' + id + '? ГП й інші позиції повернуться в залишок складу.', () => post('skladShipCancel', { code: CODE, id: id, reason: 'розібрано' })
     .then(r => { toast(r.msg); skIn(r); delete SKBT.boxes[SKS.loc]; if (SKS.act === 'ship') skShipDraw(); skBalTDraw(); }).catch(e => toast(String(e.message || e).replace(/^Error:\s*/, ''), true)));
 }
 // ---- v157: палети ГП (Sklad.gs v59)
