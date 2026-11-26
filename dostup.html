@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Доступ до запасів · Вулик</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+/* Довідник Вулика: хто що може з запасами на кожній локації. Спокійна робоча таблиця, як skhema.html:
+   графіт, фіолетовий акцент #534AB7; П — синій, Пр — зелений, З — бурштиновий. */
+:root{color-scheme:light dark;--bg:light-dark(#f4f3ef,#16161a);--card:light-dark(#fff,#1f1f24);--ink:light-dark(#22211f,#e9e7e1);--mute:light-dark(#6b6a64,#a6a49c);
+  --line:light-dark(#d8d6ce,#34333a);--acc:#534AB7;--chip:light-dark(#fff,#24242a);--hd:light-dark(#f8f7f3,#1b1b20);
+  --p:light-dark(#E6F0FB,#1d2b3d);--pi:light-dark(#1f5fa8,#9cc4f2);--pr:light-dark(#E5F4EA,#1c3326);--pri:light-dark(#1e7a45,#8fd5a8);--z:light-dark(#FFF2D9,#3a2f19);--zi:light-dark(#9a6200,#f0c46b)}
+*{box-sizing:border-box;min-width:0}
+body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.5 "IBM Plex Sans",Arial,sans-serif}
+header{padding:18px max(3vw,16px) 6px}
+h1{font-size:26px;line-height:1.1;font-weight:600;margin:0 0 4px}
+.sub{color:var(--mute);font-size:13px;margin:0;max-width:95ch}
+a{color:var(--acc)}
+.bar{padding:10px max(3vw,16px) 6px;display:flex;flex-wrap:wrap;gap:8px 18px;align-items:center}
+.seg{display:inline-flex;border:1px solid var(--line);border-radius:8px;overflow:hidden;background:var(--chip)}
+.seg button{font:inherit;font-size:14px;border:0;background:transparent;color:var(--ink);padding:6px 12px;min-height:36px;cursor:pointer}
+.seg button+button{border-left:1px solid var(--line)}
+.seg button[aria-pressed=true]{background:var(--acc);color:#fff}
+input[type=search]{font:inherit;font-size:14px;padding:7px 10px;border:1px solid var(--line);border-radius:8px;background:var(--chip);color:var(--ink);min-width:200px}
+.legend{display:flex;flex-wrap:wrap;gap:4px 18px;padding:2px max(3vw,16px) 10px;font-size:13px;color:var(--mute)}
+.legend span{display:inline-flex;align-items:center;gap:6px}
+.wrap{margin:0 max(3vw,16px) 12px;background:var(--card);border:1px solid var(--line);border-radius:10px;overflow:auto;max-height:calc(100vh - 200px)}
+table{border-collapse:separate;border-spacing:0;font-size:13px}
+th,td{padding:7px 10px;border-bottom:1px solid var(--line);text-align:left;vertical-align:middle;white-space:nowrap}
+thead th{position:sticky;top:0;background:var(--hd);z-index:2;font-weight:500;font-size:12px;color:var(--mute);vertical-align:bottom}
+thead tr.grp th{top:0;font-size:11px;text-transform:uppercase;letter-spacing:.04em;color:var(--acc);border-bottom:0;padding-bottom:0}
+thead tr.loc th{top:26px}
+thead th .c{display:block;font-size:14px;font-weight:600;color:var(--ink)}
+th.pn,td.pn{position:sticky;left:0;background:var(--card);z-index:1;border-right:1px solid var(--line);min-width:210px;white-space:normal}
+thead th.pn{background:var(--hd);z-index:3}
+td.pn b{font-weight:500}
+td.pn small{display:block;color:var(--mute);font-size:12px}
+td.g,th.g{border-left:2px solid var(--line)}
+.k{display:inline-block;border-radius:5px;padding:1px 6px;font-size:12px;font-weight:600;margin-right:3px}
+.k.p{background:var(--p);color:var(--pi)}.k.pr{background:var(--pr);color:var(--pri)}.k.z{background:var(--z);color:var(--zi)}
+.no{color:var(--line)}
+tr:hover td{background:light-dark(#faf9f5,#232329)}tr:hover td.pn{background:light-dark(#faf9f5,#232329)}
+.notes{margin:4px max(3vw,16px) 24px;font-size:13px;color:var(--mute);max-width:110ch}
+.notes li{margin:2px 0}
+.msg{padding:24px;color:var(--mute)}
+footer{padding:0 max(3vw,16px) 24px;font-size:12px;color:var(--mute)}
+</style>
+</head>
+<body>
+<header>
+  <h1>Доступ до запасів</h1>
+  <p class="sub">Хто що може з запасами на кожній локації Вулика: рядок — людина, стовпчик — локація. <span id="upd"></span> <a id="back" href="./">← до Вулика</a></p>
+</header>
+<div class="bar">
+  <div class="seg" id="who">
+    <button data-v="all" aria-pressed="true">Усі</button><button data-v="lead" aria-pressed="false">Тімліди</button><button data-v="other" aria-pressed="false">Склад і керівництво</button>
+  </div>
+  <input type="search" id="q" placeholder="пошук: ім'я">
+</div>
+<div class="legend">
+  <span><i class="k p">П</i> переміщувати звідси</span>
+  <span><i class="k pr">Пр</i> приймати сюди</span>
+  <span><i class="k z">З</i> змінити залишок</span>
+  <span><i class="no">—</i> доступу немає</span>
+</div>
+<div class="wrap"><div id="tbl" class="msg">Завантажую…</div></div>
+<ul class="notes" id="notes"></ul>
+<footer id="ver"></footer>
+<script>
+const PAGE_VERSION = 'dostup.html v1 · 26.11.2026';   // v1: матриця доступу до запасів (рішення Андрія 26.11), дані наживо з Вулика (Sklad.gs skAccessData_)
+const API = 'https://script.google.com/macros/s/AKfycbx-JUajnAtVsxaLHDgwRpfzE12g4LUtlf6JnWYAQScAVZ5FCpxzGHSrA5PDESqP80KD/exec';
+const MLP_URL = location.origin + location.pathname.replace(/[^/]*$/, '');
+function store(k) { try { return localStorage.getItem(k) || ''; } catch (e) { return ''; } }
+const CODE = store('mlp_code');
+const esc = s => String(s === null || s === undefined ? '' : s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+function apiGet(api, q) {
+  return fetch(API + '?api=' + api + '&q=' + encodeURIComponent(JSON.stringify(Object.assign({ code: CODE }, q))), { credentials: 'omit', redirect: 'follow' })
+    .then(r => r.json(), () => { throw new Error('Немає зв\'язку з сервером. Перевірте інтернет'); }).then(j => { if (!j.ok) throw new Error(j.error); return j.data; });
+}
+document.getElementById('back').href = MLP_URL;
+document.getElementById('ver').textContent = PAGE_VERSION;
+let D = null; const F = { who: 'all', q: '' };
+const KIND = { wh: 'Склади', shop: 'Цехи', virt: 'Віртуальні' };
+function cell(c) {
+  if (!c) return '<span class="no">—</span>';
+  return c.split(' ').map(x => '<i class="k ' + (x === 'П' ? 'p' : x === 'Пр' ? 'pr' : 'z') + '">' + esc(x) + '</i>').join('');
+}
+function render() {
+  const box = document.getElementById('tbl'); if (!D) return;
+  const q = F.q.trim().toLowerCase();
+  const rows = D.rows.filter(r => (F.who === 'all' || (F.who === 'lead' ? r.role === 'тімлід' : r.role !== 'тімлід')) && (!q || r.name.toLowerCase().indexOf(q) >= 0));
+  const groups = []; D.locs.forEach((l, i) => { const g = groups[groups.length - 1]; if (g && g.k === l.kind) g.n++; else groups.push({ k: l.kind, n: 1, i: i }); });
+  const first = {}; groups.forEach(g => first[g.i] = 1);
+  let h = '<table><thead><tr class="grp"><th class="pn"></th>' + groups.map(g => '<th class="g" colspan="' + g.n + '">' + esc(KIND[g.k] || g.k) + '</th>').join('') + '</tr>' +
+    '<tr class="loc"><th class="pn">Людина</th>' + D.locs.map((l, i) => '<th' + (first[i] ? ' class="g"' : '') + ' title="Відповідальні: ' + esc(l.resp || '—') + '"><span class="c">' + esc(l.code) + '</span>' + esc(l.name) + '</th>').join('') + '</tr></thead><tbody>';
+  h += rows.map(r => '<tr><td class="pn"><b>' + esc(r.name) + '</b><small>' + esc(r.role) + (r.site ? ' · ' + esc(r.site) : '') + '</small></td>' +
+    r.cells.map((c, i) => '<td' + (first[i] ? ' class="g"' : '') + '>' + cell(c) + '</td>').join('') + '</tr>').join('');
+  h += '</tbody></table>';
+  box.className = ''; box.innerHTML = rows.length ? h : '<p class="msg">Нікого не знайдено.</p>';
+}
+function notes() {
+  const ul = document.getElementById('notes');
+  ul.innerHTML = '<li>Віртуальні локації (відділ якості, РнД, Антон, Володя, Інше) приймають самі — «Пр» там нікому не потрібне.</li>' +
+    '<li>«Змінити залишок» — у таблиці «Залишки» на сторінці «Робота зі складом»: списати або додати з коментарем.</li>' +
+    '<li>Відповідальні локацій: ' + D.locs.map(l => '<b>' + esc(l.code) + '</b> — ' + esc(l.resp || '—')).join('; ') + '.</li>';
+}
+document.querySelectorAll('#who button').forEach(b => b.onclick = () => {
+  F.who = b.dataset.v; document.querySelectorAll('#who button').forEach(x => x.setAttribute('aria-pressed', x === b ? 'true' : 'false')); render(); });
+document.getElementById('q').oninput = e => { F.q = e.target.value; render(); };
+const tbl = document.getElementById('tbl');
+if (!CODE) tbl.innerHTML = 'Цей браузер не зареєстровано у Вулику. Відкрийте <a href="' + MLP_URL + '">Вулик</a> у цьому ж браузері, зареєструйтесь і поверніться сюди.';
+else apiGet('skladAccess', {}).then(d => {
+  D = d; render(); notes();
+  document.getElementById('upd').textContent = 'Дані наживо, оновлено ' + d.at + '.';
+  document.getElementById('ver').textContent = PAGE_VERSION + ' · ' + d.version;
+}).catch(e => { tbl.innerHTML = esc(e.message || 'Не вдалося завантажити'); });
+</script>
+</body>
+</html>

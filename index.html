@@ -777,7 +777,8 @@
 <div class="net" id="net" role="alert" aria-live="assertive"><div class="nb"><div class="rt" id="netr"></div><div class="nt" id="nett">Зберігаю…</div><div class="ns" id="nets"></div><div class="np"><i id="netp"></i></div><div class="nh" id="neth"></div><div class="zc" id="zc"></div><button class="nx" id="netx" type="button">Не чекати</button></div></div>
 
 <script>
-const PAGE_VERSION = 'index.html v155 · 26.11.2026';   // v155: локації — «КОД — назва» (Ж2.1 — Цех Жуляни В1)
+const PAGE_VERSION = 'index.html v156 · 26.11.2026';   // v156: Головна — «ⓘ Довідник»: схема процесів, доступ до запасів (dostup.html), «Етапи виробництва»
+//    // v155: локації — «КОД — назва» (Ж2.1 — Цех Жуляни В1)
 //    // v154: дата ящика ГП — знову біля назви ящика (в одному рядку)
 //    // v153: «Залишки» чистіше — «ящиків N» і дата ящика в колонці коментаря, без другого рядка й без повтору маркування
 //    // v152: склад — «Прийняти» → «ГП з цеху» / «Від постачальника»; фільтри (типорозмір, KV, колір, мої / усі); «Залишки» згортаються; «Записи переміщення» локації; у цехах без «Приходів» і «Усіх записів за 30 днів»
@@ -1792,7 +1793,12 @@ function routeHelp(b) {
 }
 function helpHtml(open) {
   const line = (title, desc, route) => '<div class="hline"><div class="hh">' + title + '</div><div class="muted" style="margin-bottom:6px">' + desc + '</div>' + route.map(stepHelp).join('') + '</div>';
-  return '<details class="hlp"' + (open ? ' open' : '') + '><summary>ⓘ Етапи виробництва — довідка</summary>' +
+  const dl = (href, t, d) => '<a class="tile" href="' + esc(href) + '" target="_blank" rel="noopener" style="margin:0 0 8px"><div class="tn">' + t + '</div><div class="td">' + d + '</div></a>';   // v156
+  const base = location.origin + location.pathname.replace(/[^/]*$/, '');
+  return '<details class="hlp"><summary>ⓘ Довідник</summary><div style="padding:8px 12px 0">' +   // v156: Довідник — посилання і «Етапи виробництва»
+    dl(base + 'skhema.html', '🗺 Схема процесів', 'кроки маршрутів, компоненти й норми, напівфабрикати, ціни — наживо з Вулика') +
+    dl(base + 'dostup.html', '🔑 Доступ до запасів', 'хто на якій локації переміщує, приймає, змінює залишок') + '</div>' +
+    '<details class="hlp"' + (open ? ' open' : '') + ' style="margin:0 12px 12px"><summary>Етапи виробництва</summary>' +
     '<div class="hproc"><b>Як рухається виробництво</b><ol>' +
     '<li>Кожна партія лежить у своїй тарі з QR: ящик (КР), піддон печі (ПД) або тачка (ТЧ). Скануєте QR — бачите партію й записуєте свій крок: скільки успішних і скільки браку.</li>' +
     '<li>Статори й ротори виготовляються паралельно, кожен своїм маршрутом. Пройшли маршрут — <b>готові до збирання</b>.</li>' +
@@ -1803,7 +1809,7 @@ function helpHtml(open) {
     line('Статори 4320', 'Відрізняється від 3115: база вже з підшипником (S11.2), тест S12 — до Печі 3, останній крок — S9.3 «Фен».', HR_ST4320) +
     line('Ротори', 'Вал → кільце → магніти → балансування → гравіювання KV. Покупні ротори (в1) починають одразу з F4.', HR_RT) +
     line('Двигуни', 'Збирання з готових статорів і роторів → скрутка → тест → вихідний контроль → пакування.', HR_MT) +
-    '<p class="muted" style="padding:0 16px 12px">Нормативи наведено для 3115.</p></details>';
+    '<p class="muted" style="padding:0 16px 12px">Нормативи наведено для 3115.</p></details></details>';
 }
 
 /** v12: реєстрація телефону. Код телефону (mlp_pending) створюється один раз і живе в цьому браузері.
