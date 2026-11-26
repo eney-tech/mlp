@@ -777,7 +777,8 @@
 <div class="net" id="net" role="alert" aria-live="assertive"><div class="nb"><div class="rt" id="netr"></div><div class="nt" id="nett">Зберігаю…</div><div class="ns" id="nets"></div><div class="np"><i id="netp"></i></div><div class="nh" id="neth"></div><div class="zc" id="zc"></div><button class="nx" id="netx" type="button">Не чекати</button></div></div>
 
 <script>
-const PAGE_VERSION = 'index.html v158 · 26.11.2026';   // v158: «Залишки» цеху — і напівфабрикати / власні вузли в партіях МЛП (Sklad.gs v60): додаються до залишку, рядки лише для перегляду, партії — третім рівнем
+const PAGE_VERSION = 'index.html v159 · 26.11.2026';   // v159 (рішення 26.11): «Залишки» — лише уніфіковані назви (технічних рівнів і розподілу за технічними немає); «Змінити залишок» — і ящики ГП складу (±, Sklad.gs v61 skladBoxAdjust); «Прийняти» на віртуальній — лише відповідальні (canAcc)
+//   // v158: «Залишки» цеху — і напівфабрикати / власні вузли в партіях МЛП (Sklad.gs v60): додаються до залишку, рядки лише для перегляду, партії — третім рівнем
 //   // v157: «Робота зі складом» складу — Прийняти · Запакувати палету ГП · Зібрати партію покупцю · Інше (розпакувати палету, наліпка ще раз); партія покупцю — палети, ящики й позиції складу (метизи); «Залишки» — групи «Палети ГП» і «Зібрано для покупців» (Sklad.gs v59)
 //   // v156: Головна — «ⓘ Довідник»: схема процесів, доступ до запасів (dostup.html), «Етапи виробництва»
 //    // v155: локації — «КОД — назва» (Ж2.1 — Цех Жуляни В1)
@@ -6182,7 +6183,7 @@ function skBalTDraw() {
     rows += '<tr class="btg" data-g="' + gi + '" data-gn="' + esc(g) + '" style="cursor:pointer"><td colspan="' + cols + '" style="padding:10px 0 4px;font-weight:bold;color:#2A78D6">' +
       '<span class="btgi">' + (gOpen ? '▾' : '▸') + '</span> ' + esc(g) + ' <span class="muted" style="font-weight:400">· ' + list.length + '</span></td></tr>';
     list.forEach(n => { const b = bal[n], boxes = byU[n] || [];
-      const tech = boxes.length ? [] : (tat[n] || []).filter(a => a[0] && Math.abs(a[1]) > 1e-9).sort((x, y) => y[1] - x[1]), uOpen = !!SKBT.ou[n];
+      const tech = [], uOpen = !!SKBT.ou[n];   // v159: після першого приймання — лише уніфікована назва (технічні — тільки в приході)
       const sq = sm[n] ? sm[n].qty : 0, ro = boxes.length || (sm[n] && !bal0[n]);   // v158: ro — лише перегляд (ящики / тільки в партіях)
       const rest = tech.length ? Math.round((b[0] - sq - sumU(tech, b[1])) * 1000) / 1000 : 0;
       const kids = tech.concat(Math.abs(rest) > 1e-9 ? [['технічна не вказана', rest, b[1], '', 1]] : [])
@@ -6207,7 +6208,8 @@ function skBalTDraw() {
         rows += '<tr class="btt" data-g="' + gi + '" data-p="' + esc(n) + '"' + (gOpen && uOpen ? '' : ' style="display:none"') + '>' +
           td('<span style="font-size:13px">📦 ' + esc(x.name) + '</span>' + (x.total < x.per ? ' <span class="muted" style="font-size:12px">неповний</span>' : '') + ' <span class="muted" style="font-size:12px;margin-left:6px">' + esc(x.last) + '</span>', 'padding-left:34px') +   // v154: дата — у тому ж рядку після назви ящика; v153: маркування не дублюємо
           td(esc(skNfmt(x.total)), 'text-align:right;white-space:nowrap;font-size:13px') + td('шт', 'color:#66767F;font-size:13px') +
-          (ed ? (mv ? td('<input type="checkbox" class="btX" data-box="' + esc(x.id) + '" data-n="' + esc(x.name) + '" data-q="' + x.total + '" style="transform:scale(1.4)">') : td('') + td('')) : td('')) + '</tr>'; });
+          (ed ? (mv ? td('<input type="checkbox" class="btX" data-box="' + esc(x.id) + '" data-n="' + esc(x.name) + '" data-q="' + x.total + '" style="transform:scale(1.4)">')
+            : kind === 'wh' ? td(inp('btBd', '±', '72px', ' data-box="' + esc(x.id) + '" data-n="' + esc(x.name) + '" data-q="' + x.total + '"')) + td(inp('btBc', 'коментар', '100%')) : td('') + td('')) : td('')) + '</tr>'; });   // v159: ящик ГП складу — ±
     });
   });
   const tgts = ((d.targets || {})[loc] || []).map(skLocOf), tg = (k, t) => { const a = tgts.filter(l => l.kind === k); return a.length ? '<optgroup label="' + t + '">' + a.map(l => '<option value="' + esc(l.code) + '">' + esc(skLocLab(l)) + '</option>').join('') + '</optgroup>' : ''; };
@@ -6215,8 +6217,8 @@ function skBalTDraw() {
   box.innerHTML = '<details class="card"' + (SKBT.closed ? '' : ' open') + ' ontoggle="SKBT.closed=!this.open"><summary class="mid" style="cursor:pointer">Залишки: ' + esc((skLocOf(loc).name || loc)) + ' <span class="muted" style="font-weight:400">· позицій ' + names.length + (skFOn() ? ' (за фільтрами)' : '') + '</span></summary>' +   // v152: згортається
     (modes.length > 1 ? '<div class="seg" style="margin-top:8px">' + modes.map(m => '<label><input type="radio" name="btMode" value="' + m[0] + '"' + (m[0] === SKBT.mode ? ' checked' : '') + '><span>' + m[1] + '</span></label>').join('') + '</div>' : '') +
     (mv ? '<label>Куди</label><select id="btTo" data-nocbx><option value="">— оберіть —</option>' + tg('shop', 'Цехи') + tg('wh', 'Склади') + tg('virt', 'Без приймання') + '</select>' +
-      '<p class="muted" style="margin:4px 0 0">Впишіть, скільки перемістити (не більше, ніж є). Лежить під кількома технічними назвами — по рядку на назву. Ящики ГП — галочкою.</p>'
-      : ed ? '<p class="muted" style="margin:4px 0 0">Змінити залишок: у «±» — скільки додати (12) або списати (−5), поруч коментар — чому. Потім «Записати».</p>' : '') +
+      '<p class="muted" style="margin:4px 0 0">Впишіть, скільки перемістити (не більше, ніж є). Ящики ГП — галочкою.</p>'
+      : ed ? '<p class="muted" style="margin:4px 0 0">Змінити залишок: у «±» — скільки додати (12) або списати (−5), поруч коментар — чому (ящики ГП — у рядку ящика). Потім «Записати».</p>' : '') +
     '<p class="muted" style="margin:4px 0 0;font-size:13px">Натисніть на назву — нижче з\'явиться історія її руху тут.</p>' +
     '<div class="row" style="align-items:center;margin-top:8px;gap:6px"><input type="text" id="btQ" placeholder="пошук: назва, група, технічна, ящик" value="' + esc(SKBT.q) + '" style="min-width:0;margin:0">' +
     '<button type="button" class="btn btn2" id="btLvM" style="flex:0 0 auto;width:auto;margin:0;padding:8px 10px">− рівень</button>' +
@@ -6321,7 +6323,11 @@ function skBalTAdd() {
 function skBalTSave() {
   const b = $('btGo'); if (b.disabled) return; $('err').textContent = '';
   const lines = [], bad = [], num = s => { s = String(s || '').trim().replace(/\s+/g, ''); if (!s) return null; const neg = /^[-−–]/.test(s), v = skCalc(s.replace(/^[-−–+]/, '')); return isNaN(v) || !(v > 0) ? NaN : (neg ? -v : v); };
-  document.querySelectorAll('#skBalT tr.btr').forEach(r => { const s = r.querySelector('.btD').value, v = num(s); if (v === null) return;
+  const bxl = [];   // v159: ящики ГП складу
+  document.querySelectorAll('#skBalT .btBd').forEach(i => { const s = i.value, v = num(s); if (v === null) return; const cm = i.closest('tr').querySelector('.btBc').value.trim();
+    if (isNaN(v) || Math.round(v) !== v) return bad.push('ящик ' + i.dataset.n + ': ціле число зі знаком'); if (Number(i.dataset.q) + v < 0) return bad.push('ящик ' + i.dataset.n + ': є лише ' + i.dataset.q);
+    if (!cm) return bad.push('ящик ' + i.dataset.n + ': коментар — чому'); bxl.push({ box: i.dataset.box, n: i.dataset.n, delta: s, cm: cm }); });
+  document.querySelectorAll('#skBalT tr.btr').forEach(r => { const inp0 = r.querySelector('.btD'); if (!inp0) return; const s = inp0.value, v = num(s); if (v === null) return;
     const cm = r.querySelector('.btC').value.trim();
     if (isNaN(v)) return bad.push('«' + r.dataset.pos + '»: кількість числом зі знаком (−5 або 12)');
     if (!cm) return bad.push('«' + r.dataset.pos + '»: коментар — чому');
@@ -6331,12 +6337,14 @@ function skBalTSave() {
     if (v === null || isNaN(v)) return bad.push('«' + pos + '»: кількість числом зі знаком'); if (!cm) return bad.push('«' + pos + '»: коментар — чому');
     lines.push({ pos: pos, posOther: $('btOt' + n).value, unit: $('btU' + n).value, delta: s, cm: cm }); });
   if (bad.length) { $('err').textContent = bad.join('; '); return toast(bad[0], true); }
-  if (!lines.length) return toast('Впишіть «±» хоча б в одному рядку', true);
-  confirmBox('Змінити залишок на ' + (skLocOf(SKS.loc).name || SKS.loc) + ': ' + lines.map(l => l.pos + ' ' + (/^[-−–]/.test(l.delta.trim()) ? '' : '+') + l.delta.trim() + ' ' + l.unit).join('; ') + '?', () => {
+  if (!lines.length && !bxl.length) return toast('Впишіть «±» хоча б в одному рядку', true);
+  const sg = x => (/^[-−–]/.test(String(x).trim()) ? '' : '+') + String(x).trim();
+  confirmBox('Змінити залишок на ' + (skLocOf(SKS.loc).name || SKS.loc) + ': ' + lines.map(l => l.pos + ' ' + sg(l.delta) + ' ' + l.unit).concat(bxl.map(l => 'ящик ' + l.n + ' ' + sg(l.delta) + ' шт')).join('; ') + '?', () => {
     b.disabled = true; b._t = b.textContent; b.textContent = 'Записую…';
-    post('skladAdjust', { code: CODE, loc: SKS.loc, reason: 'Зміна залишку', lines: lines })
-      .then(r => { toast(r.msg); if (r.adjRecent) SKD.adjRecent = r.adjRecent; if (r.bal) SKD.bal = Object.assign({}, SKD.bal || {}, r.bal); skIn(r); skBalTDraw(); })
-      .catch(e => skErr(e, b));
+    const p1 = lines.length ? post('skladAdjust', { code: CODE, loc: SKS.loc, reason: 'Зміна залишку', lines: lines }) : Promise.resolve(null);
+    p1.then(r => { if (r) { toast(r.msg); if (r.adjRecent) SKD.adjRecent = r.adjRecent; if (r.bal) SKD.bal = Object.assign({}, SKD.bal || {}, r.bal); skIn(r); }
+        return bxl.length ? post('skladBoxAdjust', { code: CODE, loc: SKS.loc, lines: bxl }).then(r2 => { toast(r2.msg); delete SKBT.boxes[SKS.loc]; }) : null; })
+      .then(() => skBalTDraw()).catch(e => skErr(e, b));
   });
 }
 function skActsDraw() { skActsDraw0(); skFltDraw(); skBalTDraw(); }
@@ -6347,7 +6355,7 @@ function skActsDraw0() {   // v151: «Робота зі складом» — з�
   if (k === 'wh') {
     if (d.canWrite !== false) acts.push(['rcv', 'Прийняти']);
     if ((d.canShip || {})[loc]) acts.push(['pal', 'Запакувати палету ГП'], ['ship', 'Зібрати партію покупцю'], ['other', 'Інше']);   // v157
-  } else if (k === 'virt' && loc !== 'ВЯ' && d.canWrite !== false) acts.push(['rcv', 'Прийняти']);
+  } else if (k === 'virt' && (d.canAcc || {})[loc] && d.canWrite !== false) acts.push(['rcv', 'Прийняти']);   // v159: віртуальна — лише відповідальні
   if (!loc) { $('skActs').innerHTML = '<p class="muted">Оберіть склад або цех — нижче будуть його залишки.</p>'; $('skPanel').innerHTML = ''; if (wrap) wrap.style.display = 'none'; return; }
   if (wrap) wrap.style.display = acts.length ? '' : 'none';
   if (!acts.length) { $('skActs').innerHTML = ''; $('skPanel').innerHTML = ''; return; }

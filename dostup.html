@@ -69,7 +69,8 @@ footer{padding:0 max(3vw,16px) 24px;font-size:12px;color:var(--mute)}
 <ul class="notes" id="notes"></ul>
 <footer id="ver"></footer>
 <script>
-const PAGE_VERSION = 'dostup.html v2 · 26.11.2026';   // v2: фільтр «Склад і керівництво» → «Інші підрозділи» (рішення Андрія 26.11)   // v1: матриця доступу до запасів (рішення Андрія 26.11), дані наживо з Вулика (Sklad.gs skAccessData_)
+const PAGE_VERSION = 'dostup.html v3 · 26.11.2026';   // v3: примітка — «Пр» на віртуальних (прийняти від постачальника, лише відповідальні)
+//   // v2: фільтр «Склад і керівництво» → «Інші підрозділи» (рішення Андрія 26.11)   // v1: матриця доступу до запасів (рішення Андрія 26.11), дані наживо з Вулика (Sklad.gs skAccessData_)
 const API = 'https://script.google.com/macros/s/AKfycbx-JUajnAtVsxaLHDgwRpfzE12g4LUtlf6JnWYAQScAVZ5FCpxzGHSrA5PDESqP80KD/exec';
 const MLP_URL = location.origin + location.pathname.replace(/[^/]*$/, '');
 function store(k) { try { return localStorage.getItem(k) || ''; } catch (e) { return ''; } }
@@ -102,7 +103,7 @@ function render() {
 }
 function notes() {
   const ul = document.getElementById('notes');
-  ul.innerHTML = '<li>Віртуальні локації (відділ якості, РнД, Антон, Володя, Інше) приймають самі — «Пр» там нікому не потрібне.</li>' +
+  ul.innerHTML = '<li>Віртуальні локації (відділ якості, РнД, Антон, Володя, Інше): переміщення туди приймаються самі; «Пр» — прийняти від постачальника, лише відповідальні.</li>' +
     '<li>«Змінити залишок» — у таблиці «Залишки» на сторінці «Робота зі складом»: списати або додати з коментарем.</li>' +
     '<li>Відповідальні локацій: ' + D.locs.map(l => '<b>' + esc(l.code) + '</b> — ' + esc(l.resp || '—')).join('; ') + '.</li>';
 }
