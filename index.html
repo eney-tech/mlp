@@ -777,7 +777,8 @@
 <div class="net" id="net" role="alert" aria-live="assertive"><div class="nb"><div class="rt" id="netr"></div><div class="nt" id="nett">Зберігаю…</div><div class="ns" id="nets"></div><div class="np"><i id="netp"></i></div><div class="nh" id="neth"></div><div class="zc" id="zc"></div><button class="nx" id="netx" type="button">Не чекати</button></div></div>
 
 <script>
-const PAGE_VERSION = 'index.html v161 · 26.11.2026';   // v161 (Андрій 26.11): «↩ Розібрати» зібрану партію покупцю — у картці партії (і з «Залишків»): ГП й позиції повертаються в залишок.
+const PAGE_VERSION = 'index.html v162 · 26.11.2026';   // v162 (Андрій 26.11): «+ Додати» → «Двигуни» — версія двигунів в11 / в12 / в21 / в22 (за замовчуванням в11; з партією походження M- — її версія).
+// v161   // v161 (Андрій 26.11): «↩ Розібрати» зібрану партію покупцю — у картці партії (і з «Залишків»): ГП й позиції повертаються в залишок.
 // v160   // v160 (рішення 26.11): ГП на складі — за назвою: «Зібрати партію покупцю» — назва × (палет, ящиків, шт), ящики бере сервер (найстаріші); у «Залишках» ГП складу без списку ящиків, ± і переміщення — кількістю; «Запакувати палету ГП» й «Інше» прибрано.
 // v159   // v159 (рішення 26.11): «Залишки» — лише уніфіковані назви (технічних рівнів і розподілу за технічними немає); «Змінити залишок» — і ящики ГП складу (±, Sklad.gs v61 skladBoxAdjust); «Прийняти» на віртуальній — лише відповідальні (canAcc)
 //   // v158: «Залишки» цеху — і напівфабрикати / власні вузли в партіях МЛП (Sklad.gs v60): додаються до залишку, рядки лише для перегляду, партії — третім рівнем
@@ -3004,6 +3005,8 @@ function addForm(no) {
     : [['qc', '↩ Відділ якості'], ['batch', 'Інша партія'], ['other', 'Інше']];
   const typ = String(i['Типорозмір'] || '');
   const orgList = () => (b.origins || []).filter(o => !typ || !o.typ || o.typ === typ).filter(o => what() === 'M' ? /^M/i.test(o.no) : what() === 'S' ? /^[SM]/i.test(o.no) : what() === 'R' ? /^[RM]/i.test(o.no) : o.no.charAt(0) === no.charAt(0));
+  const verSel = () => '<label>Версія двигунів</label><select id="adVer"><option value="">в11 — або як у партії походження</option>' + ['в11', 'в12', 'в21', 'в22'].map(v => '<option value="' + v + '">' + v + '</option>').join('') + '</select>' +
+    '<p class="muted" style="margin:4px 0 0;font-size:13px">Перша цифра — статор, друга — ротор: 1 — покупний (і гравійований у нас), 2 — наш.</p>';   // v162
   const stSel = (def) => '<label>Що повертаєте (на якому етапі)</label><select id="adSt">' + stages.map(x => '<option value="' + esc(x[0]) + '"' + (x[0] === def ? ' selected' : '') + '>' + esc(x[1]) + '</option>').join('') + '</select>';
   const draw = () => {
     const w = what(), list = srcList(), cur = val('acsrc');
@@ -3032,7 +3035,7 @@ function addForm(no) {
     if (src === 'res') {
       box.innerHTML = '<p class="muted" style="margin:10px 0 0">Скручені двигуни, що вже пройшли <b>' + esc(S.reserveStep || 'F3') + '</b> і лежать у резерві. Стануть у партію після ' + esc(S.reserveStep || 'F3') + '.</p>' +
         '<p style="margin:8px 0 0">Тільки <b>' + esc(typ || '—') + (i['KV'] ? ' · ' + esc(i['KV']) + ' KV' : '') + '</b> — як у цій партії.</p>' +
-        '<label>Кількість, шт</label>' + numInput('acq', '') + '<label>Коментар <span class="muted">(необов\'язково)</span></label><input type="text" id="acc" placeholder="напр. з якої коробки резерву">';
+        '<label>Кількість, шт</label>' + numInput('acq', '') + verSel() + '<label>Коментар <span class="muted">(необов\'язково)</span></label><input type="text" id="acc" placeholder="напр. з якої коробки резерву">';
       return;
     }
     const qc = src === 'qc', o = orgList();
@@ -3046,6 +3049,7 @@ function addForm(no) {
         '<label>Хто переробив <span class="muted">(необов\'язково)</span></label><select id="acBy"><option value="">— не вказано —</option>' +
         (S.people || []).map(p => '<option value="' + esc(p.id) + '">' + esc(p.name) + '</option>').join('') + '</select>' +
         (comp ? '<p class="muted" style="margin:6px 0 0">Версія — як у партії походження S- / R-; не вказано — в1. Гравіювання (F4п) для них не додається.</p>' : '') : '') +
+      (w === 'M' ? verSel() : '') +
       '<label>Коментар ' + (qc ? '<span class="muted">(необов\'язково)</span>' : '(обов\'язково)') + '</label><input type="text" id="acc"' + (qc ? '' : ' placeholder="що це і звідки"') + '>';
   };
   if (mt) document.querySelectorAll('input[name=adWhat]').forEach(r => r.onchange = draw);
@@ -3063,13 +3067,14 @@ function addForm(no) {
     }
     const q = $('acq') ? $('acq').value : '';
     if (!(Number(q) > 0)) { $('merr').textContent = 'Вкажіть кількість'; return; }
-    if (src === 'res') return act({ action: 'addComp', batch: no, comp: 'двигун', qty: q, comment: $('acc').value }, $('mgo'));
+    const ver = $('adVer') ? $('adVer').value : '';   // v162
+    if (src === 'res') return act({ action: 'addComp', batch: no, comp: 'двигун', qty: q, comment: $('acc').value, ver: ver }, $('mgo'));
     const qc = src === 'qc', purpose = qc ? S.qc : ($('adFrom') ? $('adFrom').value : '');
     if (!qc && !purpose) { $('merr').textContent = 'Оберіть, звідки саме'; return; }
     if (!qc && !$('acc').value.trim()) { $('merr').textContent = 'Коментар обов\'язковий: що це і звідки'; return; }
     const extra = qc ? { origin: $('acOrg').value.trim(), by: $('acBy').value } : {};
     if (comp) return act(Object.assign({ action: 'addComp', batch: no, comp: w === 'R' ? 'ротор' : 'статор', src: qc ? 'qc' : 'other', purpose: purpose, qty: q, comment: $('acc').value }, extra), $('mgo'));
-    act(Object.assign({ action: 'add', batch: no, stage: $('adSt').value, purpose: purpose, qty: q, comment: $('acc').value }, extra), $('mgo'));
+    act(Object.assign({ action: 'add', batch: no, stage: $('adSt').value, purpose: purpose, qty: q, comment: $('acc').value }, extra, w === 'M' ? { ver: ver } : {}), $('mgo'));
   };
 }
 /** v13: «✉ Етикетки ще раз» для запису K2 — з потрібної позиції на аркуші наліпок (v30: 1–6, A4 2 × 3) */
