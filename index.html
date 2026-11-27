@@ -777,7 +777,10 @@
 <div class="net" id="net" role="alert" aria-live="assertive"><div class="nb"><div class="rt" id="netr"></div><div class="nt" id="nett">Зберігаю…</div><div class="ns" id="nets"></div><div class="np"><i id="netp"></i></div><div class="nh" id="neth"></div><div class="zc" id="zc"></div><button class="nx" id="netx" type="button">Не чекати</button></div></div>
 
 <script>
-const PAGE_VERSION = 'index.html v164 · 27.11.2026';   // v164 (27.11): «Залишки» — рядок «у партії МЛП M-…» — посилання на сторінку партії.
+const PAGE_VERSION = 'index.html v166 · 27.11.2026';   // v166 (27.11): «Змінити залишок» — поруч із «±» поле «стане» (фактично): вписали одне — друге рахується одразу (skAdjPair).
+//     // v165 (27.11, Code.gs v181 / Sklad.gs v74): картка партії — «📦 Перемістити на склад» (напівфабрикат за назвою, увесь залишок — тара вільна; замість v62 «📦 На склад» з тарою);
+//   вільна тара — «📦 Нова партія із запасу цеху»; «🎨 Колір» → «✎ Характеристики» (типорозмір, KV, колір, версія — тімлід і вище, Code.gs setAttrs).
+//     // v164 (27.11): «Залишки» — рядок «у партії МЛП M-…» — посилання на сторінку партії.
 //     // v163 (27.11): «Залишки» → «Перемістити» / «Змінити залишок»: рядок «Інше: …» не переміщувався («Рядок 1: Оберіть позицію») — надсилаємо позицію «Інше» + «що саме» (skPosLn).
 //      // v162 (Андрій 26.11): «+ Додати» → «Двигуни» — версія двигунів в11 / в12 / в21 / в22 (за замовчуванням в11; з партією походження M- — її версія).
 // v161   // v161 (Андрій 26.11): «↩ Розібрати» зібрану партію покупцю — у картці партії (і з «Залишків»): ГП й позиції повертаються в залишок.
@@ -2010,9 +2013,39 @@ function renderNew() {
     '<div class="card"><div class="mid">Нова партія</div>' +
     '<label>Яку партію відкриваємо?</label><div class="seg">' + ['ST', 'RT', 'MT'].map(s => '<label><input type="radio" name="st" value="' + s + '"' + (s === def ? ' checked' : '') + '><span>' +
       ({ ST: 'Партія статорів', RT: 'Партія роторів', MT: 'Партія двигунів' })[s] + '</span></label>').join('') + '</div>' +   // v72: не «Що кладете» — для двигунів кладуть і статори, і ротори
-    '<div id="nf"></div><div class="err" id="err"></div></div>';
+    '<div id="nf"></div><div class="err" id="err"></div></div>' +
+    (p.separateAll || p.sklad ? '<div class="card"><button class="btn btn2" onclick="fromStockOpen()">📦 Нова партія із запасу цеху</button>' +
+      '<div class="muted" style="margin-top:6px">Напівфабрикат або готові статори / ротори / двигуни з балансу цеху — партія стане після кроку, що їх дав.</div></div>' : '');   // v165
   document.querySelectorAll('input[name=st]').forEach(r => r.onchange = drawNew);
   drawNew();
+}
+/** v165 (Code.gs v181): «Нова партія із запасу цеху» — позиція з балансу цеху (не складу; зі складу — спершу звичайне переміщення в цех) */
+function fromStockOpen() {
+  const t = S.tare;
+  busy(true);
+  post('skladStockSemi', { code: CODE, tare: t.code }).then(d => {
+    busy(false);
+    const its = d.items || [];
+    const foot = '<div class="err" id="merr"></div><div class="grid" style="margin-top:6px"><button class="btn btn2" onclick="closeModal()">Скасувати</button><button class="btn" id="mgo">Створити партію</button></div></div>';
+    if (!its.length) { openModal('<div class="card"><div class="mid">📦 Із запасу ' + esc(d.shopName) + '</div><p class="muted">На балансі цеху немає напівфабрикатів чи власних вузлів. ' +
+      'Якщо вони на складі — спершу перемістіть їх у цех (склад → «Перемістити» → ' + esc(d.shopName) + ').</p><button class="btn btn2" onclick="closeModal()">Закрити</button></div>'); return; }
+    openModal('<div class="card"><div class="mid">📦 Нова партія із запасу ' + esc(d.shopName) + '</div><div class="muted">Тара ' + esc(t.code) + '</div>' +
+      '<label>Пошук</label><input type="text" id="fsq" placeholder="назва, типорозмір, KV">' +
+      '<div id="fsl" style="max-height:300px;overflow:auto"></div>' +
+      '<div id="fsv"></div><label id="fsqL">Кількість, шт</label>' + numInput('mq', '') +
+      '<label>Коментар (необов\'язково)</label><input type="text" id="mcm">' + foot);
+    let sel = -1;
+    const draw = () => { const q = $('fsq').value.trim().toLowerCase();
+      $('fsl').innerHTML = its.map((x, k) => [x, k]).filter(a => !q || (a[0].name + ' ' + a[0].code).toLowerCase().indexOf(q) >= 0).map(a => { const x = a[0], k = a[1];
+        return '<label class="opt"><input type="radio" name="fsi" value="' + k + '"' + (k === sel ? ' checked' : '') + '><b>' + skNfmt(x.qty) + ' шт</b> · ' + esc(x.name) +
+          '<br><span class="muted" style="font-size:12px">далі — після ' + esc(x.after) + (x.pool === 'без партії' ? ' · без партії' : '') + '</span></label>'; }).join('') || '<p class="muted">Нічого не знайдено</p>';
+      document.querySelectorAll('input[name=fsi]').forEach(r => r.onchange = () => { sel = Number(r.value); const x = its[sel];
+        $('mq').value = x.qty; $('fsqL').textContent = 'Кількість, шт (до ' + skNfmt(x.qty) + ')';
+        $('fsv').innerHTML = x.stream === 'MT' ? '<label>Версія двигунів</label><select id="fsver">' + ['в11', 'в12', 'в21', 'в22'].map(v => '<option' + (v === (x.ver || 'в11') ? ' selected' : '') + '>' + v + '</option>').join('') + '</select>' : ''; }); };
+    $('fsq').oninput = draw; draw();
+    $('mgo').onclick = () => { const x = its[sel]; if (!x) { $('merr').textContent = 'Оберіть, що берете'; return; }
+      act({ action: 'fromStock', tare: t.code, code: x.code, qty: $('mq').value, ver: $('fsver') ? $('fsver').value : '', comment: $('mcm').value }, $('mgo'), () => closeModal()); };
+  }).catch(e => { busy(false); toast(e.message, true); });
 }
 /** v21: вибір кольору партії (необов'язково). stream — ST / RT, cur — поточний */
 function colorField(id, stream, cur) {
@@ -2367,8 +2400,8 @@ function renderBatch(extra) {
   else if (p.separateAll && ((b.stages || []).length || hasLeft) && b.status !== 'анульовано') acts.push(['separate', '✂ Відокремити', '']);
   else if (p.separate && hasLeft && b.status === 'в роботі') acts.push(['separate', '✂ Залишок', '']);   // v13: працівник — тільки залишок деталей
   if (p.add && !i['Призначення'] && ['в роботі', 'готово', 'видано частково'].indexOf(b.status) >= 0) acts.push(['add', '+ Додати', '']);   // v100: одна кнопка — ЩО, потім ЗВІДКИ
-  if (p.setColor && (stream === 'ST' || stream === 'RT' || stream === 'MT') && b.status !== 'анульовано') acts.push(['color', '🎨 Колір', '']);   // v21; v123: і MT
-  if (p.batchToWh && (b.tares || []).length && ['закрито', 'анульовано'].indexOf(b.status) < 0) acts.push(['toWh', i['Склад'] ? '📦 На інший склад' : '📦 На склад', '']);   // v62
+  if (p.setColor && (stream === 'ST' || stream === 'RT' || stream === 'MT') && b.status !== 'анульовано') acts.push(['color', '✎ Характеристики', '']);   // v21; v123: і MT
+  if (b.out && (b.out.items || []).length) acts.push(['out', '📦 Перемістити на склад', '']);   // v165: напівфабрикат за назвою (Code.gs v181); v62 «з тарою» прибрано
   if (p.batchFromWh && i['Склад'] && ['закрито', 'анульовано'].indexOf(b.status) < 0) acts.push(['fromWh', '↩ Повернути зі складу', '']);
   if (p.free && S.tare) acts.push(['free', 'Звільнити тару', '']);
   if (p.history) acts.push(['history', '🕘 Повна історія', '']);
@@ -2388,8 +2421,9 @@ function renderBatch(extra) {
       (x.step === 'K2' && x.boxes ? ' · ' + boxesLinks(x.boxes) : x.step === 'K2' && x.x1 ? ' · ящиків ' + x.x1 : '') + (x.d1 && (b.route.find(r => r.code === x.step) || {}).extra === 'color' ? ' · 🎨 ' + esc(x.d1) : '') +
       (PART_SCRAP.indexOf(x.step) >= 0 && b.comp && (x.x1 || x.x2) ? ' · з них лише статора ' + (x.x1 || 0) + ', лише ротора ' + (x.x2 || 0) : '') +   // v47
       ((b.route.find(r => r.code === x.step) || {}).extra === 'split' ? ' · ' + esc(splitLbl(b, x.step)[0]) + ' <b>' + (x.x1 || 0) + '</b> · ' + esc(splitLbl(b, x.step)[1]) + ' <b>' + (x.x2 || 0) + '</b>' : '');   // v99
-    if (x.type === 'нова партія') what = 'нова партія · ' + x.qty + ' шт' + (x.d1 && !b.comp ? ' · 🎨 ' + esc(x.d1) : '') + (x.d2 && !b.comp ? ' · ' + startTxt(x.d2, 1) : '');   // v27; v125: _DONE — одразу готові
+    if (x.type === 'нова партія') what = 'нова партія · ' + x.qty + ' шт' + (x.d1 && !b.comp ? ' · 🎨 ' + esc(x.d1) : '') + (x.d2 === 'із запасу' ? ' · 📦 із запасу цеху' : x.d2 && !b.comp ? ' · ' + startTxt(x.d2, 1) : '');   // v27; v125: _DONE — одразу готові
     if (x.type === 'пропуск') what = '⏭ пропущено <b>' + esc(x.step) + '</b> · ' + x.qty + ' шт';   // v27
+    if (x.type === 'характеристики') what = '✎ ' + esc(x.comment || ((x.d2 || '') + ' → ' + (x.d1 || '')));   // v165
     if (x.type === 'колір') what = '🎨 колір: ' + esc(x.d2 || 'не вказано') + ' → <b>' + esc(x.d1 || 'не вказано') + '</b>';   // v21
     if (x.type === 'перекладання') what = 'перекладання ' + esc(x.from || '—') + ' → ' + esc(x.to) + (x.back ? ' (назад)' : '') +
       (x.d1 === 'пара' ? ' · піддон пари' + (x.qty ? ' · ' + x.qty + ' шт' : '') + (x.d2 ? ' (друга: ' + esc(x.d2) + ')' : '') : x.d1 === 'обʼєднання' ? ' · пару обʼєднано' : '');   // v17
@@ -2951,6 +2985,22 @@ function openAct(a) {
         target: d === 'tare' ? tareVal('tg') : '', purpose: d === 'tare' ? '' : d, comment: $('mcm').value, ver: g('mver') }, $('mgo'));
     };
   }
+  if (a === 'out') {   // v165 (Code.gs v181): напівфабрикат з партії — на склад / в іншу локацію; увесь залишок — партія закрита, тара вільна
+    const o = S.batch.out, its = o.items, tot = its.reduce((t, x) => t + x.qty, 0);
+    openModal(head('📦 Перемістити на склад') +
+      '<p class="muted">З ' + esc(o.shopName) + '. Запишеться вибуття з партії і переміщення за назвою — склад приймає, як звичайне. ' +
+      'Перемістите все (' + tot + ' шт) — партію буде закрито, тара звільниться: перекладіть у будь-яку складську коробку без номера.</p>' +
+      '<label>Що</label>' + its.map((x, k) => '<label class="opt"><input type="radio" name="oit" value="' + k + '"' + (k === 0 ? ' checked' : '') + '>' +
+        '<b>' + x.qty + ' шт</b> · ' + esc(x.name) + '</label>').join('') +
+      '<label>Куди</label><select id="oto">' + o.targets.map(t => '<option value="' + esc(t.code) + '"' + (t.code === o.def ? ' selected' : '') + '>' + esc(t.name) + '</option>').join('') + '</select>' +
+      '<label id="oqL">Кількість, шт</label>' + numInput('mq', its[0].qty) +
+      '<label>Коментар (необов\'язково)</label><input type="text" id="mcm">' + foot);
+    const cur = () => its[Number((document.querySelector('input[name=oit]:checked') || {}).value || 0)];
+    document.querySelectorAll('input[name=oit]').forEach(r => r.onchange = () => { $('mq').value = cur().qty; $('oqL').textContent = 'Кількість, шт (до ' + cur().qty + ')'; });
+    $('oqL').textContent = 'Кількість, шт (до ' + its[0].qty + ')';
+    $('mgo').onclick = () => { const x = cur(); if (!x) { $('merr').textContent = 'Оберіть, що переміщуєте'; return; }
+      act({ action: 'batchOut', batch: no, code: x.code, qty: $('mq').value, to: $('oto').value, comment: $('mcm').value }, $('mgo')); };
+  }
   if (a === 'toWh') {   // v62: партія (тара) на склад або між складами
     const b = S.batch, i = b.info, locs = (b.whLocs || []).filter(l => l.code !== i['Склад']);
     if (!locs.length) { toast('Немає локацій складу — зверніться до зав. складу', true); return; }
@@ -2966,9 +3016,17 @@ function openAct(a) {
     confirmBox('Повернути ' + no + ' зі складу ' + (S.batch.info['Склад'] || '') + ' на виробництво?', () => act({ action: 'batchFromWh', batch: no }, null));
     return;
   }
-  if (a === 'color') {   // v21: тімлід і вище — колір партії
-    openModal(head('🎨 Колір партії') + colorField('mcl', S.batch.info['Потік'], S.batch.info['Колір']) + '<label>Коментар (необов\'язково)</label><input type="text" id="mcm">' + foot);
-    $('mgo').onclick = () => act({ action: 'setColor', batch: no, color: $('mcl').value, comment: $('mcm').value }, $('mgo'));
+  if (a === 'color') {   // v21: тімлід і вище — колір партії; v165: «✎ Характеристики» — типорозмір, KV, колір, версія (Code.gs v181 setAttrs)
+    const i = S.batch.info, sm = i['Потік'], typ0 = String(i['Типорозмір'] || '').replace(/\.0+$/, '');
+    openModal(head('✎ Характеристики партії') +
+      '<p class="muted">Виправлення помилки при створенні. Записи партії перерахуються за новими (виробіток, ціни, норми, залишки).</p>' +
+      '<label>Типорозмір</label><select id="mtp">' + opts(S.dict.typ, typ0) + '</select>' +
+      (sm !== 'RT' ? '<label>KV</label><select id="mkv">' + opts(S.dict.kv || [], String(i['KV'] || ''), '—') + '</select>' : '') +
+      colorField('mcl', sm, i['Колір']) +
+      (sm === 'MT' ? '<label>Версія двигунів</label><select id="mvr">' + opts(['в11', 'в12', 'в21', 'в22'], String(i['Варіант'] || ''), '—') + '</select>' : '') +
+      '<label>Коментар (необов\'язково)</label><input type="text" id="mcm">' + foot);
+    $('mgo').onclick = () => act({ action: 'setAttrs', batch: no, typ: $('mtp').value, kv: $('mkv') ? $('mkv').value : undefined, color: $('mcl') ? $('mcl').value : undefined,
+      ver: $('mvr') ? $('mvr').value : undefined, comment: $('mcm').value }, $('mgo'));
   }
   if (a === 'free') {
     openModal(head('Звільнити тару ' + esc(S.tare.code)) + '<label>Причина</label><select id="mr">' +
@@ -6205,9 +6263,9 @@ function skBalTDraw() {
       const bN = [boxes.length ? 'ящиків ' + boxes.length : '', sq ? 'у партіях МЛП ' + skNfmt(sq) : ''].filter(Boolean).map(t => '<span class="muted" style="font-size:12px">' + t + '</span>').join('<br>');   // v153: «ящиків N» — у колонку коментаря; v158: + у партіях
       if (!ed) cell = td(bN);
       else if (gpW && mv) cell = td(inp('btGm', 'скільки', '80px', ' data-max="' + b[0] + '"'));
-      else if (gpW) cell = td(inp('btGd', '±', '72px')) + td(inp('btGc', 'коментар', '100%'), 'min-width:120px');
+      else if (gpW) cell = td(skAdjPairH('btGd', 'btGf', b[0], inp), 'white-space:nowrap') + td(inp('btGc', 'коментар', '100%'), 'min-width:120px');   // v166: ± і «стане»
       else if (mv) cell = td(ro ? bN : split ? '<span class="muted" style="font-size:12px">за технічними ↓</span>' : inp('btM', 'скільки', '80px', ' data-max="' + Math.round((b[0] - sq) * 1000) / 1000 + '"'));
-      else cell = td(ro ? '' : inp('btD', '±', '72px')) + td(ro ? bN : inp('btC', 'коментар', '100%'), 'min-width:120px');
+      else cell = td(ro ? '' : skAdjPairH('btD', 'btF', b[0], inp), 'white-space:nowrap') + td(ro ? bN : inp('btC', 'коментар', '100%'), 'min-width:120px');   // v166
       rows += '<tr class="btr" data-g="' + gi + '" data-pos="' + esc(n) + '" data-u="' + esc(b[1]) + '" data-k="' + esc((n + ' ' + g + ' ' + kids.map(a => a[0]).join(' ') + ' ' + boxes.map(x => x.name).join(' ')).toLowerCase()) + '"' +
         (sel ? ' style="background:#EAF2FC"' : '') + '>' +
         td(((kids.length || (boxes.length && !gpW)) ? '<span class="btui" style="cursor:pointer;color:#2A78D6">' + (uOpen ? '▾' : '▸') + '</span> ' : '<span style="display:inline-block;width:12px"></span> ') +
@@ -6223,7 +6281,7 @@ function skBalTDraw() {
           td('<span style="font-size:13px">📦 ' + esc(x.name) + '</span>' + (x.total < x.per ? ' <span class="muted" style="font-size:12px">неповний</span>' : '') + ' <span class="muted" style="font-size:12px;margin-left:6px">' + esc(x.last) + '</span>', 'padding-left:34px') +   // v154: дата — у тому ж рядку після назви ящика; v153: маркування не дублюємо
           td(esc(skNfmt(x.total)), 'text-align:right;white-space:nowrap;font-size:13px') + td('шт', 'color:#66767F;font-size:13px') +
           (ed ? (mv ? td('<input type="checkbox" class="btX" data-box="' + esc(x.id) + '" data-n="' + esc(x.name) + '" data-q="' + x.total + '" style="transform:scale(1.4)">')
-            : kind === 'wh' ? td(inp('btBd', '±', '72px', ' data-box="' + esc(x.id) + '" data-n="' + esc(x.name) + '" data-q="' + x.total + '"')) + td(inp('btBc', 'коментар', '100%')) : td('') + td('')) : td('')) + '</tr>'; });   // v159: ящик ГП складу — ±
+            : kind === 'wh' ? td(skAdjPairH('btBd', 'btBf', x.total, inp, ' data-box="' + esc(x.id) + '" data-n="' + esc(x.name) + '" data-q="' + x.total + '"'), 'white-space:nowrap') + td(inp('btBc', 'коментар', '100%')) : td('') + td('')) : td('')) + '</tr>'; });   // v159: ящик ГП складу — ±
     });
   });
   const tgts = ((d.targets || {})[loc] || []).map(skLocOf), tg = (k, t) => { const a = tgts.filter(l => l.kind === k); return a.length ? '<optgroup label="' + t + '">' + a.map(l => '<option value="' + esc(l.code) + '">' + esc(skLocLab(l)) + '</option>').join('') + '</optgroup>' : ''; };
@@ -6232,13 +6290,13 @@ function skBalTDraw() {
     (modes.length > 1 ? '<div class="seg" style="margin-top:8px">' + modes.map(m => '<label><input type="radio" name="btMode" value="' + m[0] + '"' + (m[0] === SKBT.mode ? ' checked' : '') + '><span>' + m[1] + '</span></label>').join('') + '</div>' : '') +
     (mv ? '<label>Куди</label><select id="btTo" data-nocbx><option value="">— оберіть —</option>' + tg('shop', 'Цехи') + tg('wh', 'Склади') + tg('virt', 'Без приймання') + '</select>' +
       '<p class="muted" style="margin:4px 0 0">Впишіть, скільки перемістити (не більше, ніж є). ГП складу — кількістю, цілими ящиками (беремо найстаріші); ГП цеху — галочкою.</p>'
-      : ed ? '<p class="muted" style="margin:4px 0 0">Змінити залишок: у «±» — скільки додати (12) або списати (−5), поруч коментар — чому. Потім «Записати».</p>' : '') +
+      : ed ? '<p class="muted" style="margin:4px 0 0">Змінити залишок: у «±» — скільки додати (12) або списати (−5), або в «стане» — скільки є фактично (друге порахується саме). Поруч коментар — чому. Потім «Записати».</p>' : '') +
     '<p class="muted" style="margin:4px 0 0;font-size:13px">Натисніть на назву — нижче з\'явиться історія її руху тут.</p>' +
     '<div class="row" style="align-items:center;margin-top:8px;gap:6px"><input type="text" id="btQ" placeholder="пошук: назва, група, технічна, ящик" value="' + esc(SKBT.q) + '" style="min-width:0;margin:0">' +
     '<button type="button" class="btn btn2" id="btLvM" style="flex:0 0 auto;width:auto;margin:0;padding:8px 10px">− рівень</button>' +
     '<button type="button" class="btn btn2" id="btLvP" style="flex:0 0 auto;width:auto;margin:0;padding:8px 10px">+ рівень</button></div>' +
     ((names.length || pals.length || ships.length) ? '<div style="overflow-x:auto"><table style="border-collapse:collapse;width:100%;margin-top:6px"><tr>' + th('Група · позиція · технічна / ящик') + th('Є') + th('Од.') +
-      (ed ? (mv ? th('Скільки') : th('±') + th('Коментар')) : th('')) + '</tr>' + rows + '</table></div>' : '<p class="muted">На цій локації в обліку нічого немає.</p>') +
+      (ed ? (mv ? th('Скільки') : th('± · стане') + th('Коментар')) : th('')) + '</tr>' + rows + '</table></div>' : '<p class="muted">На цій локації в обліку нічого немає.</p>') +
     (SKBT.boxes[loc] === null ? '<p class="muted" style="font-size:13px">Завантажую ящики ГП…</p>' : '') +
     (ed && !mv ? '<div id="btAdd"></div><button type="button" class="btn btn2" id="btAddB" style="margin-top:8px">+ Позиція, якої немає в таблиці</button>' +
       '<button class="btn" id="btGo">Записати</button><div id="ajRecent" style="margin-top:12px"></div>' : '') +
@@ -6266,6 +6324,7 @@ function skBalTDraw() {
   if (mv) { $('btMv').onclick = skBalTMove; if ($('btAddMB')) $('btAddMB').onclick = skBalTAddMv; return; }
   if (!ed) return;
   SKBT.add = 0;
+  skAdjPairWire(box);   // v166
   $('btAddB').onclick = skBalTAdd; $('btGo').onclick = skBalTSave;
   skAdjRecentDraw();
 }
@@ -6350,6 +6409,23 @@ function skBalTAdd() {
     '<select id="btU' + n + '" data-nocbx style="flex:0 0 22%">' + opts(d.units, 'шт') + '</select><input type="text" id="btC' + n + '" placeholder="коментар" style="min-width:0"></div>';
   $('btAdd').appendChild(div);
   $('btP' + n).onchange = () => { const v = $('btP' + n).value; $('btO' + n).style.display = v === d.other ? 'block' : 'none'; const p = d.positions.find(x => x.name === v); if (p) $('btU' + n).value = p.unit; };
+}
+/** v166: пара полів «±» і «стане» (фактично). cur — що в обліку; вписали «±» — «стане» = cur ± ; вписали «стане» — «±» = стане − cur */
+function skAdjPairH(dc, fc, cur, inp, extra) {
+  return inp(dc, '±', '72px', (extra || '') + ' data-cur="' + (Number(cur) || 0) + '" data-pair="' + fc + '"') + ' ' +
+    inp(fc, 'стане', '80px', ' data-cur="' + (Number(cur) || 0) + '" data-pair="' + dc + '" inputmode="decimal"');
+}
+function skAdjPairWire(box) {
+  const r3 = v => Math.round(v * 1000) / 1000, fmt = v => String(r3(v)).replace('.', ',');
+  const num = s => { s = String(s || '').trim().replace(/\s+/g, ''); if (!s) return null; const neg = /^[-−–]/.test(s), v = skCalc(s.replace(/^[-−–+]/, '')); return isNaN(v) ? NaN : (neg ? -v : v); };
+  box.addEventListener('input', e => {
+    const i = e.target; if (!i.dataset || !i.dataset.pair) return;
+    const o = i.parentNode.querySelector('.' + i.dataset.pair); if (!o) return;
+    const cur = Number(i.dataset.cur) || 0, v = num(i.value);
+    if (i.placeholder === '±') { o.value = v === null || isNaN(v) ? '' : fmt(cur + v); return; }
+    if (v === null || isNaN(v)) { o.value = ''; return; }
+    const d = r3(v - cur); o.value = d > 0 ? '+' + fmt(d) : d < 0 ? fmt(d) : '';
+  });
 }
 function skBalTSave() {
   const b = $('btGo'); if (b.disabled) return; $('err').textContent = '';
