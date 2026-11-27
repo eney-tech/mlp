@@ -777,7 +777,8 @@
 <div class="net" id="net" role="alert" aria-live="assertive"><div class="nb"><div class="rt" id="netr"></div><div class="nt" id="nett">Зберігаю…</div><div class="ns" id="nets"></div><div class="np"><i id="netp"></i></div><div class="nh" id="neth"></div><div class="zc" id="zc"></div><button class="nx" id="netx" type="button">Не чекати</button></div></div>
 
 <script>
-const PAGE_VERSION = 'index.html v176 · 27.11.2026';   // v176 (27.11): «Залишки» складу — фільтр (типорозмір, KV, колір) діє й на «Зібрано для покупців».
+const PAGE_VERSION = 'index.html v177 · 27.11.2026';   // v177 (27.11): «Залишки» цеху — позиція і в запасі, і в партіях: рядок «не в партії» (лише його змінюють / переміщують) + «у тарі ТЧ-…» (посилання на тару, партія дрібно); сума = загальний.
+// v176:   // v176 (27.11): «Залишки» складу — фільтр (типорозмір, KV, колір) діє й на «Зібрано для покупців».
 // v175:   // v175 (27.11): блок «Приймання» на «Складі» оновлюється сам (при зміні локації й раз на хвилину; Sklad.gs v84).
 // v174:   // v174 (27.11): «✂ Відокремити» — рядок «Ротори покупні (до гравіювання F4п)» (Code.gs v185): лише в іншу партію M з F4п або вибуттям.
 // v173:   // v173 (27.11): «Історія» позиції на сторінці «Склад» — по днях: залишок на кінець дня, дії дня ручні й «авто» (списання за нормами, вибуття тощо; Sklad.gs v81).
@@ -6266,17 +6267,21 @@ function skBalTDraw() {
     rows += '<tr class="btg" data-g="' + gi + '" data-gn="' + esc(g) + '" style="cursor:pointer"><td colspan="' + cols + '" style="padding:10px 0 4px;font-weight:bold;color:#2A78D6">' +
       '<span class="btgi">' + (gOpen ? '▾' : '▸') + '</span> ' + esc(g) + ' <span class="muted" style="font-weight:400">· ' + list.length + '</span></td></tr>';
     list.forEach(n => { const b = bal[n], boxes = byU[n] || [];
+      const nbRow = !!sm[n] && !!bal0[n] && kind === 'shop';   // v177: є і запас цеху, і в партіях — окремий рядок «не в партії»; змінюють і переміщують лише його
+      if (nbRow && ed && SKBT.ou[n] === undefined) SKBT.ou[n] = true;
       const tech = [], uOpen = !!SKBT.ou[n];   // v159: після першого приймання — лише уніфікована назва (технічні — тільки в приході)
       const gpW = kind === 'wh' && boxes.length > 0;   // v160: ГП складу — за назвою (без ящиків)
       const sq = sm[n] ? sm[n].qty : 0, ro = !gpW && (boxes.length || (sm[n] && !bal0[n]));   // v158: ro — лише перегляд (ящики / тільки в партіях)
       const rest = tech.length ? Math.round((b[0] - sq - sumU(tech, b[1])) * 1000) / 1000 : 0;
       const kids = tech.concat(Math.abs(rest) > 1e-9 ? [['технічна не вказана', rest, b[1], '', 1]] : [])
-        .concat(sm[n] ? sm[n].batches.map(x => ['у партії МЛП ' + x[0], x[1], 'шт', '', 1, 'у партії МЛП <a href="' + esc(link('b=' + encodeURIComponent(x[0]))) + '" style="color:#2A78D6">' + esc(x[0]) + '</a>']) : [])   // v164: посилання на партію
+        .concat(sm[n] ? sm[n].batches.map(x => x[2] ? ['у тарі ' + x[2] + ' ' + x[0], x[1], 'шт', '', 1, 'у тарі <a href="' + esc(link('t=' + encodeURIComponent(x[2]))) + '" style="color:#2A78D6">' + esc(x[2]) + '</a> <span style="font-size:12px">· ' + esc(x[0]) + '</span>']
+          : ['у партії МЛП ' + x[0], x[1], 'шт', '', 1, 'у партії МЛП <a href="' + esc(link('b=' + encodeURIComponent(x[0]))) + '" style="color:#2A78D6">' + esc(x[0]) + '</a>']) : [])   // v164: посилання на партію; v177: тара (посилання на тару), партія — дрібно
         .concat(gpW ? skGpRows(boxes) : []);   // v160: ГП складу — палети · ящики · штуки (замість списку ящиків)
       const split = mv && tech.length > 1, sel = SKBT.sel === n;
       let cell = '';
       const bN = [boxes.length ? 'ящиків ' + boxes.length : '', sq ? 'у партіях МЛП ' + skNfmt(sq) : ''].filter(Boolean).map(t => '<span class="muted" style="font-size:12px">' + t + '</span>').join('<br>');   // v153: «ящиків N» — у колонку коментаря; v158: + у партіях
       if (!ed) cell = td(bN);
+      else if (nbRow) cell = mv ? td('<span class="muted" style="font-size:12px">↓ не в партії</span>') : td('') + td('') + td('<span class="muted" style="font-size:12px">↓ змінюють лише «не в партії»</span>');   // v177
       else if (gpW && mv) cell = td(inp('btGm', 'скільки', '80px', ' data-max="' + b[0] + '"'));
       else if (gpW) cell = skAdjPairH('btGd', 'btGf', b[0], inp, '', td) + td(inp('btGc', 'коментар', '100%'), 'min-width:120px');   // v166: ± і «стане»; v167 — окремі колонки
       else if (mv) cell = td(ro ? bN : split ? '<span class="muted" style="font-size:12px">за технічними ↓</span>' : inp('btM', 'скільки', '80px', ' data-max="' + Math.round((b[0] - sq) * 1000) / 1000 + '"'));
@@ -6287,6 +6292,12 @@ function skBalTDraw() {
           '<span class="btn2l" style="cursor:pointer;text-decoration:underline dotted #9DB0BC" title="Історія руху">' + esc(n) + '</span>' +
           (b[2] ? '<br><span class="muted" style="font-size:12px">в дорозі ' + esc(skNfmt(b[2])) + '</span>' : ''), 'padding-left:10px') +
         td('<b>' + esc(skNfmt(b[0])) + '</b>', 'text-align:right;white-space:nowrap' + (b[0] < 0 ? ';color:#9B231A' : '')) + td(esc(b[1]), 'color:#66767F') + cell + '</tr>';
+      if (nbRow) {   // v177: «не в партії» — запас цеху поза партіями (разом з рядками «у тарі …» = загальний залишок); інпути — тут
+        const nb = Math.round((b[0] - sq) * 1000) / 1000;
+        rows += '<tr class="btt btnb" data-g="' + gi + '" data-p="' + esc(n) + '" data-pos="' + esc(n) + '" data-u="' + esc(b[1]) + '"' + (gOpen && uOpen ? '' : ' style="display:none"') + '>' +
+          td('<b style="font-size:13px">не в партії</b>', 'padding-left:34px') + td('<b>' + esc(skNfmt(nb)) + '</b>', 'text-align:right;white-space:nowrap;font-size:13px' + (nb < 0 ? ';color:#9B231A' : '')) + td(esc(b[1]), 'color:#66767F;font-size:13px') +
+          (!ed ? td('') : mv ? td(inp('btM', 'скільки', '80px', ' data-max="' + nb + '"')) : skAdjPairH('btD', 'btF', nb, inp, '', td) + td(inp('btC', 'коментар', '100%'), 'min-width:120px')) + '</tr>';
+      }
       kids.forEach(a => {
         rows += '<tr class="btt" data-g="' + gi + '" data-p="' + esc(n) + '"' + (gOpen && uOpen ? '' : ' style="display:none"') + '>' +
           td('<span class="muted" style="font-size:13px">' + (a[5] || esc(a[0])) + '</span>', 'padding-left:34px') + td(esc(skNfmt(a[1])), 'text-align:right;white-space:nowrap;font-size:13px;color:#66767F') +
@@ -6466,7 +6477,7 @@ function skBalTSave() {
   document.querySelectorAll('#skBalT .btBd').forEach(i => { const s = i.value, v = num(s); if (v === null) return; const cm = i.closest('tr').querySelector('.btBc').value.trim();
     if (isNaN(v) || Math.round(v) !== v) return bad.push('ящик ' + i.dataset.n + ': ціле число зі знаком'); if (Number(i.dataset.q) + v < 0) return bad.push('ящик ' + i.dataset.n + ': є лише ' + i.dataset.q);
     if (!cm) return bad.push('ящик ' + i.dataset.n + ': коментар — чому'); bxl.push({ box: i.dataset.box, n: i.dataset.n, delta: s, cm: cm }); });
-  document.querySelectorAll('#skBalT tr.btr').forEach(r => { const inp0 = r.querySelector('.btD'); if (!inp0) return; const s = inp0.value, v = num(s); if (v === null) return;
+  document.querySelectorAll('#skBalT tr.btr, #skBalT tr.btnb').forEach(r => { const inp0 = r.querySelector('.btD'); if (!inp0) return;   // v177: + «не в партії» const s = inp0.value, v = num(s); if (v === null) return;
     const cm = r.querySelector('.btC').value.trim();
     if (isNaN(v)) return bad.push('«' + r.dataset.pos + '»: кількість числом зі знаком (−5 або 12)');
     if (!cm) return bad.push('«' + r.dataset.pos + '»: коментар — чому');
