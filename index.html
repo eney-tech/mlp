@@ -777,7 +777,8 @@
 <div class="net" id="net" role="alert" aria-live="assertive"><div class="nb"><div class="rt" id="netr"></div><div class="nt" id="nett">Зберігаю…</div><div class="ns" id="nets"></div><div class="np"><i id="netp"></i></div><div class="nh" id="neth"></div><div class="zc" id="zc"></div><button class="nx" id="netx" type="button">Не чекати</button></div></div>
 
 <script>
-const PAGE_VERSION = 'index.html v174 · 27.11.2026';   // v174 (27.11): «✂ Відокремити» — рядок «Ротори покупні (до гравіювання F4п)» (Code.gs v185): лише в іншу партію M з F4п або вибуттям.
+const PAGE_VERSION = 'index.html v175 · 27.11.2026';   // v175 (27.11): блок «Приймання» на «Складі» оновлюється сам (при зміні локації й раз на хвилину; Sklad.gs v84).
+// v174:   // v174 (27.11): «✂ Відокремити» — рядок «Ротори покупні (до гравіювання F4п)» (Code.gs v185): лише в іншу партію M з F4п або вибуттям.
 // v173:   // v173 (27.11): «Історія» позиції на сторінці «Склад» — по днях: залишок на кінець дня, дії дня ручні й «авто» (списання за нормами, вибуття тощо; Sklad.gs v81).
 // v172:   // v172 (27.11): Р-9 фільтр «Працівник» — і працівники зі звірки з формою Антона (раніше лише ті, хто мав виправлення / скасування / записи за працівника).
 // v171:   // v171 (27.11): «Усі записи за 30 днів» — лише зав. складу й адміністратор (Sklad.gs v78); «Мої записи» більше не показуються.
@@ -7277,7 +7278,22 @@ function skTrUnaccept(id, virt) {   // v169: віртуальна локація
   $('tuGo').onclick = () => { const b = $('tuGo'); b.disabled = true; b._t = b.textContent; b.textContent = 'Скасовую…';
     post('skladTrUnaccept', { code: CODE, id: id, reason: $('tuWhy').value }).then(r => { closeModal(); toast(r.msg); skIn(r); skMovesLoad(); }).catch(e => skErr(e, b)); };
 }
+/** v175: «Приймання» вгорі — свіже: при кожному завантаженні «Записів переміщення» і раз на хвилину, поки сторінка «Склад» відкрита.
+ *  Перемальовує лише коли список змінився і людина саме не вводить у ньому кількість. */
+let SKIN_T = null;
+function skInRefresh() {
+  if (!CODE || !$('skIn')) return;
+  post('skladInbox', { code: CODE, full: 1 }).then(r => {
+    if (!r || !r.full || !$('skIn')) return;
+    const sig = x => JSON.stringify((x.inbox || []).map(t => t.id + t.status).concat((x.boxes || []).map(b => b.id)));
+    if (SKD.inbox && sig(SKD.inbox) === sig(r.full)) return;
+    const a = document.activeElement; if (a && $('skIn').contains(a) && /INPUT|SELECT|TEXTAREA/.test(a.tagName)) return;
+    SKD.inbox = r.full; renderSkIn();
+  }).catch(() => { });
+}
+function skInTimer() { if (SKIN_T) clearInterval(SKIN_T); SKIN_T = setInterval(() => { if (!$('skIn')) { clearInterval(SKIN_T); SKIN_T = null; return; } if (!document.hidden) skInRefresh(); }, 60000); }
 function skMovesLoad() {
+  skInRefresh(); if (!SKIN_T) skInTimer();   // v175
   const loc = SKS.loc;   // v169: без локації — мої переміщення (відправив або прийняв)
   if (SKLM.loc !== loc) SKLM = { loc: loc, rows: [], load: true }; else SKLM.load = !SKLM.rows.length;
   renderSkLog();
