@@ -777,7 +777,8 @@
 <div class="net" id="net" role="alert" aria-live="assertive"><div class="nb"><div class="rt" id="netr"></div><div class="nt" id="nett">Зберігаю…</div><div class="ns" id="nets"></div><div class="np"><i id="netp"></i></div><div class="nh" id="neth"></div><div class="zc" id="zc"></div><button class="nx" id="netx" type="button">Не чекати</button></div></div>
 
 <script>
-const PAGE_VERSION = 'index.html v175 · 27.11.2026';   // v175 (27.11): блок «Приймання» на «Складі» оновлюється сам (при зміні локації й раз на хвилину; Sklad.gs v84).
+const PAGE_VERSION = 'index.html v176 · 27.11.2026';   // v176 (27.11): «Залишки» складу — фільтр (типорозмір, KV, колір) діє й на «Зібрано для покупців».
+// v175:   // v175 (27.11): блок «Приймання» на «Складі» оновлюється сам (при зміні локації й раз на хвилину; Sklad.gs v84).
 // v174:   // v174 (27.11): «✂ Відокремити» — рядок «Ротори покупні (до гравіювання F4п)» (Code.gs v185): лише в іншу партію M з F4п або вибуттям.
 // v173:   // v173 (27.11): «Історія» позиції на сторінці «Склад» — по днях: залишок на кінець дня, дії дня ручні й «авто» (списання за нормами, вибуття тощо; Sklad.gs v81).
 // v172:   // v172 (27.11): Р-9 фільтр «Працівник» — і працівники зі звірки з формою Антона (раніше лише ті, хто мав виправлення / скасування / записи за працівника).
@@ -6239,7 +6240,8 @@ function skBalTDraw() {
   let rows = '', gi = 0;
   // v157: палети ГП і зібрані для покупців партії — окремі групи вгорі (лише перегляд; ящики в них у «Двигунах» не числяться)
   const xcell = () => ed ? (mv ? td('') : td('') + td('') + td('')) : td('');
-  const pals = (SKBT.pals[loc] || []).filter(p => !skFOn() || p.boxes.some(skFOk)), ships = SKBT.ships[loc] || [];
+  const pals = (SKBT.pals[loc] || []).filter(p => !skFOn() || p.boxes.some(skFOk)),
+    ships = (SKBT.ships[loc] || []).filter(v => !skFOn() || (v.totals || []).some(t => skFOk(skAttrTxt(t.mark))) || (v.items || []).some(i => skFOk(skAttrTxt(i.pos))));   // v176: фільтр — і на партії покупцю
   const xGroup = (gn, list, rowFn) => { if (!list.length) return; gi++; const gOpen = SKBT.og[gn] !== false;
     rows += '<tr class="btg" data-g="' + gi + '" data-gn="' + esc(gn) + '" style="cursor:pointer"><td colspan="' + cols + '" style="padding:10px 0 4px;font-weight:bold;color:#2A78D6">' +
       '<span class="btgi">' + (gOpen ? '▾' : '▸') + '</span> ' + esc(gn) + ' <span class="muted" style="font-weight:400">· ' + list.length + '</span></td></tr>';
@@ -7227,6 +7229,10 @@ let SKLG = {};   // які з цих блоків розгорнуто (трим
 // ---- v152: фільтри сторінки складу (типорозмір, KV, колір — для «Залишків» і «Записів переміщення»; мої / усі — для записів)
 let SKFL = { typ: [], kv: [], color: [], mine: false }, SKLM = { loc: '', rows: [], load: false };
 const SKF_DIM = [['typ', 'Типорозмір'], ['kv', 'KV'], ['color', 'Колір']];
+/** v176: атрибути за назвою ГП / позиції в тексті («Двигун ENEY 3115 (KV900, синій, в22)») — для фільтра партій покупцю й палет */
+function skAttrTxt(t) { t = String(t || ''); const a = skAttr(t); if (a.typ || a.kv || a.color) return a;
+  const c = (t.match(/(чорний \/ синій|чорний|синій|жовтий|кольоровий)/i) || [])[1] || '';   // кирилиця: без \b
+  return { typ: (t.match(/\b(\d{4})\b/) || [])[1] || '', kv: (t.match(/KV(\d+)/) || [])[1] || '', color: c.toLowerCase() }; }
 function skAttr(name, typ) { const p = (SKD.positions || []).find(x => x.name === name) || {}; return { typ: p.typ || typ || '', kv: p.kv || '', color: p.color || '' }; }
 function skFOn() { return SKF_DIM.some(d => SKFL[d[0]].length); }
 /** запис проходить фільтри: «*» — для всіх; порожньо (не виробнича позиція) — ні, коли фільтр увімкнено */
