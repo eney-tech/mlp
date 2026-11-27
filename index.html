@@ -777,7 +777,8 @@
 <div class="net" id="net" role="alert" aria-live="assertive"><div class="nb"><div class="rt" id="netr"></div><div class="nt" id="nett">Зберігаю…</div><div class="ns" id="nets"></div><div class="np"><i id="netp"></i></div><div class="nh" id="neth"></div><div class="zc" id="zc"></div><button class="nx" id="netx" type="button">Не чекати</button></div></div>
 
 <script>
-const PAGE_VERSION = 'index.html v162 · 26.11.2026';   // v162 (Андрій 26.11): «+ Додати» → «Двигуни» — версія двигунів в11 / в12 / в21 / в22 (за замовчуванням в11; з партією походження M- — її версія).
+const PAGE_VERSION = 'index.html v163 · 27.11.2026';   // v163 (27.11): «Залишки» → «Перемістити» / «Змінити залишок»: рядок «Інше: …» не переміщувався («Рядок 1: Оберіть позицію») — надсилаємо позицію «Інше» + «що саме» (skPosLn).
+//      // v162 (Андрій 26.11): «+ Додати» → «Двигуни» — версія двигунів в11 / в12 / в21 / в22 (за замовчуванням в11; з партією походження M- — її версія).
 // v161   // v161 (Андрій 26.11): «↩ Розібрати» зібрану партію покупцю — у картці партії (і з «Залишків»): ГП й позиції повертаються в залишок.
 // v160   // v160 (рішення 26.11): ГП на складі — за назвою: «Зібрати партію покупцю» — назва × (палет, ящиків, шт), ящики бере сервер (найстаріші); у «Залишках» ГП складу без списку ящиків, ± і переміщення — кількістю; «Запакувати палету ГП» й «Інше» прибрано.
 // v159   // v159 (рішення 26.11): «Залишки» — лише уніфіковані назви (технічних рівнів і розподілу за технічними немає); «Змінити залишок» — і ящики ГП складу (±, Sklad.gs v61 skladBoxAdjust); «Прийняти» на віртуальній — лише відповідальні (canAcc)
@@ -6267,6 +6268,12 @@ function skBalTDraw() {
   $('btAddB').onclick = skBalTAdd; $('btGo').onclick = skBalTSave;
   skAdjRecentDraw();
 }
+/** v163: назва з балансу «Інше: що саме» → позиція «Інше» + posOther (сервер сам складає «Інше: …»; саму назву з двокрапкою не приймає) */
+function skPosLn(name) {
+  const o = SKD.other || 'Інше', n = String(name || '');
+  if (n.toLowerCase().indexOf(o.toLowerCase() + ':') === 0 && !(SKD.positions || []).some(p => p.name === n)) return { pos: o, posOther: n.slice(o.length + 1).trim() };
+  return { pos: n };
+}
 /** v151: переміщення з таблиці — компоненти одним ПЦ-…; ящики ГП: зі складу — тим самим ПЦ (лише на склад), з цеху — «ящик ГП на склад» */
 function skBalTMove() {
   const b = $('btMv'); if (b.disabled) return; $('err').textContent = '';
@@ -6274,8 +6281,8 @@ function skBalTMove() {
   if (!to) return toast('Оберіть, куди переміщуєте', true);
   const chk = (s, max, nm) => { s = String(s || '').trim(); if (!s) return null; const v = skCalc(s); if (isNaN(v) || !(v > 0)) { bad.push('«' + nm + '»: кількість числом'); return null; }
     if (v > Number(max) + 1e-9) { bad.push('«' + nm + '»: є лише ' + skNfmt(Number(max))); return null; } return s; };
-  document.querySelectorAll('#skBalT .btM').forEach(i => { const r = i.closest('tr'), q = chk(i.value, i.dataset.max, r.dataset.pos); if (q) lines.push({ pos: r.dataset.pos, qty: q, unit: r.dataset.u }); });
-  document.querySelectorAll('#skBalT .btTq').forEach(i => { const q = chk(i.value, i.dataset.max, i.dataset.pos + ' · ' + i.dataset.nm); if (q) lines.push({ pos: i.dataset.pos, qty: q, unit: i.dataset.u, det: i.dataset.nm }); });
+  document.querySelectorAll('#skBalT .btM').forEach(i => { const r = i.closest('tr'), q = chk(i.value, i.dataset.max, r.dataset.pos); if (q) lines.push(Object.assign(skPosLn(r.dataset.pos), { qty: q, unit: r.dataset.u })); });
+  document.querySelectorAll('#skBalT .btTq').forEach(i => { const q = chk(i.value, i.dataset.max, i.dataset.pos + ' · ' + i.dataset.nm); if (q) lines.push(Object.assign(skPosLn(i.dataset.pos), { qty: q, unit: i.dataset.u, det: i.dataset.nm })); });
   document.querySelectorAll('#skBalT .btX').forEach(c => { if (c.checked) bxs.push({ id: c.dataset.box, name: c.dataset.n, q: Number(c.dataset.q) }); });
   const gpm = [];   // v160: ГП складу — кількістю (сервер підбирає цілі найстаріші ящики)
   document.querySelectorAll('#skBalT .btGm').forEach(i => { const r = i.closest('tr'), s = String(i.value || '').trim(); if (!s) return; const v = skCalc(s);
@@ -6294,7 +6301,7 @@ function skBalTMove() {
 }
 function skBalTMove2(from, to, fk, tk, lines, bxs, gpm) {
   const b = $('btMv'), cm = $('btMc').value;
-  const txt = lines.map(l => l.pos + (l.det ? ' (' + l.det + ')' : '') + ' ' + l.qty + ' ' + l.unit).concat(gpm.length ? gpm.map(g => g.name + ' ' + skNfmt(g.qty) + ' шт') : bxs.map(x => 'ящик ' + x.name + ' (' + x.q + ' шт)')).join('; ') +
+  const txt = lines.map(l => l.pos + (l.posOther ? ': ' + l.posOther : '') + (l.det ? ' (' + l.det + ')' : '') + ' ' + l.qty + ' ' + l.unit).concat(gpm.length ? gpm.map(g => g.name + ' ' + skNfmt(g.qty) + ' шт') : bxs.map(x => 'ящик ' + x.name + ' (' + x.q + ' шт)')).join('; ') +
     (gpm.length ? ' (ящиків ' + bxs.length + ', найстаріші)' : '');
   confirmBox('Перемістити з ' + (skLocOf(from).name || from) + ' → ' + (skLocOf(to).name || to) + ': ' + txt + '?', () => {
     b.disabled = true; b._t = b.textContent; b.textContent = 'Переміщую…';
@@ -6357,7 +6364,7 @@ function skBalTSave() {
     const cm = r.querySelector('.btC').value.trim();
     if (isNaN(v)) return bad.push('«' + r.dataset.pos + '»: кількість числом зі знаком (−5 або 12)');
     if (!cm) return bad.push('«' + r.dataset.pos + '»: коментар — чому');
-    lines.push({ pos: r.dataset.pos, unit: r.dataset.u, delta: s, cm: cm }); });
+    lines.push(Object.assign(skPosLn(r.dataset.pos), { unit: r.dataset.u, delta: s, cm: cm })); });
   document.querySelectorAll('#skBalT .bta').forEach(el => { const n = el.dataset.n, pos = $('btP' + n).value, s = $('btQ' + n).value, v = num(s), cm = $('btC' + n).value.trim();
     if (!pos && v === null) return; if (!pos) return bad.push('нова позиція: оберіть, що саме');
     if (v === null || isNaN(v)) return bad.push('«' + pos + '»: кількість числом зі знаком'); if (!cm) return bad.push('«' + pos + '»: коментар — чому');
@@ -6365,7 +6372,7 @@ function skBalTSave() {
   if (bad.length) { $('err').textContent = bad.join('; '); return toast(bad[0], true); }
   if (!lines.length && !bxl.length && !gpl.length) return toast('Впишіть «±» хоча б в одному рядку', true);
   const sg = x => (/^[-−–]/.test(String(x).trim()) ? '' : '+') + String(x).trim();
-  confirmBox('Змінити залишок на ' + (skLocOf(SKS.loc).name || SKS.loc) + ': ' + lines.map(l => l.pos + ' ' + sg(l.delta) + ' ' + l.unit).concat(gpl.map(l => l.name + ' ' + sg(l.delta) + ' шт'), bxl.map(l => 'ящик ' + l.n + ' ' + sg(l.delta) + ' шт')).join('; ') + '?', () => {
+  confirmBox('Змінити залишок на ' + (skLocOf(SKS.loc).name || SKS.loc) + ': ' + lines.map(l => l.pos + (l.posOther ? ': ' + l.posOther : '') + ' ' + sg(l.delta) + ' ' + l.unit).concat(gpl.map(l => l.name + ' ' + sg(l.delta) + ' шт'), bxl.map(l => 'ящик ' + l.n + ' ' + sg(l.delta) + ' шт')).join('; ') + '?', () => {
     b.disabled = true; b._t = b.textContent; b.textContent = 'Записую…';
     const p1 = lines.length ? post('skladAdjust', { code: CODE, loc: SKS.loc, reason: 'Зміна залишку', lines: lines }) : Promise.resolve(null);
     p1.then(r => { if (r) { toast(r.msg); if (r.adjRecent) SKD.adjRecent = r.adjRecent; if (r.bal) SKD.bal = Object.assign({}, SKD.bal || {}, r.bal); skIn(r); }
