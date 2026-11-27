@@ -777,7 +777,8 @@
 <div class="net" id="net" role="alert" aria-live="assertive"><div class="nb"><div class="rt" id="netr"></div><div class="nt" id="nett">Зберігаю…</div><div class="ns" id="nets"></div><div class="np"><i id="netp"></i></div><div class="nh" id="neth"></div><div class="zc" id="zc"></div><button class="nx" id="netx" type="button">Не чекати</button></div></div>
 
 <script>
-const PAGE_VERSION = 'index.html v163 · 27.11.2026';   // v163 (27.11): «Залишки» → «Перемістити» / «Змінити залишок»: рядок «Інше: …» не переміщувався («Рядок 1: Оберіть позицію») — надсилаємо позицію «Інше» + «що саме» (skPosLn).
+const PAGE_VERSION = 'index.html v164 · 27.11.2026';   // v164 (27.11): «Залишки» — рядок «у партії МЛП M-…» — посилання на сторінку партії.
+//     // v163 (27.11): «Залишки» → «Перемістити» / «Змінити залишок»: рядок «Інше: …» не переміщувався («Рядок 1: Оберіть позицію») — надсилаємо позицію «Інше» + «що саме» (skPosLn).
 //      // v162 (Андрій 26.11): «+ Додати» → «Двигуни» — версія двигунів в11 / в12 / в21 / в22 (за замовчуванням в11; з партією походження M- — її версія).
 // v161   // v161 (Андрій 26.11): «↩ Розібрати» зібрану партію покупцю — у картці партії (і з «Залишків»): ГП й позиції повертаються в залишок.
 // v160   // v160 (рішення 26.11): ГП на складі — за назвою: «Зібрати партію покупцю» — назва × (палет, ящиків, шт), ящики бере сервер (найстаріші); у «Залишках» ГП складу без списку ящиків, ± і переміщення — кількістю; «Запакувати палету ГП» й «Інше» прибрано.
@@ -6197,7 +6198,7 @@ function skBalTDraw() {
       const sq = sm[n] ? sm[n].qty : 0, ro = !gpW && (boxes.length || (sm[n] && !bal0[n]));   // v158: ro — лише перегляд (ящики / тільки в партіях)
       const rest = tech.length ? Math.round((b[0] - sq - sumU(tech, b[1])) * 1000) / 1000 : 0;
       const kids = tech.concat(Math.abs(rest) > 1e-9 ? [['технічна не вказана', rest, b[1], '', 1]] : [])
-        .concat(sm[n] ? sm[n].batches.map(x => ['у партії МЛП ' + x[0], x[1], 'шт', '', 1]) : [])
+        .concat(sm[n] ? sm[n].batches.map(x => ['у партії МЛП ' + x[0], x[1], 'шт', '', 1, 'у партії МЛП <a href="' + esc(link('b=' + encodeURIComponent(x[0]))) + '" style="color:#2A78D6">' + esc(x[0]) + '</a>']) : [])   // v164: посилання на партію
         .concat(gpW ? skGpRows(boxes) : []);   // v160: ГП складу — палети · ящики · штуки (замість списку ящиків)
       const split = mv && tech.length > 1, sel = SKBT.sel === n;
       let cell = '';
@@ -6215,7 +6216,7 @@ function skBalTDraw() {
         td('<b>' + esc(skNfmt(b[0])) + '</b>', 'text-align:right;white-space:nowrap' + (b[0] < 0 ? ';color:#9B231A' : '')) + td(esc(b[1]), 'color:#66767F') + cell + '</tr>';
       kids.forEach(a => {
         rows += '<tr class="btt" data-g="' + gi + '" data-p="' + esc(n) + '"' + (gOpen && uOpen ? '' : ' style="display:none"') + '>' +
-          td('<span class="muted" style="font-size:13px">' + esc(a[0]) + '</span>', 'padding-left:34px') + td(esc(skNfmt(a[1])), 'text-align:right;white-space:nowrap;font-size:13px;color:#66767F') +
+          td('<span class="muted" style="font-size:13px">' + (a[5] || esc(a[0])) + '</span>', 'padding-left:34px') + td(esc(skNfmt(a[1])), 'text-align:right;white-space:nowrap;font-size:13px;color:#66767F') +
           td(esc(a[2]), 'color:#66767F;font-size:13px') + (ed ? (split && !a[4] ? td(inp('btTq', 'скільки', '80px', ' data-pos="' + esc(n) + '" data-nm="' + esc(a[0]) + '" data-u="' + esc(a[2]) + '" data-max="' + a[1] + '"')) : td('')) + (mv ? '' : td('')) : td('')) + '</tr>'; });
       if (!gpW) boxes.forEach(x => {
         rows += '<tr class="btt" data-g="' + gi + '" data-p="' + esc(n) + '"' + (gOpen && uOpen ? '' : ' style="display:none"') + '>' +
