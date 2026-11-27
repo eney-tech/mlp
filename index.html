@@ -777,7 +777,8 @@
 <div class="net" id="net" role="alert" aria-live="assertive"><div class="nb"><div class="rt" id="netr"></div><div class="nt" id="nett">Зберігаю…</div><div class="ns" id="nets"></div><div class="np"><i id="netp"></i></div><div class="nh" id="neth"></div><div class="zc" id="zc"></div><button class="nx" id="netx" type="button">Не чекати</button></div></div>
 
 <script>
-const PAGE_VERSION = 'index.html v172 · 27.11.2026';   // v172 (27.11): Р-9 фільтр «Працівник» — і працівники зі звірки з формою Антона (раніше лише ті, хто мав виправлення / скасування / записи за працівника).
+const PAGE_VERSION = 'index.html v173 · 27.11.2026';   // v173 (27.11): «Історія» позиції на сторінці «Склад» — по днях: залишок на кінець дня, дії дня ручні й «авто» (списання за нормами, вибуття тощо; Sklad.gs v81).
+// v172:   // v172 (27.11): Р-9 фільтр «Працівник» — і працівники зі звірки з формою Антона (раніше лише ті, хто мав виправлення / скасування / записи за працівника).
 // v171:   // v171 (27.11): «Усі записи за 30 днів» — лише зав. складу й адміністратор (Sklad.gs v78); «Мої записи» більше не показуються.
 //     // v170 (27.11): «Записи переміщення» — не прийнято: права половина світло-червона (як «Приймання»); розбіжність — червона рамка,
 //   «нестача N → Інше» (Sklad.gs v77).
@@ -6395,11 +6396,24 @@ function skHistDraw() {
   if (!h || h.loc !== SKS.loc) { box.innerHTML = ''; return; }
   box.innerHTML = '<div class="card"><div class="row" style="align-items:center"><div class="mid" style="flex:1 1 auto">Історія: ' + esc(h.pos) + ' <span class="muted" style="font-weight:400">· ' + esc(skLocOf(h.loc).name || h.loc) + '</span></div>' +
     '<button class="ic" style="flex:0 0 auto" onclick="SKBT.sel=\'\';SKBT.hist=null;skBalTDraw()">✕</button></div>' +
-    (h.rows === null ? '<p class="muted">Завантажую…</p>' : h.err ? '<p class="err">' + esc(h.err) + '</p>' : !h.rows.length ? '<p class="muted">Записів немає.</p>' :
+    (h.rows === null ? '<p class="muted">Завантажую…</p>' : h.err ? '<p class="err">' + esc(h.err) + '</p>' : h.days && h.days.days ? skHistDays(h.days) : !h.rows.length ? '<p class="muted">Записів немає.</p>' :
       '<div class="list" style="padding:0">' + h.rows.map(x => '<div class="li"><div><b>' + esc(x.what) + '</b><br><span class="muted">' + esc(x.at) + ' · ' + esc(x.id) + ' · ' + esc(x.who) +
         (x.det ? ' · ' + esc(x.det) : '') + (x.cm ? ' · ' + esc(x.cm) : '') + '</span></div><div class="r" style="flex:0 0 auto;white-space:nowrap"><b' + (x.q < 0 ? ' style="color:#9B231A"' : '') + '>' +
         (x.q > 0 ? '+' : '') + esc(skNfmt(x.q)) + '</b> ' + esc(x.unit) + '</div></div>').join('') + '</div>') +
-    '<p class="muted" style="font-size:12px">Витрата цеху за нормами (кроки Вулика) тут не показана — вона в «Залишках цехів».</p></div>';
+    (h.days && h.days.days ? '' : '<p class="muted" style="font-size:12px">Витрата цеху за нормами (кроки Вулика) тут не показана — вона в «Залишках цехів».</p>') + '</div>';
+}
+/** v173 (рішення Андрія 27.11): історія позиції по днях — залишок на кінець дня і дії дня (ручні й автоматичні); дні без дій сервер не віддає */
+function skHistDays(H) {
+  const u = H.unit || '', sg = q => (q > 0 ? '+' : '') + skNfmt(q);
+  if (!H.days.length) return '<p class="muted">Дій немає.</p>';
+  return '<p class="muted" style="margin:4px 0 8px">Зараз: <b>' + esc(skNfmt(H.now)) + '</b> ' + esc(u) + (H.from ? ' · облік з інвентаризації ' + esc(H.from) : '') + '</p>' +
+    H.days.map(d => '<div style="border-top:2px solid #C5D0D7;margin-top:10px;padding-top:6px"><div class="row" style="align-items:baseline"><b style="flex:1 1 auto">' + esc(d.dm) + '</b>' +
+      '<span style="flex:0 0 auto;white-space:nowrap">залишок на кінець дня: <b' + (d.bal < 0 ? ' style="color:#9B231A"' : '') + '>' + esc(skNfmt(d.bal)) + '</b> ' + esc(u) + '</span></div>' +
+      '<div class="list" style="padding:0">' + d.rows.map(x => '<div class="li"><div>' + (x.auto ? '<span class="tag" style="background:#EEF2F5;color:#4E5F69;font-size:11px;padding:1px 6px;border-radius:8px;margin-right:4px">авто</span>' : '') +
+        '<b>' + esc(x.what) + '</b><br><span class="muted">' + esc(x.at) + (x.cnt ? ' · записів: ' + x.cnt + (x.n ? ' · виробів: ' + skNfmt(x.n) : '') : '') + (x.id ? ' · ' + esc(x.id) : '') + (x.who ? ' · ' + esc(x.who) : '') +
+        (x.det ? ' · ' + esc(x.det) : '') + (x.cm ? ' · ' + esc(x.cm) : '') + '</span></div><div class="r" style="flex:0 0 auto;white-space:nowrap">' +
+        (x.set !== undefined ? '= <b>' + esc(skNfmt(x.set)) + '</b>' : '<b' + (x.q < 0 ? ' style="color:#9B231A"' : '') + '>' + esc(sg(x.q)) + '</b>') + ' ' + esc(u) + '</div></div>').join('') + '</div></div>').join('') +
+    (H.days.length >= 60 ? '<p class="muted" style="font-size:12px">Показано 60 останніх днів із діями.</p>' : '');
 }
 function skBalTAddMv() {   // v152: рядок переміщення позиції, якої немає в залишку (локація без контролю балансу)
   const d = SKD, n = ++SKBT.add, div = document.createElement('div');
