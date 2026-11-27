@@ -777,7 +777,8 @@
 <div class="net" id="net" role="alert" aria-live="assertive"><div class="nb"><div class="rt" id="netr"></div><div class="nt" id="nett">Зберігаю…</div><div class="ns" id="nets"></div><div class="np"><i id="netp"></i></div><div class="nh" id="neth"></div><div class="zc" id="zc"></div><button class="nx" id="netx" type="button">Не чекати</button></div></div>
 
 <script>
-const PAGE_VERSION = 'index.html v167 · 27.11.2026';   // v167 (27.11): «Змінити залишок» — «±» і «стане» окремими колонками, вирівняно; «Є» — праворуч, як числа.
+const PAGE_VERSION = 'index.html v168 · 27.11.2026';   // v168 (27.11): «Приймання» — картка переміщення 4 блоками: звідки → куди · хто й коли · що (передали / прийнято) · дії; без «Приймає: …» і пояснення.
+//     // v167 (27.11): «Змінити залишок» — «±» і «стане» окремими колонками, вирівняно; «Є» — праворуч, як числа.
 //     // v166 (27.11): «Змінити залишок» — поруч із «±» поле «стане» (фактично): вписали одне — друге рахується одразу (skAdjPair).
 //     // v165 (27.11, Code.gs v181 / Sklad.gs v74): картка партії — «📦 Перемістити на склад» (напівфабрикат за назвою, увесь залишок — тара вільна; замість v62 «📦 На склад» з тарою);
 //   вільна тара — «📦 Нова партія із запасу цеху»; «🎨 Колір» → «✎ Характеристики» (типорозмір, KV, колір, версія — тімлід і вище, Code.gs setAttrs).
@@ -7140,18 +7141,21 @@ function renderSkIn() {
     order.forEach(loc => {
       const list = by[loc], old = Math.max.apply(null, list.map(t => t.age || 0)), nm = list[0].toName || loc;
       h += '<details style="border:2px solid #E0A400;border-radius:12px;padding:8px 12px;margin-top:10px"' + (SKINB[loc] ? ' open' : '') + ' ontoggle="SKINB[\'' + esc(loc) + '\']=this.open">' +
-        '<summary class="mid">' + esc(nm) + ' <span class="pill warn" style="margin:0 0 0 6px;font-size:13px">' + list.length + '</span>' + (old >= 12 ? ' <span class="muted" style="font-weight:400;font-size:13px">найдавніше ' + old + ' год</span>' : '') + '</summary>' +
-        '<div class="muted" style="font-size:13px;margin-top:4px">Приймає: ' + esc(list[0].resp || 'зав. складу') + ' — той, хто фізично отримав.</div>' +
+        '<summary class="mid">' + esc(nm) + ' <span class="pill warn" style="margin:0 0 0 6px;font-size:13px">' + list.length + '</span>' + (old >= 12 ? ' <span class="muted" style="font-weight:400;font-size:13px">найдавніше ' + old + ' год</span>' : '') + '</summary>' +   // v168: без «Приймає: …» — блок бачить лише той, хто може прийняти
         (list.length > 1 ? '<button class="btn btn2" style="margin-top:8px" onclick="skAcceptLoc(\'' + esc(loc) + '\',this)">✔ Прийняти все на ' + esc(nm) + ' (' + list.length + ')</button>' : '');
       list.forEach(t => {
-        h += '<div style="border-top:1px solid #E7EDF1;margin-top:10px;padding-top:8px"><div class="mid">' + esc(t.id) + '</div>' +
-          '<div class="muted">' + esc(t.who) + ' · ' + esc(t.time) + ' · ' + esc(t.fromName) + ' → <b>' + esc(t.toName) + '</b>' + (t.comment ? '<br>' + esc(t.comment) : '') + '</div>' +
-          '<div class="list" style="padding:0;margin-top:8px">' + t.lines.map(l => '<div class="li"><div><b>' + esc(l.pos) + '</b>' + (l.det ? '<br><span class="muted">' + esc(l.det) + '</span>' : '') +
-            '<br><span class="muted">передали: <b>' + esc(skNum(l.qty)) + '</b> ' + esc(l.unit) + '</span></div>' +
-            (l.box ? '<div class="r" style="flex:0 0 auto"><label style="white-space:nowrap"><input type="checkbox" id="ta_' + esc(t.id) + '_' + l.n + '" checked style="transform:scale(1.4);margin-right:6px">є</label></div></div>'
-              : '<div class="r" style="flex:0 0 120px"><input type="text" inputmode="decimal" id="ta_' + esc(t.id) + '_' + l.n + '" placeholder="' + esc(skNum(l.qty)) + '" style="font-size:18px;text-align:right;margin:0"></div></div>')).join('') + '</div>' +
-          '<p class="muted" style="margin:6px 0 0">«Прийняти все» — прийшло стільки, скільки передали. Інакше впишіть фактичну кількість (можна 0) і натисніть «Фактично».</p>' +
-          '<label>Коментар <span class="muted">(якщо є розбіжність)</span></label><input type="text" id="tc_' + esc(t.id) + '">' +
+        // v168 (рішення Андрія 27.11): 4 блоки — 1) звідки → куди, 2) хто, коли, № і коментар, 3) що (передали / прийнято), 4) дії
+        const blk = 'background:#F4F7F9;border-radius:10px;padding:8px 10px;margin-top:8px', cap = t2 => '<div class="muted" style="font-size:12px;text-transform:uppercase;letter-spacing:.03em">' + t2 + '</div>';
+        h += '<div style="border-top:1px solid #E7EDF1;margin-top:12px;padding-top:4px">' +
+          '<div style="' + blk + '">' + cap('Звідки → куди') + '<div class="mid" style="margin:2px 0 0">' + esc(t.fromName) + ' <span style="color:#2A78D6">→</span> ' + esc(t.toName) + '</div></div>' +
+          '<div style="' + blk + '">' + cap('Хто й коли') + '<div style="margin-top:2px"><b>' + esc(t.who) + '</b> · ' + esc(t.time) + ' <span class="muted" style="font-size:13px">· ' + esc(t.id) + '</span>' +
+            (t.comment ? '<div class="muted" style="font-size:13px;margin-top:2px">' + esc(t.comment) + '</div>' : '') + '</div></div>' +
+          '<div style="' + blk + '">' + '<div style="display:flex;justify-content:space-between;gap:8px">' + cap('Що передали') + cap('Прийнято') + '</div>' +
+          t.lines.map(l => '<div style="display:flex;align-items:center;gap:10px;padding:6px 0;border-top:1px solid #E1E8ED"><div style="flex:1;min-width:0"><b>' + esc(l.pos) + '</b>' +
+            (l.det ? '<div class="muted" style="font-size:13px">' + esc(l.det) + '</div>' : '') + '<div style="font-size:15px">' + esc(skNum(l.qty)) + ' ' + esc(l.unit) + '</div></div>' +
+            (l.box ? '<label style="white-space:nowrap;flex:0 0 auto"><input type="checkbox" id="ta_' + esc(t.id) + '_' + l.n + '" checked style="transform:scale(1.4);margin-right:6px">є</label>'
+              : '<input type="text" inputmode="decimal" id="ta_' + esc(t.id) + '_' + l.n + '" placeholder="' + esc(skNum(l.qty)) + '" style="flex:0 0 110px;width:110px;font-size:18px;text-align:right;margin:0">') + '</div>').join('') + '</div>' +
+          '<input type="text" id="tc_' + esc(t.id) + '" placeholder="Коментар, якщо прийшло не стільки" style="margin-top:10px">' +
           '<div class="grid" style="grid-template-columns:1fr 1fr 1fr;margin-top:8px"><button class="btn" onclick="skAcceptAs(\'' + esc(t.id) + '\',this)">Прийняти все</button>' +
           '<button class="btn btn2" onclick="skAccept(\'' + esc(t.id) + '\',this)">Фактично</button><button class="btn btn2" onclick="skAcceptNone(\'' + esc(t.id) + '\')">Немає</button></div></div>';
       });
