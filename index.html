@@ -777,7 +777,9 @@
 <div class="net" id="net" role="alert" aria-live="assertive"><div class="nb"><div class="rt" id="netr"></div><div class="nt" id="nett">Зберігаю…</div><div class="ns" id="nets"></div><div class="np"><i id="netp"></i></div><div class="nh" id="neth"></div><div class="zc" id="zc"></div><button class="nx" id="netx" type="button">Не чекати</button></div></div>
 
 <script>
-const PAGE_VERSION = 'index.html v168 · 27.11.2026';   // v168 (27.11): «Приймання» — картка переміщення 4 блоками: звідки → куди · хто й коли · що (передали / прийнято) · дії; без «Приймає: …» і пояснення.
+const PAGE_VERSION = 'index.html v169 · 27.11.2026';   // v169 (27.11): «Приймання» — звідки ⟶ куди великою стрілкою, без підписів; «Записи переміщення» — рядок = переміщення з двох половин
+//   (відправлено | прийнято), «↩ Скасувати прийняття» (Sklad.gs v76); без локації — мої (відправив або прийняв).
+//     // v168 (27.11): «Приймання» — картка переміщення 4 блоками: звідки → куди · хто й коли · що (передали / прийнято) · дії; без «Приймає: …» і пояснення.
 //     // v167 (27.11): «Змінити залишок» — «±» і «стане» окремими колонками, вирівняно; «Є» — праворуч, як числа.
 //     // v166 (27.11): «Змінити залишок» — поруч із «±» поле «стане» (фактично): вписали одне — друге рахується одразу (skAdjPair).
 //     // v165 (27.11, Code.gs v181 / Sklad.gs v74): картка партії — «📦 Перемістити на склад» (напівфабрикат за назвою, увесь залишок — тара вільна; замість v62 «📦 На склад» з тарою);
@@ -7147,10 +7149,11 @@ function renderSkIn() {
         // v168 (рішення Андрія 27.11): 4 блоки — 1) звідки → куди, 2) хто, коли, № і коментар, 3) що (передали / прийнято), 4) дії
         const blk = 'background:#F4F7F9;border-radius:10px;padding:8px 10px;margin-top:8px', cap = t2 => '<div class="muted" style="font-size:12px;text-transform:uppercase;letter-spacing:.03em">' + t2 + '</div>';
         h += '<div style="border-top:1px solid #E7EDF1;margin-top:12px;padding-top:4px">' +
-          '<div style="' + blk + '">' + cap('Звідки → куди') + '<div class="mid" style="margin:2px 0 0">' + esc(t.fromName) + ' <span style="color:#2A78D6">→</span> ' + esc(t.toName) + '</div></div>' +
-          '<div style="' + blk + '">' + cap('Хто й коли') + '<div style="margin-top:2px"><b>' + esc(t.who) + '</b> · ' + esc(t.time) + ' <span class="muted" style="font-size:13px">· ' + esc(t.id) + '</span>' +
-            (t.comment ? '<div class="muted" style="font-size:13px;margin-top:2px">' + esc(t.comment) + '</div>' : '') + '</div></div>' +
-          '<div style="' + blk + '">' + '<div style="display:flex;justify-content:space-between;gap:8px">' + cap('Що передали') + cap('Прийнято') + '</div>' +
+          '<div style="' + blk + ';display:flex;align-items:center;gap:10px"><div class="mid" style="flex:1;margin:0">' + esc(t.fromName) + '</div>' +   // v169: звідки ⟶ куди, без підписів
+            '<div style="flex:0 0 auto;font-size:34px;line-height:1;color:#2A78D6">⟶</div><div class="mid" style="flex:1;margin:0;text-align:right">' + esc(t.toName) + '</div></div>' +
+          '<div style="' + blk + '"><b>' + esc(t.who) + '</b> · ' + esc(t.time) + ' <span class="muted" style="font-size:13px">· ' + esc(t.id) + '</span>' +
+            (t.comment ? '<div class="muted" style="font-size:13px;margin-top:2px">' + esc(t.comment) + '</div>' : '') + '</div>' +
+          '<div style="' + blk + '">' + '<div style="display:flex;justify-content:flex-end">' + cap('Прийнято') + '</div>' +
           t.lines.map(l => '<div style="display:flex;align-items:center;gap:10px;padding:6px 0;border-top:1px solid #E1E8ED"><div style="flex:1;min-width:0"><b>' + esc(l.pos) + '</b>' +
             (l.det ? '<div class="muted" style="font-size:13px">' + esc(l.det) + '</div>' : '') + '<div style="font-size:15px">' + esc(skNum(l.qty)) + ' ' + esc(l.unit) + '</div></div>' +
             (l.box ? '<label style="white-space:nowrap;flex:0 0 auto"><input type="checkbox" id="ta_' + esc(t.id) + '_' + l.n + '" checked style="transform:scale(1.4);margin-right:6px">є</label>'
@@ -7223,11 +7226,39 @@ function skFltDraw() {
     if (k === 'mine') SKFL.mine = v === '1'; else if (!v) SKFL[k] = []; else { const i = SKFL[k].indexOf(v); if (i >= 0) SKFL[k].splice(i, 1); else SKFL[k].push(v); }
     SKFL.open = true; skFltDraw(); skBalTDraw(); renderSkLog(); });
 }
+/** v169 (рішення Андрія 27.11): переміщення — один рядок з двох половин: ліворуч відправлено (звідки, хто, коли, що), праворуч прийнято (куди, хто, коли, скільки).
+ *  Узяв(ла) сам(а) — обидві половини одна людина. ✖ — скасувати передачу (в дорозі), ↩ — скасувати прийняття. */
+function skTrRow(t) {
+  const st = t.status, acc = st === 'прийнято' || st === 'прийнято з розбіжністю', x = st === 'скасовано';
+  const half = (bg, inner) => '<div style="flex:1 1 220px;min-width:0;background:' + bg + ';border-radius:10px;padding:8px 10px">' + inner + '</div>';
+  const left = half('#F4F7F9', '<div class="mid" style="margin:0">' + esc(t.fromName) + '</div><div style="font-size:14px;margin-top:2px"><b>' + esc(t.who) + '</b> · ' + esc(t.time) + '</div>' +
+    t.lines.map(l => '<div style="font-size:14px">' + esc(l.pos) + (l.det ? ' <span class="muted">(' + esc(l.det) + ')</span>' : '') + ' — <b>' + esc(skNum(l.qty)) + '</b> ' + esc(l.unit) + '</div>').join('') +
+    (t.comment ? '<div class="muted" style="font-size:13px">' + esc(t.comment) + '</div>' : '') +
+    (t.canCancel ? '<button class="btn btn2" style="margin-top:6px;padding:6px 10px;width:auto" onclick="skTrCancel(\'' + esc(t.id) + '\')">✖ Скасувати передачу</button>' : ''));
+  const note = (t.lines.find(l => l.note) || {}).note || '';
+  const right = half(acc ? '#EAF6EE' : x ? '#F4F4F4' : '#FFF6DD', '<div class="mid" style="margin:0">' + esc(t.toName) + '</div>' +
+    (acc ? '<div style="font-size:14px;margin-top:2px"><b>' + esc(t.by) + '</b> · ' + esc(t.at) + (t.self ? ' <span class="muted">(узяв(ла) сам(а))</span>' : '') + '</div>' +
+      t.lines.map(l => '<div style="font-size:14px">' + esc(l.pos) + ' — <b' + (l.got !== null && l.got !== l.qty ? ' style="color:#9B231A"' : '') + '>' + esc(skNum(l.got === null ? l.qty : l.got)) + '</b> ' + esc(l.unit) + '</div>').join('')
+      : '<div style="font-size:14px;margin-top:2px">' + (x ? 'скасовано' : 'в дорозі — ще не прийняли') + '</div>') +
+    (note ? '<div class="muted" style="font-size:13px">' + esc(note) + '</div>' : '') +
+    (t.canUnaccept ? '<button class="btn btn2" style="margin-top:6px;padding:6px 10px;width:auto" onclick="skTrUnaccept(\'' + esc(t.id) + '\',' + (t.virt ? 1 : 0) + ')">' + (t.virt ? '↩ Скасувати операцію' : '↩ Скасувати прийняття') + '</button>' : ''));
+  return '<div style="border-top:1px solid #E7EDF1;padding:10px 0"><div style="display:flex;align-items:center;gap:8px;margin-bottom:6px"><b>' + esc(t.id) + '</b>' +
+    '<span class="pill' + (st === 'в дорозі' ? ' warn' : st === 'прийнято' ? ' ok' : '') + '" style="margin:0">' + esc(st) + '</span></div>' +
+    '<div style="display:flex;flex-wrap:wrap;gap:8px;align-items:stretch">' + left + '<div style="flex:0 0 auto;align-self:center;font-size:28px;color:#2A78D6">⟶</div>' + right + '</div></div>';
+}
+function skTrUnaccept(id, virt) {   // v169: віртуальна локація — скасовується вся операція (Sklad.gs v77)
+  openModal('<div class="card"><div class="mid">' + (virt ? 'Скасувати операцію ' : 'Скасувати прийняття ') + esc(id) + '?</div><div class="muted">' +
+    (virt ? 'Переміщення буде скасовано, запаси повернуться туди, звідки їх узяли.' : 'Переміщення знову стане «в дорозі»: його прийме той, хто справді отримав, або відправник скасує.') + '</div>' +
+    '<label>Причина</label><textarea id="tuWhy"></textarea><div class="err" id="merr"></div>' +
+    '<div class="grid" style="margin-top:16px"><button class="btn btn2" onclick="closeModal()">Ні</button><button class="btn" id="tuGo">Скасувати</button></div></div>');
+  $('tuGo').onclick = () => { const b = $('tuGo'); b.disabled = true; b._t = b.textContent; b.textContent = 'Скасовую…';
+    post('skladTrUnaccept', { code: CODE, id: id, reason: $('tuWhy').value }).then(r => { closeModal(); toast(r.msg); skIn(r); skMovesLoad(); }).catch(e => skErr(e, b)); };
+}
 function skMovesLoad() {
-  const loc = SKS.loc; if (!loc) { SKLM = { loc: '', rows: [], load: false }; return renderSkLog(); }
+  const loc = SKS.loc;   // v169: без локації — мої переміщення (відправив або прийняв)
   if (SKLM.loc !== loc) SKLM = { loc: loc, rows: [], load: true }; else SKLM.load = !SKLM.rows.length;
   renderSkLog();
-  post('skladLocMoves', { code: CODE, loc: loc }).then(r => { if (SKS.loc !== loc) return; SKLM = { loc: loc, rows: r.rows || [], load: false }; renderSkLog(); skFltDraw(); })
+  post('skladLocMoves', { code: CODE, loc: loc || '' }).then(r => { if (SKS.loc !== loc) return; SKLM = { loc: loc, rows: r.rows || [], load: false }; renderSkLog(); skFltDraw(); })
     .catch(() => { if (SKS.loc === loc) { SKLM.load = false; renderSkLog(); } });
 }
 function renderSkLog() {
@@ -7236,15 +7267,12 @@ function renderSkLog() {
   const fold = (k, title, body) => '<details style="margin:0 12px"' + (SKLG[k] ? ' open' : '') + ' ontoggle="SKLG.' + k + '=this.open"><summary>' + title + '</summary>' + body + '</details>';
   const warn = t => ' <span class="pill warn" style="margin:0;font-size:13px">' + t + '</span>';
   let h = '';
-  const mvAll = SKLM.loc === L && L ? SKLM.rows : null;   // v152: «Записи переміщення» локації (усі / мої); без локації — мої відправлені
+  const mvAll = SKLM.loc === L && (L || SKLM.rows.length || !SKLM.load) ? SKLM.rows : null;   // v169: і без локації — мої   // v152: «Записи переміщення» локації (усі / мої); без локації — мої відправлені
   const mvs = mvAll ? mvAll.filter(t => !SKFL.mine || t.mine).map(t => Object.assign({}, t, { lines: t.lines.filter(l => skFOk(l.box ? { typ: l.typ, kv: '*', color: '*' } : skAttr(l.pos, l.typ))) })).filter(t => t.lines.length) : sent;
   const inWay = mvs.filter(t => t.status === 'в дорозі').length;
   h += fold('tr', 'Записи переміщення (' + (mvAll && SKLM.load ? '…' : mvs.length) + ')' + (mvAll && (SKFL.mine || skFOn()) ? ' <span class="muted" style="font-weight:400">' + (SKFL.mine ? 'мої' : '') + (skFOn() ? (SKFL.mine ? ', ' : '') + 'за фільтрами' : '') + '</span>' : '') + (inWay ? warn('в дорозі: ' + inWay) : ''),
     !mvs.length ? '<p class="muted">' + (mvAll && SKLM.load ? 'Завантажую…' : 'Записів немає.') + '</p>' :
-    '<div class="list">' + mvs.map(t => '<div class="li"><div><b>' + esc(t.id) + '</b> ' + (t.dir === 'in' ? '← ' + esc(t.fromName) : '→ ' + esc(t.toName)) + ' · <span class="pill' + (t.status === 'в дорозі' ? ' warn' : t.status === 'прийнято' ? ' ok' : '') + '" style="margin:0">' + esc(t.status) + '</span>' +
-      '<br><span class="muted">' + esc(t.who) + ' · ' + esc(t.time) + (t.by ? ' · прийняв(ла) ' + esc(t.by) + ' ' + esc(t.at) : '') + (t.comment ? ' · ' + esc(t.comment) : '') + '</span>' +
-      t.lines.map(l => '<div class="muted">' + esc(l.pos) + (l.det ? ' (' + esc(l.det) + ')' : '') + ' — ' + esc(skNum(l.qty)) + ' ' + esc(l.unit) + (l.got !== null && l.got !== l.qty ? ' · <b style="color:#9B231A">прийнято ' + esc(skNum(l.got)) + '</b>' : '') + (l.note ? ' · ' + esc(l.note) : '') + '</div>').join('') + '</div>' +
-      (t.canCancel ? '<div class="r"><button class="ic" onclick="skTrCancel(\'' + esc(t.id) + '\')">✖</button></div>' : '') + '</div>').join('') + '</div>');
+    mvs.map(skTrRow).join(''));
   if ((docs.length || rcv.length) && skLocOf(L).kind !== 'shop') h += fold('pr', 'Приходи від постачальників (' + rcv.length + ')' + (docs.length ? warn('чекають документ: ' + docs.length) : ''),   // v108; v122: «Чекають документ» — тут, першими
     (docs.length ? '<div class="list" style="border-left:3px solid #E0A400">' + docs.map(p => '<div class="li"><div><b>' + esc(p.pr) + '</b> · ' + esc(p.time.slice(0, 5)) + ' · ' + esc(p.supplier) + (p.docNo ? ' · ' + esc(p.docNo) : '') +
       ' · <span class="pill warn" style="margin:0">чекає документ</span><br><span class="muted">' + esc(p.who) + ' · ' + esc(p.lines.map(l => l.pos + ' ' + skNfmt(l.qty) + ' ' + l.unit).join('; ')) + '</span></div>' +
