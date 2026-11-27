@@ -777,7 +777,8 @@
 <div class="net" id="net" role="alert" aria-live="assertive"><div class="nb"><div class="rt" id="netr"></div><div class="nt" id="nett">Зберігаю…</div><div class="ns" id="nets"></div><div class="np"><i id="netp"></i></div><div class="nh" id="neth"></div><div class="zc" id="zc"></div><button class="nx" id="netx" type="button">Не чекати</button></div></div>
 
 <script>
-const PAGE_VERSION = 'index.html v166 · 27.11.2026';   // v166 (27.11): «Змінити залишок» — поруч із «±» поле «стане» (фактично): вписали одне — друге рахується одразу (skAdjPair).
+const PAGE_VERSION = 'index.html v167 · 27.11.2026';   // v167 (27.11): «Змінити залишок» — «±» і «стане» окремими колонками, вирівняно; «Є» — праворуч, як числа.
+//     // v166 (27.11): «Змінити залишок» — поруч із «±» поле «стане» (фактично): вписали одне — друге рахується одразу (skAdjPair).
 //     // v165 (27.11, Code.gs v181 / Sklad.gs v74): картка партії — «📦 Перемістити на склад» (напівфабрикат за назвою, увесь залишок — тара вільна; замість v62 «📦 На склад» з тарою);
 //   вільна тара — «📦 Нова партія із запасу цеху»; «🎨 Колір» → «✎ Характеристики» (типорозмір, KV, колір, версія — тімлід і вище, Code.gs setAttrs).
 //     // v164 (27.11): «Залишки» — рядок «у партії МЛП M-…» — посилання на сторінку партії.
@@ -6218,14 +6219,14 @@ function skBalTDraw() {
   const names = Object.keys(bal).filter(n => (Math.abs(bal[n][0]) > 1e-9 || bal[n][2] > 1e-9) && (byU[n] ? byU[n].some(skFOk) : sm[n] ? true : skFOk(skAttr(n))));   // v152: фильтри
   const groups = ['Двигуни'].concat((d.groups || []).filter(g => g !== 'Двигуни')); names.forEach(n => { const g = grpOf[n] || d.other; if (groups.indexOf(g) < 0) groups.push(g); });
   const by = {}; names.forEach(n => (by[grpOf[n] || d.other] = by[grpOf[n] || d.other] || []).push(n));
-  const cols = 3 + (ed && !mv ? 2 : 1);   // v153: у режимі перегляду — колонка приміток (ящики ГП)
+  const cols = 3 + (ed && !mv ? 3 : 1);   // v167: ± · стане · коментар   // v153: у режимі перегляду — колонка приміток (ящики ГП)
   const th = s => '<th style="text-align:left;padding:6px 6px 6px 0;font-size:12px;color:#66767F;border-bottom:1px solid #C5D0D7">' + s + '</th>';
   const td = (s, st) => '<td style="padding:5px 6px 5px 0;border-bottom:1px solid #EEF2F5;vertical-align:middle;' + (st || '') + '">' + s + '</td>';
   const inp = (cls, ph, w, extra) => '<input type="text" class="' + cls + '" placeholder="' + ph + '"' + (extra || '') + ' style="margin:0;padding:6px 8px;font-size:15px;width:' + w + '">';
   const sumU = (arr, u) => arr.filter(x => x[2] === u).reduce((s, x) => s + x[1], 0);
   let rows = '', gi = 0;
   // v157: палети ГП і зібрані для покупців партії — окремі групи вгорі (лише перегляд; ящики в них у «Двигунах» не числяться)
-  const xcell = () => ed ? (mv ? td('') : td('') + td('')) : td('');
+  const xcell = () => ed ? (mv ? td('') : td('') + td('') + td('')) : td('');
   const pals = (SKBT.pals[loc] || []).filter(p => !skFOn() || p.boxes.some(skFOk)), ships = SKBT.ships[loc] || [];
   const xGroup = (gn, list, rowFn) => { if (!list.length) return; gi++; const gOpen = SKBT.og[gn] !== false;
     rows += '<tr class="btg" data-g="' + gi + '" data-gn="' + esc(gn) + '" style="cursor:pointer"><td colspan="' + cols + '" style="padding:10px 0 4px;font-weight:bold;color:#2A78D6">' +
@@ -6263,9 +6264,9 @@ function skBalTDraw() {
       const bN = [boxes.length ? 'ящиків ' + boxes.length : '', sq ? 'у партіях МЛП ' + skNfmt(sq) : ''].filter(Boolean).map(t => '<span class="muted" style="font-size:12px">' + t + '</span>').join('<br>');   // v153: «ящиків N» — у колонку коментаря; v158: + у партіях
       if (!ed) cell = td(bN);
       else if (gpW && mv) cell = td(inp('btGm', 'скільки', '80px', ' data-max="' + b[0] + '"'));
-      else if (gpW) cell = td(skAdjPairH('btGd', 'btGf', b[0], inp), 'white-space:nowrap') + td(inp('btGc', 'коментар', '100%'), 'min-width:120px');   // v166: ± і «стане»
+      else if (gpW) cell = skAdjPairH('btGd', 'btGf', b[0], inp, '', td) + td(inp('btGc', 'коментар', '100%'), 'min-width:120px');   // v166: ± і «стане»; v167 — окремі колонки
       else if (mv) cell = td(ro ? bN : split ? '<span class="muted" style="font-size:12px">за технічними ↓</span>' : inp('btM', 'скільки', '80px', ' data-max="' + Math.round((b[0] - sq) * 1000) / 1000 + '"'));
-      else cell = td(ro ? '' : skAdjPairH('btD', 'btF', b[0], inp), 'white-space:nowrap') + td(ro ? bN : inp('btC', 'коментар', '100%'), 'min-width:120px');   // v166
+      else cell = (ro ? td('') + td('') : skAdjPairH('btD', 'btF', b[0], inp, '', td)) + td(ro ? bN : inp('btC', 'коментар', '100%'), 'min-width:120px');   // v166; v167 — окремі колонки
       rows += '<tr class="btr" data-g="' + gi + '" data-pos="' + esc(n) + '" data-u="' + esc(b[1]) + '" data-k="' + esc((n + ' ' + g + ' ' + kids.map(a => a[0]).join(' ') + ' ' + boxes.map(x => x.name).join(' ')).toLowerCase()) + '"' +
         (sel ? ' style="background:#EAF2FC"' : '') + '>' +
         td(((kids.length || (boxes.length && !gpW)) ? '<span class="btui" style="cursor:pointer;color:#2A78D6">' + (uOpen ? '▾' : '▸') + '</span> ' : '<span style="display:inline-block;width:12px"></span> ') +
@@ -6275,13 +6276,13 @@ function skBalTDraw() {
       kids.forEach(a => {
         rows += '<tr class="btt" data-g="' + gi + '" data-p="' + esc(n) + '"' + (gOpen && uOpen ? '' : ' style="display:none"') + '>' +
           td('<span class="muted" style="font-size:13px">' + (a[5] || esc(a[0])) + '</span>', 'padding-left:34px') + td(esc(skNfmt(a[1])), 'text-align:right;white-space:nowrap;font-size:13px;color:#66767F') +
-          td(esc(a[2]), 'color:#66767F;font-size:13px') + (ed ? (split && !a[4] ? td(inp('btTq', 'скільки', '80px', ' data-pos="' + esc(n) + '" data-nm="' + esc(a[0]) + '" data-u="' + esc(a[2]) + '" data-max="' + a[1] + '"')) : td('')) + (mv ? '' : td('')) : td('')) + '</tr>'; });
+          td(esc(a[2]), 'color:#66767F;font-size:13px') + (ed ? (split && !a[4] ? td(inp('btTq', 'скільки', '80px', ' data-pos="' + esc(n) + '" data-nm="' + esc(a[0]) + '" data-u="' + esc(a[2]) + '" data-max="' + a[1] + '"')) : td('')) + (mv ? '' : td('') + td('')) : td('')) + '</tr>'; });
       if (!gpW) boxes.forEach(x => {
         rows += '<tr class="btt" data-g="' + gi + '" data-p="' + esc(n) + '"' + (gOpen && uOpen ? '' : ' style="display:none"') + '>' +
           td('<span style="font-size:13px">📦 ' + esc(x.name) + '</span>' + (x.total < x.per ? ' <span class="muted" style="font-size:12px">неповний</span>' : '') + ' <span class="muted" style="font-size:12px;margin-left:6px">' + esc(x.last) + '</span>', 'padding-left:34px') +   // v154: дата — у тому ж рядку після назви ящика; v153: маркування не дублюємо
           td(esc(skNfmt(x.total)), 'text-align:right;white-space:nowrap;font-size:13px') + td('шт', 'color:#66767F;font-size:13px') +
           (ed ? (mv ? td('<input type="checkbox" class="btX" data-box="' + esc(x.id) + '" data-n="' + esc(x.name) + '" data-q="' + x.total + '" style="transform:scale(1.4)">')
-            : kind === 'wh' ? td(skAdjPairH('btBd', 'btBf', x.total, inp, ' data-box="' + esc(x.id) + '" data-n="' + esc(x.name) + '" data-q="' + x.total + '"'), 'white-space:nowrap') + td(inp('btBc', 'коментар', '100%')) : td('') + td('')) : td('')) + '</tr>'; });   // v159: ящик ГП складу — ±
+            : kind === 'wh' ? skAdjPairH('btBd', 'btBf', x.total, inp, ' data-box="' + esc(x.id) + '" data-n="' + esc(x.name) + '" data-q="' + x.total + '"', td) + td(inp('btBc', 'коментар', '100%')) : td('') + td('') + td('')) : td('')) + '</tr>'; });   // v159: ящик ГП складу — ±
     });
   });
   const tgts = ((d.targets || {})[loc] || []).map(skLocOf), tg = (k, t) => { const a = tgts.filter(l => l.kind === k); return a.length ? '<optgroup label="' + t + '">' + a.map(l => '<option value="' + esc(l.code) + '">' + esc(skLocLab(l)) + '</option>').join('') + '</optgroup>' : ''; };
@@ -6295,8 +6296,8 @@ function skBalTDraw() {
     '<div class="row" style="align-items:center;margin-top:8px;gap:6px"><input type="text" id="btQ" placeholder="пошук: назва, група, технічна, ящик" value="' + esc(SKBT.q) + '" style="min-width:0;margin:0">' +
     '<button type="button" class="btn btn2" id="btLvM" style="flex:0 0 auto;width:auto;margin:0;padding:8px 10px">− рівень</button>' +
     '<button type="button" class="btn btn2" id="btLvP" style="flex:0 0 auto;width:auto;margin:0;padding:8px 10px">+ рівень</button></div>' +
-    ((names.length || pals.length || ships.length) ? '<div style="overflow-x:auto"><table style="border-collapse:collapse;width:100%;margin-top:6px"><tr>' + th('Група · позиція · технічна / ящик') + th('Є') + th('Од.') +
-      (ed ? (mv ? th('Скільки') : th('± · стане') + th('Коментар')) : th('')) + '</tr>' + rows + '</table></div>' : '<p class="muted">На цій локації в обліку нічого немає.</p>') +
+    ((names.length || pals.length || ships.length) ? '<div style="overflow-x:auto"><table style="border-collapse:collapse;width:100%;margin-top:6px"><tr>' + th('Група · позиція · технічна / ящик') + th('Є').replace('text-align:left', 'text-align:right') + th('Од.') +
+      (ed ? (mv ? th('Скільки') : th('±') + th('стане') + th('Коментар')) : th('')) + '</tr>' + rows + '</table></div>' : '<p class="muted">На цій локації в обліку нічого немає.</p>') +
     (SKBT.boxes[loc] === null ? '<p class="muted" style="font-size:13px">Завантажую ящики ГП…</p>' : '') +
     (ed && !mv ? '<div id="btAdd"></div><button type="button" class="btn btn2" id="btAddB" style="margin-top:8px">+ Позиція, якої немає в таблиці</button>' +
       '<button class="btn" id="btGo">Записати</button><div id="ajRecent" style="margin-top:12px"></div>' : '') +
@@ -6411,16 +6412,17 @@ function skBalTAdd() {
   $('btP' + n).onchange = () => { const v = $('btP' + n).value; $('btO' + n).style.display = v === d.other ? 'block' : 'none'; const p = d.positions.find(x => x.name === v); if (p) $('btU' + n).value = p.unit; };
 }
 /** v166: пара полів «±» і «стане» (фактично). cur — що в обліку; вписали «±» — «стане» = cur ± ; вписали «стане» — «±» = стане − cur */
-function skAdjPairH(dc, fc, cur, inp, extra) {
-  return inp(dc, '±', '72px', (extra || '') + ' data-cur="' + (Number(cur) || 0) + '" data-pair="' + fc + '"') + ' ' +
-    inp(fc, 'стане', '80px', ' data-cur="' + (Number(cur) || 0) + '" data-pair="' + dc + '" inputmode="decimal"');
+function skAdjPairH(dc, fc, cur, inp, extra, td) {   // v167: td — дві окремі клітинки (колонки «±» і «стане»)
+  const a = inp(dc, '±', '72px', (extra || '') + ' data-cur="' + (Number(cur) || 0) + '" data-pair="' + fc + '"'),
+    b = inp(fc, 'стане', '80px', ' data-cur="' + (Number(cur) || 0) + '" data-pair="' + dc + '" inputmode="decimal"');
+  return td ? td(a) + td(b) : a + ' ' + b;
 }
 function skAdjPairWire(box) {
   const r3 = v => Math.round(v * 1000) / 1000, fmt = v => String(r3(v)).replace('.', ',');
   const num = s => { s = String(s || '').trim().replace(/\s+/g, ''); if (!s) return null; const neg = /^[-−–]/.test(s), v = skCalc(s.replace(/^[-−–+]/, '')); return isNaN(v) ? NaN : (neg ? -v : v); };
   box.addEventListener('input', e => {
     const i = e.target; if (!i.dataset || !i.dataset.pair) return;
-    const o = i.parentNode.querySelector('.' + i.dataset.pair); if (!o) return;
+    const o = (i.closest('tr') || i.parentNode).querySelector('.' + i.dataset.pair); if (!o) return;   // v167: у сусідній клітинці
     const cur = Number(i.dataset.cur) || 0, v = num(i.value);
     if (i.placeholder === '±') { o.value = v === null || isNaN(v) ? '' : fmt(cur + v); return; }
     if (v === null || isNaN(v)) { o.value = ''; return; }
