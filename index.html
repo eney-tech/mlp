@@ -777,7 +777,8 @@
 <div class="net" id="net" role="alert" aria-live="assertive"><div class="nb"><div class="rt" id="netr"></div><div class="nt" id="nett">Зберігаю…</div><div class="ns" id="nets"></div><div class="np"><i id="netp"></i></div><div class="nh" id="neth"></div><div class="zc" id="zc"></div><button class="nx" id="netx" type="button">Не чекати</button></div></div>
 
 <script>
-const PAGE_VERSION = 'index.html v177 · 27.11.2026';   // v177 (27.11): «Залишки» цеху — позиція і в запасі, і в партіях: рядок «не в партії» (лише його змінюють / переміщують) + «у тарі ТЧ-…» (посилання на тару, партія дрібно); сума = загальний.
+const PAGE_VERSION = 'index.html v178 · 27.11.2026';   // v178 (27.11): «Записати» у «Змінити залишок» знову працює (у v177 коментар закрив частину рядка).
+// v177:   // v177 (27.11): «Залишки» цеху — позиція і в запасі, і в партіях: рядок «не в партії» (лише його змінюють / переміщують) + «у тарі ТЧ-…» (посилання на тару, партія дрібно); сума = загальний.
 // v176:   // v176 (27.11): «Залишки» складу — фільтр (типорозмір, KV, колір) діє й на «Зібрано для покупців».
 // v175:   // v175 (27.11): блок «Приймання» на «Складі» оновлюється сам (при зміні локації й раз на хвилину; Sklad.gs v84).
 // v174:   // v174 (27.11): «✂ Відокремити» — рядок «Ротори покупні (до гравіювання F4п)» (Code.gs v185): лише в іншу партію M з F4п або вибуттям.
@@ -6477,7 +6478,7 @@ function skBalTSave() {
   document.querySelectorAll('#skBalT .btBd').forEach(i => { const s = i.value, v = num(s); if (v === null) return; const cm = i.closest('tr').querySelector('.btBc').value.trim();
     if (isNaN(v) || Math.round(v) !== v) return bad.push('ящик ' + i.dataset.n + ': ціле число зі знаком'); if (Number(i.dataset.q) + v < 0) return bad.push('ящик ' + i.dataset.n + ': є лише ' + i.dataset.q);
     if (!cm) return bad.push('ящик ' + i.dataset.n + ': коментар — чому'); bxl.push({ box: i.dataset.box, n: i.dataset.n, delta: s, cm: cm }); });
-  document.querySelectorAll('#skBalT tr.btr, #skBalT tr.btnb').forEach(r => { const inp0 = r.querySelector('.btD'); if (!inp0) return;   // v177: + «не в партії» const s = inp0.value, v = num(s); if (v === null) return;
+  document.querySelectorAll('#skBalT tr.btr, #skBalT tr.btnb').forEach(r => { const inp0 = r.querySelector('.btD'); if (!inp0) return; const s = inp0.value, v = num(s); if (v === null) return;   // v177: + «не в партії»
     const cm = r.querySelector('.btC').value.trim();
     if (isNaN(v)) return bad.push('«' + r.dataset.pos + '»: кількість числом зі знаком (−5 або 12)');
     if (!cm) return bad.push('«' + r.dataset.pos + '»: коментар — чому');
