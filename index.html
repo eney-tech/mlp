@@ -777,7 +777,8 @@
 <div class="net" id="net" role="alert" aria-live="assertive"><div class="nb"><div class="rt" id="netr"></div><div class="nt" id="nett">Зберігаю…</div><div class="ns" id="nets"></div><div class="np"><i id="netp"></i></div><div class="nh" id="neth"></div><div class="zc" id="zc"></div><button class="nx" id="netx" type="button">Не чекати</button></div></div>
 
 <script>
-const PAGE_VERSION = 'index.html v170 · 27.11.2026';   // v170 (27.11): «Записи переміщення» — не прийнято: права половина світло-червона (як «Приймання»); розбіжність — червона рамка,
+const PAGE_VERSION = 'index.html v171 · 27.11.2026';   // v171 (27.11): «Усі записи за 30 днів» — лише зав. складу й адміністратор (Sklad.gs v78); «Мої записи» більше не показуються.
+//     // v170 (27.11): «Записи переміщення» — не прийнято: права половина світло-червона (як «Приймання»); розбіжність — червона рамка,
 //   «нестача N → Інше» (Sklad.gs v77).
 //     // v169 (27.11): «Приймання» — звідки ⟶ куди великою стрілкою, без підписів; «Записи переміщення» — рядок = переміщення з двох половин
 //   (відправлено | прийнято), «↩ Скасувати прийняття» (Sklad.gs v76); без локації — мої (відправив або прийняв).
@@ -7091,7 +7092,7 @@ let SKQ = '';   // v43: пошук у списку записів
 function renderSkMy() {
   const all = SKD.my || [];
   const box = $('skMy'); if (!box) return;
-  if (skLocOf(SKS.loc).kind === 'shop') { box.innerHTML = ''; return; }   // v152: у цехах — лише «Записи переміщення»
+  if (skLocOf(SKS.loc).kind === 'shop' || !SKD.allView) { box.innerHTML = ''; return; }   // v152: у цехах — лише «Записи переміщення»; v171: журнал — лише зав. складу й адміністратор
   const q = SKQ.trim().toLowerCase();
   const my = q ? all.filter(x => [x.id, x.who, x.pos, x.typ, x.det, x.lot, x.mlp, x.loc, x.comment].join(' ').toLowerCase().indexOf(q) >= 0) : all;
   const st = x => x.cancelled ? ' · <b>скасовано</b>' + (x.fixWho ? ' (' + esc(x.fixWho) + (x.reason ? ': ' + esc(x.reason) : '') + ')' : '')
