@@ -777,7 +777,9 @@
 <div class="net" id="net" role="alert" aria-live="assertive"><div class="nb"><div class="rt" id="netr"></div><div class="nt" id="nett">Зберігаю…</div><div class="ns" id="nets"></div><div class="np"><i id="netp"></i></div><div class="nh" id="neth"></div><div class="zc" id="zc"></div><button class="nx" id="netx" type="button">Не чекати</button></div></div>
 
 <script>
-const PAGE_VERSION = 'index.html v169 · 27.11.2026';   // v169 (27.11): «Приймання» — звідки ⟶ куди великою стрілкою, без підписів; «Записи переміщення» — рядок = переміщення з двох половин
+const PAGE_VERSION = 'index.html v170 · 27.11.2026';   // v170 (27.11): «Записи переміщення» — не прийнято: права половина світло-червона (як «Приймання»); розбіжність — червона рамка,
+//   «нестача N → Інше» (Sklad.gs v77).
+//     // v169 (27.11): «Приймання» — звідки ⟶ куди великою стрілкою, без підписів; «Записи переміщення» — рядок = переміщення з двох половин
 //   (відправлено | прийнято), «↩ Скасувати прийняття» (Sklad.gs v76); без локації — мої (відправив або прийняв).
 //     // v168 (27.11): «Приймання» — картка переміщення 4 блоками: звідки → куди · хто й коли · що (передали / прийнято) · дії; без «Приймає: …» і пояснення.
 //     // v167 (27.11): «Змінити залишок» — «±» і «стане» окремими колонками, вирівняно; «Є» — праворуч, як числа.
@@ -7229,21 +7231,23 @@ function skFltDraw() {
 /** v169 (рішення Андрія 27.11): переміщення — один рядок з двох половин: ліворуч відправлено (звідки, хто, коли, що), праворуч прийнято (куди, хто, коли, скільки).
  *  Узяв(ла) сам(а) — обидві половини одна людина. ✖ — скасувати передачу (в дорозі), ↩ — скасувати прийняття. */
 function skTrRow(t) {
-  const st = t.status, acc = st === 'прийнято' || st === 'прийнято з розбіжністю', x = st === 'скасовано';
-  const half = (bg, inner) => '<div style="flex:1 1 220px;min-width:0;background:' + bg + ';border-radius:10px;padding:8px 10px">' + inner + '</div>';
+  const st = t.status, acc = st === 'прийнято' || st === 'прийнято з розбіжністю', x = st === 'скасовано', go = st === 'в дорозі';
+  const diff = acc && t.lines.some(l => l.got !== null && l.got !== l.qty);   // v170: розбіжність — червона рамка
+  const half = (bg, inner, bd) => '<div style="flex:1 1 220px;min-width:0;background:' + bg + ';border-radius:10px;padding:8px 10px' + (bd ? ';border:' + bd : '') + '">' + inner + '</div>';
   const left = half('#F4F7F9', '<div class="mid" style="margin:0">' + esc(t.fromName) + '</div><div style="font-size:14px;margin-top:2px"><b>' + esc(t.who) + '</b> · ' + esc(t.time) + '</div>' +
     t.lines.map(l => '<div style="font-size:14px">' + esc(l.pos) + (l.det ? ' <span class="muted">(' + esc(l.det) + ')</span>' : '') + ' — <b>' + esc(skNum(l.qty)) + '</b> ' + esc(l.unit) + '</div>').join('') +
     (t.comment ? '<div class="muted" style="font-size:13px">' + esc(t.comment) + '</div>' : '') +
     (t.canCancel ? '<button class="btn btn2" style="margin-top:6px;padding:6px 10px;width:auto" onclick="skTrCancel(\'' + esc(t.id) + '\')">✖ Скасувати передачу</button>' : ''));
   const note = (t.lines.find(l => l.note) || {}).note || '';
-  const right = half(acc ? '#EAF6EE' : x ? '#F4F4F4' : '#FFF6DD', '<div class="mid" style="margin:0">' + esc(t.toName) + '</div>' +
+  const right = half(diff || go ? '#FDECEC' : acc ? '#EAF6EE' : '#F4F4F4', '<div class="mid" style="margin:0">' + esc(t.toName) + '</div>' +
     (acc ? '<div style="font-size:14px;margin-top:2px"><b>' + esc(t.by) + '</b> · ' + esc(t.at) + (t.self ? ' <span class="muted">(узяв(ла) сам(а))</span>' : '') + '</div>' +
-      t.lines.map(l => '<div style="font-size:14px">' + esc(l.pos) + ' — <b' + (l.got !== null && l.got !== l.qty ? ' style="color:#9B231A"' : '') + '>' + esc(skNum(l.got === null ? l.qty : l.got)) + '</b> ' + esc(l.unit) + '</div>').join('')
-      : '<div style="font-size:14px;margin-top:2px">' + (x ? 'скасовано' : 'в дорозі — ще не прийняли') + '</div>') +
+      t.lines.map(l => '<div style="font-size:14px">' + esc(l.pos) + ' — <b' + (l.got !== null && l.got !== l.qty ? ' style="color:#9B231A"' : '') + '>' + esc(skNum(l.got === null ? l.qty : l.got)) + '</b> ' + esc(l.unit) +
+        (l.got !== null && l.got < l.qty && !t.virt ? ' <span style="color:#9B231A;font-size:13px">· нестача ' + esc(skNum(Math.round((l.qty - l.got) * 1000) / 1000)) + ' → «Інше»</span>' : '') + '</div>').join('')
+      : '<div style="font-size:14px;margin-top:2px;' + (go ? 'color:#9B231A;font-weight:600' : '') + '">' + (x ? 'скасовано' : 'ще не прийняли') + '</div>') +
     (note ? '<div class="muted" style="font-size:13px">' + esc(note) + '</div>' : '') +
-    (t.canUnaccept ? '<button class="btn btn2" style="margin-top:6px;padding:6px 10px;width:auto" onclick="skTrUnaccept(\'' + esc(t.id) + '\',' + (t.virt ? 1 : 0) + ')">' + (t.virt ? '↩ Скасувати операцію' : '↩ Скасувати прийняття') + '</button>' : ''));
-  return '<div style="border-top:1px solid #E7EDF1;padding:10px 0"><div style="display:flex;align-items:center;gap:8px;margin-bottom:6px"><b>' + esc(t.id) + '</b>' +
-    '<span class="pill' + (st === 'в дорозі' ? ' warn' : st === 'прийнято' ? ' ok' : '') + '" style="margin:0">' + esc(st) + '</span></div>' +
+    (t.canUnaccept ? '<button class="btn btn2" style="margin-top:6px;padding:6px 10px;width:auto" onclick="skTrUnaccept(\'' + esc(t.id) + '\',' + (t.virt ? 1 : 0) + ')">' + (t.virt ? '↩ Скасувати операцію' : '↩ Скасувати прийняття') + '</button>' : ''), go ? '1px solid #E8B4B0' : diff ? '1px solid #D9534F' : '');
+  return '<div style="' + (diff ? 'border:2px solid #D9534F;border-radius:12px;padding:8px;margin:8px 0;background:#FFF8F8' : 'border-top:1px solid #E7EDF1;padding:10px 0') + '"><div style="display:flex;align-items:center;gap:8px;margin-bottom:6px"><b>' + esc(t.id) + '</b>' +
+    '<span class="pill' + (st === 'в дорозі' || diff ? ' warn' : st === 'прийнято' ? ' ok' : '') + '" style="margin:0">' + esc(st) + '</span></div>' +
     '<div style="display:flex;flex-wrap:wrap;gap:8px;align-items:stretch">' + left + '<div style="flex:0 0 auto;align-self:center;font-size:28px;color:#2A78D6">⟶</div>' + right + '</div></div>';
 }
 function skTrUnaccept(id, virt) {   // v169: віртуальна локація — скасовується вся операція (Sklad.gs v77)
