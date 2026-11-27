@@ -777,7 +777,8 @@
 <div class="net" id="net" role="alert" aria-live="assertive"><div class="nb"><div class="rt" id="netr"></div><div class="nt" id="nett">Зберігаю…</div><div class="ns" id="nets"></div><div class="np"><i id="netp"></i></div><div class="nh" id="neth"></div><div class="zc" id="zc"></div><button class="nx" id="netx" type="button">Не чекати</button></div></div>
 
 <script>
-const PAGE_VERSION = 'index.html v171 · 27.11.2026';   // v171 (27.11): «Усі записи за 30 днів» — лише зав. складу й адміністратор (Sklad.gs v78); «Мої записи» більше не показуються.
+const PAGE_VERSION = 'index.html v172 · 27.11.2026';   // v172 (27.11): Р-9 фільтр «Працівник» — і працівники зі звірки з формою Антона (раніше лише ті, хто мав виправлення / скасування / записи за працівника).
+// v171:   // v171 (27.11): «Усі записи за 30 днів» — лише зав. складу й адміністратор (Sklad.gs v78); «Мої записи» більше не показуються.
 //     // v170 (27.11): «Записи переміщення» — не прийнято: права половина світло-червона (як «Приймання»); розбіжність — червона рамка,
 //   «нестача N → Інше» (Sklad.gs v77).
 //     // v169 (27.11): «Приймання» — звідки ⟶ куди великою стрілкою, без підписів; «Записи переміщення» — рядок = переміщення з двох половин
@@ -4162,7 +4163,7 @@ function zFbar8(rid, fields, extra) {
   fields.forEach(k => {
     const v = F.m[k] || [];
     if (lock[k]) { h += '<div class="zfr"><span class="zfl">' + esc(D[k].l) + '</span><div class="chips">' + (v.length ? v.map(x => '<button type="button" class="on" disabled>' + esc(D[k].lab(x)) + ' 🔒</button>').join('') : '<button type="button" disabled>усі 🔒</button>') + '</div></div>'; return; }
-    const all = (S.sortV || zSortVals)(k, zUniq(S.base.map(D[k].f)));
+    const all = (S.sortV || zSortVals)(k, zUniq(S.base.map(D[k].f).concat(S.optsX ? S.optsX(k) : [])));   // v172: + значення не з S.base (Р-9: працівники звірки з формою)
     v.forEach(x => { if (all.indexOf(x) < 0) all.push(x); });
     if (all.length <= ZCHIPMAX && ZPOPDIMS.indexOf(k) < 0) { h += zFrow(D[k].l, all.map(x => [x, D[k].lab(x)]), v, set(k)); return; }
     h += '<div class="zfr"><span class="zfl">' + esc(D[k].l) + '</span><div class="chips"><button type="button" class="zfbtn' + (v.length ? ' on' : '') + '" onclick="zMsOpen(\'' + rid + '\',\'' + k + '\',this)">' +
@@ -4189,7 +4190,7 @@ function zMsOpen(rid, k, btn) {
   p.style.top = Math.max(8, Math.min(r.bottom + 4, window.innerHeight - 430)) + 'px';
   zPopDraw(true);
 }
-function zPopOpts() { const S = ZST[ZPOP.rid], D = S.D || ZDIMS; return (S.sortV || zSortVals)(ZPOP.k, [...new Set(S.base.map(D[ZPOP.k].f))]); }
+function zPopOpts() { const S = ZST[ZPOP.rid], D = S.D || ZDIMS; return (S.sortV || zSortVals)(ZPOP.k, [...new Set(S.base.map(D[ZPOP.k].f).concat(S.optsX ? S.optsX(ZPOP.k) : []))].filter(x => x !== undefined && x !== null && x !== '')); }
 function zPopDraw(full) {
   if (!ZPOP) return;
   const S = ZST[ZPOP.rid], D = S.D || ZDIMS, k = ZPOP.k, cur = S.F.m[k] || [], all = zPopOpts(), q = ZPOP.q.toLowerCase();
@@ -4798,6 +4799,7 @@ const ZCDIMS = {
   worker: { l: 'Працівник', f: e => e.w, lab: v => zWN(v) }
 };
 ZST.control = { F: zMkF('month', 'w'), sel: [], more: false, rw: '', rday: '', rv: 'type', unk: false, only2: false, open: {}, raw: {}, rawDB: null, D: ZCDIMS,
+  optsX: k => k === 'worker' ? (DB.form || []).map(x => x[1]) : [],   // v172: у фільтрі «Працівник» — і ті, хто є лише у звірці з формою Антона (без виправлень / скасувань)
   sortV: (k, vals) => vals.sort((a, b) => k === 't' ? ZEVT.indexOf(a) - ZEVT.indexOf(b) : String(ZCDIMS[k].lab(a)).localeCompare(String(ZCDIMS[k].lab(b)), 'uk')) };
 zLoadPer('control');
 function r9() {
